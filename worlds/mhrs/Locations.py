@@ -30,6 +30,14 @@ mhr_quests.update({Quests.MR3Quests[qid]: QuestData(qid, "MR3", 3) for qid in Qu
 mhr_quests.update({Quests.MR4Quests[qid]: QuestData(qid, "MR4", 4) for qid in Quests.MR4Quests})
 mhr_quests.update({Quests.MR5Quests[qid]: QuestData(qid, "MR5", 5) for qid in Quests.MR5Quests})
 mhr_quests.update({Quests.MR6Quests[qid]: QuestData(qid, "MR6", 6) for qid in Quests.MR6Quests})
+mhr_quests.update({
+    "1★ - Uninvited Guest": QuestData(315100, "MR1 Urgent", 1),
+    "2★ - Scarlet Tengu in the Shrine Ruins": QuestData(315900, "MR2 Urgent", 2),
+    "3★ - A Rocky Rampage": QuestData(315901, "MR3 Urgent", 3),
+    "4★ - Ice Wolf, Red Moon": QuestData(315902, "MR4 Urgent", 4),
+    "5★ - Witness by Moonlight": QuestData(315903, "MR5 Urgent", 5),
+    "6★ - Proof of Courage": QuestData(315904, "MR6 Urgent", 6)
+})
 # Final Quest
 mhr_quests.update({"The Final Quest": QuestData(315905, "Final", -1)})
 

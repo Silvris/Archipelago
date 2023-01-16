@@ -20,7 +20,16 @@ progression_item_table = {
     "MR4 Urgent": ItemData(315902, True),
     "MR5 Urgent": ItemData(315903, True),
     "MR6 Urgent": ItemData(315904, True),
-    "Victory's Flame": ItemData(315905, True)
+    "Master Rank 1": ItemData(315905, True),
+    "Master Rank 2": ItemData(315906, True),
+    "Master Rank 3": ItemData(315907, True),
+    "Master Rank 4": ItemData(315908, True),
+    "Master Rank 5": ItemData(315909, True),
+    "Master Rank 6": ItemData(315910, True),
+    "Proof of a Hero": ItemData(315911, True),  # Item to access final quest
+    "Victory's Flame": ItemData(315912, True)   # Item showing completion of final quest
+
+
 }
 
 useful_item_table = {

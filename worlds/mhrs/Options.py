@@ -175,6 +175,10 @@ class MultiplayerGroup(TextChoice):
     display_name = "Multiplayer Group"
     # this gets passed to a dict that stores generated quest seeds,
     # so quests (but not items) can be sync'd across players
+    option_group_1 = 1
+    option_group_2 = 2
+    option_group_3 = 3
+    option_group_4 = 4
 
 
 mhrs_options: typing.Dict[str, type(Option)] = {

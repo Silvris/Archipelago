@@ -3,7 +3,8 @@ from typing import Dict, Any
 from worlds.AutoWorld import World, WebWorld
 from .Options import mhrs_options
 from .Items import lookup_name_to_id as items_lookup
-from .Items import filler_item_table, filler_weights, follower_table, useful_item_table, progression_item_table, MHRSItem
+from .Items import filler_item_table, filler_weights, follower_table, useful_item_table, progression_item_table, \
+    MHRSItem
 from .Locations import mhr_quests, MHRSQuest, get_exclusion_table
 from .Rules import set_mhrs_rules
 from .Regions import mhrs_regions, link_mhrs_regions
@@ -63,9 +64,6 @@ class MHRSWorld(World):
 
     def create_regions(self) -> None:
         def MHRSRegion(region_name: str, exits=[]):
-            if region_name == f"MR{self.multiworld.master_rank_requirement[self.player].value}":
-                print(f"Goal: MR{self.multiworld.master_rank_requirement[self.player].value}")
-                exits.append("To Final")
             region = Region(region_name, RegionType.Generic, region_name, self.player, self.multiworld)
             region.locations = [
                 MHRSQuest(self.player, name, mhr_quests[name].id, region)
@@ -76,15 +74,18 @@ class MHRSWorld(World):
             ]
             for exit in exits:
                 region.exits.append(Entrance(self.player, exit, region))
+            if region_name == f"MR{self.multiworld.master_rank_requirement[self.player].value}":
+                region.exits.append(Entrance(self.player, "To Final Quest", region))
             return region
+
         self.multiworld.regions += [MHRSRegion(*r) for r in mhrs_regions]
         link_mhrs_regions(self.multiworld, self.player)
 
-    def generate_basic(self) -> None:
+    def create_items(self) -> None:
         itempool = []
         for i in range(2, self.multiworld.master_rank_requirement[self.player].value + 1):
             itempool += [self.create_item(f"MR{i} Urgent")]
-
+        itempool += [self.create_item("Proof of a Hero")]
         # now handle player options for weapons
         weapons = [
             "Great Sword",
@@ -131,12 +132,34 @@ class MHRSWorld(World):
             for follower in follower_table:
                 itempool.append(self.create_item(follower))
         excluded_quests = get_exclusion_table(self.multiworld.master_rank_requirement[self.player].value)
-        quest_num = len(mhr_quests) - 1 - len(excluded_quests)
+        quest_num = len(mhr_quests) - 1 - \
+            self.multiworld.master_rank_requirement[self.player].value - len(excluded_quests)
         itempool += [self.create_item(self.get_filler_item_name()) for _ in range(quest_num - len(itempool))]
-        self.multiworld.get_location("The Final Quest", self.player).place_locked_item(self.create_item("Victory's Flame"))
+        self.multiworld.itempool += itempool
+
+    def generate_basic(self) -> None:
+        self.multiworld.get_location("1★ - Uninvited Guest", self.player).place_locked_item(
+            self.create_item("Master Rank 1"))
+        mr = self.multiworld.master_rank_requirement[self.player].value
+        if mr >= 2:
+            self.multiworld.get_location("2★ - Scarlet Tengu in the Shrine Ruins", self.player).place_locked_item(
+                self.create_item("Master Rank 2"))
+            if mr >= 3:
+                self.multiworld.get_location("3★ - A Rocky Rampage", self.player).place_locked_item(
+                    self.create_item("Master Rank 3"))
+                if mr >= 4:
+                    self.multiworld.get_location("4★ - Ice Wolf, Red Moon", self.player).place_locked_item(
+                        self.create_item("Master Rank 4"))
+                    if mr >= 5:
+                        self.multiworld.get_location("5★ - Witness by Moonlight", self.player).place_locked_item(
+                            self.create_item("Master Rank 5"))
+                        if mr == 6:
+                            self.multiworld.get_location("6★ - Proof of Courage", self.player).place_locked_item(
+                                self.create_item("Master Rank 6"))
+        self.multiworld.get_location("The Final Quest", self.player).place_locked_item(
+            self.create_item("Victory's Flame"))
 
         self.multiworld.completion_condition[self.player] = lambda state: state.has("Victory's Flame", self.player)
-        self.multiworld.itempool += itempool
 
     def set_rules(self):
         set_mhrs_rules(self.multiworld, self.player)

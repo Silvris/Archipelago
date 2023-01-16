@@ -1,5 +1,4 @@
 MR1Quests = {
-    315100: "1★ - Uninvited Guest",
     315101: "1★ - A Sinking Feeling",
     315102: "1★ - Need a Hunter, ASAP!",
     315103: "1★ - You Had Me at Poofy",
@@ -18,7 +17,6 @@ MR1Quests = {
 }
 
 MR2Quests = {
-    315900: "2★ - Scarlet Tengu in the Shrine Ruins",
     315200: "2★ - Sour Grapes",
     315201: "2★ - The Queen's Garden",
     315202: "2★ - The Alabaster Devourer",
@@ -43,7 +41,6 @@ MR2Quests = {
 }
 
 MR3Quests = {
-    315901: "3★ - A Rocky Rampage",
     315300: "3★ - Pollution Problems",
     315301: "3★ - Trial of the Almudron",
     315302: "3★ - My Ceanataur Gently Weeps",
@@ -72,7 +69,6 @@ MR3Quests = {
 }
 
 MR4Quests = {
-    315902: "4★ - Ice Wolf, Red Moon",
     315400: "4★ - Citadel Security",
     315401: "4★ - A Mizutsune's Appeal",
     315402: "4★ - Dust Devil Despot",
@@ -107,7 +103,6 @@ MR4Quests = {
 }
 
 MR5Quests = {
-    315903: "5★ - Witness by Moonlight",
     315500: "5★ - Seismic Scares",
     315501: "5★ - Settle the Score!",
     315502: "5★ - Bazelgeuse Warning",
@@ -130,7 +125,6 @@ MR5Quests = {
 }
 
 MR6Quests = {
-    315904: "6★ - Proof of Courage",
     315600: "6★ - The Devil's Reincarnation",
     315601: "6★ - Spine-Tingling Divinity",
     315602: "6★ - Retribution",
@@ -181,4 +175,13 @@ MR6Quests = {
     315656: "6★ - Risen Teostra",
     315661: "6★ - Sticky Secret Sticking Sauce",
     315662: "6★ - Advanced: Hail to the Fierce"
+}
+
+UrgentQuests = {
+    315100: "1★ - Uninvited Guest",
+    315900: "2★ - Scarlet Tengu in the Shrine Ruins",
+    315901: "3★ - A Rocky Rampage",
+    315902: "4★ - Ice Wolf, Red Moon",
+    315903: "5★ - Witness by Moonlight",
+    315904: "6★ - Proof of Courage"
 }

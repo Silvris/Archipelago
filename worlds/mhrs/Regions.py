@@ -1,13 +1,19 @@
 from BaseClasses import MultiWorld
 mhrs_regions = [
-    ("Menu", ["To MR1"]),
+    ("Menu", ["MR1 Urgent"]),
     ("MR1", ["MR2 Urgent"]),
     ("MR2", ["MR3 Urgent"]),
     ("MR3", ["MR4 Urgent"]),
     ("MR4", ["MR5 Urgent"]),
     ("MR5", ["MR6 Urgent"]),
     ("MR6", []),
-    ("Final", [])
+    ("Final", []),
+    ("MR1 Urgent", ["To MR1"]),
+    ("MR2 Urgent", ["To MR2"]),
+    ("MR3 Urgent", ["To MR3"]),
+    ("MR4 Urgent", ["To MR4"]),
+    ("MR5 Urgent", ["To MR5"]),
+    ("MR6 Urgent", ["To MR6"])
     # ("MR1 Requests", []),
     # ("MR2 Requests", []),
     # ("MR3 Requests", []),
@@ -18,12 +24,18 @@ mhrs_regions = [
 
 mandatory_connections = [
     ("To MR1", "MR1"),
-    ("MR2 Urgent", "MR2"),
-    ("MR3 Urgent", "MR3"),
-    ("MR4 Urgent", "MR4"),
-    ("MR5 Urgent", "MR5"),
-    ("MR6 Urgent", "MR6"),
-    ("To Final", "Final")
+    ("To MR2", "MR2"),
+    ("To MR3", "MR3"),
+    ("To MR4", "MR4"),
+    ("To MR5", "MR5"),
+    ("To MR6", "MR6"),
+    ("MR1 Urgent", "MR1 Urgent"),
+    ("MR2 Urgent", "MR2 Urgent"),
+    ("MR3 Urgent", "MR3 Urgent"),
+    ("MR4 Urgent", "MR4 Urgent"),
+    ("MR5 Urgent", "MR5 Urgent"),
+    ("MR6 Urgent", "MR6 Urgent"),
+    ("To Final Quest", "Final")
 ]
 
 
