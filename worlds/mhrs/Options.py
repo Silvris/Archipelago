@@ -115,6 +115,13 @@ class ConsolidateWeapons(Toggle):
     display_name = "Consolidate Weapon Unlocks"
 
 
+class ProgressiveArmor(Toggle):
+    """
+    Armor unlocks will be given progressively, from R1 to R7.
+    """
+    display_name = "Progressive Armor"
+
+
 class EnableFollowers(Choice):
     """
     Randomized: Followers are added to the item pool and are unlocked as they are received.
@@ -179,6 +186,7 @@ mhrs_options: typing.Dict[str, type(Option)] = {
     "include_risen": Risens,
     "progressive_weapons": ProgressiveWeapons,
     "consolidate_weapons": ConsolidateWeapons,
+    "progressive_armor": ProgressiveArmor,
     "average_monster_difficulty": AverageMonsterDifficulty,
     "monster_difficulty_deviation": MonsterDifficultyDeviation,
     "enable_followers": EnableFollowers,

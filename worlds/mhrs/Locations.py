@@ -6,6 +6,7 @@ from BaseClasses import Location
 class QuestData(typing.NamedTuple):
     id: typing.Optional[int]
     region: str
+    MR: int
 
 
 class MHRSQuest(Location):
@@ -16,21 +17,21 @@ class MHRSQuest(Location):
         self.event = not address
 
 
-# This is mostly for better
+# This is mostly for better logs
 urgent_quests = {
 
 }
 
 mhr_quests = {
-    Quests.MR1Quests[qid]: QuestData(qid, "MR1") for qid in Quests.MR1Quests
+    Quests.MR1Quests[qid]: QuestData(qid, "MR1", 1) for qid in Quests.MR1Quests
 }
-mhr_quests.update({Quests.MR2Quests[qid]: QuestData(qid, "MR2") for qid in Quests.MR2Quests})
-mhr_quests.update({Quests.MR3Quests[qid]: QuestData(qid, "MR3") for qid in Quests.MR3Quests})
-mhr_quests.update({Quests.MR4Quests[qid]: QuestData(qid, "MR4") for qid in Quests.MR4Quests})
-mhr_quests.update({Quests.MR5Quests[qid]: QuestData(qid, "MR5") for qid in Quests.MR5Quests})
-mhr_quests.update({Quests.MR6Quests[qid]: QuestData(qid, "MR6") for qid in Quests.MR6Quests})
+mhr_quests.update({Quests.MR2Quests[qid]: QuestData(qid, "MR2", 2) for qid in Quests.MR2Quests})
+mhr_quests.update({Quests.MR3Quests[qid]: QuestData(qid, "MR3", 3) for qid in Quests.MR3Quests})
+mhr_quests.update({Quests.MR4Quests[qid]: QuestData(qid, "MR4", 4) for qid in Quests.MR4Quests})
+mhr_quests.update({Quests.MR5Quests[qid]: QuestData(qid, "MR5", 5) for qid in Quests.MR5Quests})
+mhr_quests.update({Quests.MR6Quests[qid]: QuestData(qid, "MR6", 6) for qid in Quests.MR6Quests})
 # Final Quest
-mhr_quests.update({"The Final Quest": QuestData(315905, "Final")})
+mhr_quests.update({"The Final Quest": QuestData(315905, "Final", -1)})
 
 
 def get_exclusion_table(mr: int):

@@ -4,10 +4,9 @@ from worlds.AutoWorld import World, WebWorld
 from .Options import mhrs_options
 from .Items import lookup_name_to_id as items_lookup
 from .Items import filler_item_table, filler_weights, follower_table, useful_item_table, progression_item_table, MHRSItem
-from .Locations import mhr_quests, get_exclusion_table, MHRSQuest
+from .Locations import mhr_quests, MHRSQuest, get_exclusion_table
 from .Rules import set_mhrs_rules
 from .Regions import mhrs_regions, link_mhrs_regions
-from worlds.generic.Rules import exclusion_rules
 from BaseClasses import Item, ItemClassification, Region, RegionType, Entrance
 import os
 import json
@@ -64,12 +63,16 @@ class MHRSWorld(World):
 
     def create_regions(self) -> None:
         def MHRSRegion(region_name: str, exits=[]):
-            if region_name == f"MR{self.multiworld.master_rank_requirement[self.player]}":
+            if region_name == f"MR{self.multiworld.master_rank_requirement[self.player].value}":
+                print(f"Goal: MR{self.multiworld.master_rank_requirement[self.player].value}")
                 exits.append("To Final")
             region = Region(region_name, RegionType.Generic, region_name, self.player, self.multiworld)
             region.locations = [
                 MHRSQuest(self.player, name, mhr_quests[name].id, region)
-                for name in mhr_quests if mhr_quests[name].region == region_name
+                for name in mhr_quests
+                if mhr_quests[name].region == region_name
+                and mhr_quests[name].MR <= self.multiworld.master_rank_requirement[self.player].value
+                # this leaves quests higher than max MR out
             ]
             for exit in exits:
                 region.exits.append(Entrance(self.player, exit, region))
@@ -117,18 +120,18 @@ class MHRSWorld(World):
                     self.create_item(f"{weapon} Rarities 6-7"),
                     self.create_item(f"{weapon} Rarities 8-10")
                 ]
+        # handle armor
+        if self.multiworld.progressive_armor[self.player].value:
+            itempool += [self.create_item("Progressive Armor Rarity") for _ in range(10)]
+        else:
+            itempool += [self.create_item(f"Armor Rarity {i}") for i in range(1, 11)]
+
         # handle follower randomization if enabled
         if self.multiworld.enable_followers[self.player].value == 0:
             for follower in follower_table:
                 itempool.append(self.create_item(follower))
-        exclusion_pool = set()
-        exclusion_pool.update(get_exclusion_table(self.multiworld.master_rank_requirement[self.player].value))
-        exclusion_rules(self.multiworld, self.player, exclusion_pool)
-        # place filler items at the excluded quests
-        for quest in exclusion_pool:
-            self.multiworld.get_location(quest, self.player).place_locked_item(self.create_item(self.get_filler_item_name()))
-
-        quest_num = len(mhr_quests) - 1 - len(exclusion_pool)
+        excluded_quests = get_exclusion_table(self.multiworld.master_rank_requirement[self.player].value)
+        quest_num = len(mhr_quests) - 1 - len(excluded_quests)
         itempool += [self.create_item(self.get_filler_item_name()) for _ in range(quest_num - len(itempool))]
         self.multiworld.get_location("The Final Quest", self.player).place_locked_item(self.create_item("Victory's Flame"))
 
@@ -153,6 +156,7 @@ class MHRSWorld(World):
             "include_risen": self.multiworld.include_risen[self.player].value,
             "progressive_weapons": self.multiworld.progressive_weapons[self.player].value,
             "consolidate_weapons": self.multiworld.consolidate_weapons[self.player].value,
+            "progressive_armor": self.multiworld.progressive_armor[self.player].value,
             "average_monster_difficulty": self.multiworld.average_monster_difficulty[self.player].value,
             "monster_difficulty_deviation": self.multiworld.monster_difficulty_deviation[self.player].value,
             "enable_followers": self.multiworld.enable_followers[self.player].value,
