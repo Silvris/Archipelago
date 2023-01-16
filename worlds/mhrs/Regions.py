@@ -29,8 +29,4 @@ mandatory_connections = [
 
 def link_mhrs_regions(world: MultiWorld, player: int):
     for exit, region in mandatory_connections:
-        e = world.get_entrance(exit, player)
-        r = world.get_region(region, player)
         world.get_entrance(exit, player).connect(world.get_region(region, player))
-    # now apply final goal region
-    print(world.get_entrance("To Final", player).name, world.get_entrance("To Final", player).connected_region, world.get_entrance("To Final", player).parent_region, player)
