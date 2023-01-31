@@ -3,6 +3,16 @@ import typing
 from Options import Option, DeathLink, Choice, Range, Toggle, DefaultOnToggle, TextChoice
 
 
+class NumericGoal(Range):
+    """
+    Determines the number of "Proof of a Hero" required to gain access to the final quest.
+    """
+    display_name = "Required Proofs"
+    range_start = 1
+    range_end = 7
+    default = 2
+
+
 class Goal(Choice):
     """
     Determines the monster present within the final urgent quest.
@@ -183,6 +193,7 @@ class MultiplayerGroup(TextChoice):
 
 mhrs_options: typing.Dict[str, type(Option)] = {
     "death_link": DeathLink,
+    "required_proofs": NumericGoal,
     "final_quest_target": Goal,
     "master_rank_requirement": MasterRankGoal,
     "enable_affliction": EnableAfflicted,

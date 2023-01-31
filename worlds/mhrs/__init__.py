@@ -6,13 +6,12 @@ from .Items import lookup_name_to_id as items_lookup
 from .Items import filler_item_table, filler_weights, follower_table, useful_item_table, progression_item_table, \
     MHRSItem
 from .Locations import mhr_quests, MHRSQuest, get_exclusion_table
+from .Quests import FinalQuests
 from .Rules import set_mhrs_rules
 from .Regions import mhrs_regions, link_mhrs_regions
 from BaseClasses import Item, ItemClassification, Region, RegionType, Entrance
 import os
 import json
-
-MultiplayerGroupSeeds = dict()
 
 
 class MHRSWebWorld(WebWorld):
@@ -28,15 +27,16 @@ class MHRSWorld(World):
     game: str = "Monster Hunter Rise Sunbreak"
     option_definitions = mhrs_options
     web = MHRSWebWorld()
-    topology_present = True
     data_version = 0
     base_id = 315100
 
     item_name_to_id = items_lookup
     location_name_to_id = {name: mhr_quests[name].id for name in mhr_quests}
+    MHRSMultiplayerGroupSeeds = dict()
+    final_bosses = dict()
 
     def _get_alphanumeric_seed(self):
-        length = 23
+        length = 32
         chars = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
         seed = ""
         for _ in range(length):
@@ -46,11 +46,11 @@ class MHRSWorld(World):
     def get_quest_seed(self, group: str):
         if group == "":
             return self._get_alphanumeric_seed()
-        elif group in MultiplayerGroupSeeds:
-            return MultiplayerGroupSeeds[group]
+        elif group in self.MHRSMultiplayerGroupSeeds:
+            return self.MHRSMultiplayerGroupSeeds[group]
         else:
             seed = self._get_alphanumeric_seed()
-            MultiplayerGroupSeeds[group] = seed
+            self.MHRSMultiplayerGroupSeeds[group] = seed
             return seed
 
     def create_item(self, name: str) -> Item:
@@ -61,6 +61,29 @@ class MHRSWorld(World):
             classification = ItemClassification.useful
         item = MHRSItem(name, classification, items_lookup[name], self.player)
         return item
+
+    def get_final_boss(self, player):
+        # first check if we have already defined this player's final boss
+        if player in self.final_bosses:
+            return self.final_bosses[player]
+        else:
+            # define the player's final boss, is it a preset option?
+            target = self.multiworld.final_quest_target[player].value
+            if target not in [0, 1]:
+                return target
+            else:
+                # roll a random boss for the player
+                boss_table = [i for i in range(2, 19)]
+                if target == 0:
+                    boss_table.append(21)  # do it this way while we wait for 19 and 20 to become valid
+                boss = self.multiworld.random.choice(boss_table)
+
+                self.final_bosses[player] = boss
+                return boss
+
+    def get_final_quest(self, player):
+        boss = self.get_final_boss(player)
+        return f"{self.multiworld.master_rank_requirement[self.player].value}★ - {FinalQuests[boss]}"
 
     def create_regions(self) -> None:
         def MHRSRegion(region_name: str, exits=[]):
@@ -75,7 +98,7 @@ class MHRSWorld(World):
             for exit in exits:
                 region.exits.append(Entrance(self.player, exit, region))
             if region_name == f"MR{self.multiworld.master_rank_requirement[self.player].value}":
-                region.exits.append(Entrance(self.player, "To Final Quest", region))
+                region.locations.append(MHRSQuest(self.player, self.get_final_quest(self.player), None, region))
             return region
 
         self.multiworld.regions += [MHRSRegion(*r) for r in mhrs_regions]
@@ -83,9 +106,12 @@ class MHRSWorld(World):
 
     def create_items(self) -> None:
         itempool = []
-        for i in range(2, self.multiworld.master_rank_requirement[self.player].value + 1):
+        MR = self.multiworld.master_rank_requirement[self.player].value
+        for i in range(2, MR + 1):
             itempool += [self.create_item(f"MR{i} Urgent")]
-        itempool += [self.create_item("Proof of a Hero")]
+        itempool += [self.create_item("Proof of a Hero")
+                     for _ in range(self.multiworld.required_proofs[self.player].value)]
+
         # now handle player options for weapons
         weapons = [
             "Great Sword",
@@ -111,29 +137,29 @@ class MHRSWorld(World):
         if progressive:
             for weapon in weapons:
                 itempool += [
-                    self.create_item(f"Progressive {weapon}") for _ in range(4)
+                    self.create_item(f"Progressive {weapon}") for _ in range(4 if MR > 4 else 3)
                 ]
         else:
             for weapon in weapons:
                 itempool += [
                     self.create_item(f"{weapon} Rarities 1-3"),
                     self.create_item(f"{weapon} Rarities 4-5"),
-                    self.create_item(f"{weapon} Rarities 6-7"),
-                    self.create_item(f"{weapon} Rarities 8-10")
+                    self.create_item(f"{weapon} Rarities 6-7")
                 ]
+                if MR > 4:
+                    itempool += [self.create_item(f"{weapon} Rarities 8-10")]
         # handle armor
         if self.multiworld.progressive_armor[self.player].value:
-            itempool += [self.create_item("Progressive Armor Rarity") for _ in range(10)]
+            itempool += [self.create_item("Progressive Armor Rarity") for _ in range(10 if MR > 3 else 7)]
         else:
-            itempool += [self.create_item(f"Armor Rarity {i}") for i in range(1, 11)]
+            itempool += [self.create_item(f"Armor Rarity {i}") for i in range(1, 11 if MR > 3 else 8)]
 
         # handle follower randomization if enabled
         if self.multiworld.enable_followers[self.player].value == 0:
             for follower in follower_table:
                 itempool.append(self.create_item(follower))
         excluded_quests = get_exclusion_table(self.multiworld.master_rank_requirement[self.player].value)
-        quest_num = len(mhr_quests) - 1 - \
-            self.multiworld.master_rank_requirement[self.player].value - len(excluded_quests)
+        quest_num = len(mhr_quests) - 7 - len(excluded_quests)
         itempool += [self.create_item(self.get_filler_item_name()) for _ in range(quest_num - len(itempool))]
         self.multiworld.itempool += itempool
 
@@ -156,23 +182,31 @@ class MHRSWorld(World):
                         if mr == 6:
                             self.multiworld.get_location("6★ - Proof of Courage", self.player).place_locked_item(
                                 self.create_item("Master Rank 6"))
-        self.multiworld.get_location("The Final Quest", self.player).place_locked_item(
+        self.multiworld.get_location(self.get_final_quest(self.player), self.player).place_locked_item(
             self.create_item("Victory's Flame"))
 
         self.multiworld.completion_condition[self.player] = lambda state: state.has("Victory's Flame", self.player)
 
     def set_rules(self):
-        set_mhrs_rules(self.multiworld, self.player)
+        set_mhrs_rules(self.multiworld, self.player, self.get_final_quest(self.player))
 
     def get_filler_item_name(self) -> str:
         return self.multiworld.random.choices(list(filler_item_table.keys()), weights=list(filler_weights.values()))[0]
 
+    def get_filler_hints(self):
+        hints = list()
+        for location in self.multiworld.get_locations(self.player):
+            if location.item.player == self.player and location.item.classification == ItemClassification.filler:
+                hints.append(location.address)
+
+        return hints
+
     def fill_slot_data(self) -> Dict[str, Any]:
         slot_data = {
             "quest_seed": self.get_quest_seed(self.multiworld.multiplayer_group[self.player].value),
-            "item_seed": self._get_alphanumeric_seed(),
             "death_link": self.multiworld.death_link[self.player].value,
-            "final_quest_target": self.multiworld.final_quest_target[self.player].value,
+            "required_proofs": self.multiworld.required_proofs[self.player].value,
+            "final_quest_target": self.get_final_boss(self.player),  # just in case somehow it wasn't called before
             "master_rank_requirement": self.multiworld.master_rank_requirement[self.player].value,
             "enable_affliction": self.multiworld.enable_affliction[self.player].value,
             "include_apex": self.multiworld.include_apex[self.player].value,
@@ -185,7 +219,8 @@ class MHRSWorld(World):
             "enable_followers": self.multiworld.enable_followers[self.player].value,
             "disable_multiplayer_scaling": self.multiworld.disable_multiplayer_scaling[self.player].value,
             "multiplayer_group": self.multiworld.multiplayer_group[self.player].value,
-            "give_khezu_music": self.multiworld.give_khezu_music[self.player].value
+            "give_khezu_music": self.multiworld.give_khezu_music[self.player].value,
+            "filler_hint_table": self.get_filler_hints()
         }
         return slot_data
 

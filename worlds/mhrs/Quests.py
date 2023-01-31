@@ -139,17 +139,17 @@ MR6Quests = {
     315611: "6★ - Bringing Back That Sparkle",
     315612: "6★ - Trials of Passion and Composure",
     315613: "6★ - Unreasonable Rage",  # TODO: Rename these quests
-    315614: "6★ - Unreasonable Rage",
-    315615: "6★ - Unreasonable Rage",
-    315616: "6★ - Unreasonable Rage",
-    315617: "6★ - Unreasonable Rage",
-    315618: "6★ - Unreasonable Rage",
+    315614: "6★ - Unreasonable Rage 2",
+    315615: "6★ - Unreasonable Rage 3",
+    315616: "6★ - Unreasonable Rage 4",
+    315617: "6★ - Unreasonable Rage 5",
+    # 315618: "6★ - Unreasonable Rage", redacted, using this quest as the final quest
     315619: "6★ - Mysterious Glow",    # TODO: Rename these quests
-    315620: "6★ - Mysterious Glow",
-    315621: "6★ - Mysterious Glow",
-    315622: "6★ - Mysterious Glow",
-    315623: "6★ - Mysterious Glow",
-    315624: "6★ - Mysterious Glow",
+    315620: "6★ - Mysterious Glow 2",
+    315621: "6★ - Mysterious Glow 3",
+    315622: "6★ - Mysterious Glow 4",
+    315623: "6★ - Mysterious Glow 5",
+    315624: "6★ - Mysterious Glow 6",
     315625: "6★ - Unbridled Mayhem",
     315626: "6★ - Dance of The Fierce Flame",
     315627: "6★ - Monster Mash",
@@ -184,4 +184,28 @@ UrgentQuests = {
     315902: "4★ - Ice Wolf, Red Moon",
     315903: "5★ - Witness by Moonlight",
     315904: "6★ - Proof of Courage"
+}
+
+# special case, these are the quest names to be used for the final quest
+FinalQuests = {
+    2: "Gaismagorm",
+    3: "Kushala Daora",
+    4: "Chameleos",
+    5: "Teostra",
+    6: "Scorned Magnamalo",
+    7: "Malzeno",
+    8: "Shagaru Magala",
+    9: "Crimson Glow Valstrax",
+    10: "Wind Serpent Ibushi",
+    11: "Narwa the Allmother",
+    12: "Gold Rathian",
+    13: "Silver Rathalos",
+    14: "Lucent Nargacuga",
+    15: "Flaming Espinas",
+    16: "Violet Mizutsune",
+    17: "Furious Rajang",
+    18: "Chaotic Gore Magala",
+    19: "Velkhana",
+    20: "Amatsu",
+    21: "The Hunting Road"
 }
