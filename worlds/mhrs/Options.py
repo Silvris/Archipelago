@@ -1,6 +1,6 @@
 import typing
 
-from Options import Option, DeathLink, Choice, Range, Toggle, DefaultOnToggle, TextChoice
+from Options import Option, DeathLink, Choice, Range, Toggle, DefaultOnToggle, TextChoice, SpecialRange
 
 
 class NumericGoal(Range):
@@ -10,7 +10,7 @@ class NumericGoal(Range):
     display_name = "Required Proofs"
     range_start = 1
     range_end = 7
-    default = 2
+    default = 3
 
 
 class Goal(Choice):
@@ -49,8 +49,8 @@ class Goal(Choice):
 class Apexes(Choice):
     """
     Enable: Adds the Apexes into the regular pool and final boss pool (no effect for specific boss seeds)
-    Enforce: Replaces all Arzuros, Rathian, Mizutsune, Rathalos, Zinogre, and Diablos with their Apex equivalents, and
-    adds them to the final boss pool.
+    Enforce: Replaces all Arzuros, Rathian, Mizutsune, Rathalos, Zinogre, and Diablos with their Apex equivalents,
+    and adds them to the final boss pool.
     Disable: Apexes cannot be generated for quests.
     """
     display_name = "Include Apexes"
@@ -91,14 +91,19 @@ class MasterRankGoal(Range):
     default = 3
 
 
-class AverageMonsterDifficulty(Range):
+class AverageMonsterDifficulty(SpecialRange):
     """
     The average difficulty of the generated monsters. This will be further scaled by the quest's MR.
     """
     display_name = "Average Monster Difficulty"
     range_start = 0
-    range_end = 100
-    default = 50
+    range_end = 172
+    default = 62
+    special_range_names = {
+        "easy": 36,
+        "normal": 62,
+        "hard": 107
+    }
 
 
 class MonsterDifficultyDeviation(Range):
@@ -127,7 +132,7 @@ class ConsolidateWeapons(Toggle):
 
 class ProgressiveArmor(Toggle):
     """
-    Armor unlocks will be given progressively, from R1 to R7.
+    Armor unlocks will be given progressively, from R1 to R10.
     """
     display_name = "Progressive Armor"
 

@@ -40,7 +40,7 @@ class MHRSWorld(World):
         chars = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
         seed = ""
         for _ in range(length):
-            seed += chars[self.multiworld.slot_seeds[self.player].randrange(0, len(chars) - 1, 1)]
+            seed += chars[self.multiworld.per_slot_randoms[self.player].randrange(0, len(chars) - 1, 1)]
         return seed
 
     def get_quest_seed(self, group: str):
@@ -76,7 +76,7 @@ class MHRSWorld(World):
                 boss_table = [i for i in range(2, 19)]
                 if target == 0:
                     boss_table.append(21)  # do it this way while we wait for 19 and 20 to become valid
-                boss = self.multiworld.random.choice(boss_table)
+                boss = self.multiworld.per_slot_randoms[self.player].choice(boss_table)
 
                 self.final_bosses[player] = boss
                 return boss
@@ -99,6 +99,7 @@ class MHRSWorld(World):
                 region.exits.append(Entrance(self.player, exit, region))
             if region_name == f"MR{self.multiworld.master_rank_requirement[self.player].value}":
                 region.locations.append(MHRSQuest(self.player, self.get_final_quest(self.player), None, region))
+                self.location_name_to_id[self.get_final_quest(self.player)] = 315618
             return region
 
         self.multiworld.regions += [MHRSRegion(*r) for r in mhrs_regions]
@@ -150,16 +151,19 @@ class MHRSWorld(World):
                     itempool += [self.create_item(f"{weapon} Rarities 8-10")]
         # handle armor
         if self.multiworld.progressive_armor[self.player].value:
-            itempool += [self.create_item("Progressive Armor Rarity") for _ in range(10 if MR > 3 else 7)]
+            itempool += [self.create_item("Progressive Armor Rarity") for _ in range(3)]
         else:
-            itempool += [self.create_item(f"Armor Rarity {i}") for i in range(1, 11 if MR > 3 else 8)]
+            itempool += [self.create_item(f"Armor Rarity 1-4"),
+                         self.create_item(f"Armor Rarity 5-7"),
+                         self.create_item(f"Armor Rarity 8-10"),
+                         ]
 
         # handle follower randomization if enabled
         if self.multiworld.enable_followers[self.player].value == 0:
             for follower in follower_table:
                 itempool.append(self.create_item(follower))
         excluded_quests = get_exclusion_table(self.multiworld.master_rank_requirement[self.player].value)
-        quest_num = len(mhr_quests) - 7 - len(excluded_quests)
+        quest_num = len(mhr_quests) - 6 - len(excluded_quests)
         itempool += [self.create_item(self.get_filler_item_name()) for _ in range(quest_num - len(itempool))]
         self.multiworld.itempool += itempool
 

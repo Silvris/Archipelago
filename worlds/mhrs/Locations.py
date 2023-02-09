@@ -38,8 +38,7 @@ mhr_quests.update({
     "5★ - Witness by Moonlight": QuestData(315903, "MR4", 5),
     "6★ - Proof of Courage": QuestData(315904, "MR5", 6)
 })
-# Final Quest
-mhr_quests.update({"The Final Quest": QuestData(315905, "Final", -1)})
+
 
 
 def get_exclusion_table(mr: int):

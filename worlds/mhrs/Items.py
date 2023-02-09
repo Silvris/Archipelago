@@ -130,19 +130,12 @@ useful_item_table = {
     "Progressive Weapon": ItemData(315274, False),
 
     # Armor
-    "Armor Rarity 1": ItemData(315275, False),
-    "Armor Rarity 2": ItemData(315276, False),
-    "Armor Rarity 3": ItemData(315277, False),
-    "Armor Rarity 4": ItemData(315278, False),
-    "Armor Rarity 5": ItemData(315279, False),
-    "Armor Rarity 6": ItemData(315280, False),
-    "Armor Rarity 7": ItemData(315281, False),
-    "Armor Rarity 8": ItemData(315282, False),
-    "Armor Rarity 9": ItemData(315283, False),
-    "Armor Rarity 10": ItemData(315284, False),
+    "Armor Rarity 1-4": ItemData(315275, False),
+    "Armor Rarity 5-7": ItemData(315276, False),
+    "Armor Rarity 8-10": ItemData(315277, False),
 
     #Progressive Armor
-    "Progressive Armor Rarity": ItemData(315285, False)
+    "Progressive Armor Rarity": ItemData(315278, False)
 }
 
 filler_item_table = {
