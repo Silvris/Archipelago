@@ -150,7 +150,7 @@ class EnableFollowers(Choice):
     default = 0
 
 
-class FollowerStrength(Range):
+class FollowerStrength(SpecialRange):
     """
     The strength of followers. By default, they do 14% of their theoretical damage.
     """
@@ -158,6 +158,12 @@ class FollowerStrength(Range):
     range_start = 1
     range_end = 100
     default = 14
+    special_range_names ={
+        "default": 14,
+        "double": 28,
+        "quadruple": 56,
+        "hunter": 100 
+    }
 
 
 class GiveKhezuMusic(Toggle):
@@ -210,6 +216,7 @@ mhrs_options: typing.Dict[str, type(Option)] = {
     "average_monster_difficulty": AverageMonsterDifficulty,
     "monster_difficulty_deviation": MonsterDifficultyDeviation,
     "enable_followers": EnableFollowers,
+    "follower_strength": FollowerStrength,
     "disable_multiplayer_scaling": DisableMultiplayerScaling,
     "multiplayer_group": MultiplayerGroup,
     "give_khezu_music": GiveKhezuMusic
