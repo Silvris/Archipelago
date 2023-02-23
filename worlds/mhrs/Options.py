@@ -13,6 +13,19 @@ class NumericGoal(Range):
     default = 3
 
 
+class MHRSDeathLink(Choice):
+    """
+    When you die, everyone dies. Of course the reverse is true too.
+    Cart: Deathlinks are sent when the player carts, receiving a deathlink will cart the player.
+    Quest: Deathlinks are sent when the player fails a quest, receiving a deathlink will fail the current quest.
+    """
+    display_name = "Death Link"
+    option_none = 0
+    option_cart = 1
+    option_quest = 2
+    default = 0
+
+
 class Goal(Choice):
     """
     Determines the monster present within the final urgent quest.
@@ -41,7 +54,7 @@ class Goal(Choice):
     option_violet_mizutsune = 16
     option_furious_rajang = 17
     option_chaotic_gore_magala = 18
-    # option_velkhana = 19
+    option_velkhana = 19
     # option_amatsu = 20 #future-proofing :>
     option_hunting_road = 21
 
@@ -73,11 +86,17 @@ class Risens(Choice):
     default = 0
 
 
-class EnableAfflicted(DefaultOnToggle):
+class EnableAfflicted(Choice):
     """
-    Allow monsters to be Afflicted if they support it.
+    Enable: If a monster can be afflicted, it has a 50% chance of being afflicted.
+    Enforce: All monsters that can be afflicted will be afflicted.
+    Disable: Monsters cannot be afflicted.
     """
     display_name = "Enable Affliction"
+    option_enable = 0
+    option_enforce = 1
+    option_disable = 2
+    default = 0
 
 
 class MasterRankGoal(Range):
@@ -97,7 +116,7 @@ class AverageMonsterDifficulty(SpecialRange):
     """
     display_name = "Average Monster Difficulty"
     range_start = 0
-    range_end = 172
+    range_end = 173
     default = 62
     special_range_names = {
         "easy": 36,
@@ -203,7 +222,7 @@ class MultiplayerGroup(TextChoice):
 
 
 mhrs_options: typing.Dict[str, type(Option)] = {
-    "death_link": DeathLink,
+    "death_link": MHRSDeathLink,
     "required_proofs": NumericGoal,
     "final_quest_target": Goal,
     "master_rank_requirement": MasterRankGoal,

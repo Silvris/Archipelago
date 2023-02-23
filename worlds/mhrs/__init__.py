@@ -9,7 +9,7 @@ from .Locations import mhr_quests, MHRSQuest, get_exclusion_table
 from .Quests import FinalQuests
 from .Rules import set_mhrs_rules
 from .Regions import mhrs_regions, link_mhrs_regions
-from BaseClasses import Item, ItemClassification, Region, RegionType, Entrance
+from BaseClasses import Item, ItemClassification, Region, Entrance
 import os
 import json
 
@@ -44,7 +44,7 @@ class MHRSWorld(World):
         return seed
 
     def get_quest_seed(self, group: str):
-        if group == "":
+        if group == "" or group is None:
             return self._get_alphanumeric_seed()
         elif group in self.MHRSMultiplayerGroupSeeds:
             return self.MHRSMultiplayerGroupSeeds[group]
@@ -73,9 +73,9 @@ class MHRSWorld(World):
                 return target
             else:
                 # roll a random boss for the player
-                boss_table = [i for i in range(2, 19)]
+                boss_table = [i for i in range(2, 20)]
                 if target == 0:
-                    boss_table.append(21)  # do it this way while we wait for 19 and 20 to become valid
+                    boss_table.append(21)  # do it this way while we wait for 20 to become valid
                 boss = self.multiworld.per_slot_randoms[self.player].choice(boss_table)
 
                 self.final_bosses[player] = boss
@@ -87,7 +87,7 @@ class MHRSWorld(World):
 
     def create_regions(self) -> None:
         def MHRSRegion(region_name: str, exits=[]):
-            region = Region(region_name, RegionType.Generic, region_name, self.player, self.multiworld)
+            region = Region(region_name, self.player, self.multiworld)
             region.locations = [
                 MHRSQuest(self.player, name, mhr_quests[name].id, region)
                 for name in mhr_quests
