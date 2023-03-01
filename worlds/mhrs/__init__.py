@@ -5,7 +5,7 @@ from .Options import mhrs_options
 from .Items import lookup_name_to_id as items_lookup
 from .Items import filler_item_table, filler_weights, follower_table, useful_item_table, progression_item_table, \
     MHRSItem
-from .Locations import mhr_quests, MHRSQuest, get_exclusion_table
+from .Locations import mhr_quests, MHRSQuest, get_quest_table
 from .Quests import FinalQuests
 from .Rules import set_mhrs_rules
 from .Regions import mhrs_regions, link_mhrs_regions
@@ -32,26 +32,7 @@ class MHRSWorld(World):
 
     item_name_to_id = items_lookup
     location_name_to_id = {name: mhr_quests[name].id for name in mhr_quests}
-    MHRSMultiplayerGroupSeeds = dict()
     final_bosses = dict()
-
-    def _get_alphanumeric_seed(self):
-        length = 32
-        chars = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
-        seed = ""
-        for _ in range(length):
-            seed += chars[self.multiworld.per_slot_randoms[self.player].randrange(0, len(chars) - 1, 1)]
-        return seed
-
-    def get_quest_seed(self, group: str):
-        if group == "" or group is None:
-            return self._get_alphanumeric_seed()
-        elif group in self.MHRSMultiplayerGroupSeeds:
-            return self.MHRSMultiplayerGroupSeeds[group]
-        else:
-            seed = self._get_alphanumeric_seed()
-            self.MHRSMultiplayerGroupSeeds[group] = seed
-            return seed
 
     def create_item(self, name: str) -> Item:
         classification = ItemClassification.filler
@@ -162,8 +143,8 @@ class MHRSWorld(World):
         if self.multiworld.enable_followers[self.player].value == 0:
             for follower in follower_table:
                 itempool.append(self.create_item(follower))
-        excluded_quests = get_exclusion_table(self.multiworld.master_rank_requirement[self.player].value)
-        quest_num = len(mhr_quests) - 6 - len(excluded_quests)
+        quests = get_quest_table(self.multiworld.master_rank_requirement[self.player].value)
+        quest_num = len(quests)
         itempool += [self.create_item(self.get_filler_item_name()) for _ in range(quest_num - len(itempool))]
         self.multiworld.itempool += itempool
 

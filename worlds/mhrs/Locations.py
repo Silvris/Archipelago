@@ -40,17 +40,6 @@ mhr_quests.update({
 })
 
 
-
-def get_exclusion_table(mr: int):
-    excluded = set()
-    if mr < 6:
-        excluded.update({MR6Quests[qid] for qid in MR6Quests})
-        if mr < 5:
-            excluded.update({MR5Quests[qid] for qid in MR5Quests})
-            if mr < 4:
-                excluded.update({MR4Quests[qid] for qid in MR4Quests})
-                if mr < 3:
-                    excluded.update({MR3Quests[qid] for qid in MR3Quests})
-                    if mr < 2:
-                        excluded.update({MR2Quests[qid] for qid in MR2Quests})
-    return excluded
+def get_quest_table(mr: int):
+    quests = [mhr_quests[quest].id for quest in mhr_quests if mhr_quests[quest].MR <= mr]
+    return quests

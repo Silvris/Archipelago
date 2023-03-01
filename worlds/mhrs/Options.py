@@ -5,12 +5,12 @@ from Options import Option, DeathLink, Choice, Range, Toggle, DefaultOnToggle, T
 
 class NumericGoal(Range):
     """
-    Determines the number of "Proof of a Hero" required to gain access to the final quest.
+    Determines the percentage of "Proof of a Hero" required to gain access to the final quest.
     """
-    display_name = "Required Proofs"
+    display_name = "Max Required Proofs"
     range_start = 1
-    range_end = 7
-    default = 3
+    range_end = 100
+    default = 45
 
 
 class MHRSDeathLink(Choice):
@@ -201,25 +201,6 @@ class DisableMultiplayerScaling(Toggle):
     display_name = "Disable Multiplayer Scaling"
 
 
-class MultiplayerGroup(TextChoice):
-    """
-    An identifier for groups that would like to play multiplayer.
-    For groups that would like to play multiplayer, this and the following options must be identical for all players:
-    Master Rank Requirement
-    Enable Affliction
-    Include Apex
-    Include Risen
-    Average Monster Difficulty
-    Disable Multiplayer Scaling
-    """
-    display_name = "Multiplayer Group"
-    # this gets passed to a dict that stores generated quest seeds,
-    # so quests (but not items) can be sync'd across players
-    option_group_1 = 1
-    option_group_2 = 2
-    option_group_3 = 3
-    option_group_4 = 4
-
 
 mhrs_options: typing.Dict[str, type(Option)] = {
     "death_link": MHRSDeathLink,
@@ -237,6 +218,5 @@ mhrs_options: typing.Dict[str, type(Option)] = {
     "enable_followers": EnableFollowers,
     "follower_strength": FollowerStrength,
     "disable_multiplayer_scaling": DisableMultiplayerScaling,
-    "multiplayer_group": MultiplayerGroup,
     "give_khezu_music": GiveKhezuMusic
 }
