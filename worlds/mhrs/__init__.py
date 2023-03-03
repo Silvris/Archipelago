@@ -1,17 +1,16 @@
+import math
 from typing import Dict, Any
 
 from worlds.AutoWorld import World, WebWorld
+from worlds.generic.Rules import set_rule
+from BaseClasses import Item, ItemClassification, Region, Entrance
 from .Options import mhrs_options
 from .Items import lookup_name_to_id as items_lookup
-from .Items import filler_item_table, filler_weights, follower_table, useful_item_table, progression_item_table, \
-    MHRSItem
-from .Locations import mhr_quests, MHRSQuest, get_quest_table
-from .Quests import FinalQuests
-from .Rules import set_mhrs_rules
+from .Items import filler_item_table, filler_weights, follower_table, progression_item_table, MHRSItem
+from .Locations import mhr_quests, MHRSQuest, get_quest_table, get_mr_quest_num
+from .Quests import FinalQuests, UrgentQuests
 from .Regions import mhrs_regions, link_mhrs_regions
-from BaseClasses import Item, ItemClassification, Region, Entrance
-import os
-import json
+from .QuestGen import generate_quests
 
 
 class MHRSWebWorld(WebWorld):
@@ -33,13 +32,17 @@ class MHRSWorld(World):
     item_name_to_id = items_lookup
     location_name_to_id = {name: mhr_quests[name].id for name in mhr_quests}
     final_bosses = dict()
+    key_requirements = {1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0}
+    generate_output = generate_quests
 
-    def create_item(self, name: str) -> Item:
+    def create_item(self, name: str, force_non_progression=False) -> Item:
         classification = ItemClassification.filler
-        if name in progression_item_table:
+        if name in progression_item_table and not force_non_progression:
             classification = ItemClassification.progression
-        if name in useful_item_table or name in follower_table:
+        if name in follower_table and not force_non_progression:
             classification = ItemClassification.useful
+        if name == "Key Quest" and not force_non_progression:
+            classification = ItemClassification.progression_skip_balancing
         item = MHRSItem(name, classification, items_lookup[name], self.player)
         return item
 
@@ -73,26 +76,27 @@ class MHRSWorld(World):
                 MHRSQuest(self.player, name, mhr_quests[name].id, region)
                 for name in mhr_quests
                 if mhr_quests[name].region == region_name
-                and mhr_quests[name].MR <= self.multiworld.master_rank_requirement[self.player].value
+                   and mhr_quests[name].MR <= self.multiworld.master_rank_requirement[self.player].value
                 # this leaves quests higher than max MR out
             ]
             for exit in exits:
                 region.exits.append(Entrance(self.player, exit, region))
             if region_name == f"MR{self.multiworld.master_rank_requirement[self.player].value}":
-                region.locations.append(MHRSQuest(self.player, self.get_final_quest(self.player), None, region))
+                region.exits = list()
+                region.locations.append(MHRSQuest(self.player, self.get_final_quest(self.player), 315618, region))
                 self.location_name_to_id[self.get_final_quest(self.player)] = 315618
+                self.location_id_to_name[315618] = self.get_final_quest(self.player)
             return region
 
-        self.multiworld.regions += [MHRSRegion(*r) for r in mhrs_regions]
+        self.multiworld.regions += [MHRSRegion(*r) for r in mhrs_regions
+                                    if r[0] not in [f"MR{i}"
+                                                    for i in range(
+                    self.multiworld.master_rank_requirement[self.player].value + 1, 7)]]
         link_mhrs_regions(self.multiworld, self.player)
 
     def create_items(self) -> None:
         itempool = []
         MR = self.multiworld.master_rank_requirement[self.player].value
-        for i in range(2, MR + 1):
-            itempool += [self.create_item(f"MR{i} Urgent")]
-        itempool += [self.create_item("Proof of a Hero")
-                     for _ in range(self.multiworld.required_proofs[self.player].value)]
 
         # now handle player options for weapons
         weapons = [
@@ -119,24 +123,18 @@ class MHRSWorld(World):
         if progressive:
             for weapon in weapons:
                 itempool += [
-                    self.create_item(f"Progressive {weapon}") for _ in range(4 if MR > 4 else 3)
+                    self.create_item(f"Progressive {weapon}") for _ in range(8, 9 + (MR // 3))
                 ]
         else:
             for weapon in weapons:
                 itempool += [
-                    self.create_item(f"{weapon} Rarities 1-3"),
-                    self.create_item(f"{weapon} Rarities 4-5"),
-                    self.create_item(f"{weapon} Rarities 6-7")
+                    self.create_item(f"{weapon} Rarity {i}") for i in range(8, 9 + (MR // 3))
                 ]
-                if MR > 4:
-                    itempool += [self.create_item(f"{weapon} Rarities 8-10")]
         # handle armor
         if self.multiworld.progressive_armor[self.player].value:
-            itempool += [self.create_item("Progressive Armor Rarity") for _ in range(3)]
+            itempool += [self.create_item("Progressive Armor Rarity") for _ in range(8, 9 + (MR // 3))]
         else:
-            itempool += [self.create_item(f"Armor Rarity 1-4"),
-                         self.create_item(f"Armor Rarity 5-7"),
-                         self.create_item(f"Armor Rarity 8-10"),
+            itempool += [self.create_item(f"Armor Rarity {i}") for i in range(8, 9 + (MR // 3))
                          ]
 
         # handle follower randomization if enabled
@@ -145,7 +143,21 @@ class MHRSWorld(World):
                 itempool.append(self.create_item(follower))
         quests = get_quest_table(self.multiworld.master_rank_requirement[self.player].value)
         quest_num = len(quests)
-        itempool += [self.create_item(self.get_filler_item_name()) for _ in range(quest_num - len(itempool))]
+        total_key_count = min(quest_num - len(itempool), self.multiworld.total_keys[self.player].value)
+        required_keys = math.floor(total_key_count * (self.multiworld.required_keys[self.player].value / 100.0))
+        non_required_keys = total_key_count - required_keys
+        self.key_requirements = dict()
+        for i in range(1, MR + 1):
+            quest_percentage = get_mr_quest_num(i) / quest_num  # percentage this MR has over the total
+            self.key_requirements[i] = (self.key_requirements[i - 1] if i > 1 else 0) \
+                                       + math.floor(quest_percentage * required_keys)
+        self.key_requirements[MR] = required_keys
+        filler_num = math.floor(non_required_keys * (self.multiworld.filler_percentage[self.player].value / 100.0))
+        non_required_keys -= filler_num
+        itempool += [self.create_item("Key Quest") for _ in range(required_keys)]
+        itempool += [self.create_item("Key Quest", True) for _ in range(non_required_keys)]
+        itempool += [self.create_item(self.get_filler_item_name()) for _ in range(filler_num)]
+
         self.multiworld.itempool += itempool
 
     def generate_basic(self) -> None:
@@ -173,7 +185,32 @@ class MHRSWorld(World):
         self.multiworld.completion_condition[self.player] = lambda state: state.has("Victory's Flame", self.player)
 
     def set_rules(self):
-        set_mhrs_rules(self.multiworld, self.player, self.get_final_quest(self.player))
+        # set urgent rules
+        mr = self.multiworld.master_rank_requirement[self.player].value
+        for i in range(1, mr + 1):
+            set_rule(self.multiworld.get_entrance(f"To MR{i}", self.player),
+                     lambda state, m=i: state.has(f"Master Rank {m}", self.player))
+
+        if mr >= 2:
+            set_rule(self.multiworld.get_location("2★ - Scarlet Tengu in the Shrine Ruins", self.player),
+                     lambda state: state.has("Key Quest", self.player, self.key_requirements[1]))
+            if mr >= 3:
+                set_rule(self.multiworld.get_location("3★ - A Rocky Rampage", self.player),
+                         lambda state: state.has("Key Quest", self.player, self.key_requirements[2]))
+                if mr >= 4:
+                    set_rule(self.multiworld.get_location("4★ - Ice Wolf, Red Moon", self.player),
+                             lambda state: state.has("Key Quest", self.player, self.key_requirements[3]))
+                    if mr >= 5:
+                        set_rule(self.multiworld.get_location("5★ - Witness by Moonlight", self.player),
+                                 lambda state: state.has("Key Quest", self.player, self.key_requirements[4]))
+                        if mr == 6:
+                            set_rule(self.multiworld.get_location("6★ - Proof of Courage", self.player),
+                                     lambda state: state.has("Key Quest", self.player, self.key_requirements[5]))
+
+        set_rule(self.multiworld.get_location(self.get_final_quest(self.player), self.player),
+                 lambda state: state.has("Key Quest", self.player,
+                                         self.key_requirements[
+                                             self.multiworld.master_rank_requirement[self.player].value]))
 
     def get_filler_item_name(self) -> str:
         return self.multiworld.random.choices(list(filler_item_table.keys()), weights=list(filler_weights.values()))[0]
@@ -188,46 +225,14 @@ class MHRSWorld(World):
 
     def fill_slot_data(self) -> Dict[str, Any]:
         slot_data = {
-            "quest_seed": self.get_quest_seed(self.multiworld.multiplayer_group[self.player].value),
             "death_link": self.multiworld.death_link[self.player].value,
-            "required_proofs": self.multiworld.required_proofs[self.player].value,
-            "final_quest_target": self.get_final_boss(self.player),  # just in case somehow it wasn't called before
             "master_rank_requirement": self.multiworld.master_rank_requirement[self.player].value,
-            "enable_affliction": self.multiworld.enable_affliction[self.player].value,
-            "include_apex": self.multiworld.include_apex[self.player].value,
-            "include_risen": self.multiworld.include_risen[self.player].value,
             "progressive_weapons": self.multiworld.progressive_weapons[self.player].value,
             "consolidate_weapons": self.multiworld.consolidate_weapons[self.player].value,
             "progressive_armor": self.multiworld.progressive_armor[self.player].value,
-            "average_monster_difficulty": self.multiworld.average_monster_difficulty[self.player].value,
-            "monster_difficulty_deviation": self.multiworld.monster_difficulty_deviation[self.player].value,
             "enable_followers": self.multiworld.enable_followers[self.player].value,
-            "disable_multiplayer_scaling": self.multiworld.disable_multiplayer_scaling[self.player].value,
-            "multiplayer_group": self.multiworld.multiplayer_group[self.player].value,
             "give_khezu_music": self.multiworld.give_khezu_music[self.player].value,
+            "key_requirements": self.key_requirements,
             "filler_hint_table": self.get_filler_hints()
         }
         return slot_data
-
-    def generate_output(self, output_directory: str):
-        if self.multiworld.players != 1:
-            return
-        data = {
-            "slot_data": self.fill_slot_data(),
-            "location_to_item": {
-                self.location_name_to_id[i.name]: items_lookup[i.item.name] for i in self.multiworld.get_locations()
-            },
-            "data_package": {
-                "data": {
-                    "games": {
-                        self.game: {
-                            "item_name_to_id": self.item_name_to_id,
-                            "location_name_to_id": self.location_name_to_id
-                        }
-                    }
-                }
-            }
-        }
-        filename = f"{self.multiworld.get_out_file_name_base(self.player)}.apmhrs"
-        with open(os.path.join(output_directory, filename), 'w') as f:
-            json.dump(data, f)

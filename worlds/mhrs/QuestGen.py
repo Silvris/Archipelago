@@ -3,13 +3,13 @@ import os
 import zipfile
 from pathlib import Path
 from random import Random
+from typing import TYPE_CHECKING
 
 import worlds.Files
-from .Quests import MR1Quests, MR2Quests, MR3Quests, MR4Quests, MR5Quests, MR6Quests, UrgentQuests
-from . import MHRSWorld
 from .Locations import get_quest_table
 from BaseClasses import MultiWorld
-
+if TYPE_CHECKING:
+    from . import MHRSWorld
 stage_choices = [
     1,  # Shrine Ruins
     2,  # Sandy Plains
@@ -21,6 +21,14 @@ stage_choices = [
     11,  # Coral Palace
     12,  # Jungle
     13,  # Citadel
+    14,  # Forlorn Arena
+    15  # Yawning Abyss
+]
+
+arena_choices = [
+    9,  # Infernal Springs
+    10,  # Arena
+    11,  # Coral Palace
     14,  # Forlorn Arena
     15  # Yawning Abyss
 ]
@@ -203,6 +211,29 @@ monster_icons = {
     2134: 21  # Risen Valstrax uses Crimson Glow Valstrax
 }
 
+final_boss_remap = {
+    2: 135,
+    3: 24,
+    4: 25,
+    5: 27,
+    6: 1369,
+    7: 132,
+    8: 72,
+    9: 1366,
+    10: 96,
+    11: 1379,
+    12: 513,
+    13: 514,
+    14: 549,
+    15: 392,
+    16: 594,
+    17: 1303,
+    18: 1351,
+    19: 124,
+    20: 58,
+    21: 0
+}
+
 
 def random_normal_integer(slot_random: Random, mu: int, sigma: int, lower: int, upper: int) -> int:
     num = int(slot_random.normalvariate(mu, sigma))
@@ -270,9 +301,10 @@ def generate_valid_monster(stage: int, allowed_monsters: list, slot_random: Rand
     return monster
 
 
-def randomize_quest(multiworld: MultiWorld, player: int, allowed_monsters: list, quest_id: int, quest_targets=None) -> str:
-    if quest_targets is None:
-        quest_targets = []
+def randomize_quest(multiworld: MultiWorld, player: int, allowed_monsters: list,
+                    quest_id: int, quest_targets=None, is_hunting_road=False) -> str:
+    if quest_targets is None or is_hunting_road:
+        quest_targets = []  # clean the quest targets for Hunting Road
     base_path = Path(__file__).parent
     file_path = (base_path / f"quests/q{quest_id}.json").resolve()
     quest_data = json.load(open(file_path, encoding='utf-8'))
@@ -286,13 +318,17 @@ def randomize_quest(multiworld: MultiWorld, player: int, allowed_monsters: list,
     enemy = quest_data["EnemyData"]
 
     if 135 in quest_targets:
-        stage = 15
+        stage = 15  # gaismagorm can only spawn in the Yawning Abyss
     elif 1379 in quest_targets:
-        stage = 11
+        stage = 11  # allmother can only spawn in the Coral Palace
+    elif is_hunting_road or multiworld.arena_only[player].value:
+        stage = multiworld.per_slot_randoms[player].choice(arena_choices)
     else:
         stage = multiworld.per_slot_randoms[player].choice(stage_choices)
     if len(quest_targets) > 0:
         mon_num = len(quest_targets)
+    elif is_hunting_road:
+        mon_num = 5
     else:
         mon_num = multiworld.per_slot_randoms[player].randint(1, 5)
     monsters = list()
@@ -300,16 +336,11 @@ def randomize_quest(multiworld: MultiWorld, player: int, allowed_monsters: list,
         if i < len(quest_targets):
             monsters.append(quest_targets[i])
         else:
-            monster = generate_valid_monster(stage, allowed_monsters, multiworld.per_slot_randoms[player])
-            if stage in {9, 10, 11, 14, 15}:
-                if i < mon_num:
-                    quest_targets.append(monster)
-                    monsters.append(monster)
-            else:
-                monsters.append(monster)
-                if i < mon_num:
-                    quest_targets.append(monster)
-
+            monster = 0 if stage in arena_choices and i >= mon_num else \
+                generate_valid_monster(stage, allowed_monsters, multiworld.per_slot_randoms[player])
+            monsters.append(monster)
+            if i < mon_num:
+                quest_targets.append(monster)
     if mon_num > 2:
         normal["QuestType"] = 8
         normal["TargetTypes"] = [5, 0]
@@ -328,7 +359,7 @@ def randomize_quest(multiworld: MultiWorld, player: int, allowed_monsters: list,
         normal["TargetMonsters"] = [quest_targets[0], quest_targets[1] if mon_num > 1 else 0]
         normal["TargetAmounts"] = [1, 1 if mon_num > 1 else 0]
     normal["Map"] = stage
-    normal["Carts"] = multiworld.per_slot_randoms[player].choices([1, 3, 5], [10, 75, 15])[0]
+    normal["Carts"] = multiworld.per_slot_randoms[player].choices([1, 3, 5], [5, 85, 10])[0]
 
     for i in range(5):
         normal["Monsters"][i]["Id"] = monsters[i]
@@ -426,7 +457,6 @@ def randomize_quest(multiworld: MultiWorld, player: int, allowed_monsters: list,
             enemy["Monsters"][i]["MultiTable"] = 0
         else:
             enemy["Monsters"][i]["MultiTable"] = multiworld.per_slot_randoms[player].randint(0, 25)
-        individual_type = multiworld.per_slot_randoms[player].randint(0, 3)
 
         afflicted = multiworld.enable_affliction[player].value
         if can_afflict(monsters[i]) and afflicted in [0, 1]:
@@ -435,7 +465,8 @@ def randomize_quest(multiworld: MultiWorld, player: int, allowed_monsters: list,
                 enemy["Monsters"][i]["IndividualType"] = 1
         elif monsters[i] in [2072, 2073, 2075, 2134]:
             # this is a risen monster, rng it's level
-            enemy["Monsters"][i]["IndividualType"] = multiworld.per_slot_randoms[player].choices([2,3,4,5], weights=[7,1,1,1])
+            enemy["Monsters"][i]["IndividualType"] = multiworld.per_slot_randoms[player]\
+                .choices([2, 3, 4, 5], weights=[7, 1, 1, 1])
 
         if monsters[i] in [136, 392]:
             # edge case, Espinas and Flaming Espinas should be sleeping when they spawn
@@ -448,7 +479,7 @@ def randomize_quest(multiworld: MultiWorld, player: int, allowed_monsters: list,
     return json.dumps(quest_data)
 
 
-def randomize_quests(multiworld: MultiWorld, player: int) -> dict:
+def randomize_quests(multiworld: MultiWorld, player: int, final_boss: int) -> dict:
     quest_data = dict()
     allowed_monsters = monster_choices.copy()
 
@@ -464,18 +495,21 @@ def randomize_quests(multiworld: MultiWorld, player: int) -> dict:
     if multiworld.include_risen[player].value in [0, 1]:
         allowed_monsters.extend([2072, 2073, 2075, 2134])
 
-    for quest in get_quest_table(multiworld.master_rank_requirement[player].value):
+    for quest in get_quest_table(multiworld.master_rank_requirement[player].value, True):
         quest_data[quest] = randomize_quest(multiworld, player, allowed_monsters, quest, None)
 
-
+    quest_data[315618] = randomize_quest(multiworld, player,
+                                         allowed_monsters, 315618, [final_boss_remap[final_boss]],
+                                         True if final_boss == 21 else False)
 
     return quest_data
+
 
 class MHRSZipFile(worlds.Files.APContainer):
     def __init__(self, quest_data: dict, base_path: str, output_directory: str,
                  player=None, player_name: str = "", server: str = ""):
         self.quest_data = quest_data
-        container_path = os.path.join(output_directory, base_path, ".zip")
+        container_path = os.path.join(output_directory, base_path + ".zip")
         super().__init__(container_path, player, player_name, server)
 
     def write_contents(self, opened_zipfile: zipfile.ZipFile) -> None:
@@ -484,11 +518,11 @@ class MHRSZipFile(worlds.Files.APContainer):
         super().write_contents(opened_zipfile)
 
 
-def generate_output(world: MHRSWorld, output_directory: str):
+def generate_quests(world: "MHRSWorld", output_directory: str):
 
     file_dir = world.multiworld.get_out_file_name_base(world.player)
     apmhrs = MHRSZipFile(
-        randomize_quests(world.multiworld, world.player),
+        randomize_quests(world.multiworld, world.player, world.get_final_boss(world.player)),
         file_dir,
         output_directory,
         world.player,

@@ -1,16 +1,6 @@
 import typing
 
-from Options import Option, DeathLink, Choice, Range, Toggle, DefaultOnToggle, TextChoice, SpecialRange
-
-
-class NumericGoal(Range):
-    """
-    Determines the percentage of "Proof of a Hero" required to gain access to the final quest.
-    """
-    display_name = "Max Required Proofs"
-    range_start = 1
-    range_end = 100
-    default = 45
+from Options import Option, Choice, Range, Toggle, DefaultOnToggle, SpecialRange
 
 
 class MHRSDeathLink(Choice):
@@ -26,7 +16,38 @@ class MHRSDeathLink(Choice):
     default = 0
 
 
-class Goal(Choice):
+class RequiredKeys(Range):
+    """
+    Determines the percentage of "Key Quest" required to gain access to the final quest.
+    """
+    display_name = "Max Required Keys"
+    range_start = 1
+    range_end = 100
+    default = 45
+
+
+class TotalKeys(Range):
+    """
+    The max amount of key quests to add to the item pool. Fewer key quests may exist in the pool should the total be higher than
+    the amount of available quests.
+    """
+    display_name = "Total Keys"
+    range_start = 1
+    range_end = 80
+    default = 30
+
+
+class FillerWeight(Range):
+    """
+    Replace a given percentage of non-required key quests with filler items.
+    """
+    display_name = "Filler Percentage"
+    range_start = 0
+    range_end = 100
+    default = 25
+
+
+class FinalBoss(Choice):
     """
     Determines the monster present within the final urgent quest.
     <monster>: This monster will be the singular target of the quest
@@ -112,9 +133,9 @@ class MasterRankGoal(Range):
 
 class AverageMonsterDifficulty(SpecialRange):
     """
-    The average difficulty of the generated monsters. This will be further scaled by the quest's MR.
+    The base difficulty of the generated monsters. This will be further scaled by the quest's MR.
     """
-    display_name = "Average Monster Difficulty"
+    display_name = "Base Monster Difficulty"
     range_start = 0
     range_end = 173
     default = 62
@@ -154,6 +175,14 @@ class ProgressiveArmor(Toggle):
     Armor unlocks will be given progressively, from R1 to R10.
     """
     display_name = "Progressive Armor"
+
+
+class ArenaOnly(Toggle):
+    """
+    Quests will only be generated in the following maps:
+    Arena, Infernal Springs, Coral Palace, Yawning Abyss, Forlorn Arena
+    """
+    display_name = "Oops! All Arenas"
 
 
 class EnableFollowers(Choice):
@@ -201,11 +230,12 @@ class DisableMultiplayerScaling(Toggle):
     display_name = "Disable Multiplayer Scaling"
 
 
-
 mhrs_options: typing.Dict[str, type(Option)] = {
     "death_link": MHRSDeathLink,
-    "required_proofs": NumericGoal,
-    "final_quest_target": Goal,
+    "required_keys": RequiredKeys,
+    "total_keys": TotalKeys,
+    "filler_percentage": FillerWeight,
+    "final_quest_target": FinalBoss,
     "master_rank_requirement": MasterRankGoal,
     "enable_affliction": EnableAfflicted,
     "include_apex": Apexes,
@@ -213,6 +243,7 @@ mhrs_options: typing.Dict[str, type(Option)] = {
     "progressive_weapons": ProgressiveWeapons,
     "consolidate_weapons": ConsolidateWeapons,
     "progressive_armor": ProgressiveArmor,
+    "arena_only": ArenaOnly,
     "average_monster_difficulty": AverageMonsterDifficulty,
     "monster_difficulty_deviation": MonsterDifficultyDeviation,
     "enable_followers": EnableFollowers,
