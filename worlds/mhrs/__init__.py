@@ -32,7 +32,8 @@ class MHRSWorld(World):
     item_name_to_id = items_lookup
     location_name_to_id = {name: mhr_quests[name].id for name in mhr_quests}
     final_bosses = dict()
-    key_requirements = {1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0}
+    requirements_base = {1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0}
+    key_requirements = dict()
     generate_output = generate_quests
 
     def create_item(self, name: str, force_non_progression=False) -> Item:
@@ -84,8 +85,6 @@ class MHRSWorld(World):
             if region_name == f"MR{self.multiworld.master_rank_requirement[self.player].value}":
                 region.exits = list()
                 region.locations.append(MHRSQuest(self.player, self.get_final_quest(self.player), 315618, region))
-                self.location_name_to_id[self.get_final_quest(self.player)] = 315618
-                self.location_id_to_name[315618] = self.get_final_quest(self.player)
             return region
 
         self.multiworld.regions += [MHRSRegion(*r) for r in mhrs_regions
@@ -146,7 +145,7 @@ class MHRSWorld(World):
         total_key_count = min(quest_num - len(itempool), self.multiworld.total_keys[self.player].value)
         required_keys = math.floor(total_key_count * (self.multiworld.required_keys[self.player].value / 100.0))
         non_required_keys = total_key_count - required_keys
-        self.key_requirements = dict()
+        self.key_requirements[self.player] = self.requirements_base.copy()
         for i in range(1, MR + 1):
             quest_percentage = get_mr_quest_num(i) / quest_num  # percentage this MR has over the total
             self.key_requirements[i] = (self.key_requirements[i - 1] if i > 1 else 0) \
@@ -232,7 +231,7 @@ class MHRSWorld(World):
             "progressive_armor": self.multiworld.progressive_armor[self.player].value,
             "enable_followers": self.multiworld.enable_followers[self.player].value,
             "give_khezu_music": self.multiworld.give_khezu_music[self.player].value,
-            "key_requirements": self.key_requirements,
+            "key_requirements": self.key_requirements[self.player],
             "filler_hint_table": self.get_filler_hints()
         }
         return slot_data
