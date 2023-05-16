@@ -7,9 +7,9 @@ import random
 import secrets
 import typing  # this can go away when Python 3.8 support is dropped
 from argparse import Namespace
-from collections import OrderedDict, Counter, deque, ChainMap
+from collections import ChainMap, Counter, OrderedDict, deque
 from enum import IntEnum, IntFlag
-from typing import List, Dict, Optional, Set, Iterable, Union, Any, Tuple, TypedDict, Callable, NamedTuple
+from typing import Any, Callable, Dict, Iterable, List, NamedTuple, Optional, Set, Tuple, TypedDict, Union
 
 import NetUtils
 import Options
@@ -71,6 +71,11 @@ class MultiWorld():
     completion_condition: Dict[int, Callable[[CollectionState], bool]]
     indirect_connections: Dict[Region, Set[Entrance]]
     exclude_locations: Dict[int, Options.ExcludeLocations]
+    priority_locations: Dict[int, Options.PriorityLocations]
+    start_inventory: Dict[int, Options.StartInventory]
+    start_hints: Dict[int, Options.StartHints]
+    start_location_hints: Dict[int, Options.StartLocationHints]
+    item_links: Dict[int, Options.ItemLinks]
 
     game: Dict[int, str]
 
@@ -108,7 +113,6 @@ class MultiWorld():
         self.dark_world_light_cone = False
         self.rupoor_cost = 10
         self.aga_randomness = True
-        self.lock_aga_door_in_escape = False
         self.save_and_quit_from_boss = True
         self.custom = False
         self.customitemarray = []
@@ -117,6 +121,7 @@ class MultiWorld():
         self.early_items = {player: {} for player in self.player_ids}
         self.local_early_items = {player: {} for player in self.player_ids}
         self.indirect_connections = {}
+        self.start_inventory_from_pool: Dict[int, Options.StartInventoryPool] = {}
         self.fix_trock_doors = self.AttributeProxy(
             lambda player: self.shuffle[player] != 'vanilla' or self.mode[player] == 'inverted')
         self.fix_skullwoods_exit = self.AttributeProxy(
@@ -130,7 +135,6 @@ class MultiWorld():
             def set_player_attr(attr, val):
                 self.__dict__.setdefault(attr, {})[player] = val
 
-            set_player_attr('tech_tree_layout_prerequisites', {})
             set_player_attr('_region_cache', {})
             set_player_attr('shuffle', "vanilla")
             set_player_attr('logic', "noglitches")
@@ -331,7 +335,7 @@ class MultiWorld():
         return self.player_name[player]
 
     def get_file_safe_player_name(self, player: int) -> str:
-        return ''.join(c for c in self.get_player_name(player) if c not in '<>:"/\\|?*')
+        return Utils.get_file_safe_name(self.get_player_name(player))
 
     def get_out_file_name_base(self, player: int) -> str:
         """ the base name (without file extension) for each player's output file for a seed """
@@ -440,7 +444,6 @@ class MultiWorld():
         self.state.collect(item, True)
 
     def push_item(self, location: Location, item: Item, collect: bool = True):
-        assert location.can_fill(self.state, item, False), f"Cannot place {item} into {location}."
         location.item = item
         item.location = location
         if collect:
@@ -737,9 +740,11 @@ class CollectionState():
         return self.prog_items[item, player] >= count
 
     def has_all(self, items: Set[str], player: int) -> bool:
+        """Returns True if each item name of items is in state at least once."""
         return all(self.prog_items[item, player] for item in items)
 
     def has_any(self, items: Set[str], player: int) -> bool:
+        """Returns True if at least one item name of items is in state at least once."""
         return any(self.prog_items[item, player] for item in items)
 
     def count(self, item: str, player: int) -> int:
@@ -830,6 +835,29 @@ class Region:
                 return entrance
         for entrance in self.entrances:  # BFS might be better here, trying DFS for now.
             return entrance.parent_region.get_connecting_entrance(is_main_entrance)
+
+    def add_locations(self, locations: Dict[str, Optional[int]], location_type: Optional[typing.Type[Location]] = None) -> None:
+        """Adds locations to the Region object, where location_type is your Location class and locations is a dict of
+        location names to address."""
+        if location_type is None:
+            location_type = Location
+        for location, address in locations.items():
+            self.locations.append(location_type(self.player, location, address, self))
+
+    def add_exits(self, exits: Dict[str, Optional[str]], rules: Dict[str, Callable[[CollectionState], bool]] = None) -> None:
+        """
+        Connects current region to regions in exit dictionary. Passed region names must exist first.
+
+        :param exits: exits from the region. format is {"connecting_region", "exit_name"}
+        :param rules: rules for the exits from this region. format is {"connecting_region", rule}
+        """
+        for exiting_region, name in exits.items():
+            ret = Entrance(self.player, name, self) if name \
+                else Entrance(self.player, f"{self.name} -> {exiting_region}", self)
+            if rules and exiting_region in rules:
+                ret.access_rule = rules[exiting_region]
+            self.exits.append(ret)
+            ret.connect(self.multiworld.get_region(exiting_region, self.player))
 
     def __repr__(self):
         return self.__str__()
@@ -961,7 +989,7 @@ class Location:
         self.parent_region = parent
 
     def can_fill(self, state: CollectionState, item: Item, check_access=True) -> bool:
-        return (self.always_allow(state, item)
+        return ((self.always_allow(state, item) and item.name not in state.multiworld.non_local_items[item.player])
                 or ((self.progress_type != LocationProgressType.EXCLUDED or not (item.advancement or item.useful))
                     and self.item_rule(item)
                     and (not check_access or self.can_reach(state))))
@@ -1203,7 +1231,7 @@ class Spoiler():
                 raise RuntimeError(f'Not all required items reachable. Unreachable locations: {required_locations}')
 
         # we can finally output our playthrough
-        self.playthrough = {"0": sorted([str(item) for item in
+        self.playthrough = {"0": sorted([self.multiworld.get_name_string_for_object(item) for item in
                                          chain.from_iterable(multiworld.precollected_items.values())
                                          if item.advancement])}
 
