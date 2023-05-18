@@ -82,13 +82,13 @@ monster_choices = [
     47,  # Royal Ludroth
     54,  # Great Baggi
     # Zinogre
-    # 58, # Amatsu
+    58,  # Amatsu
     59,  # Great Wroggi
     # Arzuros
     61,  # Lagombi
     62,  # Volvidon
     71,  # Gore Magala
-    72,  # Shagaru Magala, may have to remove in the future
+    # Shagaru Magala
     77,  # Seregios
     81,  # Astalos
     # Mizutsune
@@ -126,7 +126,7 @@ monster_choices = [
     594,  # Violet Mizutsune
     1303,  # Furious Rajang
     1351,  # Chaotic Gore Magala
-    # skip Crimson Glow Valstrax
+    # Crimson Glow Valstrax
     1369,  # Scorned Magnamalo
     1379,  # Narwa the Allmother
     1398  # Seething Bazelgeuse
@@ -151,7 +151,7 @@ monster_icons = {
     47: 13,  # Royal Ludroth
     54: 14,  # Great Baggi
     57: 15,  # Zinogre
-    # 58, # Amatsu
+    58: 66,  # Amatsu
     59: 16,  # Great Wroggi
     60: 17,  # Arzuros
     61: 18,  # Lagombi
@@ -199,16 +199,17 @@ monster_icons = {
     1369: 52,  # Scorned Magnamalo
     1379: 40,  # Narwa the Allmother
     1398: 57,  # Seething Bazelgeuse
-    1793: 67,  # Apex Rathian
-    1794: 68,  # Apex Rathalos
-    1799: 69,  # Apex Diablos
-    1849: 70,  # Apex Zinogre
-    1852: 71,  # Apex Arzuros
-    1874: 72,  # Apex Mizutsune
-    2072: 6,  # Risen Kushala uses regular Kushala
-    2073: 7,  # Risen Chameleos uses regular Chameleos
-    2075: 8,  # Risen Teostra uses regular Teostra
-    2134: 21  # Risen Valstrax uses Crimson Glow Valstrax
+    1793: 68,  # Apex Rathian
+    1794: 69,  # Apex Rathalos
+    1799: 70,  # Apex Diablos
+    1849: 71,  # Apex Zinogre
+    1852: 72,  # Apex Arzuros
+    1874: 73,  # Apex Mizutsune
+    2072: 6,   # Risen Kushala uses regular Kushala
+    2073: 7,   # Risen Chameleos uses regular Chameleos
+    2075: 8,   # Risen Teostra uses regular Teostra
+    2120: 48,  # Risen Shagaru uses regular Shagaru
+    2134: 21   # Risen Valstrax uses Crimson Glow Valstrax
 }
 
 final_boss_remap = {
@@ -490,10 +491,10 @@ def randomize_quests(multiworld: MultiWorld, player: int, final_boss: int) -> di
         allowed_monsters.extend([1793, 1794, 1799, 1849, 1852, 1874])
 
     if multiworld.include_risen[player].value in [0, 2]:
-        allowed_monsters.extend([24, 25, 27, 1366])
+        allowed_monsters.extend([24, 25, 27, 72, 1366])
 
     if multiworld.include_risen[player].value in [0, 1]:
-        allowed_monsters.extend([2072, 2073, 2075, 2134])
+        allowed_monsters.extend([2072, 2073, 2075, 2120, 2134])
 
     for quest in get_quest_table(multiworld.master_rank_requirement[player].value, True):
         quest_data[quest] = randomize_quest(multiworld, player, allowed_monsters, quest, None)

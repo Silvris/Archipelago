@@ -16,18 +16,20 @@ class MHRSItem(Item):
 
 progression_item_table = {
     "Key Quest": ItemData(315900, True),  # Item to access final quest
-    "Master Rank 1": ItemData(315901, True),
-    "Master Rank 2": ItemData(315902, True),
-    "Master Rank 3": ItemData(315903, True),
-    "Master Rank 4": ItemData(315904, True),
-    "Master Rank 5": ItemData(315905, True),
-    "Master Rank 6": ItemData(315906, True),
-    "Victory's Flame": ItemData(315907, True),   # Item showing completion of final quest
+    "Master Rank 1": ItemData(None, True),
+    "Master Rank 2": ItemData(None, True),
+    "Master Rank 3": ItemData(None, True),
+    "Master Rank 4": ItemData(None, True),
+    "Master Rank 5": ItemData(None, True),
+    "Master Rank 6": ItemData(None, True),
+    "Victory's Flame": ItemData(None, True),   # Item showing completion of final quest
+}
 
+weapon_item_table = {
     # Base Weapon Unlocks
-    "Great Sword Rarity 8": ItemData(315200, True),
-    "Great Sword Rarity 9": ItemData(315201, True),
-    "Great Sword Rarity 10": ItemData(315202, True),
+    "Great Sword Rarity 8": ItemData(315200, False),
+    "Great Sword Rarity 9": ItemData(315201, False),
+    "Great Sword Rarity 10": ItemData(315202, False),
 
     "Long Sword Rarity 8": ItemData(315204, False),
     "Long Sword Rarity 9": ItemData(315205, False),
@@ -104,7 +106,9 @@ progression_item_table = {
 
     # Progressive Consolidated
     "Progressive Weapon": ItemData(315274, False),
+}
 
+armor_item_table = {
     # Armor
     "Armor Rarity 8": ItemData(315275, False),
     "Armor Rarity 9": ItemData(315276, False),
@@ -119,7 +123,6 @@ filler_item_table = {
     "Random Armor": ItemData(315101, False),
     "Decoration Gift": ItemData(315102, False, 5),
     "Item Gift": ItemData(315103, False, 20),
-    "Garbage": ItemData(315104, False)
 }
 
 filler_weights = {
@@ -127,7 +130,6 @@ filler_weights = {
     "Random Armor": 4,
     "Decoration Gift": 2,
     "Item Gift": 2,
-    "Garbage": 1
 }
 
 follower_table = {
@@ -145,12 +147,35 @@ follower_table = {
 
 item_table = {
     **progression_item_table,
+    **weapon_item_table,
+    **armor_item_table,
     **filler_item_table,
     **follower_table,
 }
 
 item_names = {
-    "follower": {name for name in follower_table.keys()}
+    "Follower": {name for name in follower_table.keys()},
+    "Weapons": {name for name in weapon_item_table.keys()},
+    "Great Sword": ["Great Sword Rarity 8", "Great Sword Rarity 9", "Great Sword Rarity 10", "Progressive Great Sword"],
+    "Long Sword": ["Long Sword Rarity 8", "Long Sword Rarity 9", "Long Sword Rarity 10", "Progressive Long Sword"],
+    "Sword and Shield": ["Sword and Shield Rarity 8", "Sword and Shield Rarity 9",
+                         "Sword and Shield Rarity 10", "Progressive Sword and Shield"],
+    "Dual Blades": ["Dual Blades Rarity 8", "Dual Blades Rarity 9", "Dual Blades Rarity 10", "Progressive Dual Blades"],
+    "Hammer": ["Hammer Rarity 8", "Hammer Rarity 9", "Hammer Rarity 10", "Progressive Hammer"],
+    "Hunting Horn": ["Hunting Horn Rarity 8", "Hunting Horn Rarity 9",
+                     "Hunting Horn Rarity 10", "Progressive Hunting Horn"],
+    "Lance": ["Lance Rarity 8", "Lance Rarity 9", "Lance Rarity 10", "Progressive Lance"],
+    "Gunlance": ["Gunlance Rarity 8", "Gunlance Rarity 9", "Gunlance Rarity 10", "Progressive Gunlance"],
+    "Switch Axe": ["Switch Axe Rarity 8", "Switch Axe Rarity 9", "Switch Axe Rarity 10", "Progressive Switch Axe"],
+    "Insect Glaive": ["Insect Glaive Rarity 8", "Insect Glaive Rarity 9",
+                      "Insect Glaive Rarity 10", "Progressive Insect Glaive"],
+    "Charge Blade": ["Charge Blade Rarity 8", "Charge Blade Rarity 9",
+                     "Charge Blade Rarity 10", "Progressive Charge Blade"],
+    "Light Bowgun": ["Light Bowgun Rarity 8", "Light Bowgun Rarity 9",
+                     "Light Bowgun Rarity 10", "Progressive Light Bowgun"],
+    "Heavy Bowgun": ["Heavy Bowgun Rarity 8", "Heavy Bowgun Rarity 9",
+                     "Heavy Bowgun Rarity 10", "Progressive Heavy Bowgun"],
+    "Bow": ["Bow Rarity 8", "Bow Rarity 9", "Bow Rarity 10", "Progressive Bow"],
 }
 
 lookup_name_to_id: typing.Dict[str, int] = {item_name: data.code for item_name, data in item_table.items() if data.code}
