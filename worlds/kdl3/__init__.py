@@ -77,12 +77,6 @@ class KDL3World(World):
         self.rom_name_available_event = threading.Event()
         super().__init__(world, player)
 
-    @classmethod
-    def stage_assert_generate(cls, multiworld: MultiWorld) -> None:
-        rom_file: str = get_base_rom_path()
-        if not os.path.exists(rom_file):
-            raise FileNotFoundError(f"Could not find base ROM for {cls.game}: {rom_file}")
-
     create_regions = create_levels
 
     def create_item(self, name: str, force_non_progression=False) -> KDL3Item:
