@@ -10,7 +10,7 @@ from .Regions import create_levels
 from .Options import kdl3_options
 from .Names import LocationName
 from .Rules import set_rules
-from .Rom import KDL3DeltaPatch, get_base_rom_path, RomData, patch_rom, KDL3JHASH, KDL3UHASH
+from .Rom import KDL3ProcedurePatch, get_base_rom_path, RomData, patch_rom, KDL3JHASH, KDL3UHASH
 from .Client import KDL3SNIClient
 
 from typing import Dict, TextIO
@@ -179,30 +179,20 @@ class KDL3World(World):
                     self.boss_butch_bosses[self.player][i] = True
 
     def generate_output(self, output_directory: str):
-        rom_path = ""
         try:
-            world = self.multiworld
-            player = self.player
-
-            rom = RomData(get_base_rom_path())
-            patch_rom(self.multiworld, self.player, rom, self.required_heart_stars[self.player],
+            patch = KDL3ProcedurePatch()
+            patch_rom(self.multiworld, self.player, patch, self.required_heart_stars[self.player],
                       self.boss_requirements[self.player],
                       self.player_levels[self.player],
                       self.boss_butch_bosses[self.player])
-
-            rom_path = os.path.join(output_directory, f"{self.multiworld.get_out_file_name_base(self.player)}.sfc")
-            rom.write_to_file(rom_path)
-            self.rom_name = rom.name
-
-            patch = KDL3DeltaPatch(os.path.splitext(rom_path)[0] + KDL3DeltaPatch.patch_file_ending, player=player,
-                                   player_name=world.player_name[player], patched_path=rom_path)
-            patch.write()
+            rom_path = os.path.join(output_directory,
+                                    f"{self.multiworld.get_out_file_name_base(self.player)}{patch.patch_file_ending}")
+            patch.write(rom_path)
+            self.rom_name = patch.name
         except Exception:
             raise
         finally:
             self.rom_name_available_event.set()  # make sure threading continues and errors are collected
-            if os.path.exists(rom_path):
-                os.unlink(rom_path)
 
     def modify_multidata(self, multidata: dict):
         # wait for self.rom_name to be available.
