@@ -189,7 +189,7 @@ class KDL3PatchExtensions(APPatchExtension):
     game = "Kirby's Dream Land 3"
 
     @staticmethod
-    def write_stage_shuffle_sprites(rom: bytes) -> bytes:
+    def write_stage_shuffle_sprites(caller: APProcedurePatch, rom: bytes) -> bytes:
         rom_data = RomData(rom)
         if rom_data.read_bytes(0x3D014, 1)[0] > 0:
             stages = [struct.unpack("HHHHHHH", rom_data.read_bytes(0x3D020 + x * 14, 14)) for x in range(5)]
@@ -206,7 +206,7 @@ class KDL3PatchExtensions(APPatchExtension):
         return rom_data.get_bytes()
 
     @staticmethod
-    def write_heart_star_sprites(rom: bytes) -> bytes:
+    def write_heart_star_sprites(caller: APProcedurePatch, rom: bytes) -> bytes:
         rom_data = RomData(rom)
         compressed = rom_data.read_bytes(heart_star_address, heart_star_size)
         decompressed = hal_decompress(compressed)
@@ -220,7 +220,7 @@ class KDL3PatchExtensions(APPatchExtension):
         return rom_data.get_bytes()
 
     @staticmethod
-    def write_consumable_sprites(rom: bytes) -> bytes:
+    def write_consumable_sprites(caller: APProcedurePatch, rom: bytes) -> bytes:
         rom_data = RomData(rom)
         if rom_data.read_bytes(0x3D018, 1)[0] > 0:
             compressed = rom_data.read_bytes(consumable_address, consumable_size)
@@ -269,10 +269,10 @@ class KDL3ProcedurePatch(APProcedurePatch):
     game = "Kirby's Dream Land 3"
     patch_file_ending = ".apkdl3"
     procedure = [
-        "apply_tokens",
-        "write_stage_shuffle_sprites",
-        "write_heart_star_sprites",
-        "write_consumable_sprites"
+        ("apply_tokens", ["token_data.bin"]),
+        ("write_stage_shuffle_sprites", []),
+        ("write_heart_star_sprites", []),
+        ("write_consumable_sprites", [])
     ]
 
     @classmethod
@@ -1075,6 +1075,8 @@ def patch_rom(multiworld: MultiWorld, player: int, patch: KDL3ProcedurePatch, he
             target = gooey_target_palettes[addr]
             palette = get_gooey_palette(multiworld, player)
             patch.write_token(addr, get_palette_bytes(palette, target[0], target[1], target[2]))
+
+    patch.write_file("token_data.bin", patch.get_token_binary())
 
 
 def get_base_rom_bytes() -> bytes:
