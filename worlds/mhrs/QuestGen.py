@@ -129,7 +129,8 @@ monster_choices = [
     # Crimson Glow Valstrax
     1369,  # Scorned Magnamalo
     1379,  # Narwa the Allmother
-    1398  # Seething Bazelgeuse
+    1398,  # Seething Bazelgeuse
+    1412   # Primordial Malzeno
 ]
 
 monster_icons = {
@@ -199,12 +200,13 @@ monster_icons = {
     1369: 52,  # Scorned Magnamalo
     1379: 40,  # Narwa the Allmother
     1398: 57,  # Seething Bazelgeuse
-    1793: 68,  # Apex Rathian
-    1794: 69,  # Apex Rathalos
-    1799: 70,  # Apex Diablos
-    1849: 71,  # Apex Zinogre
-    1852: 72,  # Apex Arzuros
-    1874: 73,  # Apex Mizutsune
+    1412: 67,  # Primordial Malzeno
+    1793: 69,  # Apex Rathian
+    1794: 70,  # Apex Rathalos
+    1799: 71,  # Apex Diablos
+    1849: 72,  # Apex Zinogre
+    1852: 73,  # Apex Arzuros
+    1874: 74,  # Apex Mizutsune
     2072: 6,   # Risen Kushala uses regular Kushala
     2073: 7,   # Risen Chameleos uses regular Chameleos
     2075: 8,   # Risen Teostra uses regular Teostra
@@ -232,7 +234,8 @@ final_boss_remap = {
     18: 1351,
     19: 124,
     20: 58,
-    21: 0
+    21: 1412,
+    22: 0
 }
 
 

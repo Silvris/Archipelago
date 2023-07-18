@@ -207,5 +207,6 @@ FinalQuests = {
     18: "Chaotic Gore Magala",
     19: "Velkhana",
     20: "Amatsu",
-    21: "The Hunting Road"
+    21: "Primordial Malzeno",
+    22: "The Hunting Road"
 }

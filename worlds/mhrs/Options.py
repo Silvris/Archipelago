@@ -76,13 +76,14 @@ class FinalBoss(Choice):
     option_furious_rajang = 17
     option_chaotic_gore_magala = 18
     option_velkhana = 19
-    # option_amatsu = 20 #future-proofing :>
-    option_hunting_road = 21
+    option_amatsu = 20
+    option_primordial_malzeno = 21
+    option_hunting_road = 22
 
 
 class Apexes(Choice):
     """
-    Enable: Adds the Apexes into the regular pool and final boss pool (no effect for specific boss seeds)
+    Enable: Adds the Apexes into the regular pool and final boss pool (no effect for specific boss settings)
     Enforce: Replaces all Arzuros, Rathian, Mizutsune, Rathalos, Zinogre, and Diablos with their Apex equivalents,
     and adds them to the final boss pool.
     Disable: Apexes cannot be generated for quests.
@@ -96,8 +97,9 @@ class Apexes(Choice):
 
 class Risens(Choice):
     """
-    Enable: Adds the Risen into the regular pool and final boss pool (no effect for specific boss seeds).
-    Enforce: Replaces all Chameleos, Teostra, and Kushala Daora with their Risen equivalents.
+    Enable: Adds the Risen into the regular pool and final boss pool (no effect for specific boss settings).
+    Enforce: Replaces all Chameleos, Teostra, Kushala Daora, Valstrax, and Shagaru Magala with their Risen equivalents,
+    and adds them to the final boss pool.
     Disable: Risen cannot be generated for quests.
     """
     display_name = "Include Risen"
@@ -158,7 +160,7 @@ class MonsterDifficultyDeviation(Range):
 
 class ProgressiveWeapons(DefaultOnToggle):
     """
-    Weapon group unlocks will be given progressively, from R1-3 to R4-5 to R6-7 to R8-9 to R10.
+    Weapon group unlocks will be given progressively, from R8 to R9 to R10.
     """
     display_name = "Progressive Weapon Unlocks"
 
@@ -172,7 +174,7 @@ class ConsolidateWeapons(Toggle):
 
 class ProgressiveArmor(Toggle):
     """
-    Armor unlocks will be given progressively, from R1 to R10.
+    Armor unlocks will be given progressively, from R8 to R10.
     """
     display_name = "Progressive Armor"
 
@@ -206,7 +208,7 @@ class FollowerStrength(SpecialRange):
     range_start = 1
     range_end = 100
     default = 14
-    special_range_names ={
+    special_range_names = {
         "default": 14,
         "double": 28,
         "quadruple": 56,

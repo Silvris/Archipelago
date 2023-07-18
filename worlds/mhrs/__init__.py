@@ -23,7 +23,7 @@ class MHRSWorld(World):
     plethora of fantastical monsters in an effort to protect their village, crafting weapons and armor along the way.
     This randomizer focuses specifically on the Sunbreak expansion.
     """
-    game: str = "Monster Hunter Rise Sunbreak"
+    game = "Monster Hunter Rise Sunbreak"
     option_definitions = mhrs_options
     web = MHRSWebWorld()
     data_version = 0
@@ -58,9 +58,8 @@ class MHRSWorld(World):
                 return target
             else:
                 # roll a random boss for the player
-                boss_table = [i for i in range(2, 20)]
-                if target == 0:
-                    boss_table.append(21)  # do it this way while we wait for 20 to become valid
+                boss_table = [i for i in range(2, 22 if target == 1 else 23)]
+
                 boss = self.multiworld.per_slot_randoms[self.player].choice(boss_table)
 
                 self.final_bosses[player] = boss
@@ -130,14 +129,14 @@ class MHRSWorld(World):
                     self.create_item(f"{weapon} Rarity {i}") for i in range(8, 9 + (MR // 3))
                 ]
         # handle armor
-        if self.multiworld.progressive_armor[self.player].value:
+        if self.multiworld.progressive_armor[self.player]:
             itempool += [self.create_item("Progressive Armor Rarity") for _ in range(8, 9 + (MR // 3))]
         else:
             itempool += [self.create_item(f"Armor Rarity {i}") for i in range(8, 9 + (MR // 3))
                          ]
 
         # handle follower randomization if enabled
-        if self.multiworld.enable_followers[self.player].value == 0:
+        if self.multiworld.enable_followers[self.player] == 0:
             for follower in follower_table:
                 itempool.append(self.create_item(follower))
         quests = get_quest_table(self.multiworld.master_rank_requirement[self.player].value)
