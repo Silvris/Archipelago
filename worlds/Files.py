@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import json
-import struct
 import zipfile
 
 from typing import ClassVar, Dict, Tuple, Any, Optional, Union, BinaryIO, List
@@ -158,7 +157,6 @@ class APProcedurePatch(APContainer, metaclass=AutoPatchRegister):
 
     def __init__(self, *args: Any, **kwargs: Any):
         super(APProcedurePatch, self).__init__(*args, **kwargs)
-        self.tokens = list()
 
     def get_manifest(self) -> Dict[str, Any]:
         manifest = super(APProcedurePatch, self).get_manifest()
@@ -195,18 +193,6 @@ class APProcedurePatch(APContainer, metaclass=AutoPatchRegister):
     def write_file(self, file_name: str, file: bytes) -> None:
         self.files[file_name] = file
 
-    def get_token_binary(self) -> bytes:
-        data = bytearray()
-        data.extend(struct.pack("I", len(self.tokens)))
-        for offset, bin_data in self.tokens:
-            data.extend(struct.pack("I", offset))
-            data.extend(struct.pack("I", len(bin_data)))
-            data.extend(bin_data)
-        return data
-
-    def write_token(self, offset, data):
-        self.tokens.append((offset, data))
-
     def patch(self, target: str):
         self.read()
         base_data = self.get_source_data_with_cache()
@@ -229,7 +215,6 @@ class APDeltaPatch(APProcedurePatch):
     """An APContainer that additionally has delta.bsdiff4
     containing a delta patch to get the desired file, often a rom."""
 
-    source_data: bytes
     procedure = [
         ("apply_bsdiff4", ["delta.bsdiff4"])
     ]
@@ -251,17 +236,3 @@ class APPatchExtension(metaclass=AutoPatchExtensionRegister):
     @staticmethod
     def apply_bsdiff4(caller: APProcedurePatch, rom: bytes, patch: str):
         return bsdiff4.patch(rom, caller.get_file(patch))
-
-    @staticmethod
-    def apply_tokens(caller: APProcedurePatch, rom: bytes, token_file: str) -> bytes:
-        token_data = caller.get_file(token_file)
-        rom_data = bytearray(rom)
-        token_count = struct.unpack("I", token_data[0:4])[0]
-        bpr = 4
-        for _ in range(token_count):
-            offset = struct.unpack("I", token_data[bpr:bpr + 4])[0]
-            size = struct.unpack("I", token_data[bpr + 4:bpr + 8])[0]
-            data = token_data[bpr + 8:bpr + 8 + size]
-            rom_data[offset:offset + len(data)] = data
-            bpr += 8 + size
-        return rom_data

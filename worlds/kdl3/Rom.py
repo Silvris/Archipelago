@@ -189,6 +189,20 @@ class KDL3PatchExtensions(APPatchExtension):
     game = "Kirby's Dream Land 3"
 
     @staticmethod
+    def apply_tokens(caller: APProcedurePatch, rom: bytes, token_file: str) -> bytes:
+        token_data = caller.get_file(token_file)
+        rom_data = bytearray(rom)
+        token_count = struct.unpack("I", token_data[0:4])[0]
+        bpr = 4
+        for _ in range(token_count):
+            offset = struct.unpack("I", token_data[bpr:bpr + 4])[0]
+            size = struct.unpack("I", token_data[bpr + 4:bpr + 8])[0]
+            data = token_data[bpr + 8:bpr + 8 + size]
+            rom_data[offset:offset + len(data)] = data
+            bpr += 8 + size
+        return rom_data
+
+    @staticmethod
     def write_stage_shuffle_sprites(caller: APProcedurePatch, rom: bytes) -> bytes:
         rom_data = RomData(rom)
         if rom_data.read_bytes(0x3D014, 1)[0] > 0:
@@ -282,6 +296,18 @@ class KDL3ProcedurePatch(APProcedurePatch):
     def __init__(self, *args: typing.Any, **kwargs: typing.Any):
         super().__init__(*args, **kwargs)
         self.name = ""
+
+    def get_token_binary(self) -> bytes:
+        data = bytearray()
+        data.extend(struct.pack("I", len(self.tokens)))
+        for offset, bin_data in self.tokens:
+            data.extend(struct.pack("I", offset))
+            data.extend(struct.pack("I", len(bin_data)))
+            data.extend(bin_data)
+        return data
+
+    def write_token(self, offset, data):
+        self.tokens.append((offset, data))
 
 
 def patch_rom(multiworld: MultiWorld, player: int, patch: KDL3ProcedurePatch, heart_stars_required: int,
