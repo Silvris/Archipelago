@@ -37,8 +37,8 @@ class Room(Region):
         self.animal_pointers = animal_pointers
 
     def patch(self, rom: "KDL3ProcedurePatch"):
-        rom.write_token(self.pointer + 2, bytes([self.music]))
+        rom.write_token(0, self.pointer + 2, bytes([self.music]))
         animals = [x.item for x in self.locations if "Animal" in x.name]
         if len(animals) > 0:
             for current_animal, address in zip(animals, self.animal_pointers):
-                rom.write_token(address + 7, animal_map[animals[current_animal]])
+                rom.write_token(0, address + 7, animal_map[animals[current_animal]])
