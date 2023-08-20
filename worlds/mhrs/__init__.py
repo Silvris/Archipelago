@@ -1,16 +1,17 @@
 import math
-from typing import Dict, Any
+from typing import Dict, Any, Optional
 
 from worlds.AutoWorld import World, WebWorld
 from worlds.generic.Rules import set_rule
-from BaseClasses import Item, ItemClassification, Region, Entrance
+from BaseClasses import Item, ItemClassification
 from .Options import mhrs_options
 from .Items import lookup_name_to_id as items_lookup
-from .Items import filler_item_table, filler_weights, follower_table, progression_item_table, MHRSItem
-from .Locations import mhr_quests, MHRSQuest, get_quest_table, get_mr_quest_num
+from .Items import filler_item_table, filler_weights, useful_item_table, follower_table,\
+    progression_item_table, MHRSItem, item_table, item_name_groups
+from .Locations import mhr_quests, MHRSQuest, get_quest_table, get_mr_quest_num, urgent_quests
 from .Quests import FinalQuests, UrgentQuests
-from .Regions import mhrs_regions, link_mhrs_regions
 from .QuestGen import generate_quests
+from .Regions import create_regions
 
 
 class MHRSWebWorld(WebWorld):
@@ -31,7 +32,8 @@ class MHRSWorld(World):
 
     item_name_to_id = items_lookup
     location_name_to_id = {name: mhr_quests[name].id for name in mhr_quests}
-    final_bosses = dict()
+    item_name_groups = item_name_groups
+    final_boss: Optional[int] = None
     requirements_base = {1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0}
     key_requirements = dict()
     generate_output = generate_quests
@@ -40,57 +42,37 @@ class MHRSWorld(World):
         classification = ItemClassification.filler
         if name in progression_item_table and not force_non_progression:
             classification = ItemClassification.progression
-        if name in follower_table and not force_non_progression:
+        if name in useful_item_table and not force_non_progression:
             classification = ItemClassification.useful
         if name == "Key Quest" and not force_non_progression:
             classification = ItemClassification.progression_skip_balancing
-        item = MHRSItem(name, classification, items_lookup[name], self.player)
+        item = MHRSItem(name, classification, item_table[name].code, self.player)
         return item
 
-    def get_final_boss(self, player):
+    def get_final_boss(self):
         # first check if we have already defined this player's final boss
-        if player in self.final_bosses:
-            return self.final_bosses[player]
+        if self.final_boss:
+            return self.final_boss
         else:
             # define the player's final boss, is it a preset option?
-            target = self.multiworld.final_quest_target[player].value
+            target = self.multiworld.final_quest_target[self.player].value
             if target not in [0, 1]:
+                self.final_boss = target
                 return target
             else:
                 # roll a random boss for the player
                 boss_table = [i for i in range(2, 22 if target == 1 else 23)]
 
-                boss = self.multiworld.per_slot_randoms[self.player].choice(boss_table)
+                boss = self.random.choice(boss_table)
 
-                self.final_bosses[player] = boss
+                self.final_boss = boss
                 return boss
 
-    def get_final_quest(self, player):
-        boss = self.get_final_boss(player)
+    def get_final_quest(self):
+        boss = self.get_final_boss()
         return f"{self.multiworld.master_rank_requirement[self.player].value}★ - {FinalQuests[boss]}"
 
-    def create_regions(self) -> None:
-        def MHRSRegion(region_name: str, exits=[]):
-            region = Region(region_name, self.player, self.multiworld)
-            region.locations = [
-                MHRSQuest(self.player, name, mhr_quests[name].id, region)
-                for name in mhr_quests
-                if mhr_quests[name].region == region_name
-                   and mhr_quests[name].MR <= self.multiworld.master_rank_requirement[self.player].value
-                # this leaves quests higher than max MR out
-            ]
-            for exit in exits:
-                region.exits.append(Entrance(self.player, exit, region))
-            if region_name == f"MR{self.multiworld.master_rank_requirement[self.player].value}":
-                region.exits = list()
-                region.locations.append(MHRSQuest(self.player, self.get_final_quest(self.player), None, region))
-            return region
-
-        self.multiworld.regions += [MHRSRegion(*r) for r in mhrs_regions
-                                    if r[0] not in [f"MR{i}"
-                                                    for i in range(
-                    self.multiworld.master_rank_requirement[self.player].value + 1, 7)]]
-        link_mhrs_regions(self.multiworld, self.player)
+    create_regions = create_regions
 
     def create_items(self) -> None:
         itempool = []
@@ -159,25 +141,7 @@ class MHRSWorld(World):
         self.multiworld.itempool += itempool
 
     def generate_basic(self) -> None:
-        self.multiworld.get_location("1★ - Uninvited Guest", self.player).place_locked_item(
-            self.create_item("Master Rank 1"))
-        mr = self.multiworld.master_rank_requirement[self.player].value
-        if mr >= 2:
-            self.multiworld.get_location("2★ - Scarlet Tengu in the Shrine Ruins", self.player).place_locked_item(
-                self.create_item("Master Rank 2"))
-            if mr >= 3:
-                self.multiworld.get_location("3★ - A Rocky Rampage", self.player).place_locked_item(
-                    self.create_item("Master Rank 3"))
-                if mr >= 4:
-                    self.multiworld.get_location("4★ - Ice Wolf, Red Moon", self.player).place_locked_item(
-                        self.create_item("Master Rank 4"))
-                    if mr >= 5:
-                        self.multiworld.get_location("5★ - Witness by Moonlight", self.player).place_locked_item(
-                            self.create_item("Master Rank 5"))
-                        if mr == 6:
-                            self.multiworld.get_location("6★ - Proof of Courage", self.player).place_locked_item(
-                                self.create_item("Master Rank 6"))
-        self.multiworld.get_location(self.get_final_quest(self.player), self.player).place_locked_item(
+        self.multiworld.get_location(self.get_final_quest(), self.player).place_locked_item(
             self.create_item("Victory's Flame"))
 
         self.multiworld.completion_condition[self.player] = lambda state: state.has("Victory's Flame", self.player)
@@ -185,27 +149,18 @@ class MHRSWorld(World):
     def set_rules(self):
         # set urgent rules
         mr = self.multiworld.master_rank_requirement[self.player].value
-        for i in range(1, mr + 1):
-            set_rule(self.multiworld.get_entrance(f"To MR{i}", self.player),
-                     lambda state, m=i: state.has(f"Master Rank {m}", self.player))
+        for i in range(2, mr + 1):
+            set_rule(self.multiworld.get_location(f"MR {i} Urgent", self.player),
+                     lambda state, m=i: state.has("Key Quest", self.player, self.key_requirements[m - 1]))
 
-        if mr >= 2:
-            set_rule(self.multiworld.get_location("2★ - Scarlet Tengu in the Shrine Ruins", self.player),
-                     lambda state: state.has("Key Quest", self.player, self.key_requirements[1]))
-            if mr >= 3:
-                set_rule(self.multiworld.get_location("3★ - A Rocky Rampage", self.player),
-                         lambda state: state.has("Key Quest", self.player, self.key_requirements[2]))
-                if mr >= 4:
-                    set_rule(self.multiworld.get_location("4★ - Ice Wolf, Red Moon", self.player),
-                             lambda state: state.has("Key Quest", self.player, self.key_requirements[3]))
-                    if mr >= 5:
-                        set_rule(self.multiworld.get_location("5★ - Witness by Moonlight", self.player),
-                                 lambda state: state.has("Key Quest", self.player, self.key_requirements[4]))
-                        if mr == 6:
-                            set_rule(self.multiworld.get_location("6★ - Proof of Courage", self.player),
-                                     lambda state: state.has("Key Quest", self.player, self.key_requirements[5]))
+        for urgent in urgent_quests:
+            if urgent_quests[urgent].MR < self.multiworld.master_rank_requirement[self.player].value:
+                set_rule(self.multiworld.get_location(urgent, self.player),
+                         (lambda state: True) if urgent_quests[urgent].MR == 1 else
+                         lambda state, m=urgent_quests[urgent].MR:
+                         state.has("Key Quest", self.player, self.key_requirements[m - 1]))
 
-        set_rule(self.multiworld.get_location(self.get_final_quest(self.player), self.player),
+        set_rule(self.multiworld.get_location(self.get_final_quest(), self.player),
                  lambda state: state.has("Key Quest", self.player,
                                          self.key_requirements[
                                              self.multiworld.master_rank_requirement[self.player].value]))

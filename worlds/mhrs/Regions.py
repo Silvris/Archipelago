@@ -1,34 +1,38 @@
-from BaseClasses import MultiWorld
-mhrs_regions = [
-    ("Menu", ["MR1 Urgent"]),
-    ("MR1 Urgent", ["To MR1"]),
-    ("MR1", ["To MR2"]),
-    ("MR2", ["To MR3"]),
-    ("MR3", ["To MR4"]),
-    ("MR4", ["To MR5"]),
-    ("MR5", ["To MR6"]),
-    ("MR6", []),
-    # ("MR1 Requests", []),
-    # ("MR2 Requests", []),
-    # ("MR3 Requests", []),
-    # ("MR4 Requests", []),
-    # ("MR5 Requests", []),
-    # ("MR6 Requests", [])
-]
+import typing
 
-entrances = {
-    "MR1 Urgent": "MR1 Urgent",
-    "To MR1": "MR1",
-    "To MR2": "MR2",
-    "To MR3": "MR3",
-    "To MR4": "MR4",
-    "To MR5": "MR5",
-    "To MR6": "MR6",
-}
+from BaseClasses import Region, Entrance
+from .Locations import MHRSQuest, mhr_quests
+
+if typing.TYPE_CHECKING:
+    from . import MHRSWorld
 
 
-def link_mhrs_regions(multiworld: MultiWorld, player: int):
-    multiworld.get_entrance("MR1 Urgent", player).connect(multiworld.get_region("MR1 Urgent", player))
-    for entrance in [f"To MR{i}" for i in range(1, multiworld.master_rank_requirement[player].value + 1)]:
-        multiworld.get_entrance(entrance, player).connect(multiworld.get_region(entrances[entrance], player))
+class MHRSRegion(Region):
+    game = "Monster Hunter Rise Sunbreak"
 
+
+def create_regions(world: "MHRSWorld") -> None:
+    mr = world.multiworld.master_rank_requirement[world.player].value
+    for i in range(mr, 0, -1):
+        region = MHRSRegion(f"Master Rank {i}", world.player, world.multiworld)
+        region.add_locations({quest: mhr_quests[quest].id
+                              for quest in mhr_quests if mhr_quests[quest].region == region.name
+                              and mhr_quests[quest].MR <= mr}, MHRSQuest)
+        # edge case: goal
+        if i == mr:
+            region.add_locations({world.get_final_quest(): None}, MHRSQuest)
+        else:
+            region.add_exits([f"Master Rank {i + 1}"],
+                             {f"Master Rank {i + 1}": lambda state, i=i: state.has(f"Master Rank {i + 1}",
+                                                                                   world.player)})
+        world.multiworld.regions.append(region)
+    # now just create our MR1 Urgent region
+    menu = MHRSRegion("Menu", world.player, world.multiworld)
+    menu.add_exits(["Master Rank 1"], {"Master Rank 1": lambda state: state.has(f"Master Rank 1", world.player)})
+    menu.add_locations({quest: mhr_quests[quest].id
+                        for quest in mhr_quests if mhr_quests[quest].region == "MR1 Urgent"}, MHRSQuest)
+    world.multiworld.regions.append(menu)
+    # while we're here, place our locked event items
+    for i in range(1, mr + 1):
+        world.multiworld.get_location(f"MR {i} Urgent", world.player)\
+            .place_locked_item(world.create_item(f"Master Rank {i}"))

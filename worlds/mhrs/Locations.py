@@ -17,29 +17,35 @@ class MHRSQuest(Location):
         super().__init__(player, name, address, parent)
         self.event = not address
 
+urgent_quests = {
+    "1★ - Uninvited Guest": QuestData(315100, "MR1 Urgent", 1, True),
+    "2★ - Scarlet Tengu in the Shrine Ruins": QuestData(315900, "Master Rank 1", 2, True),
+    "3★ - A Rocky Rampage": QuestData(315901, "Master Rank 2", 3, True),
+    "4★ - Ice Wolf, Red Moon": QuestData(315902, "Master Rank 3", 4, True),
+    "5★ - Witness by Moonlight": QuestData(315903, "Master Rank 4", 5, True),
+    "6★ - Proof of Courage": QuestData(315904, "Master Rank 5", 6, True)
+}
 
 mhr_quests = {
-    MR1Quests[qid]: QuestData(qid, "MR1", 1) for qid in MR1Quests
+    MR1Quests[qid]: QuestData(qid, "Master Rank 1", 1) for qid in MR1Quests
 }
-mhr_quests.update({MR2Quests[qid]: QuestData(qid, "MR2", 2) for qid in MR2Quests})
-mhr_quests.update({MR3Quests[qid]: QuestData(qid, "MR3", 3) for qid in MR3Quests})
-mhr_quests.update({MR4Quests[qid]: QuestData(qid, "MR4", 4) for qid in MR4Quests})
-mhr_quests.update({MR5Quests[qid]: QuestData(qid, "MR5", 5) for qid in MR5Quests})
-mhr_quests.update({MR6Quests[qid]: QuestData(qid, "MR6", 6) for qid in MR6Quests})
+mhr_quests.update({MR2Quests[qid]: QuestData(qid, "Master Rank 2", 2) for qid in MR2Quests})
+mhr_quests.update({MR3Quests[qid]: QuestData(qid, "Master Rank 3", 3) for qid in MR3Quests})
+mhr_quests.update({MR4Quests[qid]: QuestData(qid, "Master Rank 4", 4) for qid in MR4Quests})
+mhr_quests.update({MR5Quests[qid]: QuestData(qid, "Master Rank 5", 5) for qid in MR5Quests})
+mhr_quests.update({MR6Quests[qid]: QuestData(qid, "Master Rank 6", 6) for qid in MR6Quests})
+mhr_quests.update(urgent_quests)
 mhr_quests.update({
-    "1★ - Uninvited Guest": QuestData(315100, "MR1 Urgent", 1, True),
-    "2★ - Scarlet Tengu in the Shrine Ruins": QuestData(315900, "MR1", 2, True),
-    "3★ - A Rocky Rampage": QuestData(315901, "MR2", 3, True),
-    "4★ - Ice Wolf, Red Moon": QuestData(315902, "MR3", 4, True),
-    "5★ - Witness by Moonlight": QuestData(315903, "MR4", 5, True),
-    "6★ - Proof of Courage": QuestData(315904, "MR5", 6, True)
+    f"MR {urgent_quests[quest].MR} Urgent": QuestData(None, urgent_quests[quest].region, urgent_quests[quest].MR, True)
+    for quest in urgent_quests
 })
 
 
-def get_quest_table(mr: int, include_urgents=False):
+def get_quest_table(mr: int):
     quests = [mhr_quests[quest].id
               for quest in mhr_quests
-              if mhr_quests[quest].MR <= mr and (True if include_urgents else not mhr_quests[quest].urgent)]
+              if mhr_quests[quest].id
+              and mhr_quests[quest].MR <= mr]
     return quests
 
 

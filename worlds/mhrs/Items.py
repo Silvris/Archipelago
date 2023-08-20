@@ -145,6 +145,12 @@ follower_table = {
     "Galleus": ItemData(315709, False, 1, True)
 }
 
+useful_item_table = {
+    **weapon_item_table,
+    **armor_item_table,
+    **follower_table
+}
+
 item_table = {
     **progression_item_table,
     **weapon_item_table,
@@ -153,7 +159,7 @@ item_table = {
     **follower_table,
 }
 
-item_names = {
+item_name_groups = {
     "Follower": {name for name in follower_table.keys()},
     "Weapons": {name for name in weapon_item_table.keys()},
     "Great Sword": ["Great Sword Rarity 8", "Great Sword Rarity 9", "Great Sword Rarity 10", "Progressive Great Sword"],

@@ -499,7 +499,7 @@ def randomize_quests(multiworld: MultiWorld, player: int, final_boss: int) -> di
     if multiworld.include_risen[player].value in [0, 1]:
         allowed_monsters.extend([2072, 2073, 2075, 2120, 2134])
 
-    for quest in get_quest_table(multiworld.master_rank_requirement[player].value, True):
+    for quest in get_quest_table(multiworld.master_rank_requirement[player].value):
         quest_data[quest] = randomize_quest(multiworld, player, allowed_monsters, quest, None)
 
     quest_data[315618] = randomize_quest(multiworld, player,
@@ -526,7 +526,7 @@ def generate_quests(world: "MHRSWorld", output_directory: str):
 
     file_dir = world.multiworld.get_out_file_name_base(world.player)
     apmhrs = MHRSZipFile(
-        randomize_quests(world.multiworld, world.player, world.get_final_boss(world.player)),
+        randomize_quests(world.multiworld, world.player, world.get_final_boss()),
         file_dir,
         output_directory,
         world.player,
