@@ -83,7 +83,7 @@ class MHRSWorld(World):
                 region.exits.append(Entrance(self.player, exit, region))
             if region_name == f"MR{self.multiworld.master_rank_requirement[self.player].value}":
                 region.exits = list()
-                region.locations.append(MHRSQuest(self.player, self.get_final_quest(self.player), 315618, region))
+                region.locations.append(MHRSQuest(self.player, self.get_final_quest(self.player), None, region))
             return region
 
         self.multiworld.regions += [MHRSRegion(*r) for r in mhrs_regions

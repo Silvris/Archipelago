@@ -5,7 +5,7 @@ from pathlib import Path
 from random import Random
 from typing import TYPE_CHECKING
 
-import worlds.Files
+from worlds.Files import APContainer
 from .Locations import get_quest_table
 from BaseClasses import MultiWorld
 if TYPE_CHECKING:
@@ -245,7 +245,7 @@ def random_normal_integer(slot_random: Random, mu: int, sigma: int, lower: int, 
 
 
 def can_afflict(monster: int):
-    if monster in {24, 25, 27, 58, 72, 96, 124, 132, 135, 549, 594, 1379, 1366, 2072, 2073, 2075, 2134, 1793, 1794,
+    if monster in {24, 25, 27, 58, 72, 96, 124, 132, 135, 549, 594, 1379, 1366, 1412, 2072, 2073, 2075, 2134, 1793, 1794,
                    1799, 1849, 1852, 1874}:
         return False
     else:
@@ -253,7 +253,7 @@ def can_afflict(monster: int):
 
 
 def is_elder_dragon(monster: int):
-    if monster in {24, 25, 27, 58, 72, 96, 124, 132, 135, 1366, 1379, 2072, 2073, 2075, 2134}:
+    if monster in {24, 25, 27, 58, 72, 96, 124, 132, 135, 1366, 1379, 1412, 2072, 2073, 2075, 2134}:
         return True
     else:
         return False
@@ -276,13 +276,13 @@ def is_risen(monster: int):
 
 
 def get_quest_type(targets: list):
-    quest_type = 0
     for target in targets:
         if is_elder_dragon(target) or is_apex(target):
+            # since elders and apex cannot be captured, we it to slay
             quest_type = 1
-        else:
-            if quest_type != 1:
-                quest_type = 2
+            break
+    else:
+        quest_type = 2
     return quest_type
 
 
@@ -325,7 +325,7 @@ def randomize_quest(multiworld: MultiWorld, player: int, allowed_monsters: list,
         stage = 15  # gaismagorm can only spawn in the Yawning Abyss
     elif 1379 in quest_targets:
         stage = 11  # allmother can only spawn in the Coral Palace
-    elif is_hunting_road or multiworld.arena_only[player].value:
+    elif is_hunting_road or multiworld.arena_only[player]:
         stage = multiworld.per_slot_randoms[player].choice(arena_choices)
     else:
         stage = multiworld.per_slot_randoms[player].choice(stage_choices)
@@ -472,13 +472,13 @@ def randomize_quest(multiworld: MultiWorld, player: int, allowed_monsters: list,
             enemy["Monsters"][i]["IndividualType"] = multiworld.per_slot_randoms[player]\
                 .choices([2, 3, 4, 5], weights=[7, 1, 1, 1])
 
-        if monsters[i] in [136, 392]:
-            # edge case, Espinas and Flaming Espinas should be sleeping when they spawn
-            enemy["Monsters"][i]["SubType"] = 1
-
         if monsters[i] in [392, 549, 594] and multiworld.per_slot_randoms[player].randint(0, 9) == 9:
             # Hazard monsters, give a 1 in 10 chance for a hazard to spawn
             enemy["Monsters"][i]["SubType"] = 3 if monsters[i] == 392 else 1
+
+        elif monsters[i] in [136, 392]:
+            # edge case, Espinas and Flaming Espinas should be sleeping when they spawn
+            enemy["Monsters"][i]["SubType"] = 1
 
     return json.dumps(quest_data)
 
@@ -504,12 +504,12 @@ def randomize_quests(multiworld: MultiWorld, player: int, final_boss: int) -> di
 
     quest_data[315618] = randomize_quest(multiworld, player,
                                          allowed_monsters, 315618, [final_boss_remap[final_boss]],
-                                         True if final_boss == 21 else False)
+                                         True if final_boss == 22 else False)
 
     return quest_data
 
 
-class MHRSZipFile(worlds.Files.APContainer):
+class MHRSZipFile(APContainer):
     def __init__(self, quest_data: dict, base_path: str, output_directory: str,
                  player=None, player_name: str = "", server: str = ""):
         self.quest_data = quest_data
