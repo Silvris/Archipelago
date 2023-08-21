@@ -3,7 +3,7 @@ from typing import Dict, Any, Optional
 
 from worlds.AutoWorld import World, WebWorld
 from worlds.generic.Rules import set_rule
-from BaseClasses import Item, ItemClassification
+from BaseClasses import Item, ItemClassification, Tutorial
 from .Options import mhrs_options
 from .Items import lookup_name_to_id as items_lookup
 from .Items import filler_item_table, filler_weights, useful_item_table, follower_table,\
@@ -16,6 +16,16 @@ from .Regions import create_regions
 
 class MHRSWebWorld(WebWorld):
     theme = "stone"
+    tutorials = [
+        Tutorial(
+            "Multiworld Setup Guide",
+            "A guide to setting up the Monster Hunter Rise Sunbreak randomizer connected to an Archipelago Multiworld.",
+            "English",
+            "setup_en.md",
+            "setup/en",
+            ["Silvris"]
+        )
+    ]
 
 
 class MHRSWorld(World):
