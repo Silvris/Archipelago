@@ -1,0 +1,4502 @@
+[
+    {
+        "qid": "m00001",
+        "name": "A True Foe - The Giadrome!",
+        "hub": "0",
+        "rank": "0",
+        "star": "0",
+        "idx": "01",
+        "flag": "0",
+        "mask": "0"
+    },
+    {
+        "qid": "m00002",
+        "name": "Reckless Bulldrome Hunter",
+        "hub": "0",
+        "rank": "0",
+        "star": "0",
+        "idx": "02",
+        "flag": "0",
+        "mask": "1"
+    },
+    {
+        "qid": "m00003",
+        "name": "A Pack of Blangos",
+        "hub": "0",
+        "rank": "0",
+        "star": "0",
+        "idx": "03",
+        "flag": "0",
+        "mask": "2"
+    },
+    {
+        "qid": "m00004",
+        "name": "Mountain Herb Picking",
+        "hub": "0",
+        "rank": "0",
+        "star": "0",
+        "idx": "04",
+        "flag": "0",
+        "mask": "3"
+    },
+    {
+        "qid": "m00005",
+        "name": "Rarest of the Rare Beasts",
+        "hub": "0",
+        "rank": "0",
+        "star": "0",
+        "idx": "05",
+        "flag": "0",
+        "mask": "4"
+    },
+    {
+        "qid": "m00006",
+        "name": "Hunt the Rare Forest Congas!",
+        "hub": "0",
+        "rank": "0",
+        "star": "0",
+        "idx": "06",
+        "flag": "0",
+        "mask": "5"
+    },
+    {
+        "qid": "m00007",
+        "name": "A Mushroom Goldrush!",
+        "hub": "0",
+        "rank": "0",
+        "star": "0",
+        "idx": "07",
+        "flag": "0",
+        "mask": "6"
+    },
+    {
+        "qid": "m00008",
+        "name": "The Land Shark",
+        "hub": "0",
+        "rank": "0",
+        "star": "0",
+        "idx": "08",
+        "flag": "0",
+        "mask": "7"
+    },
+    {
+        "qid": "m00009",
+        "name": "The Giant Enemy Crab",
+        "hub": "0",
+        "rank": "0",
+        "star": "0",
+        "idx": "09",
+        "flag": "1",
+        "mask": "0"
+    },
+    {
+        "qid": "m00010",
+        "name": "The Lady Gourmet",
+        "hub": "0",
+        "rank": "0",
+        "star": "0",
+        "idx": "10",
+        "flag": "1",
+        "mask": "1"
+    },
+    {
+        "qid": "m00101",
+        "name": "The Shadow in the Mountains",
+        "hub": "0",
+        "rank": "0",
+        "star": "1",
+        "idx": "01",
+        "flag": "1",
+        "mask": "2"
+    },
+    {
+        "qid": "m00102",
+        "name": "The King of the Mountains",
+        "hub": "0",
+        "rank": "0",
+        "star": "1",
+        "idx": "02",
+        "flag": "1",
+        "mask": "3"
+    },
+    {
+        "qid": "m00103",
+        "name": "A Swarm of Hermitaurs",
+        "hub": "0",
+        "rank": "0",
+        "star": "1",
+        "idx": "03",
+        "flag": "1",
+        "mask": "4"
+    },
+    {
+        "qid": "m00104",
+        "name": "Water Wyvern in the Desert",
+        "hub": "0",
+        "rank": "0",
+        "star": "1",
+        "idx": "04",
+        "flag": "1",
+        "mask": "5"
+    },
+    {
+        "qid": "m00105",
+        "name": "Gypceros: Venomous Terror",
+        "hub": "0",
+        "rank": "0",
+        "star": "1",
+        "idx": "05",
+        "flag": "1",
+        "mask": "6"
+    },
+    {
+        "qid": "m00106",
+        "name": "Supreme Ruler of the Swamp",
+        "hub": "0",
+        "rank": "0",
+        "star": "1",
+        "idx": "06",
+        "flag": "1",
+        "mask": "7"
+    },
+    {
+        "qid": "m00107",
+        "name": "Slay the Great Kut-Ku!",
+        "hub": "0",
+        "rank": "0",
+        "star": "1",
+        "idx": "07",
+        "flag": "2",
+        "mask": "0"
+    },
+    {
+        "qid": "m00108",
+        "name": "Eliminate the Rathalos!",
+        "hub": "0",
+        "rank": "0",
+        "star": "1",
+        "idx": "08",
+        "flag": "2",
+        "mask": "1"
+    },
+    {
+        "qid": "m00109",
+        "name": "Attack of the Rathian",
+        "hub": "0",
+        "rank": "0",
+        "star": "1",
+        "idx": "09",
+        "flag": "2",
+        "mask": "2"
+    },
+    {
+        "qid": "m01001",
+        "name": "Gathering - Snowy Mountains",
+        "hub": "0",
+        "rank": "1",
+        "star": "0",
+        "idx": "01",
+        "flag": "2",
+        "mask": "3"
+    },
+    {
+        "qid": "m01002",
+        "name": "Gathering - Jungle Zone",
+        "hub": "0",
+        "rank": "1",
+        "star": "0",
+        "idx": "02",
+        "flag": "2",
+        "mask": "4"
+    },
+    {
+        "qid": "m01003",
+        "name": "Gathering - Desert Zone",
+        "hub": "0",
+        "rank": "1",
+        "star": "0",
+        "idx": "03",
+        "flag": "2",
+        "mask": "5"
+    },
+    {
+        "qid": "m01004",
+        "name": "Giadrome Assault",
+        "hub": "0",
+        "rank": "1",
+        "star": "0",
+        "idx": "04",
+        "flag": "2",
+        "mask": "6"
+    },
+    {
+        "qid": "m01005",
+        "name": "The Mountain Roughrider",
+        "hub": "0",
+        "rank": "1",
+        "star": "0",
+        "idx": "05",
+        "flag": "2",
+        "mask": "7"
+    },
+    {
+        "qid": "m01006",
+        "name": "Slay the Giaprey!",
+        "hub": "0",
+        "rank": "1",
+        "star": "0",
+        "idx": "06",
+        "flag": "3",
+        "mask": "0"
+    },
+    {
+        "qid": "m01007",
+        "name": "Find the Mountain Herbs!",
+        "hub": "0",
+        "rank": "1",
+        "star": "0",
+        "idx": "07",
+        "flag": "3",
+        "mask": "1"
+    },
+    {
+        "qid": "m01008",
+        "name": "Hunt Down the Velocidrome!",
+        "hub": "0",
+        "rank": "1",
+        "star": "0",
+        "idx": "08",
+        "flag": "3",
+        "mask": "2"
+    },
+    {
+        "qid": "m01009",
+        "name": "Blue Menace of the Jungle",
+        "hub": "0",
+        "rank": "1",
+        "star": "0",
+        "idx": "09",
+        "flag": "3",
+        "mask": "3"
+    },
+    {
+        "qid": "m01010",
+        "name": "Cunning Raiders",
+        "hub": "0",
+        "rank": "1",
+        "star": "0",
+        "idx": "10",
+        "flag": "3",
+        "mask": "4"
+    },
+    {
+        "qid": "m01011",
+        "name": "Attack of the Giant Bugs!",
+        "hub": "0",
+        "rank": "1",
+        "star": "0",
+        "idx": "11",
+        "flag": "3",
+        "mask": "5"
+    },
+    {
+        "qid": "m01012",
+        "name": "The Mushroom Hunt!",
+        "hub": "0",
+        "rank": "1",
+        "star": "0",
+        "idx": "12",
+        "flag": "3",
+        "mask": "6"
+    },
+    {
+        "qid": "m01013",
+        "name": "Panning for Goldenfish",
+        "hub": "0",
+        "rank": "1",
+        "star": "0",
+        "idx": "13",
+        "flag": "3",
+        "mask": "7"
+    },
+    {
+        "qid": "m01014",
+        "name": "Hunt the Gendrome!",
+        "hub": "0",
+        "rank": "1",
+        "star": "0",
+        "idx": "14",
+        "flag": "4",
+        "mask": "0"
+    },
+    {
+        "qid": "m01015",
+        "name": "The Land Shark",
+        "hub": "0",
+        "rank": "1",
+        "star": "0",
+        "idx": "15",
+        "flag": "4",
+        "mask": "1"
+    },
+    {
+        "qid": "m01016",
+        "name": "The Lurking Desert Giant",
+        "hub": "0",
+        "rank": "1",
+        "star": "0",
+        "idx": "16",
+        "flag": "4",
+        "mask": "2"
+    },
+    {
+        "qid": "m01017",
+        "name": "Slay the Genprey!",
+        "hub": "0",
+        "rank": "1",
+        "star": "0",
+        "idx": "17",
+        "flag": "4",
+        "mask": "3"
+    },
+    {
+        "qid": "m01018",
+        "name": "Liver of Legend!",
+        "hub": "0",
+        "rank": "1",
+        "star": "0",
+        "idx": "18",
+        "flag": "4",
+        "mask": "4"
+    },
+    {
+        "qid": "m01019",
+        "name": "Gone Fishin'",
+        "hub": "0",
+        "rank": "1",
+        "star": "0",
+        "idx": "19",
+        "flag": "4",
+        "mask": "5"
+    },
+    {
+        "qid": "m01020",
+        "name": "Attack of the Yian Kut-Ku",
+        "hub": "0",
+        "rank": "1",
+        "star": "0",
+        "idx": "20",
+        "flag": "4",
+        "mask": "6"
+    },
+    {
+        "qid": "m01021",
+        "name": "Charge... Charge... Charge!",
+        "hub": "0",
+        "rank": "1",
+        "star": "0",
+        "idx": "21",
+        "flag": "4",
+        "mask": "7"
+    },
+    {
+        "qid": "m01022",
+        "name": "The Mischief-maker",
+        "hub": "0",
+        "rank": "1",
+        "star": "0",
+        "idx": "22",
+        "flag": "5",
+        "mask": "0"
+    },
+    {
+        "qid": "m01101",
+        "name": "Gathering - Swamp Zone",
+        "hub": "0",
+        "rank": "1",
+        "star": "1",
+        "idx": "01",
+        "flag": "5",
+        "mask": "1"
+    },
+    {
+        "qid": "m01102",
+        "name": "Gathering - Forest and Hills",
+        "hub": "0",
+        "rank": "1",
+        "star": "1",
+        "idx": "02",
+        "flag": "5",
+        "mask": "2"
+    },
+    {
+        "qid": "m01103",
+        "name": "Gathering - Volcanic Zone",
+        "hub": "0",
+        "rank": "1",
+        "star": "1",
+        "idx": "03",
+        "flag": "5",
+        "mask": "3"
+    },
+    {
+        "qid": "m01104",
+        "name": "The Ruler of the Snow",
+        "hub": "0",
+        "rank": "1",
+        "star": "1",
+        "idx": "04",
+        "flag": "5",
+        "mask": "4"
+    },
+    {
+        "qid": "m01105",
+        "name": "The Shadow in the Cave",
+        "hub": "0",
+        "rank": "1",
+        "star": "1",
+        "idx": "05",
+        "flag": "5",
+        "mask": "5"
+    },
+    {
+        "qid": "m01106",
+        "name": "Red Shadow in the Snow",
+        "hub": "0",
+        "rank": "1",
+        "star": "1",
+        "idx": "06",
+        "flag": "5",
+        "mask": "6"
+    },
+    {
+        "qid": "m01107",
+        "name": "Blango Slaying Tactics",
+        "hub": "0",
+        "rank": "1",
+        "star": "1",
+        "idx": "07",
+        "flag": "5",
+        "mask": "7"
+    },
+    {
+        "qid": "m01108",
+        "name": "The Subterranean Glutton",
+        "hub": "0",
+        "rank": "1",
+        "star": "1",
+        "idx": "08",
+        "flag": "6",
+        "mask": "0"
+    },
+    {
+        "qid": "m01109",
+        "name": "Master of the Giant Lake",
+        "hub": "0",
+        "rank": "1",
+        "star": "1",
+        "idx": "09",
+        "flag": "6",
+        "mask": "1"
+    },
+    {
+        "qid": "m01110",
+        "name": "The Pink Fur Party",
+        "hub": "0",
+        "rank": "1",
+        "star": "1",
+        "idx": "10",
+        "flag": "6",
+        "mask": "2"
+    },
+    {
+        "qid": "m01111",
+        "name": "The Hidden Jungle Clouds",
+        "hub": "0",
+        "rank": "1",
+        "star": "1",
+        "idx": "11",
+        "flag": "6",
+        "mask": "3"
+    },
+    {
+        "qid": "m01112",
+        "name": "The Underwater Terror",
+        "hub": "0",
+        "rank": "1",
+        "star": "1",
+        "idx": "12",
+        "flag": "6",
+        "mask": "4"
+    },
+    {
+        "qid": "m01113",
+        "name": "Evening Hermitaur Sonata",
+        "hub": "0",
+        "rank": "1",
+        "star": "1",
+        "idx": "13",
+        "flag": "6",
+        "mask": "5"
+    },
+    {
+        "qid": "m01114",
+        "name": "The Purple Poison Menace",
+        "hub": "0",
+        "rank": "1",
+        "star": "1",
+        "idx": "14",
+        "flag": "6",
+        "mask": "6"
+    },
+    {
+        "qid": "m01115",
+        "name": "Pincer through the Sky",
+        "hub": "0",
+        "rank": "1",
+        "star": "1",
+        "idx": "15",
+        "flag": "6",
+        "mask": "7"
+    },
+    {
+        "qid": "m01116",
+        "name": "Chase the Poison Gypceros!",
+        "hub": "0",
+        "rank": "1",
+        "star": "1",
+        "idx": "16",
+        "flag": "7",
+        "mask": "0"
+    },
+    {
+        "qid": "m01117",
+        "name": "Trouble in the Forest",
+        "hub": "0",
+        "rank": "1",
+        "star": "1",
+        "idx": "17",
+        "flag": "7",
+        "mask": "1"
+    },
+    {
+        "qid": "m01118",
+        "name": "Seeking the Strange Mask",
+        "hub": "0",
+        "rank": "1",
+        "star": "1",
+        "idx": "18",
+        "flag": "7",
+        "mask": "2"
+    },
+    {
+        "qid": "m01119",
+        "name": "The Ioprey Leader",
+        "hub": "0",
+        "rank": "1",
+        "star": "1",
+        "idx": "19",
+        "flag": "7",
+        "mask": "3"
+    },
+    {
+        "qid": "m01120",
+        "name": "Commander in the Flames",
+        "hub": "0",
+        "rank": "1",
+        "star": "1",
+        "idx": "20",
+        "flag": "7",
+        "mask": "4"
+    },
+    {
+        "qid": "m01121",
+        "name": "Basarios: Unseen Peril",
+        "hub": "0",
+        "rank": "1",
+        "star": "1",
+        "idx": "21",
+        "flag": "7",
+        "mask": "5"
+    },
+    {
+        "qid": "m01122",
+        "name": "A Band of Ceanataurs",
+        "hub": "0",
+        "rank": "1",
+        "star": "1",
+        "idx": "22",
+        "flag": "7",
+        "mask": "6"
+    },
+    {
+        "qid": "m01123",
+        "name": "Great Ore Discovery",
+        "hub": "0",
+        "rank": "1",
+        "star": "1",
+        "idx": "23",
+        "flag": "7",
+        "mask": "7"
+    },
+    {
+        "qid": "m01124",
+        "name": "A Giant Dragon Invades!",
+        "hub": "0",
+        "rank": "1",
+        "star": "1",
+        "idx": "24",
+        "flag": "8",
+        "mask": "0"
+    },
+    {
+        "qid": "m01125",
+        "name": "The Meeting of Daimyo",
+        "hub": "0",
+        "rank": "1",
+        "star": "1",
+        "idx": "25",
+        "flag": "8",
+        "mask": "1"
+    },
+    {
+        "qid": "m01126",
+        "name": "Go Fish Goldenfish!",
+        "hub": "0",
+        "rank": "1",
+        "star": "1",
+        "idx": "26",
+        "flag": "8",
+        "mask": "2"
+    },
+    {
+        "qid": "m01201",
+        "name": "Absolute Power",
+        "hub": "0",
+        "rank": "1",
+        "star": "2",
+        "idx": "01",
+        "flag": "8",
+        "mask": "3"
+    },
+    {
+        "qid": "m01202",
+        "name": "The Tigrex's Roar",
+        "hub": "0",
+        "rank": "1",
+        "star": "2",
+        "idx": "02",
+        "flag": "8",
+        "mask": "4"
+    },
+    {
+        "qid": "m01203",
+        "name": "The Runaway Diablos",
+        "hub": "0",
+        "rank": "1",
+        "star": "2",
+        "idx": "03",
+        "flag": "8",
+        "mask": "5"
+    },
+    {
+        "qid": "m01204",
+        "name": "The Fierce Black Horn",
+        "hub": "0",
+        "rank": "1",
+        "star": "2",
+        "idx": "04",
+        "flag": "8",
+        "mask": "6"
+    },
+    {
+        "qid": "m01205",
+        "name": "Valor in the Swamp Zone",
+        "hub": "0",
+        "rank": "1",
+        "star": "2",
+        "idx": "05",
+        "flag": "8",
+        "mask": "7"
+    },
+    {
+        "qid": "m01206",
+        "name": "Terror of the Gravios",
+        "hub": "0",
+        "rank": "1",
+        "star": "2",
+        "idx": "06",
+        "flag": "9",
+        "mask": "0"
+    },
+    {
+        "qid": "m01207",
+        "name": "The King's Domain",
+        "hub": "0",
+        "rank": "1",
+        "star": "2",
+        "idx": "07",
+        "flag": "9",
+        "mask": "1"
+    },
+    {
+        "qid": "m01208",
+        "name": "Attack of the Rathalos",
+        "hub": "0",
+        "rank": "1",
+        "star": "2",
+        "idx": "08",
+        "flag": "9",
+        "mask": "2"
+    },
+    {
+        "qid": "m01209",
+        "name": "The Queen's Descent",
+        "hub": "0",
+        "rank": "1",
+        "star": "2",
+        "idx": "09",
+        "flag": "9",
+        "mask": "3"
+    },
+    {
+        "qid": "m01210",
+        "name": "The Cherry Blossom Rathian",
+        "hub": "0",
+        "rank": "1",
+        "star": "2",
+        "idx": "10",
+        "flag": "9",
+        "mask": "4"
+    },
+    {
+        "qid": "m01211",
+        "name": "The Legendary Kirin",
+        "hub": "0",
+        "rank": "1",
+        "star": "2",
+        "idx": "11",
+        "flag": "9",
+        "mask": "5"
+    },
+    {
+        "qid": "m01212",
+        "name": "The Red and Green Wyverns",
+        "hub": "0",
+        "rank": "1",
+        "star": "2",
+        "idx": "12",
+        "flag": "9",
+        "mask": "6"
+    },
+    {
+        "qid": "m01213",
+        "name": "Attack of the Wind Dragon",
+        "hub": "0",
+        "rank": "1",
+        "star": "2",
+        "idx": "13",
+        "flag": "9",
+        "mask": "7"
+    },
+    {
+        "qid": "m01214",
+        "name": "A Sun with Fangs",
+        "hub": "0",
+        "rank": "1",
+        "star": "2",
+        "idx": "14",
+        "flag": "10",
+        "mask": "0"
+    },
+    {
+        "qid": "m01215",
+        "name": "Emperor of Flame",
+        "hub": "0",
+        "rank": "1",
+        "star": "2",
+        "idx": "15",
+        "flag": "10",
+        "mask": "1"
+    },
+    {
+        "qid": "m01216",
+        "name": "The Elder Dragon of Mist",
+        "hub": "0",
+        "rank": "1",
+        "star": "2",
+        "idx": "16",
+        "flag": "10",
+        "mask": "2"
+    },
+    {
+        "qid": "m01217",
+        "name": "Towards the Silence",
+        "hub": "0",
+        "rank": "1",
+        "star": "2",
+        "idx": "17",
+        "flag": "10",
+        "mask": "3"
+    },
+    {
+        "qid": "m01218",
+        "name": "The Approaching Gaoren",
+        "hub": "0",
+        "rank": "1",
+        "star": "2",
+        "idx": "18",
+        "flag": "10",
+        "mask": "4"
+    },
+    {
+        "qid": "m01219",
+        "name": "Two Little Shadows",
+        "hub": "0",
+        "rank": "1",
+        "star": "2",
+        "idx": "19",
+        "flag": "10",
+        "mask": "5"
+    },
+    {
+        "qid": "m01220",
+        "name": "A Horde of Congalalas",
+        "hub": "0",
+        "rank": "1",
+        "star": "2",
+        "idx": "20",
+        "flag": "10",
+        "mask": "6"
+    },
+    {
+        "qid": "m02001",
+        "name": "Gathering - Snowy Mountains",
+        "hub": "0",
+        "rank": "2",
+        "star": "0",
+        "idx": "01",
+        "flag": "10",
+        "mask": "7"
+    },
+    {
+        "qid": "m02002",
+        "name": "Gathering - Jungle Zone",
+        "hub": "0",
+        "rank": "2",
+        "star": "0",
+        "idx": "02",
+        "flag": "11",
+        "mask": "0"
+    },
+    {
+        "qid": "m02003",
+        "name": "Gathering - Desert Zone",
+        "hub": "0",
+        "rank": "2",
+        "star": "0",
+        "idx": "03",
+        "flag": "11",
+        "mask": "1"
+    },
+    {
+        "qid": "m02004",
+        "name": "A True Foe - The Giadrome!",
+        "hub": "0",
+        "rank": "2",
+        "star": "0",
+        "idx": "04",
+        "flag": "11",
+        "mask": "2"
+    },
+    {
+        "qid": "m02005",
+        "name": "Reckless Bulldrome Hunter",
+        "hub": "0",
+        "rank": "2",
+        "star": "0",
+        "idx": "05",
+        "flag": "11",
+        "mask": "3"
+    },
+    {
+        "qid": "m02006",
+        "name": "Flanked by Velocidrome",
+        "hub": "0",
+        "rank": "2",
+        "star": "0",
+        "idx": "06",
+        "flag": "11",
+        "mask": "4"
+    },
+    {
+        "qid": "m02007",
+        "name": "Aim for the Jungle Crab",
+        "hub": "0",
+        "rank": "2",
+        "star": "0",
+        "idx": "07",
+        "flag": "11",
+        "mask": "5"
+    },
+    {
+        "qid": "m02008",
+        "name": "The Poison Fanged Duo",
+        "hub": "0",
+        "rank": "2",
+        "star": "0",
+        "idx": "08",
+        "flag": "11",
+        "mask": "6"
+    },
+    {
+        "qid": "m02009",
+        "name": "Pursuit of the Sand Wyvern",
+        "hub": "0",
+        "rank": "2",
+        "star": "0",
+        "idx": "09",
+        "flag": "11",
+        "mask": "7"
+    },
+    {
+        "qid": "m02010",
+        "name": "Ultimate Crab Dinner",
+        "hub": "0",
+        "rank": "2",
+        "star": "0",
+        "idx": "10",
+        "flag": "12",
+        "mask": "0"
+    },
+    {
+        "qid": "m02011",
+        "name": "Trapped by Yian Kut-Ku ",
+        "hub": "0",
+        "rank": "2",
+        "star": "0",
+        "idx": "11",
+        "flag": "12",
+        "mask": "1"
+    },
+    {
+        "qid": "m02012",
+        "name": "Conga Counterattack!",
+        "hub": "0",
+        "rank": "2",
+        "star": "0",
+        "idx": "12",
+        "flag": "12",
+        "mask": "2"
+    },
+    {
+        "qid": "m02013",
+        "name": "The Beating of Royal Wings",
+        "hub": "0",
+        "rank": "2",
+        "star": "0",
+        "idx": "13",
+        "flag": "12",
+        "mask": "3"
+    },
+    {
+        "qid": "m02101",
+        "name": "Gathering - Swamp Zone",
+        "hub": "0",
+        "rank": "2",
+        "star": "1",
+        "idx": "01",
+        "flag": "12",
+        "mask": "6"
+    },
+    {
+        "qid": "m02102",
+        "name": "Gathering - Forest and Hills",
+        "hub": "0",
+        "rank": "2",
+        "star": "1",
+        "idx": "02",
+        "flag": "12",
+        "mask": "7"
+    },
+    {
+        "qid": "m02103",
+        "name": "Gathering - Volcanic Zone",
+        "hub": "0",
+        "rank": "2",
+        "star": "1",
+        "idx": "03",
+        "flag": "13",
+        "mask": "0"
+    },
+    {
+        "qid": "m02104",
+        "name": "Two Roars in the Snow",
+        "hub": "0",
+        "rank": "2",
+        "star": "1",
+        "idx": "04",
+        "flag": "13",
+        "mask": "1"
+    },
+    {
+        "qid": "m02105",
+        "name": "The King of the Mountains",
+        "hub": "0",
+        "rank": "2",
+        "star": "1",
+        "idx": "05",
+        "flag": "13",
+        "mask": "2"
+    },
+    {
+        "qid": "m02106",
+        "name": "The Electrified Wyvern",
+        "hub": "0",
+        "rank": "2",
+        "star": "1",
+        "idx": "06",
+        "flag": "13",
+        "mask": "3"
+    },
+    {
+        "qid": "m02107",
+        "name": "Red Shadow in the Swampland",
+        "hub": "0",
+        "rank": "2",
+        "star": "1",
+        "idx": "07",
+        "flag": "13",
+        "mask": "4"
+    },
+    {
+        "qid": "m02108",
+        "name": "The Poison Gas",
+        "hub": "0",
+        "rank": "2",
+        "star": "1",
+        "idx": "08",
+        "flag": "13",
+        "mask": "5"
+    },
+    {
+        "qid": "m02109",
+        "name": "Dual Plesioth",
+        "hub": "0",
+        "rank": "2",
+        "star": "1",
+        "idx": "09",
+        "flag": "13",
+        "mask": "6"
+    },
+    {
+        "qid": "m02110",
+        "name": "Attack of the Rathian",
+        "hub": "0",
+        "rank": "2",
+        "star": "1",
+        "idx": "10",
+        "flag": "13",
+        "mask": "7"
+    },
+    {
+        "qid": "m02111",
+        "name": "Water Wyvern in the Desert",
+        "hub": "0",
+        "rank": "2",
+        "star": "1",
+        "idx": "11",
+        "flag": "14",
+        "mask": "0"
+    },
+    {
+        "qid": "m02112",
+        "name": "The Underwater Terror",
+        "hub": "0",
+        "rank": "2",
+        "star": "1",
+        "idx": "12",
+        "flag": "14",
+        "mask": "1"
+    },
+    {
+        "qid": "m02113",
+        "name": "An Evening Soaked in Poison",
+        "hub": "0",
+        "rank": "2",
+        "star": "1",
+        "idx": "13",
+        "flag": "14",
+        "mask": "2"
+    },
+    {
+        "qid": "m02114",
+        "name": "Supreme Ruler of the Swamp",
+        "hub": "0",
+        "rank": "2",
+        "star": "1",
+        "idx": "14",
+        "flag": "14",
+        "mask": "3"
+    },
+    {
+        "qid": "m02115",
+        "name": "The Purple Poison Menace",
+        "hub": "0",
+        "rank": "2",
+        "star": "1",
+        "idx": "15",
+        "flag": "14",
+        "mask": "4"
+    },
+    {
+        "qid": "m02116",
+        "name": "Eliminate the Rathalos!",
+        "hub": "0",
+        "rank": "2",
+        "star": "1",
+        "idx": "16",
+        "flag": "14",
+        "mask": "5"
+    },
+    {
+        "qid": "m02117",
+        "name": "The Shogun's Encampment",
+        "hub": "0",
+        "rank": "2",
+        "star": "1",
+        "idx": "17",
+        "flag": "14",
+        "mask": "6"
+    },
+    {
+        "qid": "m02118",
+        "name": "Basarios: Unseen Peril",
+        "hub": "0",
+        "rank": "2",
+        "star": "1",
+        "idx": "18",
+        "flag": "14",
+        "mask": "7"
+    },
+    {
+        "qid": "m02119",
+        "name": "Envoy to Disaster",
+        "hub": "0",
+        "rank": "2",
+        "star": "1",
+        "idx": "19",
+        "flag": "15",
+        "mask": "0"
+    },
+    {
+        "qid": "m02120",
+        "name": "Lao-Shan Lung Draws Near!",
+        "hub": "0",
+        "rank": "2",
+        "star": "1",
+        "idx": "20",
+        "flag": "15",
+        "mask": "1"
+    },
+    {
+        "qid": "m02121",
+        "name": "Meeting of the Blangongas",
+        "hub": "0",
+        "rank": "2",
+        "star": "1",
+        "idx": "21",
+        "flag": "15",
+        "mask": "2"
+    },
+    {
+        "qid": "m02122",
+        "name": "The White Brute",
+        "hub": "0",
+        "rank": "2",
+        "star": "1",
+        "idx": "22",
+        "flag": "15",
+        "mask": "3"
+    },
+    {
+        "qid": "m02123",
+        "name": "Pricy Mushrooms, Shaka!",
+        "hub": "0",
+        "rank": "2",
+        "star": "1",
+        "idx": "23",
+        "flag": "15",
+        "mask": "4"
+    },
+    {
+        "qid": "m02124",
+        "name": "The Big Dirt Nap",
+        "hub": "0",
+        "rank": "2",
+        "star": "1",
+        "idx": "24",
+        "flag": "15",
+        "mask": "5"
+    },
+    {
+        "qid": "m02125",
+        "name": "Twin Walls of the Jungle",
+        "hub": "0",
+        "rank": "2",
+        "star": "1",
+        "idx": "25",
+        "flag": "15",
+        "mask": "6"
+    },
+    {
+        "qid": "m02126",
+        "name": "The Meeting of Sea and Air",
+        "hub": "0",
+        "rank": "2",
+        "star": "1",
+        "idx": "26",
+        "flag": "15",
+        "mask": "7"
+    },
+    {
+        "qid": "m02127",
+        "name": "Red Lightning, Violet Blade",
+        "hub": "0",
+        "rank": "2",
+        "star": "1",
+        "idx": "27",
+        "flag": "16",
+        "mask": "0"
+    },
+    {
+        "qid": "m02201",
+        "name": "Land of the Tremors",
+        "hub": "0",
+        "rank": "2",
+        "star": "2",
+        "idx": "01",
+        "flag": "16",
+        "mask": "4"
+    },
+    {
+        "qid": "m02202",
+        "name": "The Rajang in the Snow",
+        "hub": "0",
+        "rank": "2",
+        "star": "2",
+        "idx": "02",
+        "flag": "16",
+        "mask": "5"
+    },
+    {
+        "qid": "m02203",
+        "name": "The Tigrex's Roar",
+        "hub": "0",
+        "rank": "2",
+        "star": "2",
+        "idx": "03",
+        "flag": "16",
+        "mask": "6"
+    },
+    {
+        "qid": "m02204",
+        "name": "Pink Dance in the Jungle",
+        "hub": "0",
+        "rank": "2",
+        "star": "2",
+        "idx": "04",
+        "flag": "16",
+        "mask": "7"
+    },
+    {
+        "qid": "m02205",
+        "name": "The Runaway Diablos",
+        "hub": "0",
+        "rank": "2",
+        "star": "2",
+        "idx": "05",
+        "flag": "17",
+        "mask": "0"
+    },
+    {
+        "qid": "m02206",
+        "name": "The Fierce Black Horn",
+        "hub": "0",
+        "rank": "2",
+        "star": "2",
+        "idx": "06",
+        "flag": "17",
+        "mask": "1"
+    },
+    {
+        "qid": "m02207",
+        "name": "Four Horns",
+        "hub": "0",
+        "rank": "2",
+        "star": "2",
+        "idx": "07",
+        "flag": "17",
+        "mask": "2"
+    },
+    {
+        "qid": "m02208",
+        "name": "Rajang of Mountain Flames",
+        "hub": "0",
+        "rank": "2",
+        "star": "2",
+        "idx": "08",
+        "flag": "17",
+        "mask": "3"
+    },
+    {
+        "qid": "m02209",
+        "name": "Terror of the Gravios",
+        "hub": "0",
+        "rank": "2",
+        "star": "2",
+        "idx": "09",
+        "flag": "17",
+        "mask": "4"
+    },
+    {
+        "qid": "m02210",
+        "name": "Black Rock in the Swamp",
+        "hub": "0",
+        "rank": "2",
+        "star": "2",
+        "idx": "10",
+        "flag": "17",
+        "mask": "5"
+    },
+    {
+        "qid": "m02211",
+        "name": "A Troublesome Pair",
+        "hub": "0",
+        "rank": "2",
+        "star": "2",
+        "idx": "11",
+        "flag": "17",
+        "mask": "6"
+    },
+    {
+        "qid": "m02212",
+        "name": "Blue Sky, Pink Earth",
+        "hub": "0",
+        "rank": "2",
+        "star": "2",
+        "idx": "12",
+        "flag": "17",
+        "mask": "7"
+    },
+    {
+        "qid": "m02213",
+        "name": "Attack of the Rathalos",
+        "hub": "0",
+        "rank": "2",
+        "star": "2",
+        "idx": "13",
+        "flag": "18",
+        "mask": "0"
+    },
+    {
+        "qid": "m02214",
+        "name": "Deny the Silver Rathalos",
+        "hub": "0",
+        "rank": "2",
+        "star": "2",
+        "idx": "14",
+        "flag": "18",
+        "mask": "1"
+    },
+    {
+        "qid": "m02215",
+        "name": "Find the Golden Phantom",
+        "hub": "0",
+        "rank": "2",
+        "star": "2",
+        "idx": "15",
+        "flag": "18",
+        "mask": "2"
+    },
+    {
+        "qid": "m02216",
+        "name": "The Fleeting Shadow",
+        "hub": "0",
+        "rank": "2",
+        "star": "2",
+        "idx": "16",
+        "flag": "18",
+        "mask": "3"
+    },
+    {
+        "qid": "m02217",
+        "name": "The Frozen Dictator",
+        "hub": "0",
+        "rank": "2",
+        "star": "2",
+        "idx": "17",
+        "flag": "18",
+        "mask": "4"
+    },
+    {
+        "qid": "m02218",
+        "name": "The Elder Dragon of Wind",
+        "hub": "0",
+        "rank": "2",
+        "star": "2",
+        "idx": "18",
+        "flag": "18",
+        "mask": "5"
+    },
+    {
+        "qid": "m02219",
+        "name": "The War of Immolation",
+        "hub": "0",
+        "rank": "2",
+        "star": "2",
+        "idx": "19",
+        "flag": "18",
+        "mask": "6"
+    },
+    {
+        "qid": "m02220",
+        "name": "Emperor of Flame",
+        "hub": "0",
+        "rank": "2",
+        "star": "2",
+        "idx": "20",
+        "flag": "18",
+        "mask": "7"
+    },
+    {
+        "qid": "m02221",
+        "name": "The Elder Dragon of Mist",
+        "hub": "0",
+        "rank": "2",
+        "star": "2",
+        "idx": "21",
+        "flag": "19",
+        "mask": "0"
+    },
+    {
+        "qid": "m02222",
+        "name": "Towards the Silence",
+        "hub": "0",
+        "rank": "2",
+        "star": "2",
+        "idx": "22",
+        "flag": "19",
+        "mask": "1"
+    },
+    {
+        "qid": "m02223",
+        "name": "Legendary Black Dragon",
+        "hub": "0",
+        "rank": "2",
+        "star": "2",
+        "idx": "23",
+        "flag": "19",
+        "mask": "2"
+    },
+    {
+        "qid": "m02224",
+        "name": "The End Times",
+        "hub": "0",
+        "rank": "2",
+        "star": "2",
+        "idx": "24",
+        "flag": "19",
+        "mask": "3"
+    },
+    {
+        "qid": "m02225",
+        "name": "The Approaching Gaoren",
+        "hub": "0",
+        "rank": "2",
+        "star": "2",
+        "idx": "25",
+        "flag": "19",
+        "mask": "4"
+    },
+    {
+        "qid": "m02226",
+        "name": "Rise to the Summit",
+        "hub": "0",
+        "rank": "2",
+        "star": "2",
+        "idx": "26",
+        "flag": "19",
+        "mask": "5"
+    },
+    {
+        "qid": "m02227",
+        "name": "Ancestral Dragon",
+        "hub": "0",
+        "rank": "2",
+        "star": "2",
+        "idx": "27",
+        "flag": "19",
+        "mask": "6"
+    },
+    {
+        "qid": "m02228",
+        "name": "Wyvern of the Wind",
+        "hub": "0",
+        "rank": "2",
+        "star": "2",
+        "idx": "28",
+        "flag": "19",
+        "mask": "7"
+    },
+    {
+        "qid": "m02229",
+        "name": "Born of Darkness",
+        "hub": "0",
+        "rank": "2",
+        "star": "2",
+        "idx": "29",
+        "flag": "20",
+        "mask": "0"
+    },
+    {
+        "qid": "m02230",
+        "name": "Two Queens",
+        "hub": "0",
+        "rank": "2",
+        "star": "2",
+        "idx": "30",
+        "flag": "20",
+        "mask": "1"
+    },
+    {
+        "qid": "m02231",
+        "name": "One-Horned Demon King",
+        "hub": "0",
+        "rank": "2",
+        "star": "2",
+        "idx": "31",
+        "flag": "20",
+        "mask": "2"
+    },
+    {
+        "qid": "m02232",
+        "name": "Phantasmic Battle",
+        "hub": "0",
+        "rank": "2",
+        "star": "2",
+        "idx": "32",
+        "flag": "20",
+        "mask": "3"
+    },
+    {
+        "qid": "m02233",
+        "name": "Furious Beauties",
+        "hub": "0",
+        "rank": "2",
+        "star": "2",
+        "idx": "33",
+        "flag": "20",
+        "mask": "4"
+    },
+    {
+        "qid": "m02234",
+        "name": "Fight for the Throne",
+        "hub": "0",
+        "rank": "2",
+        "star": "2",
+        "idx": "34",
+        "flag": "20",
+        "mask": "5"
+    },
+    {
+        "qid": "m02235",
+        "name": "Hotter than Hell Itself",
+        "hub": "0",
+        "rank": "2",
+        "star": "2",
+        "idx": "35",
+        "flag": "20",
+        "mask": "6"
+    },
+    {
+        "qid": "m02236",
+        "name": "Desert Unifier",
+        "hub": "0",
+        "rank": "2",
+        "star": "2",
+        "idx": "36",
+        "flag": "20",
+        "mask": "7"
+    },
+    {
+        "qid": "m03001",
+        "name": "G-Lvl Gathering - Grt Forest",
+        "hub": "0",
+        "rank": "3",
+        "star": "0",
+        "idx": "01",
+        "flag": "21",
+        "mask": "4"
+    },
+    {
+        "qid": "m03002",
+        "name": "G-Lvl Gathering - Old Jungle",
+        "hub": "0",
+        "rank": "3",
+        "star": "0",
+        "idx": "02",
+        "flag": "21",
+        "mask": "5"
+    },
+    {
+        "qid": "m03003",
+        "name": "G-Lvl Gathering - Old Desert",
+        "hub": "0",
+        "rank": "3",
+        "star": "0",
+        "idx": "03",
+        "flag": "21",
+        "mask": "6"
+    },
+    {
+        "qid": "m03004",
+        "name": "G-Lvl Gathering - Old Swamp",
+        "hub": "0",
+        "rank": "3",
+        "star": "0",
+        "idx": "04",
+        "flag": "21",
+        "mask": "7"
+    },
+    {
+        "qid": "m03005",
+        "name": "G-Lvl Gathering - Snowy Mts.",
+        "hub": "0",
+        "rank": "3",
+        "star": "0",
+        "idx": "05",
+        "flag": "22",
+        "mask": "0"
+    },
+    {
+        "qid": "m03006",
+        "name": "Shakalaka Showdown!",
+        "hub": "0",
+        "rank": "3",
+        "star": "0",
+        "idx": "06",
+        "flag": "22",
+        "mask": "1"
+    },
+    {
+        "qid": "m03007",
+        "name": "The Beating of Royal Wings",
+        "hub": "0",
+        "rank": "3",
+        "star": "0",
+        "idx": "07",
+        "flag": "22",
+        "mask": "2"
+    },
+    {
+        "qid": "m03008",
+        "name": "The Big Dirt Nap",
+        "hub": "0",
+        "rank": "3",
+        "star": "0",
+        "idx": "08",
+        "flag": "22",
+        "mask": "3"
+    },
+    {
+        "qid": "m03009",
+        "name": "Hypno, Hypno!",
+        "hub": "0",
+        "rank": "3",
+        "star": "0",
+        "idx": "09",
+        "flag": "22",
+        "mask": "4"
+    },
+    {
+        "qid": "m03010",
+        "name": "Trapped by Yian Kut-Ku ",
+        "hub": "0",
+        "rank": "3",
+        "star": "0",
+        "idx": "10",
+        "flag": "22",
+        "mask": "5"
+    },
+    {
+        "qid": "m03011",
+        "name": "Giant Crab of the Old Jungle",
+        "hub": "0",
+        "rank": "3",
+        "star": "0",
+        "idx": "11",
+        "flag": "22",
+        "mask": "6"
+    },
+    {
+        "qid": "m03012",
+        "name": "Daimyo of Sengoku Fame",
+        "hub": "0",
+        "rank": "3",
+        "star": "0",
+        "idx": "12",
+        "flag": "22",
+        "mask": "7"
+    },
+    {
+        "qid": "m03013",
+        "name": "Wag the Dog!",
+        "hub": "0",
+        "rank": "3",
+        "star": "0",
+        "idx": "13",
+        "flag": "23",
+        "mask": "0"
+    },
+    {
+        "qid": "m03014",
+        "name": "Old Jungle Lightning",
+        "hub": "0",
+        "rank": "3",
+        "star": "0",
+        "idx": "14",
+        "flag": "23",
+        "mask": "1"
+    },
+    {
+        "qid": "m03015",
+        "name": "Red Shadow in the Snow",
+        "hub": "0",
+        "rank": "3",
+        "star": "0",
+        "idx": "15",
+        "flag": "23",
+        "mask": "2"
+    },
+    {
+        "qid": "m03016",
+        "name": "Tales from the Old Swamp",
+        "hub": "0",
+        "rank": "3",
+        "star": "0",
+        "idx": "16",
+        "flag": "23",
+        "mask": "3"
+    },
+    {
+        "qid": "m03017",
+        "name": "Eyes in the Underground Lake",
+        "hub": "0",
+        "rank": "3",
+        "star": "0",
+        "idx": "17",
+        "flag": "23",
+        "mask": "4"
+    },
+    {
+        "qid": "m03018",
+        "name": "Giant Green Waves of Verdure",
+        "hub": "0",
+        "rank": "3",
+        "star": "0",
+        "idx": "18",
+        "flag": "23",
+        "mask": "5"
+    },
+    {
+        "qid": "m03019",
+        "name": "Prodigal Pack Attack!",
+        "hub": "0",
+        "rank": "3",
+        "star": "0",
+        "idx": "19",
+        "flag": "23",
+        "mask": "6"
+    },
+    {
+        "qid": "m03020",
+        "name": "Pelagus Pride",
+        "hub": "0",
+        "rank": "3",
+        "star": "0",
+        "idx": "20",
+        "flag": "23",
+        "mask": "7"
+    },
+    {
+        "qid": "m03021",
+        "name": "Trickster!",
+        "hub": "0",
+        "rank": "3",
+        "star": "0",
+        "idx": "21",
+        "flag": "24",
+        "mask": "0"
+    },
+    {
+        "qid": "m03022",
+        "name": "Stealing in the Jungle!",
+        "hub": "0",
+        "rank": "3",
+        "star": "0",
+        "idx": "22",
+        "flag": "24",
+        "mask": "1"
+    },
+    {
+        "qid": "m03023",
+        "name": "Old Swamp, Shrouded in Mist",
+        "hub": "0",
+        "rank": "3",
+        "star": "0",
+        "idx": "23",
+        "flag": "24",
+        "mask": "2"
+    },
+    {
+        "qid": "m03024",
+        "name": "Subspecies Three!",
+        "hub": "0",
+        "rank": "3",
+        "star": "0",
+        "idx": "24",
+        "flag": "24",
+        "mask": "3"
+    },
+    {
+        "qid": "m03025",
+        "name": "Predators of the Swamp",
+        "hub": "0",
+        "rank": "3",
+        "star": "0",
+        "idx": "25",
+        "flag": "24",
+        "mask": "4"
+    },
+    {
+        "qid": "m03101",
+        "name": "G-Lvl Gathering - Frst&Hills",
+        "hub": "0",
+        "rank": "3",
+        "star": "1",
+        "idx": "01",
+        "flag": "25",
+        "mask": "2"
+    },
+    {
+        "qid": "m03102",
+        "name": "G-Lvl Gathering - OldVolcano",
+        "hub": "0",
+        "rank": "3",
+        "star": "1",
+        "idx": "02",
+        "flag": "25",
+        "mask": "3"
+    },
+    {
+        "qid": "m03103",
+        "name": "Ever-Present Shadow",
+        "hub": "0",
+        "rank": "3",
+        "star": "1",
+        "idx": "03",
+        "flag": "25",
+        "mask": "4"
+    },
+    {
+        "qid": "m03104",
+        "name": "Assassin of the Swamp",
+        "hub": "0",
+        "rank": "3",
+        "star": "1",
+        "idx": "04",
+        "flag": "25",
+        "mask": "5"
+    },
+    {
+        "qid": "m03105",
+        "name": "Ancient Beauty, Black Beast",
+        "hub": "0",
+        "rank": "3",
+        "star": "1",
+        "idx": "05",
+        "flag": "25",
+        "mask": "6"
+    },
+    {
+        "qid": "m03106",
+        "name": "Lavasioth Sighting!",
+        "hub": "0",
+        "rank": "3",
+        "star": "1",
+        "idx": "06",
+        "flag": "25",
+        "mask": "7"
+    },
+    {
+        "qid": "m03107",
+        "name": "River of Fire",
+        "hub": "0",
+        "rank": "3",
+        "star": "1",
+        "idx": "07",
+        "flag": "26",
+        "mask": "0"
+    },
+    {
+        "qid": "m03108",
+        "name": "Strong Sword, Strong Shield",
+        "hub": "0",
+        "rank": "3",
+        "star": "1",
+        "idx": "08",
+        "flag": "26",
+        "mask": "1"
+    },
+    {
+        "qid": "m03109",
+        "name": "Commander in the Flames",
+        "hub": "0",
+        "rank": "3",
+        "star": "1",
+        "idx": "09",
+        "flag": "26",
+        "mask": "2"
+    },
+    {
+        "qid": "m03110",
+        "name": "Dark-Shelled Ceanataur",
+        "hub": "0",
+        "rank": "3",
+        "star": "1",
+        "idx": "10",
+        "flag": "26",
+        "mask": "3"
+    },
+    {
+        "qid": "m03111",
+        "name": "Under the Gaze of Heaven",
+        "hub": "0",
+        "rank": "3",
+        "star": "1",
+        "idx": "11",
+        "flag": "26",
+        "mask": "4"
+    },
+    {
+        "qid": "m03112",
+        "name": "At Birds' Hill...",
+        "hub": "0",
+        "rank": "3",
+        "star": "1",
+        "idx": "12",
+        "flag": "26",
+        "mask": "5"
+    },
+    {
+        "qid": "m03113",
+        "name": "A King, Robed in Smoke",
+        "hub": "0",
+        "rank": "3",
+        "star": "1",
+        "idx": "13",
+        "flag": "26",
+        "mask": "6"
+    },
+    {
+        "qid": "m03114",
+        "name": "The King's Domain",
+        "hub": "0",
+        "rank": "3",
+        "star": "1",
+        "idx": "14",
+        "flag": "26",
+        "mask": "7"
+    },
+    {
+        "qid": "m03115",
+        "name": "Her Eternal Majesty",
+        "hub": "0",
+        "rank": "3",
+        "star": "1",
+        "idx": "15",
+        "flag": "27",
+        "mask": "0"
+    },
+    {
+        "qid": "m03116",
+        "name": "The Cherry Blossom Rathian",
+        "hub": "0",
+        "rank": "3",
+        "star": "1",
+        "idx": "16",
+        "flag": "27",
+        "mask": "1"
+    },
+    {
+        "qid": "m03117",
+        "name": "Howling at the Moon",
+        "hub": "0",
+        "rank": "3",
+        "star": "1",
+        "idx": "17",
+        "flag": "27",
+        "mask": "2"
+    },
+    {
+        "qid": "m03118",
+        "name": "The Yian Garuga Twins",
+        "hub": "0",
+        "rank": "3",
+        "star": "1",
+        "idx": "18",
+        "flag": "27",
+        "mask": "3"
+    },
+    {
+        "qid": "m03119",
+        "name": "The King of the Mountains",
+        "hub": "0",
+        "rank": "3",
+        "star": "1",
+        "idx": "19",
+        "flag": "27",
+        "mask": "4"
+    },
+    {
+        "qid": "m03120",
+        "name": "Copper Sands",
+        "hub": "0",
+        "rank": "3",
+        "star": "1",
+        "idx": "20",
+        "flag": "27",
+        "mask": "5"
+    },
+    {
+        "qid": "m03121",
+        "name": "Wild Monk of the Dunes",
+        "hub": "0",
+        "rank": "3",
+        "star": "1",
+        "idx": "21",
+        "flag": "27",
+        "mask": "6"
+    },
+    {
+        "qid": "m03122",
+        "name": "Basarios Season",
+        "hub": "0",
+        "rank": "3",
+        "star": "1",
+        "idx": "22",
+        "flag": "27",
+        "mask": "7"
+    },
+    {
+        "qid": "m03123",
+        "name": "Operation Tropical Storm",
+        "hub": "0",
+        "rank": "3",
+        "star": "1",
+        "idx": "23",
+        "flag": "28",
+        "mask": "0"
+    },
+    {
+        "qid": "m03124",
+        "name": "Save the Great Forest Town!",
+        "hub": "0",
+        "rank": "3",
+        "star": "1",
+        "idx": "24",
+        "flag": "28",
+        "mask": "1"
+    },
+    {
+        "qid": "m03125",
+        "name": "Three Walls",
+        "hub": "0",
+        "rank": "3",
+        "star": "1",
+        "idx": "25",
+        "flag": "28",
+        "mask": "2"
+    },
+    {
+        "qid": "m03126",
+        "name": "A Hunter's Feast",
+        "hub": "0",
+        "rank": "3",
+        "star": "1",
+        "idx": "26",
+        "flag": "28",
+        "mask": "3"
+    },
+    {
+        "qid": "m03127",
+        "name": "Lao-Shan Lung Draws Near!",
+        "hub": "0",
+        "rank": "3",
+        "star": "1",
+        "idx": "27",
+        "flag": "28",
+        "mask": "4"
+    },
+    {
+        "qid": "m03201",
+        "name": "Absolute Power",
+        "hub": "0",
+        "rank": "3",
+        "star": "2",
+        "idx": "01",
+        "flag": "29",
+        "mask": "0"
+    },
+    {
+        "qid": "m03202",
+        "name": "Land of the Tremors",
+        "hub": "0",
+        "rank": "3",
+        "star": "2",
+        "idx": "02",
+        "flag": "29",
+        "mask": "1"
+    },
+    {
+        "qid": "m03203",
+        "name": "Sandstorm Summoner",
+        "hub": "0",
+        "rank": "3",
+        "star": "2",
+        "idx": "03",
+        "flag": "29",
+        "mask": "2"
+    },
+    {
+        "qid": "m03204",
+        "name": "The Fierce Black Horn",
+        "hub": "0",
+        "rank": "3",
+        "star": "2",
+        "idx": "04",
+        "flag": "29",
+        "mask": "3"
+    },
+    {
+        "qid": "m03205",
+        "name": "Black Phalanges",
+        "hub": "0",
+        "rank": "3",
+        "star": "2",
+        "idx": "05",
+        "flag": "29",
+        "mask": "4"
+    },
+    {
+        "qid": "m03206",
+        "name": "Armored Supremacy",
+        "hub": "0",
+        "rank": "3",
+        "star": "2",
+        "idx": "06",
+        "flag": "29",
+        "mask": "5"
+    },
+    {
+        "qid": "m03207",
+        "name": "Terror of the Gravios",
+        "hub": "0",
+        "rank": "3",
+        "star": "2",
+        "idx": "07",
+        "flag": "29",
+        "mask": "6"
+    },
+    {
+        "qid": "m03208",
+        "name": "The Dark Cataphracts",
+        "hub": "0",
+        "rank": "3",
+        "star": "2",
+        "idx": "08",
+        "flag": "29",
+        "mask": "7"
+    },
+    {
+        "qid": "m03209",
+        "name": "Explore the Unexplored",
+        "hub": "0",
+        "rank": "3",
+        "star": "2",
+        "idx": "09",
+        "flag": "30",
+        "mask": "0"
+    },
+    {
+        "qid": "m03210",
+        "name": "A Single Beam of Moonlight",
+        "hub": "0",
+        "rank": "3",
+        "star": "2",
+        "idx": "10",
+        "flag": "30",
+        "mask": "1"
+    },
+    {
+        "qid": "m03211",
+        "name": "Descendants of the King",
+        "hub": "0",
+        "rank": "3",
+        "star": "2",
+        "idx": "11",
+        "flag": "30",
+        "mask": "2"
+    },
+    {
+        "qid": "m03212",
+        "name": "Child of Destruction",
+        "hub": "0",
+        "rank": "3",
+        "star": "2",
+        "idx": "12",
+        "flag": "30",
+        "mask": "3"
+    },
+    {
+        "qid": "m03213",
+        "name": "The Final Invitation",
+        "hub": "0",
+        "rank": "3",
+        "star": "2",
+        "idx": "13",
+        "flag": "30",
+        "mask": "4"
+    },
+    {
+        "qid": "m03214",
+        "name": "A Scenic Locale",
+        "hub": "0",
+        "rank": "3",
+        "star": "2",
+        "idx": "14",
+        "flag": "30",
+        "mask": "5"
+    },
+    {
+        "qid": "m03215",
+        "name": "It's Electric",
+        "hub": "0",
+        "rank": "3",
+        "star": "2",
+        "idx": "15",
+        "flag": "30",
+        "mask": "6"
+    },
+    {
+        "qid": "m03216",
+        "name": "Deathmatch on the Dunes!",
+        "hub": "0",
+        "rank": "3",
+        "star": "2",
+        "idx": "16",
+        "flag": "30",
+        "mask": "7"
+    },
+    {
+        "qid": "m03217",
+        "name": "Fire, Electricity, Heat Ray",
+        "hub": "0",
+        "rank": "3",
+        "star": "2",
+        "idx": "17",
+        "flag": "31",
+        "mask": "0"
+    },
+    {
+        "qid": "m03218",
+        "name": "The 3 Masters of the Volcano",
+        "hub": "0",
+        "rank": "3",
+        "star": "2",
+        "idx": "18",
+        "flag": "31",
+        "mask": "1"
+    },
+    {
+        "qid": "m03219",
+        "name": "Diamond Dust",
+        "hub": "0",
+        "rank": "3",
+        "star": "2",
+        "idx": "19",
+        "flag": "31",
+        "mask": "2"
+    },
+    {
+        "qid": "m03220",
+        "name": "Hunter's Funeral",
+        "hub": "0",
+        "rank": "3",
+        "star": "2",
+        "idx": "20",
+        "flag": "31",
+        "mask": "3"
+    },
+    {
+        "qid": "m03221",
+        "name": "Pride on the Line",
+        "hub": "0",
+        "rank": "3",
+        "star": "2",
+        "idx": "21",
+        "flag": "31",
+        "mask": "4"
+    },
+    {
+        "qid": "m03222",
+        "name": "Dragon of Steel",
+        "hub": "0",
+        "rank": "3",
+        "star": "2",
+        "idx": "22",
+        "flag": "31",
+        "mask": "5"
+    },
+    {
+        "qid": "m03223",
+        "name": "The Elder Dragon of Wind",
+        "hub": "0",
+        "rank": "3",
+        "star": "2",
+        "idx": "23",
+        "flag": "31",
+        "mask": "6"
+    },
+    {
+        "qid": "m03224",
+        "name": "A Midnight Audience",
+        "hub": "0",
+        "rank": "3",
+        "star": "2",
+        "idx": "24",
+        "flag": "31",
+        "mask": "7"
+    },
+    {
+        "qid": "m03225",
+        "name": "Emperor of Flame",
+        "hub": "0",
+        "rank": "3",
+        "star": "2",
+        "idx": "25",
+        "flag": "32",
+        "mask": "0"
+    },
+    {
+        "qid": "m03226",
+        "name": "Evaporate into the Night",
+        "hub": "0",
+        "rank": "3",
+        "star": "2",
+        "idx": "26",
+        "flag": "32",
+        "mask": "1"
+    },
+    {
+        "qid": "m03227",
+        "name": "Towards the Silence",
+        "hub": "0",
+        "rank": "3",
+        "star": "2",
+        "idx": "27",
+        "flag": "32",
+        "mask": "2"
+    },
+    {
+        "qid": "m03228",
+        "name": "The Floating Dragon",
+        "hub": "0",
+        "rank": "3",
+        "star": "2",
+        "idx": "28",
+        "flag": "32",
+        "mask": "3"
+    },
+    {
+        "qid": "m03229",
+        "name": "The Approaching Gaoren",
+        "hub": "0",
+        "rank": "3",
+        "star": "2",
+        "idx": "29",
+        "flag": "32",
+        "mask": "4"
+    },
+    {
+        "qid": "m03230",
+        "name": "Legendary Black Dragon",
+        "hub": "0",
+        "rank": "3",
+        "star": "2",
+        "idx": "30",
+        "flag": "32",
+        "mask": "5"
+    },
+    {
+        "qid": "m03231",
+        "name": "The End Times",
+        "hub": "0",
+        "rank": "3",
+        "star": "2",
+        "idx": "31",
+        "flag": "32",
+        "mask": "6"
+    },
+    {
+        "qid": "m03232",
+        "name": "Ancestral Dragon",
+        "hub": "0",
+        "rank": "3",
+        "star": "2",
+        "idx": "32",
+        "flag": "32",
+        "mask": "7"
+    },
+    {
+        "qid": "m03233",
+        "name": "Absolute Zero",
+        "hub": "0",
+        "rank": "3",
+        "star": "2",
+        "idx": "33",
+        "flag": "33",
+        "mask": "0"
+    },
+    {
+        "qid": "m04001",
+        "name": "Treasure in the Mountains!",
+        "hub": "0",
+        "rank": "4",
+        "star": "0",
+        "idx": "01",
+        "flag": "-1",
+        "mask": "-1"
+    },
+    {
+        "qid": "m04002",
+        "name": "Treasure in the Jungle!",
+        "hub": "0",
+        "rank": "4",
+        "star": "0",
+        "idx": "02",
+        "flag": "-1",
+        "mask": "-1"
+    },
+    {
+        "qid": "m04003",
+        "name": "Treasure in the Desert!",
+        "hub": "0",
+        "rank": "4",
+        "star": "0",
+        "idx": "03",
+        "flag": "-1",
+        "mask": "-1"
+    },
+    {
+        "qid": "m04004",
+        "name": "Treasure in the Swamp!",
+        "hub": "0",
+        "rank": "4",
+        "star": "0",
+        "idx": "04",
+        "flag": "-1",
+        "mask": "-1"
+    },
+    {
+        "qid": "m04005",
+        "name": "Treasure in the Hills!",
+        "hub": "0",
+        "rank": "4",
+        "star": "0",
+        "idx": "05",
+        "flag": "-1",
+        "mask": "-1"
+    },
+    {
+        "qid": "m04006",
+        "name": "Treasure in the Lava!",
+        "hub": "0",
+        "rank": "4",
+        "star": "0",
+        "idx": "06",
+        "flag": "-1",
+        "mask": "-1"
+    },
+    {
+        "qid": "m04007",
+        "name": "Treasure in the Grt Forest!",
+        "hub": "0",
+        "rank": "4",
+        "star": "0",
+        "idx": "07",
+        "flag": "-1",
+        "mask": "-1"
+    },
+    {
+        "qid": "m10001",
+        "name": "Mountain Herb Picking",
+        "hub": "1",
+        "rank": "0",
+        "star": "0",
+        "idx": "01",
+        "flag": "34",
+        "mask": "7"
+    },
+    {
+        "qid": "m10002",
+        "name": "An Anteka in the Snow",
+        "hub": "1",
+        "rank": "0",
+        "star": "0",
+        "idx": "02",
+        "flag": "35",
+        "mask": "0"
+    },
+    {
+        "qid": "m10003",
+        "name": "Hunt the Carnivore!",
+        "hub": "1",
+        "rank": "0",
+        "star": "0",
+        "idx": "03",
+        "flag": "35",
+        "mask": "1"
+    },
+    {
+        "qid": "m10004",
+        "name": "Sinking Feeling",
+        "hub": "1",
+        "rank": "0",
+        "star": "0",
+        "idx": "04",
+        "flag": "35",
+        "mask": "2"
+    },
+    {
+        "qid": "m10005",
+        "name": "Slay the Blangos!",
+        "hub": "1",
+        "rank": "0",
+        "star": "0",
+        "idx": "05",
+        "flag": "35",
+        "mask": "3"
+    },
+    {
+        "qid": "m10101",
+        "name": "Gathering - Snowy Mountains",
+        "hub": "1",
+        "rank": "0",
+        "star": "1",
+        "idx": "01",
+        "flag": "35",
+        "mask": "4"
+    },
+    {
+        "qid": "m10102",
+        "name": "Gathering - Jungle Zone",
+        "hub": "1",
+        "rank": "0",
+        "star": "1",
+        "idx": "02",
+        "flag": "35",
+        "mask": "5"
+    },
+    {
+        "qid": "m10103",
+        "name": "Gathering - Desert Zone",
+        "hub": "1",
+        "rank": "0",
+        "star": "1",
+        "idx": "03",
+        "flag": "35",
+        "mask": "6"
+    },
+    {
+        "qid": "m10104",
+        "name": "The Carnivorous Leader",
+        "hub": "1",
+        "rank": "0",
+        "star": "1",
+        "idx": "04",
+        "flag": "35",
+        "mask": "7"
+    },
+    {
+        "qid": "m10105",
+        "name": "Reckless Bulldrome Hunter",
+        "hub": "1",
+        "rank": "0",
+        "star": "1",
+        "idx": "05",
+        "flag": "36",
+        "mask": "0"
+    },
+    {
+        "qid": "m10106",
+        "name": "Slay the Giaprey!",
+        "hub": "1",
+        "rank": "0",
+        "star": "1",
+        "idx": "06",
+        "flag": "36",
+        "mask": "1"
+    },
+    {
+        "qid": "m10107",
+        "name": "The Pack of Blangos",
+        "hub": "1",
+        "rank": "0",
+        "star": "1",
+        "idx": "07",
+        "flag": "36",
+        "mask": "2"
+    },
+    {
+        "qid": "m10108",
+        "name": "The Taboo of Negligence!",
+        "hub": "1",
+        "rank": "0",
+        "star": "1",
+        "idx": "08",
+        "flag": "36",
+        "mask": "3"
+    },
+    {
+        "qid": "m10109",
+        "name": "Hunt Down the Velocidrome!",
+        "hub": "1",
+        "rank": "0",
+        "star": "1",
+        "idx": "09",
+        "flag": "36",
+        "mask": "4"
+    },
+    {
+        "qid": "m10110",
+        "name": "Jungle Menace",
+        "hub": "1",
+        "rank": "0",
+        "star": "1",
+        "idx": "10",
+        "flag": "36",
+        "mask": "5"
+    },
+    {
+        "qid": "m10111",
+        "name": "Rarest of the Rare Beasts",
+        "hub": "1",
+        "rank": "0",
+        "star": "1",
+        "idx": "11",
+        "flag": "36",
+        "mask": "6"
+    },
+    {
+        "qid": "m10112",
+        "name": "Hunt the Rare Forest Congas!",
+        "hub": "1",
+        "rank": "0",
+        "star": "1",
+        "idx": "12",
+        "flag": "36",
+        "mask": "7"
+    },
+    {
+        "qid": "m10113",
+        "name": "Attack of the Giant Bugs!",
+        "hub": "1",
+        "rank": "0",
+        "star": "1",
+        "idx": "13",
+        "flag": "37",
+        "mask": "0"
+    },
+    {
+        "qid": "m10114",
+        "name": "Collect to Combine",
+        "hub": "1",
+        "rank": "0",
+        "star": "1",
+        "idx": "14",
+        "flag": "37",
+        "mask": "1"
+    },
+    {
+        "qid": "m10115",
+        "name": "Hunt the Gendrome!",
+        "hub": "1",
+        "rank": "0",
+        "star": "1",
+        "idx": "15",
+        "flag": "37",
+        "mask": "2"
+    },
+    {
+        "qid": "m10116",
+        "name": "The Land Shark",
+        "hub": "1",
+        "rank": "0",
+        "star": "1",
+        "idx": "16",
+        "flag": "37",
+        "mask": "3"
+    },
+    {
+        "qid": "m10117",
+        "name": "Liver of Legend!",
+        "hub": "1",
+        "rank": "0",
+        "star": "1",
+        "idx": "17",
+        "flag": "37",
+        "mask": "4"
+    },
+    {
+        "qid": "m10118",
+        "name": "Gone Fishin'",
+        "hub": "1",
+        "rank": "0",
+        "star": "1",
+        "idx": "18",
+        "flag": "37",
+        "mask": "5"
+    },
+    {
+        "qid": "m10201",
+        "name": "Gathering - Swamp Zone",
+        "hub": "1",
+        "rank": "0",
+        "star": "2",
+        "idx": "01",
+        "flag": "37",
+        "mask": "6"
+    },
+    {
+        "qid": "m10202",
+        "name": "Gathering - Forest and Hills",
+        "hub": "1",
+        "rank": "0",
+        "star": "2",
+        "idx": "02",
+        "flag": "37",
+        "mask": "7"
+    },
+    {
+        "qid": "m10203",
+        "name": "Shadow in the Snow",
+        "hub": "1",
+        "rank": "0",
+        "star": "2",
+        "idx": "03",
+        "flag": "38",
+        "mask": "0"
+    },
+    {
+        "qid": "m10204",
+        "name": "The Subterranean Glutton",
+        "hub": "1",
+        "rank": "0",
+        "star": "2",
+        "idx": "04",
+        "flag": "38",
+        "mask": "1"
+    },
+    {
+        "qid": "m10205",
+        "name": "Blango Slaying Tactics",
+        "hub": "1",
+        "rank": "0",
+        "star": "2",
+        "idx": "05",
+        "flag": "38",
+        "mask": "2"
+    },
+    {
+        "qid": "m10206",
+        "name": "Aim for the Jungle Crab",
+        "hub": "1",
+        "rank": "0",
+        "star": "2",
+        "idx": "06",
+        "flag": "38",
+        "mask": "3"
+    },
+    {
+        "qid": "m10207",
+        "name": "Master of the Giant Lake",
+        "hub": "1",
+        "rank": "0",
+        "star": "2",
+        "idx": "07",
+        "flag": "38",
+        "mask": "4"
+    },
+    {
+        "qid": "m10208",
+        "name": "A Swarm of Hermitaurs",
+        "hub": "1",
+        "rank": "0",
+        "star": "2",
+        "idx": "08",
+        "flag": "38",
+        "mask": "5"
+    },
+    {
+        "qid": "m10209",
+        "name": "The Purple Poison Menace",
+        "hub": "1",
+        "rank": "0",
+        "star": "2",
+        "idx": "09",
+        "flag": "38",
+        "mask": "6"
+    },
+    {
+        "qid": "m10210",
+        "name": "The Lurking Desert Giant",
+        "hub": "1",
+        "rank": "0",
+        "star": "2",
+        "idx": "10",
+        "flag": "38",
+        "mask": "7"
+    },
+    {
+        "qid": "m10211",
+        "name": "Water Wyvern in the Desert",
+        "hub": "1",
+        "rank": "0",
+        "star": "2",
+        "idx": "11",
+        "flag": "39",
+        "mask": "0"
+    },
+    {
+        "qid": "m10212",
+        "name": "Slay the Genprey!",
+        "hub": "1",
+        "rank": "0",
+        "star": "2",
+        "idx": "12",
+        "flag": "39",
+        "mask": "1"
+    },
+    {
+        "qid": "m10213",
+        "name": "Gypceros: Venomous Terror",
+        "hub": "1",
+        "rank": "0",
+        "star": "2",
+        "idx": "13",
+        "flag": "39",
+        "mask": "2"
+    },
+    {
+        "qid": "m10214",
+        "name": "Attack of the Blue Kut-Ku",
+        "hub": "1",
+        "rank": "0",
+        "star": "2",
+        "idx": "14",
+        "flag": "39",
+        "mask": "3"
+    },
+    {
+        "qid": "m10215",
+        "name": "The Mischief-maker",
+        "hub": "1",
+        "rank": "0",
+        "star": "2",
+        "idx": "15",
+        "flag": "39",
+        "mask": "4"
+    },
+    {
+        "qid": "m10216",
+        "name": "Fang of the Iodrome!",
+        "hub": "1",
+        "rank": "0",
+        "star": "2",
+        "idx": "16",
+        "flag": "39",
+        "mask": "5"
+    },
+    {
+        "qid": "m10217",
+        "name": "Slay the Great Kut-Ku!",
+        "hub": "1",
+        "rank": "0",
+        "star": "2",
+        "idx": "17",
+        "flag": "39",
+        "mask": "6"
+    },
+    {
+        "qid": "m10218",
+        "name": "A Killing from Mushrooms",
+        "hub": "1",
+        "rank": "0",
+        "star": "2",
+        "idx": "18",
+        "flag": "39",
+        "mask": "7"
+    },
+    {
+        "qid": "m10301",
+        "name": "Gathering - Volcanic Zone",
+        "hub": "1",
+        "rank": "0",
+        "star": "3",
+        "idx": "01",
+        "flag": "40",
+        "mask": "0"
+    },
+    {
+        "qid": "m10302",
+        "name": "The Ruler of the Snow",
+        "hub": "1",
+        "rank": "0",
+        "star": "3",
+        "idx": "02",
+        "flag": "40",
+        "mask": "1"
+    },
+    {
+        "qid": "m10303",
+        "name": "Red Shadow in the Swampland",
+        "hub": "1",
+        "rank": "0",
+        "star": "3",
+        "idx": "03",
+        "flag": "40",
+        "mask": "2"
+    },
+    {
+        "qid": "m10304",
+        "name": "The Lone Black Garuga",
+        "hub": "1",
+        "rank": "0",
+        "star": "3",
+        "idx": "04",
+        "flag": "40",
+        "mask": "3"
+    },
+    {
+        "qid": "m10305",
+        "name": "Twin Velocidrome",
+        "hub": "1",
+        "rank": "0",
+        "star": "3",
+        "idx": "05",
+        "flag": "40",
+        "mask": "4"
+    },
+    {
+        "qid": "m10306",
+        "name": "Attack of the Giant Bugs!",
+        "hub": "1",
+        "rank": "0",
+        "star": "3",
+        "idx": "06",
+        "flag": "40",
+        "mask": "5"
+    },
+    {
+        "qid": "m10307",
+        "name": "Battle of the Blos",
+        "hub": "1",
+        "rank": "0",
+        "star": "3",
+        "idx": "07",
+        "flag": "40",
+        "mask": "6"
+    },
+    {
+        "qid": "m10308",
+        "name": "The Silver Horn",
+        "hub": "1",
+        "rank": "0",
+        "star": "3",
+        "idx": "08",
+        "flag": "40",
+        "mask": "7"
+    },
+    {
+        "qid": "m10309",
+        "name": "Supreme Ruler of the Swamp",
+        "hub": "1",
+        "rank": "0",
+        "star": "3",
+        "idx": "09",
+        "flag": "41",
+        "mask": "0"
+    },
+    {
+        "qid": "m10310",
+        "name": "Trapped by Yian Kut-Ku",
+        "hub": "1",
+        "rank": "0",
+        "star": "3",
+        "idx": "10",
+        "flag": "41",
+        "mask": "1"
+    },
+    {
+        "qid": "m10311",
+        "name": "The Ioprey Leader",
+        "hub": "1",
+        "rank": "0",
+        "star": "3",
+        "idx": "11",
+        "flag": "41",
+        "mask": "2"
+    },
+    {
+        "qid": "m10312",
+        "name": "Basarios: Unseen Peril",
+        "hub": "1",
+        "rank": "0",
+        "star": "3",
+        "idx": "12",
+        "flag": "41",
+        "mask": "3"
+    },
+    {
+        "qid": "m10313",
+        "name": "Commander in the Flames",
+        "hub": "1",
+        "rank": "0",
+        "star": "3",
+        "idx": "13",
+        "flag": "41",
+        "mask": "4"
+    },
+    {
+        "qid": "m10314",
+        "name": "Ioprey Hunting",
+        "hub": "1",
+        "rank": "0",
+        "star": "3",
+        "idx": "14",
+        "flag": "41",
+        "mask": "5"
+    },
+    {
+        "qid": "m10315",
+        "name": "A Band of Ceanataurs",
+        "hub": "1",
+        "rank": "0",
+        "star": "3",
+        "idx": "15",
+        "flag": "41",
+        "mask": "6"
+    },
+    {
+        "qid": "m10316",
+        "name": "More Coal Please",
+        "hub": "1",
+        "rank": "0",
+        "star": "3",
+        "idx": "16",
+        "flag": "41",
+        "mask": "7"
+    },
+    {
+        "qid": "m10317",
+        "name": "The Frozen Dictator",
+        "hub": "1",
+        "rank": "0",
+        "star": "3",
+        "idx": "17",
+        "flag": "42",
+        "mask": "0"
+    },
+    {
+        "qid": "m10318",
+        "name": "The Elder Dragon of Wind",
+        "hub": "1",
+        "rank": "0",
+        "star": "3",
+        "idx": "18",
+        "flag": "42",
+        "mask": "1"
+    },
+    {
+        "qid": "m10319",
+        "name": "Hermitaur Buffet",
+        "hub": "1",
+        "rank": "0",
+        "star": "3",
+        "idx": "19",
+        "flag": "42",
+        "mask": "2"
+    },
+    {
+        "qid": "m10401",
+        "name": "Absolute Power",
+        "hub": "1",
+        "rank": "0",
+        "star": "4",
+        "idx": "01",
+        "flag": "42",
+        "mask": "4"
+    },
+    {
+        "qid": "m10402",
+        "name": "The Legendary Kirin",
+        "hub": "1",
+        "rank": "0",
+        "star": "4",
+        "idx": "02",
+        "flag": "42",
+        "mask": "5"
+    },
+    {
+        "qid": "m10403",
+        "name": "Two Roars in the Snow",
+        "hub": "1",
+        "rank": "0",
+        "star": "4",
+        "idx": "03",
+        "flag": "42",
+        "mask": "6"
+    },
+    {
+        "qid": "m10404",
+        "name": "The Poison Siege",
+        "hub": "1",
+        "rank": "0",
+        "star": "4",
+        "idx": "04",
+        "flag": "42",
+        "mask": "7"
+    },
+    {
+        "qid": "m10405",
+        "name": "The Tigrex's Roar",
+        "hub": "1",
+        "rank": "0",
+        "star": "4",
+        "idx": "05",
+        "flag": "43",
+        "mask": "0"
+    },
+    {
+        "qid": "m10406",
+        "name": "The Runaway Diablos",
+        "hub": "1",
+        "rank": "0",
+        "star": "4",
+        "idx": "06",
+        "flag": "43",
+        "mask": "1"
+    },
+    {
+        "qid": "m10407",
+        "name": "The Fierce Black Horn",
+        "hub": "1",
+        "rank": "0",
+        "star": "4",
+        "idx": "07",
+        "flag": "43",
+        "mask": "2"
+    },
+    {
+        "qid": "m10408",
+        "name": "Ultimate Crab Dinner",
+        "hub": "1",
+        "rank": "0",
+        "star": "4",
+        "idx": "08",
+        "flag": "43",
+        "mask": "3"
+    },
+    {
+        "qid": "m10409",
+        "name": "Black Rock in the Swamp",
+        "hub": "1",
+        "rank": "0",
+        "star": "4",
+        "idx": "09",
+        "flag": "43",
+        "mask": "4"
+    },
+    {
+        "qid": "m10410",
+        "name": "Seeking the Strange Mask",
+        "hub": "1",
+        "rank": "0",
+        "star": "4",
+        "idx": "10",
+        "flag": "43",
+        "mask": "5"
+    },
+    {
+        "qid": "m10411",
+        "name": "Terror of the Gravios",
+        "hub": "1",
+        "rank": "0",
+        "star": "4",
+        "idx": "11",
+        "flag": "43",
+        "mask": "6"
+    },
+    {
+        "qid": "m10412",
+        "name": "Check the Ancient Tower",
+        "hub": "1",
+        "rank": "0",
+        "star": "4",
+        "idx": "12",
+        "flag": "43",
+        "mask": "7"
+    },
+    {
+        "qid": "m10413",
+        "name": "The Empress's Blazing Throne",
+        "hub": "1",
+        "rank": "0",
+        "star": "4",
+        "idx": "13",
+        "flag": "44",
+        "mask": "0"
+    },
+    {
+        "qid": "m10414",
+        "name": "Overseer of the Ancients",
+        "hub": "1",
+        "rank": "0",
+        "star": "4",
+        "idx": "14",
+        "flag": "44",
+        "mask": "1"
+    },
+    {
+        "qid": "m10415",
+        "name": "The Elder Dragon of Mist",
+        "hub": "1",
+        "rank": "0",
+        "star": "4",
+        "idx": "15",
+        "flag": "44",
+        "mask": "2"
+    },
+    {
+        "qid": "m10416",
+        "name": "Towards the Silence",
+        "hub": "1",
+        "rank": "0",
+        "star": "4",
+        "idx": "16",
+        "flag": "44",
+        "mask": "3"
+    },
+    {
+        "qid": "m10417",
+        "name": "Small Shadow over the Swamp",
+        "hub": "1",
+        "rank": "0",
+        "star": "4",
+        "idx": "17",
+        "flag": "44",
+        "mask": "4"
+    },
+    {
+        "qid": "m10418",
+        "name": "Congalala Territorial Fight",
+        "hub": "1",
+        "rank": "0",
+        "star": "4",
+        "idx": "18",
+        "flag": "44",
+        "mask": "5"
+    },
+    {
+        "qid": "m10501",
+        "name": "A Troublesome Pair",
+        "hub": "1",
+        "rank": "0",
+        "star": "5",
+        "idx": "01",
+        "flag": "45",
+        "mask": "0"
+    },
+    {
+        "qid": "m10502",
+        "name": "Dual Plesioth",
+        "hub": "1",
+        "rank": "0",
+        "star": "5",
+        "idx": "02",
+        "flag": "45",
+        "mask": "1"
+    },
+    {
+        "qid": "m10503",
+        "name": "Pink Dance in the Jungle",
+        "hub": "1",
+        "rank": "0",
+        "star": "5",
+        "idx": "03",
+        "flag": "45",
+        "mask": "2"
+    },
+    {
+        "qid": "m10504",
+        "name": "Four Horns",
+        "hub": "1",
+        "rank": "0",
+        "star": "5",
+        "idx": "04",
+        "flag": "45",
+        "mask": "3"
+    },
+    {
+        "qid": "m10505",
+        "name": "A Sun with Fangs",
+        "hub": "1",
+        "rank": "0",
+        "star": "5",
+        "idx": "05",
+        "flag": "45",
+        "mask": "4"
+    },
+    {
+        "qid": "m10506",
+        "name": "Emperor of Flame",
+        "hub": "1",
+        "rank": "0",
+        "star": "5",
+        "idx": "06",
+        "flag": "45",
+        "mask": "5"
+    },
+    {
+        "qid": "m10507",
+        "name": "The Shogun's Encampment",
+        "hub": "1",
+        "rank": "0",
+        "star": "5",
+        "idx": "07",
+        "flag": "45",
+        "mask": "6"
+    },
+    {
+        "qid": "m10508",
+        "name": "Attack of the Rathalos",
+        "hub": "1",
+        "rank": "0",
+        "star": "5",
+        "idx": "08",
+        "flag": "45",
+        "mask": "7"
+    },
+    {
+        "qid": "m10509",
+        "name": "A State of Crisis!",
+        "hub": "1",
+        "rank": "0",
+        "star": "5",
+        "idx": "09",
+        "flag": "46",
+        "mask": "0"
+    },
+    {
+        "qid": "m10510",
+        "name": "The Final Invitation",
+        "hub": "1",
+        "rank": "0",
+        "star": "5",
+        "idx": "10",
+        "flag": "46",
+        "mask": "1"
+    },
+    {
+        "qid": "m10511",
+        "name": "A Giant Dragon Invades!",
+        "hub": "1",
+        "rank": "0",
+        "star": "5",
+        "idx": "11",
+        "flag": "46",
+        "mask": "2"
+    },
+    {
+        "qid": "m11001",
+        "name": "Bullfangos in the Night",
+        "hub": "1",
+        "rank": "1",
+        "star": "0",
+        "idx": "01",
+        "flag": "46",
+        "mask": "6"
+    },
+    {
+        "qid": "m11002",
+        "name": "Whack a Shakalaka",
+        "hub": "1",
+        "rank": "1",
+        "star": "0",
+        "idx": "02",
+        "flag": "46",
+        "mask": "7"
+    },
+    {
+        "qid": "m11003",
+        "name": "Carnivore Carnival",
+        "hub": "1",
+        "rank": "1",
+        "star": "0",
+        "idx": "03",
+        "flag": "47",
+        "mask": "0"
+    },
+    {
+        "qid": "m11004",
+        "name": "The Beating of Royal Wings",
+        "hub": "1",
+        "rank": "1",
+        "star": "0",
+        "idx": "04",
+        "flag": "47",
+        "mask": "1"
+    },
+    {
+        "qid": "m11005",
+        "name": "Secret Request: Hypnocatrice",
+        "hub": "1",
+        "rank": "1",
+        "star": "0",
+        "idx": "05",
+        "flag": "47",
+        "mask": "2"
+    },
+    {
+        "qid": "m11006",
+        "name": "The Burning Dunes",
+        "hub": "1",
+        "rank": "1",
+        "star": "0",
+        "idx": "06",
+        "flag": "47",
+        "mask": "3"
+    },
+    {
+        "qid": "m11007",
+        "name": "Stealing in the Old Swamp!",
+        "hub": "1",
+        "rank": "1",
+        "star": "0",
+        "idx": "07",
+        "flag": "47",
+        "mask": "4"
+    },
+    {
+        "qid": "m11008",
+        "name": "The Purple Poison Menace",
+        "hub": "1",
+        "rank": "1",
+        "star": "0",
+        "idx": "08",
+        "flag": "47",
+        "mask": "5"
+    },
+    {
+        "qid": "m11009",
+        "name": "Target: Basarios",
+        "hub": "1",
+        "rank": "1",
+        "star": "0",
+        "idx": "09",
+        "flag": "47",
+        "mask": "6"
+    },
+    {
+        "qid": "m11010",
+        "name": "Old Jungle Lightning",
+        "hub": "1",
+        "rank": "1",
+        "star": "0",
+        "idx": "10",
+        "flag": "47",
+        "mask": "7"
+    },
+    {
+        "qid": "m11011",
+        "name": "Red Shadow in the Snow",
+        "hub": "1",
+        "rank": "1",
+        "star": "0",
+        "idx": "11",
+        "flag": "48",
+        "mask": "0"
+    },
+    {
+        "qid": "m11012",
+        "name": "Congalalas' Assault",
+        "hub": "1",
+        "rank": "1",
+        "star": "0",
+        "idx": "12",
+        "flag": "48",
+        "mask": "1"
+    },
+    {
+        "qid": "m11013",
+        "name": "The Meeting of Daimyo",
+        "hub": "1",
+        "rank": "1",
+        "star": "0",
+        "idx": "13",
+        "flag": "48",
+        "mask": "2"
+    },
+    {
+        "qid": "m11014",
+        "name": "Epic Hunt in the Jungle!",
+        "hub": "1",
+        "rank": "1",
+        "star": "0",
+        "idx": "14",
+        "flag": "48",
+        "mask": "3"
+    },
+    {
+        "qid": "m11101",
+        "name": "The Remobra Den",
+        "hub": "1",
+        "rank": "1",
+        "star": "1",
+        "idx": "01",
+        "flag": "49",
+        "mask": "3"
+    },
+    {
+        "qid": "m11102",
+        "name": "The Sleepy Great Forest",
+        "hub": "1",
+        "rank": "1",
+        "star": "1",
+        "idx": "02",
+        "flag": "49",
+        "mask": "4"
+    },
+    {
+        "qid": "m11103",
+        "name": "Eyes in the Underground Lake",
+        "hub": "1",
+        "rank": "1",
+        "star": "1",
+        "idx": "03",
+        "flag": "49",
+        "mask": "5"
+    },
+    {
+        "qid": "m11104",
+        "name": "Green Waves of Verdure",
+        "hub": "1",
+        "rank": "1",
+        "star": "1",
+        "idx": "04",
+        "flag": "49",
+        "mask": "6"
+    },
+    {
+        "qid": "m11105",
+        "name": "Elegy for a Lone Wolf",
+        "hub": "1",
+        "rank": "1",
+        "star": "1",
+        "idx": "05",
+        "flag": "49",
+        "mask": "7"
+    },
+    {
+        "qid": "m11106",
+        "name": "Battle with the Monoblos",
+        "hub": "1",
+        "rank": "1",
+        "star": "1",
+        "idx": "06",
+        "flag": "50",
+        "mask": "0"
+    },
+    {
+        "qid": "m11107",
+        "name": "Secret Request: 2 Monoblos!",
+        "hub": "1",
+        "rank": "1",
+        "star": "1",
+        "idx": "07",
+        "flag": "50",
+        "mask": "1"
+    },
+    {
+        "qid": "m11108",
+        "name": "Kut-Ku Calamity!",
+        "hub": "1",
+        "rank": "1",
+        "star": "1",
+        "idx": "08",
+        "flag": "50",
+        "mask": "2"
+    },
+    {
+        "qid": "m11109",
+        "name": "Basarios Season",
+        "hub": "1",
+        "rank": "1",
+        "star": "1",
+        "idx": "09",
+        "flag": "50",
+        "mask": "3"
+    },
+    {
+        "qid": "m11110",
+        "name": "A Shogun Tastes Like...?",
+        "hub": "1",
+        "rank": "1",
+        "star": "1",
+        "idx": "10",
+        "flag": "50",
+        "mask": "4"
+    },
+    {
+        "qid": "m11111",
+        "name": "Bl-Bl-Blangongas!",
+        "hub": "1",
+        "rank": "1",
+        "star": "1",
+        "idx": "11",
+        "flag": "50",
+        "mask": "5"
+    },
+    {
+        "qid": "m11112",
+        "name": "Operation Desert Winds",
+        "hub": "1",
+        "rank": "1",
+        "star": "1",
+        "idx": "12",
+        "flag": "50",
+        "mask": "6"
+    },
+    {
+        "qid": "m11113",
+        "name": "Congalala in a Crab Shell",
+        "hub": "1",
+        "rank": "1",
+        "star": "1",
+        "idx": "13",
+        "flag": "50",
+        "mask": "7"
+    },
+    {
+        "qid": "m11114",
+        "name": "Sleepy Miasma, Poison Mist",
+        "hub": "1",
+        "rank": "1",
+        "star": "1",
+        "idx": "14",
+        "flag": "51",
+        "mask": "0"
+    },
+    {
+        "qid": "m11115",
+        "name": "Carnivores of the Old Jungle",
+        "hub": "1",
+        "rank": "1",
+        "star": "1",
+        "idx": "15",
+        "flag": "51",
+        "mask": "1"
+    },
+    {
+        "qid": "m11116",
+        "name": "Attack of the Wind Dragon",
+        "hub": "1",
+        "rank": "1",
+        "star": "1",
+        "idx": "16",
+        "flag": "51",
+        "mask": "2"
+    },
+    {
+        "qid": "m11117",
+        "name": "The Empress's Blazing Throne",
+        "hub": "1",
+        "rank": "1",
+        "star": "1",
+        "idx": "17",
+        "flag": "51",
+        "mask": "3"
+    },
+    {
+        "qid": "m11118",
+        "name": "Indigo Meteor",
+        "hub": "1",
+        "rank": "1",
+        "star": "1",
+        "idx": "18",
+        "flag": "51",
+        "mask": "4"
+    },
+    {
+        "qid": "m11119",
+        "name": "Lao-Shan Lung Draws Near!",
+        "hub": "1",
+        "rank": "1",
+        "star": "1",
+        "idx": "19",
+        "flag": "51",
+        "mask": "5"
+    },
+    {
+        "qid": "m11201",
+        "name": "Secret Request: Nargacuga!",
+        "hub": "1",
+        "rank": "1",
+        "star": "2",
+        "idx": "01",
+        "flag": "52",
+        "mask": "4"
+    },
+    {
+        "qid": "m11202",
+        "name": "Assassin of the Jungle",
+        "hub": "1",
+        "rank": "1",
+        "star": "2",
+        "idx": "02",
+        "flag": "52",
+        "mask": "5"
+    },
+    {
+        "qid": "m11203",
+        "name": "Land of the Tremors",
+        "hub": "1",
+        "rank": "1",
+        "star": "2",
+        "idx": "03",
+        "flag": "52",
+        "mask": "6"
+    },
+    {
+        "qid": "m11204",
+        "name": "A King, Robed in Smoke",
+        "hub": "1",
+        "rank": "1",
+        "star": "2",
+        "idx": "04",
+        "flag": "52",
+        "mask": "7"
+    },
+    {
+        "qid": "m11205",
+        "name": "Dancing Desert Queen",
+        "hub": "1",
+        "rank": "1",
+        "star": "2",
+        "idx": "05",
+        "flag": "53",
+        "mask": "0"
+    },
+    {
+        "qid": "m11206",
+        "name": "Descendants of the King",
+        "hub": "1",
+        "rank": "1",
+        "star": "2",
+        "idx": "06",
+        "flag": "53",
+        "mask": "1"
+    },
+    {
+        "qid": "m11207",
+        "name": "Diablos, the Demon King",
+        "hub": "1",
+        "rank": "1",
+        "star": "2",
+        "idx": "07",
+        "flag": "53",
+        "mask": "2"
+    },
+    {
+        "qid": "m11208",
+        "name": "The Four Spires",
+        "hub": "1",
+        "rank": "1",
+        "star": "2",
+        "idx": "08",
+        "flag": "53",
+        "mask": "3"
+    },
+    {
+        "qid": "m11209",
+        "name": "Armored Supremacy",
+        "hub": "1",
+        "rank": "1",
+        "star": "2",
+        "idx": "09",
+        "flag": "53",
+        "mask": "4"
+    },
+    {
+        "qid": "m11210",
+        "name": "Two Black Suits of Armor",
+        "hub": "1",
+        "rank": "1",
+        "star": "2",
+        "idx": "10",
+        "flag": "53",
+        "mask": "5"
+    },
+    {
+        "qid": "m11211",
+        "name": "Explore the Unexplored",
+        "hub": "1",
+        "rank": "1",
+        "star": "2",
+        "idx": "11",
+        "flag": "53",
+        "mask": "6"
+    },
+    {
+        "qid": "m11212",
+        "name": "A Single Beam of Moonlight",
+        "hub": "1",
+        "rank": "1",
+        "star": "2",
+        "idx": "12",
+        "flag": "53",
+        "mask": "7"
+    },
+    {
+        "qid": "m11213",
+        "name": "Fire Ring, Lunar Ring",
+        "hub": "1",
+        "rank": "1",
+        "star": "2",
+        "idx": "13",
+        "flag": "54",
+        "mask": "0"
+    },
+    {
+        "qid": "m11214",
+        "name": "Attack of the Rajang",
+        "hub": "1",
+        "rank": "1",
+        "star": "2",
+        "idx": "14",
+        "flag": "54",
+        "mask": "1"
+    },
+    {
+        "qid": "m11215",
+        "name": "It's Electric",
+        "hub": "1",
+        "rank": "1",
+        "star": "2",
+        "idx": "15",
+        "flag": "54",
+        "mask": "2"
+    },
+    {
+        "qid": "m11216",
+        "name": "Diamond Dust",
+        "hub": "1",
+        "rank": "1",
+        "star": "2",
+        "idx": "16",
+        "flag": "54",
+        "mask": "3"
+    },
+    {
+        "qid": "m11217",
+        "name": "Hard-Shelled Terrors",
+        "hub": "1",
+        "rank": "1",
+        "star": "2",
+        "idx": "17",
+        "flag": "54",
+        "mask": "4"
+    },
+    {
+        "qid": "m11218",
+        "name": "Bird Wyvern All-Stars",
+        "hub": "1",
+        "rank": "1",
+        "star": "2",
+        "idx": "18",
+        "flag": "54",
+        "mask": "5"
+    },
+    {
+        "qid": "m11219",
+        "name": "Sand Dune's Might",
+        "hub": "1",
+        "rank": "1",
+        "star": "2",
+        "idx": "19",
+        "flag": "54",
+        "mask": "6"
+    },
+    {
+        "qid": "m11220",
+        "name": "The Elder Dragon of Mist",
+        "hub": "1",
+        "rank": "1",
+        "star": "2",
+        "idx": "20",
+        "flag": "54",
+        "mask": "7"
+    },
+    {
+        "qid": "m11221",
+        "name": "Evaporate into the Night",
+        "hub": "1",
+        "rank": "1",
+        "star": "2",
+        "idx": "21",
+        "flag": "55",
+        "mask": "0"
+    },
+    {
+        "qid": "m11222",
+        "name": "Fight for Your Life!",
+        "hub": "1",
+        "rank": "1",
+        "star": "2",
+        "idx": "22",
+        "flag": "55",
+        "mask": "1"
+    },
+    {
+        "qid": "m11223",
+        "name": "A Midnight Audience",
+        "hub": "1",
+        "rank": "1",
+        "star": "2",
+        "idx": "23",
+        "flag": "55",
+        "mask": "2"
+    },
+    {
+        "qid": "m11224",
+        "name": "The Approaching Gaoren",
+        "hub": "1",
+        "rank": "1",
+        "star": "2",
+        "idx": "24",
+        "flag": "55",
+        "mask": "3"
+    },
+    {
+        "qid": "m11225",
+        "name": "Rise to the Summit",
+        "hub": "1",
+        "rank": "1",
+        "star": "2",
+        "idx": "25",
+        "flag": "55",
+        "mask": "4"
+    },
+    {
+        "qid": "m11226",
+        "name": "Monster Hunter",
+        "hub": "1",
+        "rank": "1",
+        "star": "2",
+        "idx": "26",
+        "flag": "55",
+        "mask": "5"
+    },
+    {
+        "qid": "m20001",
+        "name": "Basic Training - Basics",
+        "hub": "2",
+        "rank": "0",
+        "star": "0",
+        "idx": "01",
+        "flag": "56",
+        "mask": "2"
+    },
+    {
+        "qid": "m20002",
+        "name": "Basic Training - BBQ",
+        "hub": "2",
+        "rank": "0",
+        "star": "0",
+        "idx": "02",
+        "flag": "56",
+        "mask": "3"
+    },
+    {
+        "qid": "m20003",
+        "name": "Basic Training - Gathering",
+        "hub": "2",
+        "rank": "0",
+        "star": "0",
+        "idx": "03",
+        "flag": "56",
+        "mask": "4"
+    },
+    {
+        "qid": "m20004",
+        "name": "Basic Training - Combining",
+        "hub": "2",
+        "rank": "0",
+        "star": "0",
+        "idx": "04",
+        "flag": "56",
+        "mask": "5"
+    },
+    {
+        "qid": "m20005",
+        "name": "Basic Training - Fishing",
+        "hub": "2",
+        "rank": "0",
+        "star": "0",
+        "idx": "05",
+        "flag": "56",
+        "mask": "6"
+    },
+    {
+        "qid": "m20006",
+        "name": "Basic Training - Transport",
+        "hub": "2",
+        "rank": "0",
+        "star": "0",
+        "idx": "06",
+        "flag": "56",
+        "mask": "7"
+    },
+    {
+        "qid": "m20007",
+        "name": "Basic Training - Hunting",
+        "hub": "2",
+        "rank": "0",
+        "star": "0",
+        "idx": "07",
+        "flag": "57",
+        "mask": "0"
+    },
+    {
+        "qid": "m20008",
+        "name": "Sword Mastery",
+        "hub": "2",
+        "rank": "0",
+        "star": "0",
+        "idx": "08",
+        "flag": "57",
+        "mask": "1"
+    },
+    {
+        "qid": "m20009",
+        "name": "Dual Blade Mastery",
+        "hub": "2",
+        "rank": "0",
+        "star": "0",
+        "idx": "09",
+        "flag": "57",
+        "mask": "2"
+    },
+    {
+        "qid": "m20010",
+        "name": "Great Sword Mastery",
+        "hub": "2",
+        "rank": "0",
+        "star": "0",
+        "idx": "10",
+        "flag": "57",
+        "mask": "3"
+    },
+    {
+        "qid": "m20011",
+        "name": "Long Sword Mastery",
+        "hub": "2",
+        "rank": "0",
+        "star": "0",
+        "idx": "11",
+        "flag": "57",
+        "mask": "4"
+    },
+    {
+        "qid": "m20012",
+        "name": "Hammer Mastery",
+        "hub": "2",
+        "rank": "0",
+        "star": "0",
+        "idx": "12",
+        "flag": "57",
+        "mask": "5"
+    },
+    {
+        "qid": "m20013",
+        "name": "Hunting Horn Mastery",
+        "hub": "2",
+        "rank": "0",
+        "star": "0",
+        "idx": "13",
+        "flag": "57",
+        "mask": "6"
+    },
+    {
+        "qid": "m20014",
+        "name": "Lance Mastery",
+        "hub": "2",
+        "rank": "0",
+        "star": "0",
+        "idx": "14",
+        "flag": "57",
+        "mask": "7"
+    },
+    {
+        "qid": "m20015",
+        "name": "Gunlance Mastery",
+        "hub": "2",
+        "rank": "0",
+        "star": "0",
+        "idx": "15",
+        "flag": "58",
+        "mask": "0"
+    },
+    {
+        "qid": "m20016",
+        "name": "Light Bowgun Mastery",
+        "hub": "2",
+        "rank": "0",
+        "star": "0",
+        "idx": "16",
+        "flag": "58",
+        "mask": "1"
+    },
+    {
+        "qid": "m20017",
+        "name": "Heavy Bowgun Mastery",
+        "hub": "2",
+        "rank": "0",
+        "star": "0",
+        "idx": "17",
+        "flag": "58",
+        "mask": "2"
+    },
+    {
+        "qid": "m20018",
+        "name": "Bow Mastery",
+        "hub": "2",
+        "rank": "0",
+        "star": "0",
+        "idx": "18",
+        "flag": "58",
+        "mask": "3"
+    },
+    {
+        "qid": "m21001",
+        "name": "Yian Kut-Ku Training",
+        "hub": "2",
+        "rank": "1",
+        "star": "0",
+        "idx": "01",
+        "flag": "58",
+        "mask": "4"
+    },
+    {
+        "qid": "m21002",
+        "name": "Congalala Training",
+        "hub": "2",
+        "rank": "1",
+        "star": "0",
+        "idx": "02",
+        "flag": "58",
+        "mask": "5"
+    },
+    {
+        "qid": "m21003",
+        "name": "Khezu Training",
+        "hub": "2",
+        "rank": "1",
+        "star": "0",
+        "idx": "03",
+        "flag": "58",
+        "mask": "6"
+    },
+    {
+        "qid": "m21004",
+        "name": "Daimyo Hermitaur Training",
+        "hub": "2",
+        "rank": "1",
+        "star": "0",
+        "idx": "04",
+        "flag": "58",
+        "mask": "7"
+    },
+    {
+        "qid": "m21005",
+        "name": "Blangonga Training",
+        "hub": "2",
+        "rank": "1",
+        "star": "0",
+        "idx": "05",
+        "flag": "59",
+        "mask": "0"
+    },
+    {
+        "qid": "m21006",
+        "name": "Yian Garuga Training",
+        "hub": "2",
+        "rank": "1",
+        "star": "0",
+        "idx": "06",
+        "flag": "59",
+        "mask": "1"
+    },
+    {
+        "qid": "m21007",
+        "name": "Tigrex Training",
+        "hub": "2",
+        "rank": "1",
+        "star": "0",
+        "idx": "07",
+        "flag": "59",
+        "mask": "2"
+    },
+    {
+        "qid": "m21008",
+        "name": "Diablos Training",
+        "hub": "2",
+        "rank": "1",
+        "star": "0",
+        "idx": "08",
+        "flag": "59",
+        "mask": "3"
+    },
+    {
+        "qid": "m21009",
+        "name": "Gravios Training",
+        "hub": "2",
+        "rank": "1",
+        "star": "0",
+        "idx": "09",
+        "flag": "59",
+        "mask": "4"
+    },
+    {
+        "qid": "m21010",
+        "name": "Kirin Training",
+        "hub": "2",
+        "rank": "1",
+        "star": "0",
+        "idx": "10",
+        "flag": "59",
+        "mask": "5"
+    },
+    {
+        "qid": "m21011",
+        "name": "Cephadrome Training",
+        "hub": "2",
+        "rank": "1",
+        "star": "0",
+        "idx": "11",
+        "flag": "59",
+        "mask": "6"
+    },
+    {
+        "qid": "m21012",
+        "name": "Plesioth Training",
+        "hub": "2",
+        "rank": "1",
+        "star": "0",
+        "idx": "12",
+        "flag": "59",
+        "mask": "7"
+    },
+    {
+        "qid": "m21013",
+        "name": "Shogun Ceanataur Training",
+        "hub": "2",
+        "rank": "1",
+        "star": "0",
+        "idx": "13",
+        "flag": "60",
+        "mask": "0"
+    },
+    {
+        "qid": "m21014",
+        "name": "Rathalos Training",
+        "hub": "2",
+        "rank": "1",
+        "star": "0",
+        "idx": "14",
+        "flag": "60",
+        "mask": "1"
+    },
+    {
+        "qid": "m21015",
+        "name": "Rajang Training",
+        "hub": "2",
+        "rank": "1",
+        "star": "0",
+        "idx": "15",
+        "flag": "60",
+        "mask": "2"
+    },
+    {
+        "qid": "m21016",
+        "name": "Hypnocatrice Training",
+        "hub": "2",
+        "rank": "1",
+        "star": "0",
+        "idx": "16",
+        "flag": "60",
+        "mask": "3"
+    },
+    {
+        "qid": "m21017",
+        "name": "Emerald Congalala Training",
+        "hub": "2",
+        "rank": "1",
+        "star": "0",
+        "idx": "17",
+        "flag": "60",
+        "mask": "4"
+    },
+    {
+        "qid": "m21018",
+        "name": "Plum D.Hermitaur Training",
+        "hub": "2",
+        "rank": "1",
+        "star": "0",
+        "idx": "18",
+        "flag": "60",
+        "mask": "5"
+    },
+    {
+        "qid": "m21019",
+        "name": "Nargacuga Training",
+        "hub": "2",
+        "rank": "1",
+        "star": "0",
+        "idx": "19",
+        "flag": "60",
+        "mask": "6"
+    },
+    {
+        "qid": "m21020",
+        "name": "Copper Blangonga Training",
+        "hub": "2",
+        "rank": "1",
+        "star": "0",
+        "idx": "20",
+        "flag": "60",
+        "mask": "7"
+    },
+    {
+        "qid": "m21021",
+        "name": "Lavasioth Training",
+        "hub": "2",
+        "rank": "1",
+        "star": "0",
+        "idx": "21",
+        "flag": "61",
+        "mask": "0"
+    },
+    {
+        "qid": "m21022",
+        "name": "Terra S.Ceanataur Training",
+        "hub": "2",
+        "rank": "1",
+        "star": "0",
+        "idx": "22",
+        "flag": "61",
+        "mask": "1"
+    },
+    {
+        "qid": "m21023",
+        "name": "Rajang Training",
+        "hub": "2",
+        "rank": "1",
+        "star": "0",
+        "idx": "23",
+        "flag": "61",
+        "mask": "2"
+    },
+    {
+        "qid": "m22001",
+        "name": "Blue Yian Kut-Ku Exercises",
+        "hub": "2",
+        "rank": "2",
+        "star": "0",
+        "idx": "01",
+        "flag": "61",
+        "mask": "3"
+    },
+    {
+        "qid": "m22002",
+        "name": "Cephadrome Exercises",
+        "hub": "2",
+        "rank": "2",
+        "star": "0",
+        "idx": "02",
+        "flag": "61",
+        "mask": "4"
+    },
+    {
+        "qid": "m22003",
+        "name": "Rathian Exercises",
+        "hub": "2",
+        "rank": "2",
+        "star": "0",
+        "idx": "03",
+        "flag": "61",
+        "mask": "5"
+    },
+    {
+        "qid": "m22004",
+        "name": "Congalala Exercises",
+        "hub": "2",
+        "rank": "2",
+        "star": "0",
+        "idx": "04",
+        "flag": "61",
+        "mask": "6"
+    },
+    {
+        "qid": "m22005",
+        "name": "Shogun Ceanataur Exercises",
+        "hub": "2",
+        "rank": "2",
+        "star": "0",
+        "idx": "05",
+        "flag": "61",
+        "mask": "7"
+    },
+    {
+        "qid": "m22006",
+        "name": "Tigrex Exercises",
+        "hub": "2",
+        "rank": "2",
+        "star": "0",
+        "idx": "06",
+        "flag": "62",
+        "mask": "0"
+    }
+]

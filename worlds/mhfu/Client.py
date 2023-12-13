@@ -9,8 +9,10 @@ import asyncio
 from websockets import client
 import base64
 import json
-from uuid import getnode
 import struct
+
+from .Quests import quest_data, base_id
+
 
 ppsspp_logger = logging.getLogger("PPSSPP")
 PPSSPP_REPORTING = "https://report.ppsspp.org/match/list"
@@ -39,25 +41,23 @@ MHFU_POINTERS = {
 }
 
 
-async def receive_all(ctx: MHFUContext):
+async def send_and_receive(ctx: MHFUContext, message: str, event: str):
+    # since we can't register for a specific change in value,
+    # we can just wait until we receive the one we're looking for
+    await ctx.debugger.send(message)
     try:
-        message = await asyncio.wait_for(ctx.debugger.recv(), 1)
+        new_message = await asyncio.wait_for(ctx.debugger.recv(), 1)
     except asyncio.exceptions.TimeoutError:
-        message = None
+        new_message = None
     results = []
-    while message:
-        results.append(json.loads(message))
+    while new_message:
+        results.append(json.loads(new_message))
         try:
-            message = await asyncio.wait_for(ctx.debugger.recv(), 1)
+            new_message = await asyncio.wait_for(ctx.debugger.recv(), 1)
         except asyncio.exceptions.TimeoutError:
-            message = None
+            new_message = None
 
-    return results
-
-
-async def send_all(ctx: MHFUContext, messages: typing.Dict[str, str]):
-    for message in messages:
-        await ctx.debugger.send(messages[message])
+    return next(message for message in results if message["event"] == event)
 
 
 async def connect_psp(ctx: MHFUContext, target: typing.Optional[int] = None):
@@ -83,22 +83,19 @@ async def connect_psp(ctx: MHFUContext, target: typing.Optional[int] = None):
             return
     ctx.debugger = await client.connect(f"ws://{psp['ip']}:{psp['p']}/debugger", subprotocols=[PPSSPP_DEBUG])
 
-    await ctx.debugger.send(json.dumps(PPSSPP_HELLO))
-    response = await ctx.debugger.recv()
-    await ctx.debugger.send(json.dumps(PPSSPP_STATUS))
-    game_status = await receive_all(ctx)
-    status = next(x for x in game_status if x['event'] == "game.status")
-    if not status['game'] or status['game']['id'] not in (MHFU_SERIAL, MHP2G_SERIAL):
+    hello = await send_and_receive(ctx, json.dumps(PPSSPP_HELLO), "version")
+    game_status = await send_and_receive(ctx, json.dumps(PPSSPP_STATUS), "game.status")
+    if not game_status["game"] or game_status["game"]["id"] not in (MHFU_SERIAL, MHP2G_SERIAL):
         ppsspp_logger.error("Connected to PPSSPP but MHFU is not currently being played. Please run /psp when MHFU is"
                             " loaded.")
         del ctx.debugger
         ctx.debugger = None
         return
-    if status["game"]["id"] == MHFU_SERIAL:
+    if game_status["game"]["id"] == MHFU_SERIAL:
         ctx.lang = "US"
     else:
         ctx.lang = "JP"
-    ppsspp_logger.info("Connected to PPSSPP playing Monster Hunter Freedom Unite!")
+    ppsspp_logger.info(f"Connected to PPSSPP {hello['version']} playing Monster Hunter Freedom Unite!")
     return
 
 
@@ -110,46 +107,50 @@ class MHFUClientCommandProcessor(ClientCommandProcessor):
 
 
 class MHFUContext(CommonContext):
-    game = ""#"Monster Hunter Freedom Unite"
-    tags = {"AP", "TextOnly"}
+    game = "Monster Hunter Freedom Unite"
+    tags = {"AP"}
     items_handling = 0b111
     command_processor = MHFUClientCommandProcessor
     lang: str = "JP"
     debugger: typing.Optional[client.WebSocketClientProtocol] = None
     watcher_task = None
 
-    def ppsspp_read_bytes(self, offset, length):
-        return json.dumps({
+    async def ppsspp_read_bytes(self, offset, length):
+        result = await send_and_receive(self, json.dumps({
             "event": "memory.read",
             "address": offset,
             "size": length
-        })
+        }), "memory.read")
+        return result
 
-    def ppsspp_read_unsigned(self, offset, length = 8):
+    async def ppsspp_read_unsigned(self, offset, length = 8):
         if length not in (8, 16, 32):
             raise Exception("Can only read 8/16/32-bit integers.")
-        return json.dumps({
+        result = await send_and_receive(self, json.dumps({
             "event": f"memory.read_u{length}",
             "address": offset
-        })
+        }), f"memory.read_u{length}")
+        return result
 
-    def ppsspp_write_bytes(self, offset, data):
-        return json.dumps({
-            "event": "memory.read",
+    async def ppsspp_write_bytes(self, offset, data):
+        result = await send_and_receive(self, json.dumps({
+            "event": "memory.write",
             "address": offset,
             "base64": base64.b64encode(data)
-        })
+        }), "memory.write")
+        return result
 
-    def ppsspp_write_unsigned(self, offset, value, length = 8):
+    async def ppsspp_write_unsigned(self, offset, value, length = 8):
         if length not in (8, 16, 32):
             raise Exception("Can only read 8/16/32-bit integers.")
         if value > pow(2, length):
             raise Exception("Attempted a write greater than the possible size of the location.")
-        return json.dumps({
-            "event": f"memory.read_u{length}",
+        result = await send_and_receive(self, json.dumps({
+            "event": f"memory.write_u{length}",
             "address": offset,
             "value": value
-        })
+        }), f"memory.write_u{length}")
+        return result
 
     async def server_auth(self, password_requested: bool = False):
         if password_requested and not self.password:
@@ -174,19 +175,35 @@ class MHFUContext(CommonContext):
 async def game_watcher(ctx):
     while not ctx.exit_event.is_set():
         try:
-            await asyncio.wait_for(ctx.watcher_event.wait(), 0.125)
-        except asyncio.TimeoutError:
-            pass
-        ctx.watcher_event.clear()
-        if ctx.server is None or ctx.slot is None:
-            continue
+            try:
+                await asyncio.wait_for(ctx.watcher_event.wait(), 0.125)
+            except asyncio.TimeoutError:
+                pass
+            ctx.watcher_event.clear()
+            if ctx.server is None or ctx.slot is None:
+                continue
 
-        messages = {
-            "GH_VISIBLE": ctx.ppsspp_read_bytes(MHFU_POINTERS[ctx.lang]["GH_VISIBLE"], 0x210)
-        }
-        await send_all(ctx, messages)
-        responses = await receive_all(ctx)
-        print(base64.b64decode(responses[0]["base64"]))
+            new_checks = []
+            gh_visible = await ctx.ppsspp_read_bytes(MHFU_POINTERS[ctx.lang]["GH_VISIBLE"], 0x210)
+            completion_bytes = await ctx.ppsspp_read_bytes(MHFU_POINTERS[ctx.lang]["QUEST_COMPLETE"], 63)
+            quest_completion = base64.b64decode(completion_bytes["base64"])
+            for id, quest in enumerate(quest_data):
+                flag = int(quest["flag"])
+                mask = int(quest["mask"])
+                if flag >= 0 and mask >= 0:
+                    if quest_completion[flag] & (1 << mask) and base_id + id not in ctx.checked_locations:
+                        new_checks.append(id + base_id)
+
+            if new_checks:
+                for new_check_id in new_checks:
+                    ctx.locations_checked.add(new_check_id)
+                    location = ctx.location_names[new_check_id]
+                    ppsspp_logger.info(
+                        f'New Check: {location} ({len(ctx.locations_checked)}/{len(ctx.missing_locations) + len(ctx.checked_locations)})')
+                    await ctx.send_msgs([{"cmd": 'LocationChecks', "locations": [new_check_id]}])
+        except Exception as ex:
+            Utils.messagebox("Error", str(ex), True)
+
 
 async def main(args):
 
