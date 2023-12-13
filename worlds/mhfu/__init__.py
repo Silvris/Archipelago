@@ -21,7 +21,7 @@ class MHFUWebWorld(WebWorld):
 
 class MHFUWorld(World):
     """
-    Play a little Sudoku while you're in BK mode to maybe get some useful hints
+    Monster Hunter Freedom Unite description goes here.
     """
     game = "Monster Hunter Freedom Unite"
     web = MHFUWebWorld()
@@ -30,6 +30,6 @@ class MHFUWorld(World):
     item_name_to_id: Dict[str, int] = {}
     location_name_to_id: Dict[str, int] = {}
 
-    @classmethod
-    def stage_assert_generate(cls, multiworld):
-        raise Exception("MHFU cannot be used for generating worlds")
+    def create_regions(self):
+        pass
+
