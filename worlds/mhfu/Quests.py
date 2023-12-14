@@ -49,6 +49,17 @@ hub_rank_max = {
     (2, 1): 1,
     (2, 2): 1,
 }
+goal_quests = {
+    0: "m10509",
+    1: "m11225",
+    2: "m11226",
+    3: "m01218",
+    4: "m02226",
+    5: "m03233",
+    6: "m03230",
+    7: "m03231",
+    8: "m03232"
+}
 
 
 class MHFULocation(Location):
@@ -60,7 +71,7 @@ def get_proper_name(info):
     hub = hubs[int(info["hub"])]
     rank = ranks[int(info["rank"]) + (1 if hub != "Guild" else 0)]
     star = hub_rank_start[(int(info["hub"]), int(info["rank"]))] + int(info["star"]) + 1
-    if int(info["rank"]) != 4:
+    if int(info["rank"]) != 4 and int(info["hub"]) != 2:
         return f"({hub} {rank} {star}*) {base_name}"
     else:
         return f"({hub} {rank}) {base_name}"
@@ -74,6 +85,10 @@ base_id = 24700000
 location_name_to_id = {get_proper_name(info): base_id + id for id, info in enumerate(quest_data)}
 
 
+def get_quest_by_id(idx: str) -> typing.Dict[str, str] | None:
+    return next((quest for quest in quest_data if quest["qid"] == idx), None)
+
+
 def create_ranks(world: "MHFUWorld"):
     menu_region = Region("Menu", world.player, world.multiworld)
     world.multiworld.regions.append(menu_region)
@@ -83,6 +98,7 @@ def create_ranks(world: "MHFUWorld"):
             for star in range(hub_rank_max[(hub, rank)] - 1, -1, -1):
                 valid_quests = [quest for quest in quest_data if int(quest["hub"]) == hub
                                 and int(quest["rank"]) == rank and int(quest["star"]) == star]
+                world.location_num += len(valid_quests)
                 region = Region(f"{hubs[hub]} {ranks[rank]} {hub_rank_start[(hub,rank)] + star + 1}",
                                 world.player, world.multiworld)
                 region.add_locations({get_proper_name(quest): location_name_to_id[get_proper_name(quest)]
