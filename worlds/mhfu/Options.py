@@ -33,11 +33,11 @@ class GuildQuestDepth(Choice):
     Unranked is considered alongside Low Rank.
     """
     display_name = "Guild Quest Depth"
-    option_none = -1
-    option_low_rank = 0
-    option_high_rank = 1
-    option_g_rank = 2
-    default = 1
+    option_none = 0
+    option_low_rank = 1
+    option_high_rank = 2
+    option_g_rank = 3
+    default = 2
 
 
 class VillageQuestDepth(Choice):
@@ -45,10 +45,10 @@ class VillageQuestDepth(Choice):
     What Village ranks to consider as checks. All ranks prior to the selected rank will be added.
     """
     display_name = "Village Quest Depth"
-    option_none = -1
-    option_low_rank = 0
-    option_high_rank = 1
-    default = 0
+    option_none = 0
+    option_low_rank = 1
+    option_high_rank = 2
+    default = 1
 
 
 class TrainingQuests(DefaultOnToggle):

@@ -36,15 +36,82 @@ MHFU_POINTERS = {
     "JP": {
         "GH_VISIBLE": 0x089AEAF0,
         "VL_VISIBLE": 0x089AED00,
-        "QUEST_COMPLETE": 0x09999DC8
+        "QUEST_COMPLETE": 0x09999DC8,
+        "GH_KEYS": 0x089AEE44,
+        "VL_KEYS": 0x089AEEB4,
+        "EQUIP_CHEST": 0x9995EE8,
+        "ITEM_CHEST": 0x09998DC8,
+        "CURRENT_OVL": 0x09A5A5A0,
+        "RESET_ACTION": 0x090AF355,  # byte
+        "SET_ACTION": 0x090AF418,    # half
+        "FAIL_QUEST": 0x09A01B1C,    # byte
+        "POISON_TIMER": 0x090AF508   # half
     }
 }
 
+MHFU_BREAKPOINTS = {
+    # logFormat: address, size, enabled, log, read, write, change
+    "QUEST_LOAD": (0x08A57510, 1, True, True, False, True, False),
+    "QUEST_COMPLETE": (0x09999DC8, 63, False, True, False, True, True),
+}
 
-async def send_and_receive(ctx: MHFUContext, message: str, event: str):
-    # since we can't register for a specific change in value,
-    # we can just wait until we receive the one we're looking for
-    await ctx.debugger.send(message)
+ACTIONS = {
+    -1: 0x0300,  # Kill Player
+    10: 0x0072,  # Farcaster
+    11: 0x0215,  # Sleep
+    12: 0x0216,  # Paralysis
+    13: 0x021B,  # Snowman
+    14: 0x0019,  # Use Item
+}
+
+
+async def handle_logs(ctx: MHFUContext, logs: typing.List):
+    for log in logs:
+        if log["channel"] == "MEMMAP":
+            # we hit a breakpoint
+            breakpoint = log["message"].replace("\n", "").rsplit(" ")[-1]
+            if breakpoint == "QUEST_LOAD":
+                print(breakpoint)
+                quest_base = MHFU_BREAKPOINTS[breakpoint][0]
+                large_mon_ptr_ptr = quest_base + 0x14
+                large_mon_ptr = (await ctx.ppsspp_read_unsigned(large_mon_ptr_ptr, 32))["value"]
+                large_mon_id_ptr = await ctx.ppsspp_read_unsigned(large_mon_ptr + quest_base + 8, 32)
+                large_mon_info_ptr = await ctx.ppsspp_read_unsigned(large_mon_ptr + 12 + quest_base, 32)
+                large_mons = struct.unpack("IIII",
+                                           base64.b64decode((await ctx.ppsspp_read_bytes(large_mon_id_ptr["value"] + quest_base, 16))["base64"]))
+                mons = {}
+                for idx, mon in enumerate([mon for mon in large_mons if mon != 0xFFFFFFFF]):
+                    # pull the mons
+                    mons[mon] = await ctx.ppsspp_read_bytes(large_mon_info_ptr["value"] + quest_base + (idx * 60), 60)
+                print(mons)
+            elif breakpoint == "QUEST_COMPLETE":
+                new_checks = []
+                completion_bytes = await ctx.ppsspp_read_bytes(MHFU_POINTERS[ctx.lang]["QUEST_COMPLETE"], 63)
+                quest_completion = bytearray(base64.b64decode(completion_bytes["base64"]))
+                for id, quest in enumerate(quest_data):
+                    flag = int(quest["flag"])
+                    mask = int(quest["mask"])
+                    if flag >= 0 and mask >= 0:
+                        if quest_completion[flag] & (1 << mask):
+                            if base_id + id not in ctx.checked_locations:
+                                new_checks.append(id + base_id)
+                        elif base_id + id in ctx.checked_locations:
+                            quest_completion[flag] |= (1 << mask)
+                await ctx.ppsspp_write_bytes(MHFU_POINTERS[ctx.lang]["QUEST_COMPLETE"], bytes(quest_completion))
+
+                if new_checks:
+                    for new_check_id in new_checks:
+                        ctx.locations_checked.add(new_check_id)
+                        location = ctx.location_names[new_check_id]
+                        ppsspp_logger.info(
+                            f'New Check: {location} ({len(ctx.locations_checked)}/{len(ctx.missing_locations) + len(ctx.checked_locations)})')
+                        await ctx.send_msgs([{"cmd": 'LocationChecks', "locations": [new_check_id]}])
+            if MHFU_BREAKPOINTS[breakpoint][2]:
+                # this break point stops emulation, we need to restart it
+                await send_and_receive(ctx, json.dumps({"event": "cpu.resume"}), "cpu.resume")
+
+
+async def receive_all(ctx: MHFUContext):
     try:
         new_message = await asyncio.wait_for(ctx.debugger.recv(), 1)
     except asyncio.exceptions.TimeoutError:
@@ -56,7 +123,21 @@ async def send_and_receive(ctx: MHFUContext, message: str, event: str):
             new_message = await asyncio.wait_for(ctx.debugger.recv(), 1)
         except asyncio.exceptions.TimeoutError:
             new_message = None
+    regular, logs = [], []
+    for x in results:
+        (regular, logs)[x["event"] == "log"].append(x)
+    await handle_logs(ctx, logs)
+    return regular
 
+
+async def send_and_receive(ctx: MHFUContext, message: str, event: str):
+    # since we can't register for a specific change in value,
+    # we can just wait until we receive the one we're looking for
+    await ctx.debugger.send(message)
+    results = await receive_all(ctx)
+    logs = [message for message in results if message["event"] == "log"]
+    if logs:
+        print(logs)
     return next(message for message in results if message["event"] == event)
 
 
@@ -79,7 +160,7 @@ async def connect_psp(ctx: MHFUContext, target: typing.Optional[int] = None):
             psp = psps[0]
         else:
             ppsspp_logger.error("No PPSSPP instances found to connect to. Make sure PPSSPP is running and "
-                                  "\"Allow remote debugging\" is enabled in the settings.")
+                                "\"Allow remote debugging\" is enabled in the settings.")
             return
     ctx.debugger = await client.connect(f"ws://{psp['ip']}:{psp['p']}/debugger", subprotocols=[PPSSPP_DEBUG])
 
@@ -96,6 +177,10 @@ async def connect_psp(ctx: MHFUContext, target: typing.Optional[int] = None):
     else:
         ctx.lang = "JP"
     ppsspp_logger.info(f"Connected to PPSSPP {hello['version']} playing Monster Hunter Freedom Unite!")
+    for breakpoint in MHFU_BREAKPOINTS:
+        response = await send_and_receive(ctx, json.dumps(
+            dict(zip(["event", "address", "size", "enabled", "log", "read", "write", "change", "logFormat"],
+                ["memory.breakpoint.add", *MHFU_BREAKPOINTS[breakpoint], breakpoint]))), "memory.breakpoint.add")
     return
 
 
@@ -132,11 +217,18 @@ class MHFUContext(CommonContext):
         }), f"memory.read_u{length}")
         return result
 
+    async def ppsspp_read_string(self, offset):
+        result = await send_and_receive(self, json.dumps({
+            "event": "memory.readString",
+            "address": offset
+        }), "memory.readString")
+        return result
+
     async def ppsspp_write_bytes(self, offset, data):
         result = await send_and_receive(self, json.dumps({
             "event": "memory.write",
             "address": offset,
-            "base64": base64.b64encode(data)
+            "base64": str(base64.b64encode(data), "utf-8")
         }), "memory.write")
         return result
 
@@ -182,25 +274,17 @@ async def game_watcher(ctx):
             ctx.watcher_event.clear()
             if ctx.server is None or ctx.slot is None:
                 continue
+            key_check = await ctx.ppsspp_read_unsigned(MHFU_POINTERS[ctx.lang]["GH_KEYS"], 16)
+            if key_check["value"]:
+                await ctx.ppsspp_write_bytes(MHFU_POINTERS[ctx.lang]["GH_KEYS"], bytes([0] * 212))
 
-            new_checks = []
-            gh_visible = await ctx.ppsspp_read_bytes(MHFU_POINTERS[ctx.lang]["GH_VISIBLE"], 0x210)
-            completion_bytes = await ctx.ppsspp_read_bytes(MHFU_POINTERS[ctx.lang]["QUEST_COMPLETE"], 63)
-            quest_completion = base64.b64decode(completion_bytes["base64"])
-            for id, quest in enumerate(quest_data):
-                flag = int(quest["flag"])
-                mask = int(quest["mask"])
-                if flag >= 0 and mask >= 0:
-                    if quest_completion[flag] & (1 << mask) and base_id + id not in ctx.checked_locations:
-                        new_checks.append(id + base_id)
-
-            if new_checks:
-                for new_check_id in new_checks:
-                    ctx.locations_checked.add(new_check_id)
-                    location = ctx.location_names[new_check_id]
-                    ppsspp_logger.info(
-                        f'New Check: {location} ({len(ctx.locations_checked)}/{len(ctx.missing_locations) + len(ctx.checked_locations)})')
-                    await ctx.send_msgs([{"cmd": 'LocationChecks', "locations": [new_check_id]}])
+            current_overlay = await ctx.ppsspp_read_string(MHFU_POINTERS[ctx.lang]["CURRENT_OVL"])
+            if current_overlay["value"] != "game_task.ovl":
+                # we are not in a quest, parse quest completion
+                pass
+            else:
+                # we are in a quest
+                pass
         except Exception as ex:
             Utils.messagebox("Error", str(ex), True)
 
