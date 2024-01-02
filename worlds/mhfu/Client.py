@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import typing
 
+from kivy.uix.label import Label
+from operator import itemgetter
 import Utils
 import logging
 from CommonClient import CommonContext, ClientCommandProcessor, gui_enabled, get_base_parser, server_loop
@@ -151,7 +153,7 @@ async def connect_psp(ctx: MHFUContext, target: typing.Optional[int] = None):
     if len(psps) > 1:
         if not target:
             ppsspp_logger.error("Multiple PPSSPP instances found. Please specify the PPSSPP instance to connect to:\n"
-                                  + f"Instance {psp['t']}\n" for psp in psps)
+                                + f"Instance {psp['t']}\n" for psp in psps)
             return
         else:
             psp = psps[target]
@@ -199,6 +201,15 @@ class MHFUContext(CommonContext):
     lang: str = "JP"
     debugger: typing.Optional[client.WebSocketClientProtocol] = None
     watcher_task = None
+    want_slot_data = True
+
+    # game info
+    death_link = False
+    goal: int = 0
+    weapons: int = 0b00  # 1 - progressive 2 - consolidated
+    unlocked_keys: int = 0
+    required_keys: int = 0
+    rank_requirements: typing.Dict[(int, int, int), int] = {}
 
     async def ppsspp_read_bytes(self, offset, length):
         result = await send_and_receive(self, json.dumps({
@@ -208,7 +219,7 @@ class MHFUContext(CommonContext):
         }), "memory.read")
         return result
 
-    async def ppsspp_read_unsigned(self, offset, length = 8):
+    async def ppsspp_read_unsigned(self, offset, length=8):
         if length not in (8, 16, 32):
             raise Exception("Can only read 8/16/32-bit integers.")
         result = await send_and_receive(self, json.dumps({
@@ -232,7 +243,7 @@ class MHFUContext(CommonContext):
         }), "memory.write")
         return result
 
-    async def ppsspp_write_unsigned(self, offset, value, length = 8):
+    async def ppsspp_write_unsigned(self, offset, value, length=8):
         if length not in (8, 16, 32):
             raise Exception("Can only read 8/16/32-bit integers.")
         if value > pow(2, length):
@@ -250,6 +261,10 @@ class MHFUContext(CommonContext):
         await self.get_username()
         await self.send_connect()
 
+    def get_key_binary(self):
+        for hub, rank, star in sorted(self.rank_requirements, key=itemgetter(0,1,2)):
+            if self.required_keys >
+
     def run_gui(self):
         from kvui import GameManager
 
@@ -259,10 +274,39 @@ class MHFUContext(CommonContext):
                 ("PPSSPP", "PPSSPP"),
             ]
             base_title = "Archipelago Monster Hunter Freedom Unite Client"
+            keys: typing.Optional[Label] = None
+
+            def build(self):
+                b = super().build()
+
+                keys = Label(text="Key Quests: 0/0",
+                                           size_hint_x=None, width=150)
+                self.keys = keys
+
+                self.connect_layout.add_widget(keys)
+                return b
+
+            def update_keys(self, current, target):
+                if self.keys:
+                    self.keys.text = f"Key Quests: {current}/{target}"
 
         self.ui = MHFUManager(self)
         self.ui_task = asyncio.create_task(self.ui.async_run(), name="UI")
 
+    def on_package(self, cmd: str, args: dict):
+        if cmd == "Connected":
+            print(args)
+            # pick up our slot data
+            self.death_link = args["slot_data"]["death_link"]
+            self.goal = args["slot_data"]["goal"]
+            self.weapons = args["slot_data"]["weapons"]
+            self.required_keys = args["slot_data"]["required_keys"]
+            for group, value in args["slot_data"]["rank_requirements"].items():
+                hub, rank, star = group.split(",")
+                self.rank_requirements[int(hub), int(rank), int(star)] = value
+            print(self.rank_requirements)
+        elif cmd == "ReceivedItems":
+            print(args)
 
 async def game_watcher(ctx):
     while not ctx.exit_event.is_set():

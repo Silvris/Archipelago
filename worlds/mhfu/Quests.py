@@ -60,6 +60,17 @@ goal_quests = {
     7: "m03231",
     8: "m03232"
 }
+goal_ranks = {
+    0: (1, 0, 5),
+    1: (1, 1, 2),
+    2: (1, 1, 2),
+    3: (0, 1, 2),
+    4: (0, 2, 2),
+    5: (0, 3, 2),
+    6: (0, 3, 2),
+    7: (0, 3, 2),
+    8: (0, 3, 2),
+}
 
 
 class MHFULocation(Location):
@@ -77,7 +88,11 @@ def get_proper_name(info):
         return f"({hub} {rank}) {base_name}"
 
 
-quest_data: typing.List[typing.Dict[str,str]] = \
+def get_star_name(hub, rank, star):
+    return f"{hubs[hub]} {ranks[rank]} {hub_rank_start[(hub, rank)] + star + 1}"
+
+
+quest_data: typing.List[typing.Dict[str, str]] = \
     orjson.loads(pkgutil.get_data(__name__, os.path.join("data", "quests.json")))
 
 base_id = 24700000
@@ -92,21 +107,47 @@ def get_quest_by_id(idx: str) -> typing.Dict[str, str] | None:
 def create_ranks(world: "MHFUWorld"):
     menu_region = Region("Menu", world.player, world.multiworld)
     world.multiworld.regions.append(menu_region)
-    # TODO: write this not inverted so spoiler looks nicer
-    for hub in range(3):
-        for rank in range(hub_max[hub] - 1, -1, -1):
-            for star in range(hub_rank_max[(hub, rank)] - 1, -1, -1):
-                valid_quests = [quest for quest in quest_data if int(quest["hub"]) == hub
-                                and int(quest["rank"]) == rank and int(quest["star"]) == star]
-                world.location_num += len(valid_quests)
-                region = Region(f"{hubs[hub]} {ranks[rank]} {hub_rank_start[(hub,rank)] + star + 1}",
-                                world.player, world.multiworld)
-                region.add_locations({get_proper_name(quest): location_name_to_id[get_proper_name(quest)]
-                                      for quest in valid_quests})
-                if star != hub_rank_max[(hub, rank)] - 1:
-                    region.add_exits([f"{hubs[hub]} {ranks[rank]} {hub_rank_start[(hub,rank)] + star + 2}"],
-                                     {f"{hubs[hub]} {ranks[rank]} {hub_rank_start[(hub,rank)] + star + 2}":
-                                      lambda state: True})
-                if star == 0:
-                    menu_region.connect(region)
-                world.multiworld.regions.append(region)
+    # we only write 0 into rank requirements, since we need to know how many quests we have access to
+    # we properly fill them in create_items, then apply in set_rules
+    if world.options.guild_depth:
+        # if any guild depth, we write low rank
+        for i in range(hub_rank_max[0, 0]):
+            world.rank_requirements[0, 0, i] = 0
+        for i in range(hub_rank_max[0, 1]):
+            world.rank_requirements[0, 1, i] = 0
+        # check treasure quests
+        if world.options.treasure_quests:
+            world.rank_requirements[0, 4, 0] = 0
+        if world.options.guild_depth.value > 1:
+            # write high rank
+            for i in range(hub_rank_max[0, 2]):
+                world.rank_requirements[0, 2, i] = 0
+            if world.options.guild_depth.value == 3:
+                # write g rank
+                for i in range(hub_rank_max[0, 3]):
+                    world.rank_requirements[0, 3, i] = 0
+    if world.options.village_depth:
+        # if any village depth, we write low rank
+        for i in range(hub_rank_max[1, 0]):
+            world.rank_requirements[1, 0, i] = 0
+        if world.options.village_depth.value == 2:
+            for i in range(hub_rank_max[1, 1]):
+                world.rank_requirements[1, 1, i] = 0
+    if world.options.training_quests:
+        for i in range(3 if world.options.guild_depth.value == 3 else 2):
+            world.rank_requirements[2, i, 0] = 0
+    for hub, rank, star in world.rank_requirements:
+        valid_quests = [quest for quest in quest_data if int(quest["hub"]) == hub
+                        and int(quest["rank"]) == rank and int(quest["star"]) == star]
+        world.location_num[hub, rank, star] = len(valid_quests)
+        region = Region(get_star_name(hub, rank, star),
+                        world.player, world.multiworld)
+        region.add_locations({get_proper_name(quest): location_name_to_id[get_proper_name(quest)]
+                              for quest in valid_quests})
+        world.multiworld.regions.append(region)
+    for hub, rank, star in world.rank_requirements:
+        region = world.multiworld.get_region(get_star_name(hub, rank, star), world.player)
+        if star != hub_rank_max[(hub, rank)] - 1:
+            region.add_exits({get_star_name(hub, rank, star + 1): f"To {get_star_name(hub, rank, star + 1)}"})
+        if star == 0:
+            menu_region.connect(region, f"To {region.name}")

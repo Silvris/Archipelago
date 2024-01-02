@@ -1,4 +1,4 @@
-from Options import DeathLink, Choice, Toggle, DefaultOnToggle, PerGameCommonOptions
+from Options import DeathLink, Choice, Toggle, DefaultOnToggle, PerGameCommonOptions, Range
 from dataclasses import dataclass
 
 
@@ -30,7 +30,7 @@ class Goal(Choice):
 class GuildQuestDepth(Choice):
     """
     What ranks to consider as checks. All ranks prior to the selected rank will be added.
-    Unranked is considered alongside Low Rank.
+    Unranked is considered to be a part of Low Rank.
     """
     display_name = "Guild Quest Depth"
     option_none = 0
@@ -62,7 +62,48 @@ class TreasureQuests(DefaultOnToggle):
     """
     Enables checks for reaching specific thresholds within the Treasure quests provided by Treshi.
     """
-    display_name = "Training Quests"
+    display_name = "Treasure Quests"
+
+
+class TotalKeyQuests(Range):
+    """
+    Maximum number of key quests to include in the pool of items.
+    This number may not be exact depending on other settings.
+    """
+    display_name = "Total Key Quests"
+    range_start = 25  # set to 25 because we don't want it too low
+    range_end = 250  # this is mostly a guess tbh
+    default = 100
+
+
+class RequiredKeyQuests(Range):
+    """
+    Percentage of key quests required to unlock the final urgent quest.
+    """
+    display_name = "Required Key Quests"
+    range_start = 1
+    range_end = 100
+    default = 50
+
+
+class FillerPercentage(Range):
+    """
+    Percentage of non-required Key Quests to be converted to filler items (random weapons/armor/decorations).
+    """
+    display_name = "Filler Percentage"
+    range_start = 0
+    range_end = 100
+    default = 50
+
+
+class TrapPercentage(Range):
+    """
+    Percentage of filler items to be converted to trap items.
+    """
+    display_name = "Trap Percentage"
+    range_start = 0
+    range_end = 100
+    default = 50
 
 
 class Weapons(Choice):
@@ -88,4 +129,8 @@ class MHFUOptions(PerGameCommonOptions):
     village_depth: VillageQuestDepth
     training_quests: TrainingQuests
     treasure_quests: TreasureQuests
+    total_keys: TotalKeyQuests
+    required_keys: RequiredKeyQuests
+    filler_percentage: FillerPercentage
+    #trap_percentage: TrapPercentage
     weapons: Weapons

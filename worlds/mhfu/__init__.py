@@ -1,12 +1,16 @@
+import logging
 import typing
-from typing import Dict
+from typing import Dict, Any
+from operator import itemgetter
 import settings
 from BaseClasses import Tutorial, ItemClassification, MultiWorld
 from worlds.AutoWorld import WebWorld, World
 from worlds.LauncherComponents import launch_subprocess, components, Component, Type
-from .Quests import create_ranks, location_name_to_id, base_id, goal_quests, get_quest_by_id, get_proper_name
+from .Quests import create_ranks, location_name_to_id, base_id, goal_quests,\
+    get_quest_by_id, get_proper_name, goal_ranks, hub_rank_max
 from .Items import MHFUItem, item_table, filler_item_table, filler_weights, item_name_to_id, weapons
 from .Options import MHFUOptions
+from .Rules import set_rules
 
 
 def launch_client():
@@ -49,7 +53,21 @@ class MHFUWorld(World):
 
     def __init__(self, multiworld: MultiWorld, player: int):
         super().__init__(multiworld, player)
-        self.location_num = 0
+        self.location_num: Dict[(int, int, int), int] = {}
+        self.rank_requirements: Dict[(int, int, int), int] = {}
+        self.required_keys: int = 0
+
+    def generate_early(self) -> None:
+        # there's an impossible set of options, so we just need to block it
+        if not self.options.guild_depth and not self.options.village_depth:
+            raise Exception("Must have at least one rank of quests to play through.")
+        goal_rank = goal_ranks[self.options.goal.value]
+        if goal_rank[0] == 0 and goal_rank[1] > self.options.guild_depth:
+            self.options.guild_depth.value = goal_rank[1]
+            logging.warning(f"Guild Depth too low for goal, increasing to {self.options.guild_depth.get_option_name(goal_rank[1])}")
+        elif goal_rank[0] == 1 and goal_rank[1] > self.options.village_depth:
+            self.options.village_depth.value = goal_rank[1]
+            logging.warning(f"Village Depth too low for goal, increasing to {self.options.village_depth.get_option_name(goal_rank[1])}")
 
     def create_item(self, name: str, force_non_progression=False) -> MHFUItem:
         item = item_table[name]
@@ -63,20 +81,55 @@ class MHFUWorld(World):
 
     def create_items(self) -> None:
         itempool = []
+
+        # first, determine our quest depth
+        if self.options.guild_depth:
+            max_guild = (0, self.options.guild_depth.value, hub_rank_max[0, self.options.guild_depth.value])
+        else:
+            max_guild = None
+        if self.options.village_depth:
+            max_village = (1, self.options.village_depth.value, hub_rank_max[1, self.options.village_depth.value])
+        else:
+            max_village = None
+        if max_guild[1] == 3:
+            max_rarity = 10
+        elif max_guild[1] == 2 or max_village[1] == 1:
+            max_rarity = 7
+        else:
+            max_rarity = 3
         if self.options.weapons.value in (0, 2):
             if self.options.weapons.value == 2:
-                itempool += [self.create_item(f"Weapons Rarity {x}") for x in range(1, 11)]
+                itempool += [self.create_item(f"Weapons Rarity {x}") for x in range(1, max_rarity + 1)]
             else:
                 for weapon in weapons:
-                    itempool += [self.create_item(f"{weapon} Rarity {x}") for x in range(1, 11)]
+                    itempool += [self.create_item(f"{weapon} Rarity {x}") for x in range(1, max_rarity + 1)]
         else:
             if self.options.weapons.value == 3:
-                itempool += [self.create_item("Progressive Weapons") for _ in range(10)]
+                itempool += [self.create_item("Progressive Weapons") for _ in range(max_rarity)]
             else:
                 for weapon in weapons:
-                    itempool += [self.create_item(f"Progressive {weapon}") for _ in range(10)]
-
-        itempool += [self.create_item(self.get_filler_item_name()) for _ in range(self.location_num - len(itempool))]
+                    itempool += [self.create_item(f"Progressive {weapon}") for _ in range(max_rarity)]
+        free_items = sum(self.location_num.values()) - len(itempool) - 1
+        self.required_keys = int(free_items * (self.options.required_keys.value / 100))
+        non_required = free_items - self.required_keys
+        filler_items = int(non_required * (self.options.filler_percentage / 100))
+        non_required -= filler_items
+        # notes about the special cases
+        # training is either always open aside from each individual quest unlocks, or locked behind GR access
+        # so we lock the entrance by can_reach(Region), which opens a can of worms for rules
+        # treasure is sphere 1 always if enabled, since there's only one set of them
+        location_count = self.location_num.copy()
+        for key in ((0, 0, 0), (0, 0, 1), (0, 1, 0), (0, 4, 0), (1, 0, 0), (2, 0, 0), (2, 1, 0), (2, 2, 0)):
+            if key in location_count:
+                location_count.pop(key)
+        rank_order = sorted(location_count, key=itemgetter(1, 2), reverse=True)
+        running_total = self.required_keys
+        for rank in rank_order:
+            running_total -= int(location_count[rank] * (self.options.required_keys.value / 100))
+            self.rank_requirements[rank] = running_total
+        itempool += [self.create_item("Key Quest") for _ in range(self.required_keys)]
+        itempool += [self.create_item("Key Quest", True) for _ in range(non_required)]
+        itempool += [self.create_item(self.get_filler_item_name()) for _ in range(filler_items)]
         self.multiworld.itempool += itempool
 
     def get_filler_item_name(self) -> str:
@@ -87,5 +140,19 @@ class MHFUWorld(World):
         quest_name = get_proper_name(get_quest_by_id(goal_quest))
         self.multiworld.get_location(quest_name, self.player)\
             .place_locked_item(self.create_item("Victory"))
-
         self.multiworld.completion_condition[self.player] = lambda state: state.has("Victory", self.player)
+
+    set_rules = set_rules
+
+    def fill_slot_data(self) -> Dict[str, Any]:
+        options = self.options.as_dict(
+            "death_link",
+            "goal",
+            "weapons"
+        )
+        options["required_keys"] = self.required_keys
+        rank_requirements = {}
+        for rank in self.rank_requirements:
+            rank_requirements[f"{rank[0]},{rank[1]},{rank[2]}"] = self.rank_requirements[rank]
+        options["rank_requirements"] = rank_requirements
+        return options
