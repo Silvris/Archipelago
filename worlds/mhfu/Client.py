@@ -13,7 +13,9 @@ import base64
 import json
 import struct
 
+from NetUtils import NetworkItem
 from .Quests import quest_data, base_id
+from .Items import item_name_to_id
 
 
 ppsspp_logger = logging.getLogger("PPSSPP")
@@ -66,6 +68,27 @@ ACTIONS = {
     14: 0x0019,  # Use Item
 }
 
+KEY_OFFSETS = {
+    #hub, rank, star: offset size
+    (0,1,0): 0,
+    (0,1,1): 12,
+    (0,1,2): 24,
+    (0,2,0): 36,
+    (0,2,1): 48,
+    (0,2,2): 60,
+    (0,3,0): 72,
+    (0,3,1): 84,
+    (0,3,2): 96,
+    (1,0,0): 0,
+    (1,0,1): 10,
+    (1,0,2): 22,
+    (1,0,3): 34,
+    (1,0,4): 46,
+    (1,0,5): 58,
+    (1,1,0): 70,
+    (1,1,1): 82,
+    (1,1,2): 94
+}
 
 async def handle_logs(ctx: MHFUContext, logs: typing.List):
     for log in logs:
@@ -140,7 +163,7 @@ async def send_and_receive(ctx: MHFUContext, message: str, event: str):
     logs = [message for message in results if message["event"] == "log"]
     if logs:
         print(logs)
-    return next(message for message in results if message["event"] == event)
+    return next((message for message in results if message["event"] == event), None)
 
 
 async def connect_psp(ctx: MHFUContext, target: typing.Optional[int] = None):
@@ -204,11 +227,13 @@ class MHFUContext(CommonContext):
     want_slot_data = True
 
     # game info
+    recv_index = -1
     death_link = False
     goal: int = 0
     weapons: int = 0b00  # 1 - progressive 2 - consolidated
     unlocked_keys: int = 0
     required_keys: int = 0
+    refresh_keys: bool = False
     rank_requirements: typing.Dict[(int, int, int), int] = {}
 
     async def ppsspp_read_bytes(self, offset, length):
@@ -261,9 +286,33 @@ class MHFUContext(CommonContext):
         await self.get_username()
         await self.send_connect()
 
-    def get_key_binary(self):
+    async def get_key_binary(self):
+        target = 65535
         for hub, rank, star in sorted(self.rank_requirements, key=itemgetter(0,1,2)):
-            if self.required_keys >
+            if (hub, rank, star) in KEY_OFFSETS:
+                address = MHFU_POINTERS[self.lang]["GH_KEYS" if hub == 0 else "VL_KEYS"]
+                address += KEY_OFFSETS[hub, rank, star]
+                data = bytearray()
+                if self.unlocked_keys > self.rank_requirements[hub, rank, star]:
+                    data.extend([0] * 10)
+                else:
+                    if target > self.rank_requirements[hub, rank, star]:
+                        target = self.rank_requirements[hub, rank, star]
+                    data.extend(struct.pack("HHHHH", 30001, 30001, 30001, 30001, 30001))
+                if (hub, rank, star) != (1, 0, 0):
+                    data.extend([0] * 2)
+                await self.ppsspp_write_bytes(address, data)
+        if self.ui:
+            self.ui.update_keys(self.unlocked_keys, target)
+        self.refresh_keys = False
+
+    def receive_items(self, items: typing.List[NetworkItem]):
+        # we will need to come up with a data storage solution for weapon/armor gifts, but for now, grant always
+        for item in items:
+            if item.item == item_name_to_id["Key Quest"]:
+                self.unlocked_keys += 1
+                self.refresh_keys = True
+        self.recv_index = len(items)
 
     def run_gui(self):
         from kvui import GameManager
@@ -295,7 +344,6 @@ class MHFUContext(CommonContext):
 
     def on_package(self, cmd: str, args: dict):
         if cmd == "Connected":
-            print(args)
             # pick up our slot data
             self.death_link = args["slot_data"]["death_link"]
             self.goal = args["slot_data"]["goal"]
@@ -304,9 +352,12 @@ class MHFUContext(CommonContext):
             for group, value in args["slot_data"]["rank_requirements"].items():
                 hub, rank, star = group.split(",")
                 self.rank_requirements[int(hub), int(rank), int(star)] = value
-            print(self.rank_requirements)
+            # initialize certain variables
+            self.recv_index = -1
+            self.unlocked_keys = 0
+            self.refresh_keys = True
         elif cmd == "ReceivedItems":
-            print(args)
+            self.receive_items(args["items"])
 
 async def game_watcher(ctx):
     while not ctx.exit_event.is_set():
@@ -318,9 +369,9 @@ async def game_watcher(ctx):
             ctx.watcher_event.clear()
             if ctx.server is None or ctx.slot is None:
                 continue
-            key_check = await ctx.ppsspp_read_unsigned(MHFU_POINTERS[ctx.lang]["GH_KEYS"], 16)
-            if key_check["value"]:
-                await ctx.ppsspp_write_bytes(MHFU_POINTERS[ctx.lang]["GH_KEYS"], bytes([0] * 212))
+
+            if ctx.refresh_keys:
+                await ctx.get_key_binary()
 
             current_overlay = await ctx.ppsspp_read_string(MHFU_POINTERS[ctx.lang]["CURRENT_OVL"])
             if current_overlay["value"] != "game_task.ovl":
