@@ -26,6 +26,122 @@
         "default": "Max Revive",
         "tags": ["GIFT", "POSTGAME"]
       }
+    ],
+    "connections": [
+      {
+        "name": "Route 19",
+        "requirements": []
+      }
+    ]
+  },
+  "Route 19": {
+    "locations": [],
+    "connections": [
+      {
+        "name": "Floccesy Town",
+        "requirements": []
+      }
+    ]
+  },
+  "Floccesy Town": {
+    "locations": [],
+    "connections": [
+      {
+        "name": "Route 20",
+        "requirements": []
+      }
+    ]
+  },
+  "Route 20": {
+    "locations": [],
+    "connections": [
+      {
+        "name": "Floccesy Ranch",
+        "requirements": ["Hugh's Town Map"]
+      },
+      {
+        "name": "Virbank City",
+        "requirements": [["R20_HIKER", "Basic Badge"]]
+      },
+      {
+        "name": "Cave of Being",
+        "requirements": ["HM03 Surf"]
+      }
+    ]
+  },
+  "Cave of Being": {
+    "locations": [
+      {
+        "name": "Release Lake Spirits",
+        "default": "Released Lake Spirits",
+        "tags": ["EVENT"]
+      }
+    ],
+    "connections": []
+  },
+  "Floccesy Ranch": {
+    "locations": [],
+    "connections": []
+  },
+  "Virbank City": {
+    "locations": [],
+    "connections": [
+      {
+        "name": "Virbank Complex",
+        "requirements": []
+      },
+      {
+        "name": "Pokestar Studios",
+        "requirements": ["Toxic Badge"]
+      },
+      {
+        "name": "Castelia City",
+        "requirements": ["Toxic Badge"]
+      }
+    ]
+  },
+  "Virbank Complex": {
+    "locations": [],
+    "connections": []
+  },
+  "Pokestar Studios": {
+    "locations": [],
+    "connections": []
+  },
+  "Castelia City": {
+    "locations": [
+      {
+        "name": "Royal Unova",
+        "default": "Rare Candy",
+        "tags": ["GIFT"]
+      }
+    ],
+    "connections": [
+      {
+        "name": "Castelia Sewers",
+        "requirements": ["Insect Badge"]
+      },
+      {
+        "name": "Route 4",
+        "requirements": [["CASTELIA_CLOWNS","Insect Badge"]]
+      },
+      {
+        "name": "Skyarrow Bridge",
+        "requirements": ["come up with something here"]
+      }
+    ]
+  },
+  "Castelia Sewers": {
+    "locations": [],
+    "connections": [
+      {
+        "name": "Castelia Park",
+        "requirements": ["HM03 Surf", "Season Machine"]
+      },
+      {
+        "name": "Castelia Back Alley",
+        "requirements": ["HM03 Surf", "Season Machine"]
+      }
     ]
   }
 }

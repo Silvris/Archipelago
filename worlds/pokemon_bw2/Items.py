@@ -10,7 +10,7 @@ class ItemData(typing.NamedTuple):
     trap: bool = False
 
 
-class BW2Item(Item):
+class PokemonBW2Item(Item):
     game = "Pokemon Black 2 and White 2"
 
 
@@ -138,8 +138,8 @@ all_items = {
     "Jet Badge": ItemData(125, ItemClassification.progression),
     "Legend Badge": ItemData(126, ItemClassification.progression),
     "Wave Badge": ItemData(127, ItemClassification.progression),
-    "Hugh's Town Map": ItemData(128, ItemClassification.progression),
-    "Ferry Pass": ItemData(129, ItemClassification.progression),
+    "Reserved 1": ItemData(128, ItemClassification.progression),
+    "Reserved 2": ItemData(129, ItemClassification.progression),
     "Reserved 3": ItemData(130, ItemClassification.trap),
     "Reserved 4": ItemData(131, ItemClassification.trap),
     "Reserved 5": ItemData(132, ItemClassification.trap),
@@ -488,7 +488,7 @@ all_items = {
     "Relic Crown": ItemData(590, ItemClassification.filler),
     "Casteliacone": ItemData(591, ItemClassification.filler),
     "Light Stone": ItemData(616, ItemClassification.progression),  # do these work on the other version? good question
-    "Dark Stone": ItemData(617, ItemClassification.progression),
+    "Dark Stone": ItemData(617, ItemClassification.progression),  # they do now
     "TM93": ItemData(618, ItemClassification.useful),
     "TM94": ItemData(619, ItemClassification.useful),
     "TM95": ItemData(620, ItemClassification.useful),
@@ -500,8 +500,8 @@ all_items = {
     "Plasma Card": ItemData(633, ItemClassification.progression),
     "Grubby Hanky": ItemData(634, ItemClassification.progression),
     "Colress MCHN": ItemData(635, ItemClassification.progression),
-    "Dropped Item (Yancy)": ItemData(636, ItemClassification.progression),
-    "Dropped Item (Curtis)": ItemData(637, ItemClassification.progression),
+    "Dropped Item (Yancy)": ItemData(636, ItemClassification.progression),  # does which one you pick up determine who
+    "Dropped Item (Curtis)": ItemData(637, ItemClassification.progression),  # calls?
     "Reveal Glass": ItemData(638, ItemClassification.useful),
 }
 
