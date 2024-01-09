@@ -1,0 +1,31 @@
+{
+  "Aspertia City": {
+    "locations": [
+      {
+        "name": "Pokedex from Bianca",
+        "default": "Pokedex",
+        "tags": ["IGNORE", "KEY"]
+      },
+      {
+        "name": "Town Map from Hugh's Sister",
+        "default": "Town Map",
+        "tags": ["KEY"]
+      },
+      {
+        "name": "Hugh's Town Map from Hugh's Sister",
+        "default": "Hugh's Town Map",
+        "tags": ["EXTENDED", "KEY"]
+      },
+      {
+        "name": "Poke Balls from Bianca",
+        "default": "Poke Ball",
+        "tags": ["GIFT"]
+      },
+      {
+        "name": "Max Revives from Mom",
+        "default": "Max Revive",
+        "tags": ["GIFT", "POSTGAME"]
+      }
+    ]
+  }
+}
