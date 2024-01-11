@@ -138,12 +138,6 @@ all_items = {
     "Jet Badge": ItemData(125, ItemClassification.progression),
     "Legend Badge": ItemData(126, ItemClassification.progression),
     "Wave Badge": ItemData(127, ItemClassification.progression),
-    "Reserved 1": ItemData(128, ItemClassification.progression),
-    "Reserved 2": ItemData(129, ItemClassification.progression),
-    "Reserved 3": ItemData(130, ItemClassification.trap),
-    "Reserved 4": ItemData(131, ItemClassification.trap),
-    "Reserved 5": ItemData(132, ItemClassification.trap),
-    "Reserved 6": ItemData(133, ItemClassification.trap),
     "Sweet Heart": ItemData(134, ItemClassification.filler),
     "Adamant Orb": ItemData(135, ItemClassification.useful),
     "Lustrous Orb": ItemData(136, ItemClassification.useful),
@@ -419,14 +413,14 @@ all_items = {
     "HM04 Strength": ItemData(423, ItemClassification.progression),
     "HM05 Waterfall": ItemData(424, ItemClassification.progression),
     "HM06 Dive": ItemData(425, ItemClassification.progression),
-    "Reserved 7": ItemData(426, ItemClassification.filler),
-    "Reserved 8": ItemData(427, ItemClassification.filler),
+    #"Reserved 7": ItemData(426, ItemClassification.filler),
+    #"Reserved 8": ItemData(427, ItemClassification.filler),
     "Town Map": ItemData(442, ItemClassification.progression),
-    "Bicycle": ItemData(450, ItemClassification.filler),
-    "Lunar Wing": ItemData(453, ItemClassification.filler),
-    "Magma Stone": ItemData(458, ItemClassification.filler),
-    "Gracidea": ItemData(466, ItemClassification.filler),
-    "Dowsing MCHN": ItemData(471, ItemClassification.filler),
+    "Bicycle": ItemData(450, ItemClassification.progression),
+    "Lunar Wing": ItemData(453, ItemClassification.progression),
+    "Magma Stone": ItemData(458, ItemClassification.progression),
+    "Gracidea": ItemData(466, ItemClassification.useful),
+    "Dowsing MCHN": ItemData(471, ItemClassification.progression),
     #"Fast Ball": ItemData(492, ItemClassification.filler),  #TODO: Look into reimplementing
     #"Level Ball": ItemData(493, ItemClassification.filler),
     #"Lure Ball": ItemData(494, ItemClassification.filler),
@@ -492,7 +486,7 @@ all_items = {
     "TM93": ItemData(618, ItemClassification.useful),
     "TM94": ItemData(619, ItemClassification.useful),
     "TM95": ItemData(620, ItemClassification.useful),
-    # "Xtransceiver": ItemData(621, ItemClassification.filler), always have this
+    "Season Machine": ItemData(621, ItemClassification.progression), #BW1 Xtransceiver
     #"God Stone": ItemData(622, ItemClassification.filler),
     "Medal Box": ItemData(627, ItemClassification.progression),
     "DNA Splicers": ItemData(628, ItemClassification.progression),
@@ -518,3 +512,12 @@ item_groups = {
 }
 
 filler_items = {item: all_items[item].code for item in all_items if all_items[item].classification == ItemClassification.filler}
+key_items = {item: all_items[item].code for item in ["Reveal Glass", "Dropped Item (Yancy)", "Colress MCHN",
+                                                     "Grubby Hanky", "Plasma Card", "Permit", "DNA Splicers",
+                                                     "Medal Box", "Season Machine", "Light Stone", "Town Map",
+                                                     "Hugh's Town Map", "Bicycle", "Dowsing MCHN", "HM01 Cut",
+                                                     "HM02 Fly", "HM03 Surf", "HM04 Strength", "HM05 Waterfall",
+                                                     "HM06 Dive", "Basic Badge", "Toxic Badge", "Insect Badge",
+                                                     "Bolt Badge", "Quake Badge", "Jet Badge", "Legend Badge",
+                                                     "Wave Badge", "Lunar Wing", "Magma Stone", "Gracidea",
+                                                     "Permit", "Super Rod", "Vs. Recorder"]}

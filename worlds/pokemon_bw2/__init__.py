@@ -10,8 +10,8 @@ from .Locations import location_table, K64Location
 from .Names import LocationName, ItemName
 from .Regions import create_levels, default_levels
 from .Rom import K64DeltaPatch, get_base_rom_path, RomData, patch_rom, K64UHASH
-from .Client import K64Client
-from .Options import K64Options
+from .Client import PokemonBW2Client
+from .Options import PokemonBW2Options
 from .Rules import set_rules
 from typing import Dict, TextIO, Optional, List
 import os

@@ -28,52 +28,34 @@
       }
     ],
     "connections": [
-      {
-        "name": "Route 19",
-        "requirements": []
-      }
+      "Route 19"
     ]
   },
   "Route 19": {
     "locations": [],
     "connections": [
-      {
-        "name": "Floccesy Town",
-        "requirements": []
-      }
+      "Floccesy Town"
     ]
   },
   "Floccesy Town": {
     "locations": [],
     "connections": [
-      {
-        "name": "Route 20",
-        "requirements": []
-      }
+      "Route 20"
     ]
   },
   "Route 20": {
     "locations": [],
     "connections": [
-      {
-        "name": "Floccesy Ranch",
-        "requirements": ["Hugh's Town Map"]
-      },
-      {
-        "name": "Virbank City",
-        "requirements": [["R20_HIKER", "Basic Badge"]]
-      },
-      {
-        "name": "Cave of Being",
-        "requirements": ["HM03 Surf"]
-      }
+      "Floccesy Ranch",
+      "Virbank City",
+      "Cave of Being"
     ]
   },
   "Cave of Being": {
     "locations": [
       {
-        "name": "Release Lake Spirits",
-        "default": "Released Lake Spirits",
+        "name": "VISIT_CAVE_OF_BEING",
+        "default": "RELEASE_LAKE_SPIRITS",
         "tags": ["EVENT"]
       }
     ],
@@ -86,18 +68,9 @@
   "Virbank City": {
     "locations": [],
     "connections": [
-      {
-        "name": "Virbank Complex",
-        "requirements": []
-      },
-      {
-        "name": "Pokestar Studios",
-        "requirements": ["Toxic Badge"]
-      },
-      {
-        "name": "Castelia City",
-        "requirements": ["Toxic Badge"]
-      }
+      "Virbank Complex",
+      "Pokestar Studios",
+      "Castelia City"
     ]
   },
   "Virbank Complex": {
@@ -117,31 +90,577 @@
       }
     ],
     "connections": [
-      {
-        "name": "Castelia Sewers",
-        "requirements": ["Insect Badge"]
-      },
-      {
-        "name": "Route 4",
-        "requirements": [["CASTELIA_CLOWNS","Insect Badge"]]
-      },
-      {
-        "name": "Skyarrow Bridge",
-        "requirements": ["come up with something here"]
-      }
+      "Castelia Sewers",
+      "Route 4",
+      "Skyarrow Bridge"
     ]
   },
   "Castelia Sewers": {
     "locations": [],
     "connections": [
+      "Castelia Park",
+      "Castelia Back Alley",
+      "Relic Passage"
+    ]
+  },
+  "Castelia Park": {
+    "locations": [],
+    "connections": []
+  },
+  "Castelia Back Alley": {
+    "locations": [],
+    "connections": []
+  },
+  "Route 4": {
+    "locations": [],
+    "connections": [
+      "Desert Resort",
+      "Nimbasa City"
+    ]
+  },
+  "Desert Resort": {
+    "locations": [],
+    "connections": [
+      "Relic Castle"
+    ]
+  },
+  "Relic Castle": {
+    "locations": [],
+    "connections": [
+      "Desert Resort"
+    ]
+  },
+  "Nimbasa City": {
+    "locations": [],
+    "connections": [
+      "Route 4",
+      "Route 5",
+      "Route 16",
+      "Anville Town"
+    ]
+  },
+  "Anville Town": {
+    "locations": [],
+    "connections": [
+      "Nimbasa City"
+    ]
+  },
+  "Route 5": {
+    "locations": [],
+    "connections": [
+      "Nimbasa City",
+      "Driftveil Drawbridge"
+    ]
+  },
+  "Driftveil Drawbridge": {
+    "locations": [
       {
-        "name": "Castelia Park",
-        "requirements": ["HM03 Surf", "Season Machine"]
+        "name": "VISIT_DRIFTVEIL_DRAWBRIDGE",
+        "default": "VISITED_DRIFTVEIL_DRAWBRIDGE",
+        "tags": ["EVENT"]
+      }
+    ],
+    "connections": [
+      "Route 5",
+      "Driftveil City"
+    ]
+  },
+  "Driftveil City": {
+    "locations": [],
+    "connections": [
+      "Driftveil Drawbridge",
+      "PWT",
+      "Route 6",
+      "Clay Tunnel"
+    ]
+  },
+  "PWT": {
+    "locations": [],
+    "connections": [
+      "Driftveil City",
+      "Relic Passage"
+    ]
+  },
+  "Relic Passage": {
+    "locations": [],
+    "connections": [
+      "Castelia Sewers"
+    ]
+  },
+  "Clay Tunnel": {
+    "locations": [],
+    "connections": [
+      "Driftveil City",
+      "Twist Mountain",
+      "Mistralton Cave"
+    ]
+  },
+  "Route 6": {
+    "locations": [],
+    "connections": [
+      "Driftveil City",
+      "Mistralton Cave",
+      "Chargestone Cave"
+    ]
+  },
+  "Mistralton Cave": {
+    "locations": [],
+    "connections": [
+      "Route 6"
+    ]
+  },
+  "Chargestone Cave": {
+    "locations": [],
+    "connections": [
+      "Route 6",
+      "Mistralton City"
+    ]
+  },
+  "Mistralton City": {
+    "locations": [],
+    "connections": [
+      "Route 7",
+      "Lentimas Town",
+      "Nature Preserve"
+    ]
+  },
+  "Nature Preserve": {
+    "locations": [],
+    "connections": [
+      "Mistralton City"
+    ]
+  },
+  "Route 7": {
+    "locations": [],
+    "connections": [
+      "Mistralton City",
+      "Celestial Tower",
+      "Twist Mountain"
+    ]
+  },
+  "Celestial Tower": {
+    "locations": [],
+    "connections": [
+      "Route 7"
+    ]
+  },
+  "Twist Mountain": {
+    "locations": [],
+    "connections": [
+      "Clay Tunnel",
+      "Route 7",
+      "Icirrus City"
+    ]
+  },
+  "Icirrus City": {
+    "locations": [],
+    "connections": [
+      "Twist Mountain",
+      "Route 8",
+      "Dragonspiral Tower"
+    ]
+  },
+  "Dragonspiral Tower": {
+    "locations": [],
+    "connections": [
+      "Icirrus City"
+    ]
+  },
+  "Route 8": {
+    "locations": [],
+    "connections": [
+      "Icirrus City",
+      "Moor of Icirrus",
+      "Tubeline Bridge"
+    ]
+  },
+  "Moor of Icirrus": {
+    "locations": [],
+    "connections": []
+  },
+  "Tubeline Bridge": {
+    "locations": [
+      {
+        "name": "VISIT_TUBELINE_BRIDGE",
+        "default": "VISITED_TUBELINE_BRIDGE",
+        "tags": ["EVENT"]
+      }
+    ],
+    "connections": [
+      "Route 8",
+      "Route 9"
+    ]
+  },
+  "Route 9": {
+    "locations": [],
+    "connections": [
+      "Tubeline Bridge",
+      "Opelucid City"
+    ]
+  },
+  "Opelucid City": {
+    "locations": [],
+    "connections": [
+      "Route 9",
+      "Route 11"
+    ]
+  },
+  "Route 11": {
+    "locations": [],
+    "connections": [
+      "Opelucid City",
+      "Village Bridge"
+    ]
+  },
+  "Village Bridge": {
+    "locations": [
+      {
+        "name": "VISIT_VILLAGE_BRIDGE",
+        "default": "VISITED_VILLAGE_BRIDGE",
+        "tags": ["EVENT"]
+      }
+    ],
+    "connections": [
+      "Route 11",
+      "Route 12"
+    ]
+  },
+  "Route 12": {
+    "locations": [],
+    "connections": [
+      "Village Bridge",
+      "Lacunosa Town"
+    ]
+  },
+  "Lacunosa Town": {
+    "locations": [],
+    "connections": [
+      "Route 12",
+      "Route 13"
+    ]
+  },
+  "Route 13": {
+    "locations": [],
+    "connections": [
+      "Lacunosa Town",
+      "Giant Chasm",
+      "Undella Town"
+    ]
+  },
+  "Undella Town": {
+    "locations": [],
+    "connections": [
+      "Route 13",
+      "Route 14",
+      "Undella Bay",
+      "Reversal Mountain",
+      "Marine Tube"
+    ]
+  },
+  "Reversal Mountain": {
+    "locations": [],
+    "connections": [
+      "Undella Town",
+      "Lentimas Town",
+      "Strange House"
+    ]
+  },
+  "Strange House": {
+    "locations": [],
+    "connections": [
+      "Reversal Mountain"
+    ]
+  },
+  "Lentimas Town": {
+    "locations": [],
+    "connections": [
+      "Reversal Mountain",
+      "Mistralton City"
+    ]
+  },
+  "Route 14": {
+    "locations": [],
+    "connections": [
+      "Undella Town",
+      "Black City/White Forest",
+      "Abundant Shrine"
+    ]
+  },
+  "Abundant Shrine": {
+    "locations": [],
+    "connections": [
+      "Route 14"
+    ]
+  },
+  "Black City/White Forest": {
+    "locations": [],
+    "connections": [
+      "Route 14",
+      "Route 15"
+    ]
+  },
+  "Route 15": {
+    "locations": [],
+    "connections": [
+      "Black City/White Forest",
+      "Marvelous Bridge"
+    ]
+  },
+  "Marvelous Bridge": {
+    "locations": [
+      {
+        "name": "VISIT_MARVELOUS_BRIDGE",
+        "default": "VISITED_MARVELOUS_BRIDGE",
+        "tags": ["EVENT"]
+      }
+    ],
+    "connections": [
+      "Route 15",
+      "Route 16"
+    ]
+  },
+  "Route 16": {
+    "locations": [],
+    "connections": [
+      "Marvelous Bridge",
+      "Nimbasa City",
+      "Lostlorn Forest"
+    ]
+  },
+  "Lostlorn Forest": {
+    "locations": [],
+    "connections": [
+      "Route 16"
+    ]
+  },
+  "Marine Tube": {
+    "locations": [
+      {
+        "name": "VISIT_MARINE_TUBE",
+        "default": "VISITED_MARINE_TUBE",
+        "tags": ["EVENT"]
+      }
+    ],
+    "connections": [
+      "Undella Town",
+      "Humilau City"
+    ]
+  },
+  "Undella Bay": {
+    "locations": [],
+    "connections": [
+      "Undella Town",
+      "Abyssal Ruins",
+      "Seaside Cave"
+    ]
+  },
+  "Abyssal Ruins": {
+    "locations": [],
+    "connections": [
+      "Undella Bay"
+    ]
+  },
+  "Route 21": {
+    "locations": [],
+    "connections": [
+      "Humilau City",
+      "Seaside Cave"
+    ]
+  },
+  "Humilau City": {
+    "locations": [],
+    "connections": [
+      "Route 21",
+      "Route 22"
+    ]
+  },
+  "Route 22": {
+    "locations": [],
+    "connections": [
+      "Humilau City",
+      "Giant Chasm"
+    ]
+  },
+  "Giant Chasm": {
+    "locations": [],
+    "connections": [
+      "Route 13",
+      "Route 22",
+      "Route 23"
+    ]
+  },
+  "Route 23": {
+    "locations": [],
+    "connections": [
+      "Giant Chasm",
+      "Victory Road"
+    ]
+  },
+  "Victory Road": {
+    "locations": [
+      {
+        "name": "HM05 From N",
+        "default": "HM05",
+        "tags": ["KEY"]
       },
       {
-        "name": "Castelia Back Alley",
-        "requirements": ["HM03 Surf", "Season Machine"]
+        "name": "Gift from Hugh",
+        "default": "TM24",
+        "tags": ["GIFT"]
       }
+    ],
+    "connections": [
+      "Route 23",
+      "Pokemon League",
+      "N's Castle"
+    ]
+  },
+  "N's Castle": {
+    "locations": [
+      {
+        "name": "Dark Stone from N",
+        "default": "Dark Stone",
+        "tags": ["KEY", "BLACK"]
+      },
+      {
+        "name": "Light Stone from N",
+        "default": "Light Stone",
+        "tags": ["KEY", "WHITE"]
+      },
+      {
+        "name": "South of N's Room",
+        "default": "Protein",
+        "tags": ["OVERWORLD"]
+      },
+      {
+        "name": "Inside N's Room",
+        "default": "Luxury Ball",
+        "tags": ["OVERWORLD"]
+      },
+      {
+        "name": "SE Near Stairs",
+        "default": "TM50",
+        "tags": ["OVERWORLD"]
+      }
+    ],
+    "connections": [
+      "Victory Road"
+    ]
+  },
+  "Pokemon League": {
+    "locations": [
+      {
+        "name": "Defeat Iris",
+        "default": "Victory",
+        "tags": ["EVENT"]
+      }
+    ],
+    "connections": [
+      "Victory Road"
+    ]
+  },
+  "Skyarrow Bridge": {
+    "locations": [
+      {
+        "name": "VISIT_SKYARROW_BRIDGE",
+        "default": "VISITED_SKYARROW_BRIDGE",
+        "tags": ["EVENT"]
+      }
+    ],
+    "connections": [
+      "Castelia City",
+      "Pinwheel Forest"
+    ]
+  },
+  "Pinwheel Forest": {
+    "locations": [],
+    "connections": [
+      "Skyarrow Bridge",
+      "Nacrene City"
+    ]
+  },
+  "Nacrene City": {
+    "locations": [],
+    "connections": [
+      "Pinwheel Forest",
+      "Route 3"
+    ]
+  },
+  "Route 3": {
+    "locations": [],
+    "connections": [
+      "Nacrene City",
+      "Striaton City",
+      "Wellspring Cave"
+    ]
+  },
+  "Wellspring Cave": {
+    "locations": [],
+    "connections": [
+      "Route 3"
+    ]
+  },
+  "Striaton City": {
+    "locations": [],
+    "connections": [
+      "Route 3",
+      "Dreamyard",
+      "Route 2"
+    ]
+  },
+  "Dreamyard": {
+    "locations": [],
+    "connections": [
+      "Striaton City"
+    ]
+  },
+  "Route 2": {
+    "locations": [],
+    "connections": [
+      "Striaton City",
+      "Accumula Town"
+    ]
+  },
+  "Accumula Town": {
+    "locations": [],
+    "connections": [
+      "Route 2",
+      "Route 1"
+    ]
+  },
+  "Route 1": {
+    "locations": [],
+    "connections": [
+      "Accumula Town",
+      "Nuvema Town",
+      "Route 17"
+    ]
+  },
+  "Nuvema Town": {
+    "locations": [],
+    "connections": [
+      "Route 1"
+    ]
+  },
+  "Route 17": {
+    "locations": [],
+    "connections": [
+      "Route 1",
+      "Route 18",
+      "P2 Laboratory"
+    ]
+  },
+  "Route 18": {
+    "locations": [],
+    "connections": [
+      "Route 17"
+    ]
+  },
+  "P2 Laboratory": {
+    "locations": [],
+    "connections": [
+      "Route 17",
+      "Plasma Frigate"
     ]
   }
 }
