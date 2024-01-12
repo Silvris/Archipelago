@@ -34,18 +34,21 @@
   "Route 19": {
     "locations": [],
     "connections": [
+      "Aspertia City",
       "Floccesy Town"
     ]
   },
   "Floccesy Town": {
     "locations": [],
     "connections": [
+      "Route 19",
       "Route 20"
     ]
   },
   "Route 20": {
     "locations": [],
     "connections": [
+      "Floccesy Town",
       "Floccesy Ranch",
       "Virbank City",
       "Cave of Being"
@@ -59,15 +62,20 @@
         "tags": ["EVENT"]
       }
     ],
-    "connections": []
+    "connections": [
+      "Route 20"
+    ]
   },
   "Floccesy Ranch": {
     "locations": [],
-    "connections": []
+    "connections": [
+      "Route 20"
+    ]
   },
   "Virbank City": {
     "locations": [],
     "connections": [
+      "Route 20",
       "Virbank Complex",
       "Pokestar Studios",
       "Castelia City"
@@ -75,11 +83,15 @@
   },
   "Virbank Complex": {
     "locations": [],
-    "connections": []
+    "connections": [
+      "Virbank City"
+    ]
   },
   "Pokestar Studios": {
     "locations": [],
-    "connections": []
+    "connections": [
+      "Virbank City"
+    ]
   },
   "Castelia City": {
     "locations": [
@@ -90,6 +102,7 @@
       }
     ],
     "connections": [
+      "Virbank City",
       "Castelia Sewers",
       "Route 4",
       "Skyarrow Bridge"
@@ -98,6 +111,7 @@
   "Castelia Sewers": {
     "locations": [],
     "connections": [
+      "Castelia City",
       "Castelia Park",
       "Castelia Back Alley",
       "Relic Passage"
@@ -464,7 +478,14 @@
     "locations": [],
     "connections": [
       "Humilau City",
-      "Seaside Cave"
+      "Seaside Cave",
+      "Plasma Frigate (Route 21)"
+    ]
+  },
+  "Plasma Frigate (Route 21)": {
+    "locations": [],
+    "connections": [
+      "Route 21"
     ]
   },
   "Humilau City": {
@@ -660,7 +681,13 @@
     "locations": [],
     "connections": [
       "Route 17",
-      "Plasma Frigate"
+      "Plasma Frigate (Route 17)"
+    ]
+  },
+  "Plasma Frigate (Route 17)": {
+    "locations": [],
+    "connections": [
+      "P2 Laboratory"
     ]
   }
 }
