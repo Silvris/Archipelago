@@ -40,7 +40,7 @@ item_table: Dict[str, ItemData] = {
     "Sydney Opera Sheet Music": ItemData('Artifacts', 0x198415, progression=True),
         #Tokyo
     "Great Buddha's Orange": ItemData('Artifacts', 0x198416, progression=True),
-    'Sensoji Temple Latern': ItemData('Artifacts', 0x198417, progression=True),
+    'Sensoji Temple Lantern': ItemData('Artifacts', 0x198417, progression=True),
     "Sumo Apron": ItemData('Artifacts', 0x198418, progression=True),
         #Nairobi
     'Baby Elephant': ItemData('Artifacts', 0x198419, progression=True),
@@ -72,11 +72,11 @@ item_table: Dict[str, ItemData] = {
     "Fine Arts Catalog": ItemData('Artifacts', 0x19842D, progression=True),
 
     "Castle Floor Key": ItemData('Other', 0x19842E, 2, progression=True),
-    "Newspaper": ItemData('Other', 0x19842F),
+    "Newspaper": ItemData('Other', 0x19842F, 0),
     "Mario": ItemData('Events', None, 0, progression=True),
     "Artifact Secured": ItemData('Events', None, 0, progression=True),
-    "Photograph": ItemData('Other', 0x198430),
-    "Advice": ItemData('Other', 0x198431)
+    "Photograph": ItemData('Other', 0x198430, 0),
+    "Advice": ItemData('Other', 0x198431, 0)
 
 }
 
