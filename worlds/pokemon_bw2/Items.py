@@ -1,5 +1,9 @@
 import typing
 from BaseClasses import Item, ItemClassification
+from .Regions import location_data
+
+if typing.TYPE_CHECKING:
+    from . import PokemonBW2World
 
 
 class ItemData(typing.NamedTuple):
@@ -416,9 +420,11 @@ all_items = {
     #"Reserved 7": ItemData(426, ItemClassification.filler),
     #"Reserved 8": ItemData(427, ItemClassification.filler),
     "Town Map": ItemData(442, ItemClassification.progression),
+    "Super Rod": ItemData(447, ItemClassification.progression),
     "Bicycle": ItemData(450, ItemClassification.progression),
     "Lunar Wing": ItemData(453, ItemClassification.progression),
     "Magma Stone": ItemData(458, ItemClassification.progression),
+    "Vs. Recorder": ItemData(465, ItemClassification.progression),
     "Gracidea": ItemData(466, ItemClassification.useful),
     "Dowsing MCHN": ItemData(471, ItemClassification.progression),
     #"Fast Ball": ItemData(492, ItemClassification.filler),  #TODO: Look into reimplementing
@@ -467,6 +473,7 @@ all_items = {
     "Pretty Wing": ItemData(571, ItemClassification.filler),
     "Cover Fossil": ItemData(572, ItemClassification.progression),
     "Plume Fossil": ItemData(573, ItemClassification.progression),
+    "Ferry Pass": ItemData(574, ItemClassification.progression),  # vanilla Liberty Pass
     "Poké Toy": ItemData(577, ItemClassification.filler),
     "Prop Case": ItemData(578, ItemClassification.progression),  # would this even lock stuff outside of medal logic?
     "BalmMushroom": ItemData(580, ItemClassification.filler),
@@ -486,8 +493,8 @@ all_items = {
     "TM93": ItemData(618, ItemClassification.useful),
     "TM94": ItemData(619, ItemClassification.useful),
     "TM95": ItemData(620, ItemClassification.useful),
-    "Season Machine": ItemData(621, ItemClassification.progression), #BW1 Xtransceiver
-    #"God Stone": ItemData(622, ItemClassification.filler),
+    "Season Machine": ItemData(622, ItemClassification.progression),  # God Stone
+    "Hugh's Town Map": ItemData(622, ItemClassification.progression),  # Gram 1
     "Medal Box": ItemData(627, ItemClassification.progression),
     "DNA Splicers": ItemData(628, ItemClassification.progression),
     "Permit": ItemData(630, ItemClassification.progression),
@@ -521,3 +528,30 @@ key_items = {item: all_items[item].code for item in ["Reveal Glass", "Dropped It
                                                      "Bolt Badge", "Quake Badge", "Jet Badge", "Legend Badge",
                                                      "Wave Badge", "Lunar Wing", "Magma Stone", "Gracidea",
                                                      "Permit", "Super Rod", "Vs. Recorder"]}
+
+
+def generate_itempool(world: "PokemonBW2World"):
+    default_tags = ["EVENT"]
+    if not world.options.key_items:
+        default_tags.append("KEY")
+    if not world.options.hms:
+        default_tags.append("HM")
+    if world.options.badges == 0:
+        default_tags.append("BADGE")
+    itempool = []
+    for location in world.multiworld.regions.location_cache[world.player]:
+        # is this a cursed method of attack for my items, probably!
+        location_info = location_data[location]
+        if any(tag in location_info["tags"] for tag in default_tags):
+            # grab and create the default item, and place it
+            world.multiworld.get_location(location, world.player)\
+                .place_locked_item(world.create_item(location_info["default"],
+                                                     True if "EVENT" in location_info["tags"] else False))
+        # else, add the item to the item pool
+        elif location_info["default"] in filler_items:
+            # generate a random filler instead
+            itempool.append(world.create_item(world.get_filler_item_name()))
+        else:
+            itempool.append(world.create_item(location_info["default"]))
+
+    world.multiworld.itempool += itempool

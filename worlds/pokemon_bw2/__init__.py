@@ -4,15 +4,12 @@ import typing
 from BaseClasses import Tutorial, ItemClassification, MultiWorld
 from Fill import fill_restrictive
 from worlds.AutoWorld import World, WebWorld
-from .Items import item_table, item_names, copy_ability_table, filler_item_weights, K64Item, copy_ability_access_table,\
-    power_combo_table, friend_table
-from .Locations import location_table, K64Location
-from .Names import LocationName, ItemName
-from .Regions import create_levels, default_levels
-from .Rom import K64DeltaPatch, get_base_rom_path, RomData, patch_rom, K64UHASH
+from .Items import all_items, key_items, filler_items, item_groups, PokemonBW2Item, generate_itempool
+from .Regions import create_regions, location_data
 from .Client import PokemonBW2Client
 from .Options import PokemonBW2Options
 from .Rules import set_rules
+from .Rom import patch_rom, get_base_rom_path, PokemonBlack2DeltaPatch, PokemonWhite2DeltaPatch, RomData
 from typing import Dict, TextIO, Optional, List
 import os
 import math
@@ -64,9 +61,9 @@ class PokemonBW2World(World):
     game = "Pokemon Black 2 and White 2"
     options_dataclass = PokemonBW2Options
     options: PokemonBW2Options
-    item_name_to_id = {item: item_table[item].code for item in item_table}
-    location_name_to_id = {location_table[location]: location for location in location_table}
-    item_name_groups = item_names
+    item_name_to_id = {item: all_items[item].code for item in all_items}
+    location_name_to_id = {location: location_data[location]["idx"] for location in location_data}
+    item_name_groups = item_groups
     data_version = 0
     web = PokemonBW2WebWorld()
     settings: typing.ClassVar[PokemonBW2Settings]
@@ -77,34 +74,31 @@ class PokemonBW2World(World):
         self.rom_name_available_event = threading.Event()
         super().__init__(multiworld, player)
 
-    create_regions = create_levels
+    create_regions = create_regions
 
     @classmethod
     def stage_assert_generate(cls, multiworld: MultiWorld) -> None:
-        rom_file: str = get_base_rom_path()
-        if not os.path.exists(rom_file):
-            raise FileNotFoundError(f"Could not find base ROM for {cls.game}: {rom_file}")
+        pass
+        #rom_file: str = get_base_rom_path()
+        #if not os.path.exists(rom_file):
+            #raise FileNotFoundError(f"Could not find base ROM for {cls.game}: {rom_file}")
 
-    def create_item(self, name: str, force_non_progression=False) -> K64Item:
-        item = item_table[name]
-        classification = ItemClassification.filler
-        if item.progression and not force_non_progression:
-            classification = ItemClassification.progression_skip_balancing \
-                if item.skip_balancing else ItemClassification.progression
-        elif item.trap:
-            classification = ItemClassification.trap
-        return K64Item(name, classification, item.code, self.player)
+    def create_item(self, name: str, is_event=False) -> PokemonBW2Item:
+        if is_event:
+            return PokemonBW2Item(name, ItemClassification.progression, None, self.player)
+        item = all_items[name]
+        return PokemonBW2Item(name, item.classification, item.code, self.player)
 
     def get_filler_item_name(self) -> str:
-        return self.random.choices(list(filler_item_weights.keys()),
-                                   weights=list(filler_item_weights.values()))[0]
+        return self.random.choice(filler_items)
 
-    def create_items(self) -> None:
-        pass
+    create_items = generate_itempool
 
     set_rules = set_rules
 
-    def generate_output(self, output_directory: str):
+    #def generate_output(self, output_directory: str):
+        #pass
+    """
         rom_path = ""
         try:
             world = self.multiworld
@@ -117,7 +111,7 @@ class PokemonBW2World(World):
             rom.write_to_file(rom_path)
             self.rom_name = rom.name
 
-            patch = PokemonBW2DeltaPatch(os.path.splitext(rom_path)[0] + PokemonBW2DeltaPatch.patch_file_ending, player=player,
+            patch = PokemonWhite2DeltaPatch(os.path.splitext(rom_path)[0] + PokemonWhite2DeltaPatch.patch_file_ending, player=player,
                                    player_name=world.player_name[player], patched_path=rom_path)
             patch.write()
         except Exception:
@@ -126,12 +120,13 @@ class PokemonBW2World(World):
             self.rom_name_available_event.set()  # make sure threading continues and errors are collected
             if os.path.exists(rom_path):
                 os.unlink(rom_path)
+                """
 
-    def modify_multidata(self, multidata: dict):
-        # wait for self.rom_name to be available.
-        self.rom_name_available_event.wait()
-        rom_name = getattr(self, "rom_name", None)
-        # we skip in case of error, so that the original error in the output thread is the one that gets raised
-        if rom_name:
-            new_name = base64.b64encode(bytes(self.rom_name)).decode()
-            multidata["connect_names"][new_name] = multidata["connect_names"][self.multiworld.player_name[self.player]]
+    #def modify_multidata(self, multidata: dict):
+    #    # wait for self.rom_name to be available.
+    #    self.rom_name_available_event.wait()
+    #    rom_name = getattr(self, "rom_name", None)
+    #    # we skip in case of error, so that the original error in the output thread is the one that gets raised
+    #    if rom_name:
+    #        new_name = base64.b64encode(bytes(self.rom_name)).decode()
+    #        multidata["connect_names"][new_name] = multidata["connect_names"][self.multiworld.player_name[self.player]]

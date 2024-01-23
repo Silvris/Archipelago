@@ -25,6 +25,11 @@
         "name": "Max Revives from Mom",
         "default": "Max Revive",
         "tags": ["GIFT", "POSTGAME"]
+      },
+      {
+        "name": "Basic Badge from Cheren",
+        "default": "Basic Badge",
+        "tags": ["BADGE"]
       }
     ],
     "connections": [
@@ -39,7 +44,13 @@
     ]
   },
   "Floccesy Town": {
-    "locations": [],
+    "locations": [
+      {
+        "name": "Medal Box from Mr. Medal",
+        "default": "Medal Box",
+        "tags": ["KEY"]
+      }
+    ],
     "connections": [
       "Route 19",
       "Route 20"
@@ -73,7 +84,18 @@
     ]
   },
   "Virbank City": {
-    "locations": [],
+    "locations": [
+      {
+        "name": "HM01 from Roxie",
+        "default": "HM01 Cut",
+        "tags": ["HM"]
+      },
+      {
+        "name": "Toxic Badge from Roxie",
+        "default": "Toxic Badge",
+        "tags": ["BADGE"]
+      }
+    ],
     "connections": [
       "Route 20",
       "Virbank Complex",
@@ -96,6 +118,21 @@
   "Castelia City": {
     "locations": [
       {
+        "name": "Bicycle from Harlequin",
+        "default": "Bicycle",
+        "tags": ["KEY"]
+      },
+      {
+        "name": "Insect Badge from Burgh",
+        "default": "Insect Badge",
+        "tags": ["BADGE"]
+      },
+      {
+        "name": "Dowsing MCHN from Bianca",
+        "default": "Dowsing MCHN",
+        "tags": ["KEY"]
+      },
+      {
         "name": "Royal Unova",
         "default": "Rare Candy",
         "tags": ["GIFT"]
@@ -109,7 +146,13 @@
     ]
   },
   "Castelia Sewers": {
-    "locations": [],
+    "locations": [
+      {
+        "name": "HM04 from Hugh",
+        "default": "HM04 Strength",
+        "tags": ["HM"]
+      }
+    ],
     "connections": [
       "Castelia City",
       "Castelia Park",
@@ -145,7 +188,28 @@
     ]
   },
   "Nimbasa City": {
-    "locations": [],
+    "locations": [
+      {
+        "name": "Prop Case from Musical Theatre Owner",
+        "default": "Prop Case",
+        "tags": ["KEY"]
+      },
+      {
+        "name": "Vs. Recorder from Nate/Rosa",
+        "default": "Vs. Recorder",
+        "tags": ["KEY"]
+      },
+      {
+        "name": "Dropped Item",
+        "default": "Dropped Item (Yancy)",
+        "tags": ["KEY"]
+      },
+      {
+        "name": "Bolt Badge from Elesa",
+        "default": "Bolt Badge",
+        "tags": ["BADGE"]
+      }
+    ],
     "connections": [
       "Route 4",
       "Route 5",
@@ -160,7 +224,13 @@
     ]
   },
   "Route 5": {
-    "locations": [],
+    "locations": [
+      {
+        "name": "HM02 from Bianca",
+        "default": "HM02 Fly",
+        "tags": ["HM"]
+      }
+    ],
     "connections": [
       "Nimbasa City",
       "Driftveil Drawbridge"
@@ -180,7 +250,13 @@
     ]
   },
   "Driftveil City": {
-    "locations": [],
+    "locations": [
+      {
+        "name": "Quake Badge from Clay",
+        "default": "Quake Badge",
+        "tags": ["BADGE"]
+      }
+    ],
     "connections": [
       "Driftveil Drawbridge",
       "PWT",
@@ -210,7 +286,13 @@
     ]
   },
   "Route 6": {
-    "locations": [],
+    "locations": [
+      {
+        "name": "HM03 from Cheren",
+        "default": "HM03 Surf",
+        "tags": ["HM"]
+      }
+    ],
     "connections": [
       "Driftveil City",
       "Mistralton Cave",
@@ -231,7 +313,13 @@
     ]
   },
   "Mistralton City": {
-    "locations": [],
+    "locations": [
+      {
+        "name": "Jet Badge from Skyla",
+        "default": "Jet Badge",
+        "tags": ["BADGE"]
+      }
+    ],
     "connections": [
       "Route 7",
       "Lentimas Town",
@@ -313,7 +401,13 @@
     ]
   },
   "Opelucid City": {
-    "locations": [],
+    "locations": [
+      {
+        "name": "Legend Badge from Drayden",
+        "default": "Legend Badge",
+        "tags": ["BADGE"]
+      }
+    ],
     "connections": [
       "Route 9",
       "Route 11"
@@ -362,7 +456,13 @@
     ]
   },
   "Undella Town": {
-    "locations": [],
+    "locations": [
+      {
+        "name": "HM06 from Hugh",
+        "default": "HM06 Dive",
+        "tags": ["HM"]
+      }
+    ],
     "connections": [
       "Route 13",
       "Route 14",
@@ -380,7 +480,13 @@
     ]
   },
   "Strange House": {
-    "locations": [],
+    "locations": [
+      {
+        "name": "Lunar Wing",
+        "default": "Lunar Wing",
+        "tags": ["KEY"]
+      }
+    ],
     "connections": [
       "Reversal Mountain"
     ]
@@ -401,7 +507,13 @@
     ]
   },
   "Abundant Shrine": {
-    "locations": [],
+    "locations": [
+      {
+        "name": "Reveal Glass from Old Man",
+        "default": "Reveal Glass",
+        "tags": ["KEY"]
+      }
+    ],
     "connections": [
       "Route 14"
     ]
@@ -474,36 +586,67 @@
       "Undella Bay"
     ]
   },
+  "Seaside Cave": {
+    "locations": [],
+    "connections": [
+      "Undella Bay",
+      "Route 21",
+      "Plasma Frigate (Route 21)"
+    ]
+  },
   "Route 21": {
     "locations": [],
     "connections": [
       "Humilau City",
-      "Seaside Cave",
-      "Plasma Frigate (Route 21)"
+      "Seaside Cave"
     ]
   },
   "Plasma Frigate (Route 21)": {
-    "locations": [],
+    "locations": [
+      {
+        "name": "Plasma Card",
+        "default": "Plasma Card",
+        "tags": ["KEY"]
+      }
+    ],
     "connections": [
-      "Route 21"
+      "Seaside Cave"
     ]
   },
   "Humilau City": {
-    "locations": [],
+    "locations": [
+      {
+        "name": "Wave Badge from Marlon",
+        "default": "Wave Badge",
+        "tags": ["BADGE"]
+      }
+    ],
     "connections": [
       "Route 21",
       "Route 22"
     ]
   },
   "Route 22": {
-    "locations": [],
+    "locations": [
+      {
+        "name": "Colress MCHN from Colress",
+        "default": "Colress MCHN",
+        "tags": ["KEY"]
+      }
+    ],
     "connections": [
       "Humilau City",
       "Giant Chasm"
     ]
   },
   "Giant Chasm": {
-    "locations": [],
+    "locations": [
+      {
+        "name": "DNA Splicers",
+        "default": "DNA Splicers",
+        "tags": ["KEY"]
+      }
+    ],
     "connections": [
       "Route 13",
       "Route 22",
@@ -521,8 +664,8 @@
     "locations": [
       {
         "name": "HM05 From N",
-        "default": "HM05",
-        "tags": ["KEY"]
+        "default": "HM05 Waterfall",
+        "tags": ["HM"]
       },
       {
         "name": "Gift from Hugh",
@@ -601,7 +744,13 @@
     ]
   },
   "Nacrene City": {
-    "locations": [],
+    "locations": [
+      {
+        "name": "Grubby Hanky from Maid",
+        "default": "Grubby Hanky",
+        "tags": ["KEY"]
+      }
+    ],
     "connections": [
       "Pinwheel Forest",
       "Route 3"
@@ -622,7 +771,13 @@
     ]
   },
   "Striaton City": {
-    "locations": [],
+    "locations": [
+      {
+        "name": "Gracidea from Girl in Pokemon Center",
+        "default": "Gracidea",
+        "tags": ["KEY"]
+      }
+    ],
     "connections": [
       "Route 3",
       "Dreamyard",
@@ -658,7 +813,18 @@
     ]
   },
   "Nuvema Town": {
-    "locations": [],
+    "locations": [
+      {
+        "name": "Super Rod from Cedric Juniper",
+        "default": "Super Rod",
+        "tags": ["KEY"]
+      },
+      {
+        "name": "Permit from Professor Juniper",
+        "default": "Permit",
+        "tags": ["KEY"]
+      }
+    ],
     "connections": [
       "Route 1"
     ]
@@ -672,7 +838,13 @@
     ]
   },
   "Route 18": {
-    "locations": [],
+    "locations": [
+      {
+        "name": "Magma Stone",
+        "default": "Magma Stone",
+        "tags": ["KEY"]
+      }
+    ],
     "connections": [
       "Route 17"
     ]

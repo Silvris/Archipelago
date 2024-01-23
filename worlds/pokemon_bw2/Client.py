@@ -10,11 +10,11 @@ class PokemonBW2Client(BizHawkClient):
     system = "DS"
     patch_suffix = (".apblack2", ".apwhite2")
 
-    def validate_rom(self, ctx: BizHawkClientContext) -> bool:
+    def validate_rom(self, ctx: "BizHawkClientContext") -> bool:
         return False
 
-    def set_auth(self, ctx: BizHawkClientContext) -> None:
+    def set_auth(self, ctx: "BizHawkClientContext") -> None:
         pass
 
-    def game_watcher(self, ctx: BizHawkClientContext) -> None:
+    def game_watcher(self, ctx: "BizHawkClientContext") -> None:
         pass
