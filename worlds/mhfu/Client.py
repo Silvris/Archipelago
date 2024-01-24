@@ -17,7 +17,6 @@ from NetUtils import NetworkItem
 from .Quests import quest_data, base_id
 from .Items import item_name_to_id
 
-
 ppsspp_logger = logging.getLogger("PPSSPP")
 PPSSPP_REPORTING = "https://report.ppsspp.org/match/list"
 PPSSPP_DEBUG = "debugger.ppsspp.org"
@@ -45,16 +44,28 @@ MHFU_POINTERS = {
         "VL_KEYS": 0x089AEEB4,
         "EQUIP_CHEST": 0x9995EE8,
         "ITEM_CHEST": 0x09998DC8,
+        "SHOP_HEAD": 0x08938D14,
+        "SHOP_CHEST": 0x0893B976,
+        "SHOP_ARM": 0x0893E5A4,
+        "SHOP_WAIST": 0x089410E8,
+        "SHOP_LEG": 0x08943BF8,
+        "SHOP_GREAT_LONG": 0x08946828,
+        "SHOP_LANCE_GUN": 0x08947576,
+        "SHOP_SNS_DUAL": 0x08948158,
+        "SHOP_HAMMER_HORN": 0x08948EA6,
+        "SHOP_GUNNER": 0x08949C0E,
         "CURRENT_OVL": 0x09A5A5A0,
         "RESET_ACTION": 0x090AF355,  # byte
-        "SET_ACTION": 0x090AF418,    # half
-        "FAIL_QUEST": 0x09A01B1C,    # byte
-        "POISON_TIMER": 0x090AF508   # half
+        "SET_ACTION": 0x090AF418,  # half
+        "FAIL_QUEST": 0x09A01B1C,  # byte
+        "POISON_TIMER": 0x090AF508  # half
     }
 }
 
 MHFU_BREAKPOINTS = {
     # logFormat: address, size, enabled, log, read, write, change
+    # enabled being "do we want to pause emulation here"
+    # disabled effectively acting as an event system
     "QUEST_LOAD": (0x08A57510, 1, True, True, False, True, False),
     "QUEST_COMPLETE": (0x09999DC8, 63, False, True, False, True, True),
 }
@@ -69,26 +80,27 @@ ACTIONS = {
 }
 
 KEY_OFFSETS = {
-    #hub, rank, star: offset size
-    (0,1,0): 0,
-    (0,1,1): 12,
-    (0,1,2): 24,
-    (0,2,0): 36,
-    (0,2,1): 48,
-    (0,2,2): 60,
-    (0,3,0): 72,
-    (0,3,1): 84,
-    (0,3,2): 96,
-    (1,0,0): 0,
-    (1,0,1): 10,
-    (1,0,2): 22,
-    (1,0,3): 34,
-    (1,0,4): 46,
-    (1,0,5): 58,
-    (1,1,0): 70,
-    (1,1,1): 82,
-    (1,1,2): 94
+    # hub, rank, star: offset size
+    (0, 1, 0): 0,
+    (0, 1, 1): 12,
+    (0, 1, 2): 24,
+    (0, 2, 0): 36,
+    (0, 2, 1): 48,
+    (0, 2, 2): 60,
+    (0, 3, 0): 72,
+    (0, 3, 1): 84,
+    (0, 3, 2): 96,
+    (1, 0, 0): 0,
+    (1, 0, 1): 10,
+    (1, 0, 2): 22,
+    (1, 0, 3): 34,
+    (1, 0, 4): 46,
+    (1, 0, 5): 58,
+    (1, 1, 0): 70,
+    (1, 1, 1): 82,
+    (1, 1, 2): 94
 }
+
 
 async def handle_logs(ctx: MHFUContext, logs: typing.List):
     for log in logs:
@@ -103,7 +115,8 @@ async def handle_logs(ctx: MHFUContext, logs: typing.List):
                 large_mon_id_ptr = await ctx.ppsspp_read_unsigned(large_mon_ptr + quest_base + 8, 32)
                 large_mon_info_ptr = await ctx.ppsspp_read_unsigned(large_mon_ptr + 12 + quest_base, 32)
                 large_mons = struct.unpack("IIII",
-                                           base64.b64decode((await ctx.ppsspp_read_bytes(large_mon_id_ptr["value"] + quest_base, 16))["base64"]))
+                                           base64.b64decode((await ctx.ppsspp_read_bytes(
+                                               large_mon_id_ptr["value"] + quest_base, 16))["base64"]))
                 mons = {}
                 for idx, mon in enumerate([mon for mon in large_mons if mon != 0xFFFFFFFF]):
                     # pull the mons
@@ -205,7 +218,7 @@ async def connect_psp(ctx: MHFUContext, target: typing.Optional[int] = None):
     for breakpoint in MHFU_BREAKPOINTS:
         response = await send_and_receive(ctx, json.dumps(
             dict(zip(["event", "address", "size", "enabled", "log", "read", "write", "change", "logFormat"],
-                ["memory.breakpoint.add", *MHFU_BREAKPOINTS[breakpoint], breakpoint]))), "memory.breakpoint.add")
+                     ["memory.breakpoint.add", *MHFU_BREAKPOINTS[breakpoint], breakpoint]))), "memory.breakpoint.add")
     return
 
 
@@ -235,6 +248,19 @@ class MHFUContext(CommonContext):
     required_keys: int = 0
     refresh_keys: bool = False
     rank_requirements: typing.Dict[(int, int, int), int] = {}
+    weapon_status: typing.Dict[int, int] = {
+        0: -1,  # Great Sword
+        1: -1,  # Heavy Bowgun
+        2: -1,  # Hammer
+        3: -1,  # Lance
+        4: -1,  # Sword and Shield
+        5: -1,  # Light Bowgun
+        6: -1,  # Dual Blades
+        7: -1,  # Long Sword
+        8: -1,  # Hunting Horn
+        9: -1,  # Gunlance
+        10: -1,  # Bow
+    }
 
     async def ppsspp_read_bytes(self, offset, length):
         result = await send_and_receive(self, json.dumps({
@@ -288,7 +314,7 @@ class MHFUContext(CommonContext):
 
     async def get_key_binary(self):
         target = 65535
-        for hub, rank, star in sorted(self.rank_requirements, key=itemgetter(0,1,2)):
+        for hub, rank, star in sorted(self.rank_requirements, key=itemgetter(0, 1, 2)):
             if (hub, rank, star) in KEY_OFFSETS:
                 address = MHFU_POINTERS[self.lang]["GH_KEYS" if hub == 0 else "VL_KEYS"]
                 address += KEY_OFFSETS[hub, rank, star]
@@ -305,6 +331,14 @@ class MHFUContext(CommonContext):
         if self.ui:
             self.ui.update_keys(self.unlocked_keys, target)
         self.refresh_keys = False
+
+    #async def set_equipment_status(self):
+
+
+    async def connect_init(self):
+        # set of initialization we need to handle first
+        await self.get_key_binary()
+        await self.set_equipment_status()
 
     def receive_items(self, items: typing.List[NetworkItem]):
         # we will need to come up with a data storage solution for weapon/armor gifts, but for now, grant always
@@ -329,7 +363,7 @@ class MHFUContext(CommonContext):
                 b = super().build()
 
                 keys = Label(text="Key Quests: 0/0",
-                                           size_hint_x=None, width=150)
+                             size_hint_x=None, width=150)
                 self.keys = keys
 
                 self.connect_layout.add_widget(keys)
@@ -359,6 +393,7 @@ class MHFUContext(CommonContext):
         elif cmd == "ReceivedItems":
             self.receive_items(args["items"])
 
+
 async def game_watcher(ctx):
     while not ctx.exit_event.is_set():
         try:
@@ -385,7 +420,6 @@ async def game_watcher(ctx):
 
 
 async def main(args):
-
     ctx = MHFUContext(args.connect, args.password)
     """
     chat_socket = MySocket()
@@ -417,7 +451,6 @@ async def main(args):
     if ctx.debugger and not ctx.debugger.closed:
         await ctx.debugger.close()
     await ctx.shutdown()
-
 
 
 def launch():
