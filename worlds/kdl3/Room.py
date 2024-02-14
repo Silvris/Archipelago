@@ -1,9 +1,11 @@
 import struct
 import typing
-from BaseClasses import Region, ItemClassification
+from BaseClasses import Region, ItemClassification, Entrance
 
 if typing.TYPE_CHECKING:
+    from . import KDL3World
     from .Rom import RomData
+    from EntranceRando import ERPlacementState
 
 animal_map = {
     "Rick Spawn": 0,
@@ -13,6 +15,36 @@ animal_map = {
     "ChuChu Spawn": 4,
     "Pitch Spawn": 5
 }
+
+final_iceberg_rooms = {
+    "Spark Ability": "Iceberg 6 - 8",
+    "Stone Ability": "Iceberg 6 - 10",
+    "Parasol Ability": "Iceberg 6 - 12",
+    "Ice Ability": "Iceberg 6 - 14",
+    "Cutter Ability": "Iceberg 6 - 16",
+    "Clean Ability": "Iceberg 6 - 18",
+    "Burning Ability": "Iceberg 6 - 20",
+    "Needle Ability": "Iceberg 6 - 22"
+}
+
+
+class KDL3Door(Entrance):
+    world: typing.Optional["KDL3World"] = None
+    parent_region: "KDL3Room"
+
+    def can_connect_to(self, other: "KDL3Door", state: "ERPlacementState") -> bool:
+        from . import KDL3World
+        world = getattr(self, "world", None)
+        if not world:
+            return super().can_connect_to(other, state)
+        assert isinstance(world, KDL3World)
+        if other.connected_region.name in final_iceberg_rooms.values():
+            if any(x for x in self.parent_region.enemies if any(world.copy_abilities[x] == final_iceberg_rooms[other.connected_region.name])):
+                return super().can_connect_to(other, state)
+            else:
+                return False
+        else:
+            return super().can_connect_to(other, state)
 
 
 class KDL3Room(Region):
@@ -26,6 +58,8 @@ class KDL3Room(Region):
     enemies: typing.List[str]
     entity_load: typing.List[typing.List[int]]
     consumables: typing.List[typing.Dict[str, typing.Union[int, str]]]
+
+    entrance_type = KDL3Door
 
     def __init__(self, name, player, multiworld, hint, level, stage, room, pointer, music, default_exits,
                  animal_pointers, enemies, entity_load, consumables, consumable_pointer):
