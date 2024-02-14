@@ -121,6 +121,12 @@ class Weapons(Choice):
     default = 1
 
 
+class ProgressiveArmor(Toggle):
+    """
+    When enabled, armor will be received progressively starting from rarity 1 to rarity 10.
+    """
+
+
 @dataclass
 class MHFUOptions(PerGameCommonOptions):
     death_link: DeathLink
@@ -134,3 +140,4 @@ class MHFUOptions(PerGameCommonOptions):
     filler_percentage: FillerPercentage
     #trap_percentage: TrapPercentage
     weapons: Weapons
+    progressive_armor: ProgressiveArmor

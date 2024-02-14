@@ -109,6 +109,10 @@ class MHFUWorld(World):
             else:
                 for weapon in weapons:
                     itempool += [self.create_item(f"Progressive {weapon}") for _ in range(max_rarity)]
+        if self.options.progressive_armor:
+            itempool += [self.create_item("Progressive Armor") for _ in range(max_rarity)]
+        else:
+            itempool += [self.create_item(f"Armor Rarity {i}") for i in range(1, max_rarity + 1)]
         free_items = sum(self.location_num.values()) - len(itempool) - 1
         self.required_keys = int(free_items * (self.options.required_keys.value / 100))
         non_required = free_items - self.required_keys
@@ -119,7 +123,7 @@ class MHFUWorld(World):
         # so we lock the entrance by can_reach(Region), which opens a can of worms for rules
         # treasure is sphere 1 always if enabled, since there's only one set of them
         location_count = self.location_num.copy()
-        for key in ((0, 0, 0), (0, 0, 1), (0, 1, 0), (0, 4, 0), (1, 0, 0), (2, 0, 0), (2, 1, 0), (2, 2, 0)):
+        for key in ((0, 0, 0), (0, 0, 1), (0, 4, 0), (2, 0, 0), (2, 1, 0), (2, 2, 0)):
             if key in location_count:
                 location_count.pop(key)
         rank_order = sorted(location_count, key=itemgetter(1, 2), reverse=True)

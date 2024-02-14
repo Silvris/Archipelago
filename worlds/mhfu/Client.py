@@ -15,7 +15,8 @@ import struct
 
 from NetUtils import NetworkItem
 from .Quests import quest_data, base_id
-from .Items import item_name_to_id
+from .Items import item_name_to_id, item_id_to_name, item_name_groups
+from .data.Equipment import blademaster, gunner
 
 ppsspp_logger = logging.getLogger("PPSSPP")
 PPSSPP_REPORTING = "https://report.ppsspp.org/match/list"
@@ -99,6 +100,14 @@ KEY_OFFSETS = {
     (1, 1, 0): 70,
     (1, 1, 1): 82,
     (1, 1, 2): 94
+}
+
+WEAPON_GROUPS = {
+    0: [0, 7],
+    1: [3, 9],
+    2: [4, 6],
+    3: [2, 8],
+    4: [1, 5, 10]
 }
 
 
@@ -243,23 +252,22 @@ class MHFUContext(CommonContext):
     recv_index = -1
     death_link = False
     goal: int = 0
-    weapons: int = 0b00  # 1 - progressive 2 - consolidated
     unlocked_keys: int = 0
     required_keys: int = 0
-    refresh_keys: bool = False
+    refresh: bool = False
     rank_requirements: typing.Dict[(int, int, int), int] = {}
-    weapon_status: typing.Dict[int, int] = {
-        0: -1,  # Great Sword
-        1: -1,  # Heavy Bowgun
-        2: -1,  # Hammer
-        3: -1,  # Lance
-        4: -1,  # Sword and Shield
-        5: -1,  # Light Bowgun
-        6: -1,  # Dual Blades
-        7: -1,  # Long Sword
-        8: -1,  # Hunting Horn
-        9: -1,  # Gunlance
-        10: -1,  # Bow
+    weapon_status: typing.Dict[int, typing.Set[int]] = {
+        0: set(),  # Great Sword
+        1: set(),  # Heavy Bowgun
+        2: set(),  # Hammer
+        3: set(),  # Lance
+        4: set(),  # Sword and Shield
+        5: set(),  # Light Bowgun
+        6: set(),  # Dual Blades
+        7: set(),  # Long Sword
+        8: set(),  # Hunting Horn
+        9: set(),  # Gunlance
+        10: set(),  # Bow
     }
 
     async def ppsspp_read_bytes(self, offset, length):
@@ -324,16 +332,38 @@ class MHFUContext(CommonContext):
                 else:
                     if target > self.rank_requirements[hub, rank, star]:
                         target = self.rank_requirements[hub, rank, star]
-                    data.extend(struct.pack("HHHHH", 30001, 30001, 30001, 30001, 30001))
+                    data.extend(struct.pack("HHHHH", 30001, 0, 0, 0, 0))
                 if (hub, rank, star) != (1, 0, 0):
                     data.extend([0] * 2)
                 await self.ppsspp_write_bytes(address, data)
         if self.ui:
             self.ui.update_keys(self.unlocked_keys, target)
-        self.refresh_keys = False
 
-    #async def set_equipment_status(self):
-
+    async def set_equipment_status(self):
+        for equip_group, length in zip([
+            # "SHOP_HEAD", "SHOP_CHEST", "SHOP_ARM", "SHOP_WAIST","SHOP_LEG",
+            "SHOP_GREAT_LONG", "SHOP_LANCE_GUN", "SHOP_SNS_DUAL", "SHOP_HAMMER_HORN", "SHOP_GUNNER"],
+            [  # 11362, 11310, 11076, 11024, 11284,
+                3406, 3042, 3406, 3224, 7878]):
+            data = bytearray(base64.b64decode((await self.ppsspp_read_bytes(MHFU_POINTERS[self.lang][equip_group], length))["base64"]))
+            if equip_group == "SHOP_GUNNER":
+                remap = gunner
+                equipment_type = 6
+            elif equip_group in ("SHOP_GREAT_LONG", "SHOP_LANCE_GUN", "SHOP_SNS_DUAL", "SHOP_HAMMER_HORN",):
+                remap = blademaster
+                equipment_type = 5
+            else:
+                remap = []
+                equipment_type = 0  # todo: armor
+            for i in range(length // 0x1A):
+                equip_type, _, equip_id = struct.unpack("BBH", data[0x1A*i: (0x1A*i) + 4])
+                weapon_type, equip_rarity = remap[equip_id]
+                if equip_rarity + 1 not in self.weapon_status[weapon_type]:
+                    data[0x1A*i] = 0x10  # somehow this doesn't crash the game
+                else:
+                    data[0x1A*i] = equipment_type
+                data[(0x1A*i) + 1] = 0x1  # this unhides every weapon/armor, so it should be visible when unlocked
+            await self.ppsspp_write_bytes(MHFU_POINTERS[self.lang][equip_group], bytes(data))
 
     async def connect_init(self):
         # set of initialization we need to handle first
@@ -341,11 +371,40 @@ class MHFUContext(CommonContext):
         await self.set_equipment_status()
 
     def receive_items(self, items: typing.List[NetworkItem]):
-        # we will need to come up with a data storage solution for weapon/armor gifts, but for now, grant always
+        # we might need to come up with a data storage solution for weapon/armor gifts, but for now, grant always
         for item in items:
-            if item.item == item_name_to_id["Key Quest"]:
+            if item.item == 24700077:
                 self.unlocked_keys += 1
-                self.refresh_keys = True
+            if item_id_to_name[item.item] in item_name_groups["Weapons"]:
+                # there's like 50 of these gimme a break
+                local_id = item.item - base_id
+                if local_id >= 55:
+                    # consolidated weapons
+                    if local_id == 55:
+                        # progressive
+                        if not self.weapon_status[0]:
+                            current_max = 0
+                        else:
+                            current_max = max(self.weapon_status[0])
+                        for i in range(11):
+                            self.weapon_status[i].add(current_max + 1)
+                    else:
+                        rarity = local_id - 55
+                        for i in range(11):
+                            self.weapon_status[i].add(rarity)
+                else:
+                    weapon_group = local_id // 11
+                    for weapon in WEAPON_GROUPS[weapon_group]:
+                        if not local_id % 11:
+                            # progressive
+                            if not self.weapon_status[weapon]:
+                                current_max = 0
+                            else:
+                                current_max = max(self.weapon_status[weapon])
+                            self.weapon_status[weapon].add(current_max + 1)
+                        else:
+                            self.weapon_status[weapon].add(local_id % 11)
+        self.refresh = True
         self.recv_index = len(items)
 
     def run_gui(self):
@@ -381,7 +440,6 @@ class MHFUContext(CommonContext):
             # pick up our slot data
             self.death_link = args["slot_data"]["death_link"]
             self.goal = args["slot_data"]["goal"]
-            self.weapons = args["slot_data"]["weapons"]
             self.required_keys = args["slot_data"]["required_keys"]
             for group, value in args["slot_data"]["rank_requirements"].items():
                 hub, rank, star = group.split(",")
@@ -389,7 +447,7 @@ class MHFUContext(CommonContext):
             # initialize certain variables
             self.recv_index = -1
             self.unlocked_keys = 0
-            self.refresh_keys = True
+            self.refresh = True
         elif cmd == "ReceivedItems":
             self.receive_items(args["items"])
 
@@ -405,8 +463,10 @@ async def game_watcher(ctx):
             if ctx.server is None or ctx.slot is None:
                 continue
 
-            if ctx.refresh_keys:
+            if ctx.refresh:
                 await ctx.get_key_binary()
+                await ctx.set_equipment_status()
+                # ctx.refresh = False
 
             current_overlay = await ctx.ppsspp_read_string(MHFU_POINTERS[ctx.lang]["CURRENT_OVL"])
             if current_overlay["value"] != "game_task.ovl":
