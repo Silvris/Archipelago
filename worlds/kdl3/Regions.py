@@ -5,7 +5,7 @@ from pkgutil import get_data
 
 from BaseClasses import Region
 from worlds.generic.Rules import add_item_rule
-from .Locations import KDL3Location
+from .Locations import KDL3Location, heart_star_locations, stage_locations, boss_locations
 from .Names import LocationName
 from .Options import BossShuffle
 from .Room import KDL3Room
@@ -21,10 +21,85 @@ default_levels = {
     5: [0x770019, 0x77001A, 0x77001B, 0x77001C, 0x77001D, 0x77001E, 0x770204],
 }
 
+stage_names = {stage: stage_locations[stage].replace(" - Complete", "") for stage in stage_locations}
+stage_names.update({stage: boss_locations[stage].replace(" Purified", "") for stage in boss_locations})
+
 first_stage_blacklist = {
     0x77000B,  # 2-5 needs Kine
     0x770011,  # 3-5 needs Cutter
     0x77001C,  # 5-4 needs Burning
+}
+
+split_rooms = {  # Rooms that need split per exit
+    "Grass Land 4 - 6",
+    "Ripple Field 3 - 7",
+    "Ripple Field 4 - 2",
+    "Ripple Field 4 - 5",  # this one is BAD, split locations 1 per as well. guess do that with all?
+    "Sand Canyon 4 - 6",
+    "Iceberg 4 - 10"
+}
+
+heart_star_requirement = {  # Rooms required for the current stage's heart star
+    "Grass Land 1 - 3",
+    "Grass Land 1 - 4",
+    "Grass Land 1 - 5",
+    "Grass Land 2 - 3",
+    "Grass Land 2 - 5",
+    "Grass Land 2 - 6"
+    "Grass Land 3 - 3",
+    "Grass Land 3 - 6",
+    "Grass Land 3 - 5",
+    "Grass Land 4 - 6B",
+    "Grass Land 4 - 8",
+    "Grass Land 4 - 10",
+    "Grass Land 5 - 5",
+    "Grass Land 5 - 6"
+    "Grass Land 6 - 1",
+    "Grass Land 6 - 5",
+    "Grass Land 6 - 8",
+    "Ripple Field 1 - 5",
+    "Ripple Field 1 - 6",
+    "Ripple Field 1 - 7",
+    "Ripple Field 2 - 4",
+    "Ripple Field 3 - 5",
+    "Ripple Field 4 - 2A",
+    "Ripple Field 6 - 3",  # Questionable, needs testing. if fail add in 4 as well
+    "Sand Canyon 1 - 0",
+    "Sand Canyon 2 - 6",
+    # "Sand Canyon 2 - 7",  # unknown if needed currently
+    "Sand Canyon 2 - 8",
+    "Sand Canyon 3 - 8",
+    "Sand Canyon 4 - 6B",
+    "Sand Canyon 6 - 15",
+    "Sand Canyon 6 - 18",
+    "Sand Canyon 6 - 20",
+    "Sand Canyon 6 - 29",
+    "Sand Canyon 6 - 37",
+    "Cloudy Park 1 - 8",
+    "Cloudy Park 2 - 7",
+    "Cloudy Park 3 - 5",
+    "Cloudy Park 4 - 8",
+    # "Cloudy Park 6 - 13",
+    "Cloudy Park 6 - 14",
+    "Iceberg 1 - 2",
+    "Iceberg 2 - 3",
+    "Iceberg 2 - 4",
+    "Iceberg 2 - 5",
+    "Iceberg 3 - 5",
+    "Iceberg 4 - 10A",
+    "Iceberg 6 - 8",
+    "Iceberg 6 - 10",
+    "Iceberg 6 - 12",
+    "Iceberg 6 - 14",
+    "Iceberg 6 - 16",
+    "Iceberg 6 - 18",
+    "Iceberg 6 - 20",
+    "Iceberg 6 - 22"
+}
+
+blocked_groups = {
+    # this room is going to cause me nightmares
+    "Sand Canyon 5 - 9": ["Grass Land 5", "Ripple Field 2", "Sand Canyon 6"]  # Kine physically cannot make this jump
 }
 
 
@@ -46,9 +121,10 @@ def generate_rooms(world: "KDL3World", door_shuffle: bool, level_regions: typing
                         room_entry["default_exits"], room_entry["animal_pointers"], room_entry["enemies"],
                         room_entry["entity_load"], room_entry["consumables"], room_entry["consumables_pointer"])
         room.add_locations({location: world.location_name_to_id[location] if location in world.location_name_to_id else
-                            None for location in room_entry["locations"]
+        None for location in room_entry["locations"]
                             if (not any([x in location for x in ["1-Up", "Maxim"]]) or
-                            world.options.consumables.value) and (not "Star" in location or world.options.starsanity.value)},
+                                world.options.consumables.value) and (
+                                        not "Star" in location or world.options.starsanity.value)},
                            KDL3Location)
         rooms[room.name] = room
         for location in room.locations:
@@ -60,34 +136,28 @@ def generate_rooms(world: "KDL3World", door_shuffle: bool, level_regions: typing
     world.multiworld.regions.extend(world.rooms)
 
     first_rooms: typing.Dict[int, KDL3Room] = dict()
-    if door_shuffle:
-        # first, we need to generate the notable edge cases
-        # 5-6 is the first, being the most restrictive
-        # half of its rooms are required to be vanilla, but can be in different orders
-        # the room before it *must* contain the copy ability required to unlock the room's goal
-
-        raise NotImplementedError()
-    else:
-        for name in rooms:
-            room = rooms[name]
-            if room.room == 0:
-                if room.stage == 7:
-                    first_rooms[0x770200 + room.level - 1] = room
-                else:
-                    first_rooms[0x770000 + ((room.level - 1) * 6) + room.stage] = room
-            exits = dict()
-            for def_exit in room.default_exits:
-                target = f"{level_names[room.level]} {room.stage} - {def_exit['room']}"
-                access_rule = tuple(def_exit["access_rule"])
-                exits[target] = lambda state, rule=access_rule: state.has_all(rule, world.player)
-            room.add_exits(
-                exits.keys(),
-                exits
-            )
-            if world.options.open_world:
-                if any(["Complete" in location.name for location in room.locations]):
-                    room.add_locations({f"{level_names[room.level]} {room.stage} - Stage Completion": None},
-                                       KDL3Location)
+    for name in rooms:
+        room = rooms[name]
+        if room.room == 0:
+            if room.stage == 7:
+                first_rooms[0x770200 + room.level - 1] = room
+            else:
+                first_rooms[0x770000 + ((room.level - 1) * 6) + room.stage] = room
+        exits = dict()
+        for def_exit in room.default_exits:
+            target = f"{level_names[room.level]} {room.stage} - {def_exit['room']}"
+            access_rule = tuple(def_exit["access_rule"])
+            exits[target] = lambda state, rule=access_rule: state.has_all(rule, world.player)
+        room.add_exits(
+            exits.keys(),
+            exits
+        )
+        for exit in room.get_exits():
+            exit.er_group = stage_names[default_levels[room.level][room.stage]]
+        if world.options.open_world:
+            if any(["Complete" in location.name for location in room.locations]):
+                room.add_locations({f"{level_names[room.level]} {room.stage} - Stage Completion": None},
+                                   KDL3Location)
 
     for level in world.player_levels:
         for stage in range(6):
@@ -101,6 +171,31 @@ def generate_rooms(world: "KDL3World", door_shuffle: bool, level_regions: typing
                     .parent_region.add_exits([first_rooms[proper_stage].name])
         else:
             level_regions[level].add_exits([first_rooms[0x770200 + level - 1].name])
+
+    if door_shuffle:
+        non_randomized_entrances = []
+        randomized_rooms = []
+        available_groups = [stage_names[default_levels[rooms[room].level][rooms[room].stage-1]] for room in rooms
+                            if rooms[room].name not in heart_star_requirement]
+        for room in rooms:
+            if any(location.address in heart_star_locations
+                   for location in rooms[room].get_locations()):
+                for exit in rooms[room].get_exits():
+                    non_randomized_entrances.append(exit.name)
+                    location = rooms[room].get_locations()[0]
+
+            else:
+                if room not in heart_star_requirement:
+                    pass
+                randomized_rooms.append(room)
+
+
+        from EntranceRando import disconnect_entrances_for_randomization, randomize_entrances
+        disconnect_entrances_for_randomization(world, [entrance for entrance in world.multiworld.get_entrances()
+                                                       if entrance.name not in non_randomized_entrances])
+        # now we need to define groups
+
+        raise NotImplementedError
 
 
 def generate_valid_levels(world: "KDL3World", enforce_world: bool, enforce_pattern: bool) -> dict:
@@ -218,7 +313,7 @@ def create_levels(world: "KDL3World") -> None:
             level_shuffle == 1,
             level_shuffle == 2)
 
-    generate_rooms(world, False, levels)
+    generate_rooms(world, True, levels)
 
     level6.add_locations({LocationName.goals[world.options.goal]: None}, KDL3Location)
 
