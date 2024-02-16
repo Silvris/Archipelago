@@ -10,7 +10,7 @@ from .Items import item_table, item_names, copy_ability_table, animal_friend_tab
 from .Locations import location_table, KDL3Location, level_consumables, consumable_locations, star_locations
 from .Names.AnimalFriendSpawns import animal_friend_spawns
 from .Names.EnemyAbilities import vanilla_enemies, enemy_mapping, enemy_restrictive
-from .Regions import create_levels, default_levels
+from .Regions import create_levels, default_levels, door_shuffle_events
 from .Options import KDL3Options
 from .Presets import kdl3_options_presets
 from .Names import LocationName
@@ -136,6 +136,50 @@ class KDL3World(World):
             for enemy in enemies_to_set:
                 self.copy_abilities[enemy] = self.random \
                     .choice(valid_abilities)
+        if self.options.animal_randomization != 0:
+            spawns = [animal for animal in animal_friend_spawns.keys() if
+                      animal not in ["Ripple Field 5 - Animal 2", "Sand Canyon 6 - Animal 1", "Iceberg 4 - Animal 1"]]
+            self.multiworld.get_location("Iceberg 4 - Animal 1", self.player) \
+                .place_locked_item(self.create_item("ChuChu Spawn"))
+            # Not having ChuChu here makes the room impossible (since only she has vertical burning)
+            self.multiworld.get_location("Ripple Field 5 - Animal 2", self.player) \
+                .place_locked_item(self.create_item("Pitch Spawn"))
+            guaranteed_animal = self.random.choice(["Kine Spawn", "Coo Spawn"])
+            self.multiworld.get_location("Sand Canyon 6 - Animal 1", self.player) \
+                .place_locked_item(self.create_item(guaranteed_animal))
+            # Ripple Field 5 - Animal 2 needs to be Pitch to ensure accessibility on non-door rando
+            if self.options.animal_randomization == 1:
+                animal_pool = [animal_friend_spawns[spawn] for spawn in animal_friend_spawns
+                               if spawn not in ["Ripple Field 5 - Animal 2", "Sand Canyon 6 - Animal 1",
+                                                "Iceberg 4 - Animal 1"]]
+            else:
+                animal_base = ["Rick Spawn", "Kine Spawn", "Coo Spawn", "Nago Spawn", "ChuChu Spawn", "Pitch Spawn"]
+                animal_pool = [self.random.choice(animal_base)
+                               for _ in range(len(animal_friend_spawns) - 9)]
+                # have to guarantee one of each animal
+                animal_pool.extend(animal_base)
+            if guaranteed_animal == "Kine Spawn":
+                animal_pool.append("Coo Spawn")
+            else:
+                animal_pool.append("Kine Spawn")
+            self.animal_pool = animal_pool
+        if True: #self.options.door_shuffle:
+            for locations in door_shuffle_events.values():
+                for location in locations:
+                    self.multiworld.get_location(location, self.player)\
+                        .place_locked_item(self.create_item(location.split("-")[1]))
+
+    def get_pre_fill_items(self) -> List[KDL3Item]:
+        pre_fill_items = []
+        for enemy in enemy_mapping:
+            pre_fill_items.append(self.create_item(self.copy_abilities[enemy_mapping[enemy]]))
+        if self.options.animal_randomization != 0:
+            for animal in self.animal_pool:
+                pre_fill_items.append(self.create_item(animal))
+        else:
+            for animal in animal_friend_spawns:
+                pre_fill_items.append(self.create_item(animal_friend_spawns[animal]))
+        return pre_fill_items
 
     def pre_fill(self) -> None:
         for enemy in enemy_mapping:
