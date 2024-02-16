@@ -10,7 +10,7 @@ from .Items import item_table, item_names, copy_ability_table, animal_friend_tab
 from .Locations import location_table, KDL3Location, level_consumables, consumable_locations, star_locations
 from .Names.AnimalFriendSpawns import animal_friend_spawns
 from .Names.EnemyAbilities import vanilla_enemies, enemy_mapping, enemy_restrictive
-from .Regions import create_levels, default_levels
+from .Regions import create_levels, default_levels, door_shuffle_events
 from .Options import KDL3Options
 from .Presets import kdl3_options_presets
 from .Names import LocationName
@@ -173,10 +173,8 @@ class KDL3World(World):
             # place remaining
             for enemy in enemies_to_set:
                 self.copy_abilities[enemy] = self.random.choice(valid_abilities)
-        for enemy in enemy_mapping:
-            self.multiworld.get_location(enemy, self.player) \
-                .place_locked_item(self.create_item(self.copy_abilities[enemy_mapping[enemy]]))
-        # fill animals
+            for enemy in enemy_mapping:
+                self.multiworld.get_location(enemy, self.player).place_locked_item(self.create_item(self.copy_abilities[enemy_mapping[enemy]]))
         if self.options.animal_randomization != 0:
             spawns = [animal for animal in animal_friend_spawns.keys() if
                       animal not in ["Ripple Field 5 - Animal 2", "Sand Canyon 6 - Animal 1", "Iceberg 4 - Animal 1"]]
@@ -203,15 +201,25 @@ class KDL3World(World):
                 animal_pool.append("Coo Spawn")
             else:
                 animal_pool.append("Kine Spawn")
-            locations = [self.multiworld.get_location(spawn, self.player) for spawn in spawns]
-            items = [self.create_item(animal) for animal in animal_pool]
-            allstate = self.multiworld.get_all_state(False)
-            fill_restrictive(self.multiworld, allstate, locations, items, True, True)
+            self.animal_pool = animal_pool
+        if True: #self.options.door_shuffle:
+            for locations in door_shuffle_events.values():
+                for location in locations:
+                    self.multiworld.get_location(location, self.player)\
+                        .place_locked_item(self.create_item(location.split("-")[1]))
+
+    def get_pre_fill_items(self) -> List[KDL3Item]:
+        pre_fill_items = []
+        for enemy in enemy_mapping:
+            pre_fill_items.append(self.create_item(self.copy_abilities[enemy_mapping[enemy]]))
+        if self.options.animal_randomization != 0:
+            for animal in self.animal_pool:
+                pre_fill_items.append(self.create_item(animal))
         else:
-            animal_friends = animal_friend_spawns.copy()
-            for animal in animal_friends:
-                self.multiworld.get_location(animal, self.player) \
-                    .place_locked_item(self.create_item(animal_friends[animal]))
+            for animal in animal_friend_spawns:
+                pre_fill_items.append(self.create_item(animal_friend_spawns[animal]))
+        return pre_fill_items
+
 
     def create_items(self) -> None:
         itempool = []

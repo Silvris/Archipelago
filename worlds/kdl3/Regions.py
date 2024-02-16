@@ -3,6 +3,7 @@ import os
 import typing
 from pkgutil import get_data
 
+import Utils
 from BaseClasses import Region
 from worlds.generic.Rules import add_item_rule
 from .Locations import KDL3Location, heart_star_locations, stage_locations, boss_locations
@@ -39,14 +40,13 @@ first_world_limit = {
     0x770013,
     0x77001E,
 }
-
-split_rooms = {  # Rooms that need split per exit
-    "Grass Land 4 - 6",
-    "Ripple Field 3 - 7",
-    "Ripple Field 4 - 2",
-    "Ripple Field 4 - 5",  # this one is BAD, split locations 1 per as well. guess do that with all?
-    "Sand Canyon 4 - 6",
-    "Iceberg 4 - 10"
+door_shuffle_events = {
+    "Grass Land 4 - 6-2": {LocationName.grass_land_4_goku: None},
+    "Ripple Field 4 - 2-1": {LocationName.ripple_field_4_little_toad: None},
+    "Ripple Field 5 - 8": {LocationName.ripple_field_5_wall: None},
+    "Sand Canyon 4 - 6-2": {LocationName.sand_canyon_4_donbe: None},
+    "Cloudy Park 4 - 8": {LocationName.cloudy_park_4_mikarin: None},
+    "Iceberg 4 - 10-1": {LocationName.iceberg_4_shell: None}
 }
 
 heart_star_requirement = {  # Rooms required for the current stage's heart star
@@ -59,7 +59,7 @@ heart_star_requirement = {  # Rooms required for the current stage's heart star
     "Grass Land 3 - 3",
     "Grass Land 3 - 6",
     "Grass Land 3 - 5",
-    "Grass Land 4 - 6B",
+    "Grass Land 4 - 6-2",
     "Grass Land 4 - 8",
     "Grass Land 4 - 10",
     "Grass Land 5 - 5",
@@ -71,32 +71,76 @@ heart_star_requirement = {  # Rooms required for the current stage's heart star
     "Ripple Field 1 - 6",
     "Ripple Field 1 - 7",
     "Ripple Field 2 - 4",
+    "Ripple Field 2 - 6",
+    "Ripple Field 2 - 7",
     "Ripple Field 3 - 5",
-    "Ripple Field 4 - 2A",
+    "Ripple Field 3 - 4",
+    "Ripple Field 3 - 6",
+    "Ripple Field 4 - 2-1",
+    "Ripple Field 4 - 3",
+    "Ripple Field 4 - 4",
+    "Ripple Field 5 - 9",
+    "Ripple Field 5 - 11",
     "Ripple Field 6 - 3",  # Questionable, needs testing. if fail add in 4 as well
+    "Ripple Field 6 - 10",
+    "Ripple Field 6 - 11",
     "Sand Canyon 1 - 0",
+    "Sand Canyon 1 - 7",
+    "Sand Canyon 1 - 8",
     "Sand Canyon 2 - 6",
     # "Sand Canyon 2 - 7",  # unknown if needed currently
     "Sand Canyon 2 - 8",
+    "Sand Canyon 2 - 10",
+    "Sand Canyon 2 - 11",
+    "Sand Canyon 3 - 5",
+    "Sand Canyon 3 - 7",
     "Sand Canyon 3 - 8",
-    "Sand Canyon 4 - 6B",
+    "Sand Canyon 4 - 6-2",
+    "Sand Canyon 4 - 8",
+    "Sand Canyon 4 - 9",
+    "Sand Canyon 5 - 7",
+    "Sand Canyon 5 - 8",
     "Sand Canyon 6 - 15",
     "Sand Canyon 6 - 18",
     "Sand Canyon 6 - 20",
     "Sand Canyon 6 - 29",
     "Sand Canyon 6 - 37",
+    "Sand Canyon 6 - 43",
+    "Sand Canyon 6 - 44",
     "Cloudy Park 1 - 8",
+    "Cloudy Park 1 - 12",
+    "Cloudy Park 1 - 13",
     "Cloudy Park 2 - 7",
+    "Cloudy Park 2 - 8",
+    "Cloudy Park 2 - 9",
     "Cloudy Park 3 - 5",
+    "Cloudy Park 3 - 6",
+    "Cloudy Park 3 - 7",
     "Cloudy Park 4 - 8",
+    "Cloudy Park 4 - 9",
+    "Cloudy Park 4 - 10",
+    "Cloudy Park 5 - 7",
+    "Cloudy Park 5 - 8",
     # "Cloudy Park 6 - 13",
     "Cloudy Park 6 - 14",
+    "Cloudy Park 6 - 15",
+    "Cloudy Park 6 - 16",
     "Iceberg 1 - 2",
+    "Iceberg 1 - 6",
+    "Iceberg 1 - 7",
     "Iceberg 2 - 3",
     "Iceberg 2 - 4",
     "Iceberg 2 - 5",
+    "Iceberg 2 - 8",
+    "Iceberg 2 - 10",
     "Iceberg 3 - 5",
-    "Iceberg 4 - 10A",
+    "Iceberg 3 - 7",
+    "Iceberg 3 - 8",
+    "Iceberg 4 - 10-1",
+    "Iceberg 4 - 19",
+    "Iceberg 4 - 20",
+    "Iceberg 5 - 36",
+    "Iceberg 5 - 37",
     "Iceberg 6 - 8",
     "Iceberg 6 - 10",
     "Iceberg 6 - 12",
@@ -104,7 +148,15 @@ heart_star_requirement = {  # Rooms required for the current stage's heart star
     "Iceberg 6 - 16",
     "Iceberg 6 - 18",
     "Iceberg 6 - 20",
-    "Iceberg 6 - 22"
+    "Iceberg 6 - 22",
+    "Iceberg 6 - 23",
+    "Iceberg 6 - 24",
+    # Boss rooms
+    "Grass Land Boss - 0",
+    "Ripple Field Boss - 0",
+    "Sand Canyon Boss - 0",
+    "Cloudy Park Boss - 0",
+    "Iceberg Boss - 0"
 }
 
 blocked_groups = {
@@ -125,7 +177,7 @@ def generate_valid_level(world: "KDL3World", level, stage, possible_stages, plac
     return new_stage
 
 
-def generate_rooms(world: "KDL3World", door_shuffle: bool, level_regions: typing.Dict[int, Region]):
+def generate_rooms(world: "KDL3World", level_regions: typing.Dict[int, Region]):
     level_names = {LocationName.level_names[level]: level for level in LocationName.level_names}
     room_data = orjson.loads(get_data(__name__, os.path.join("data", "Rooms.json")))
     rooms: typing.Dict[str, KDL3Room] = dict()
@@ -157,12 +209,14 @@ def generate_rooms(world: "KDL3World", door_shuffle: bool, level_regions: typing
             else:
                 first_rooms[0x770000 + ((room.level - 1) * 6) + room.stage] = room
         exits = dict()
+        names = dict()
         for def_exit in room.default_exits:
             target = f"{level_names[room.level]} {room.stage} - {def_exit['room']}"
             access_rule = tuple(def_exit["access_rule"])
             exits[target] = lambda state, rule=access_rule: state.has_all(rule, world.player)
+            names[target] = def_exit["name"]
         room.add_exits(
-            exits.keys(),
+            names,
             exits
         )
         for exit in room.get_exits():
@@ -187,31 +241,6 @@ def generate_rooms(world: "KDL3World", door_shuffle: bool, level_regions: typing
                 world.multiworld.get_location(world.location_id_to_name[world.player_levels[level][stage - 1]],
                                               world.player).parent_region.add_exits([first_rooms[proper_stage].name])
         level_regions[level].add_exits([first_rooms[0x770200 + level - 1].name])
-
-    if door_shuffle:
-        non_randomized_entrances = []
-        randomized_rooms = []
-        available_groups = [stage_names[default_levels[rooms[room].level][rooms[room].stage-1]] for room in rooms
-                            if rooms[room].name not in heart_star_requirement]
-        for room in rooms:
-            if any(location.address in heart_star_locations
-                   for location in rooms[room].get_locations()):
-                for exit in rooms[room].get_exits():
-                    non_randomized_entrances.append(exit.name)
-                    location = rooms[room].get_locations()[0]
-
-            else:
-                if room not in heart_star_requirement:
-                    pass
-                randomized_rooms.append(room)
-
-
-        from EntranceRando import disconnect_entrances_for_randomization, randomize_entrances
-        disconnect_entrances_for_randomization(world, [entrance for entrance in world.multiworld.get_entrances()
-                                                       if entrance.name not in non_randomized_entrances])
-        # now we need to define groups
-
-        raise NotImplementedError
 
 
 def generate_valid_levels(world: "KDL3World", enforce_world: bool, enforce_pattern: bool) -> dict:
@@ -302,6 +331,85 @@ def generate_valid_levels(world: "KDL3World", enforce_world: bool, enforce_patte
     return levels
 
 
+def shuffle_doors(world: "KDL3World"):
+    non_randomized_rooms = []
+    randomized_rooms = []
+    available_groups = [stage_names[default_levels[room.level][room.stage - 1]] for room in world.rooms
+                        if room.name not in heart_star_requirement]
+    world.random.shuffle(available_groups)
+    for room in world.rooms:
+        if any(location.address in heart_star_locations
+               for location in room.get_locations()):
+            for exit in room.get_exits():
+                non_randomized_rooms.append(exit.connected_region.name)
+            randomized_rooms.append(room)
+        elif any(location.address in boss_locations for location in room.get_locations()):
+            non_randomized_rooms.append(room.name)
+        elif room.name not in non_randomized_rooms:
+            randomized_rooms.append(room)
+
+    level_regions = [world.multiworld.get_region(x, world.player) for x in ["Grass Land", "Ripple Field", "Sand Canyon",
+                                                                            "Cloudy Park", "Iceberg"]]
+
+    from EntranceRando import disconnect_entrances_for_randomization, randomize_entrances
+    randomized_entrances = []
+    for room in randomized_rooms:
+        randomized_entrances.extend(list(room.entrances))
+    disconnect_entrances_for_randomization(world, randomized_entrances)
+    local_rooms = world.rooms.copy()
+    world.random.shuffle(local_rooms)
+    exits = []
+    entrances = []
+    for room in local_rooms:
+        if room.name not in heart_star_requirement:
+            stage_group = available_groups.pop()
+        else:
+            stage_group = stage_names[default_levels[room.level][room.stage - 1]]
+        for exit in room.get_exits():
+            exit.er_group = stage_group
+        for entrance in room.entrances:
+            entrance.er_group = stage_group
+        exits.extend(list(room.get_exits()))
+        entrances.extend(list(room.entrances))
+    for region in level_regions:
+        for exit in region.get_exits():
+            if exit.connected_region not in level_regions:
+                exit.er_group = exit.name.replace(f"{region.name} -> ", "").replace(" - 0", "")
+                exits.append(exit)
+
+    def group_match(group: str) -> typing.List[str]:
+        return [group]
+    groups = {}
+    for stage, group in stage_names.items():
+        groups[group] = ([x for x in entrances if x.er_group == group], [x for x in exits if x.er_group == group])
+    for group in groups:
+        g_entrances = groups[group][0]
+        g_exits = groups[group][1]
+        if len(g_entrances) > len(g_exits):
+            # too many entrances
+            unique_entrances = {x.name for x in g_entrances}
+            while len(g_entrances) > len(g_exits):
+                potential = g_entrances.pop()
+                if unique_entrances == {x.name for x in g_entrances}:
+                    # this is safe to remove
+                    potential.connected_region.entrances.remove(potential)
+                else:
+                    # last entrance to the region, keep
+                    g_entrances.insert(0, potential)
+        elif len(g_entrances) < len(g_exits):
+            possible_entrances = [x.connected_region for x in g_entrances]
+            while len(g_entrances) < len(g_exits):
+                region = world.random.choice(possible_entrances)
+                new_entrance = region.create_er_target(region.name)
+                new_entrance.er_group = group
+                g_entrances.append(new_entrance)
+
+
+    result = randomize_entrances(world, world.multiworld.get_regions(world.player), True, group_match, True)
+    Utils.visualize_regions(world.multiworld.get_region("Menu", world.player), "kdl3_doors.puml", show_locations=False)
+    raise NotImplementedError
+
+
 def create_levels(world: "KDL3World") -> None:
     menu = Region("Menu", world.player, world.multiworld)
     level1 = Region("Grass Land", world.player, world.multiworld)
@@ -323,11 +431,6 @@ def create_levels(world: "KDL3World") -> None:
             world,
             level_shuffle == 1,
             level_shuffle == 2)
-
-    generate_rooms(world, True, levels)
-
-    level6.add_locations({LocationName.goals[world.options.goal]: None}, KDL3Location)
-
     menu.connect(level1, "Start Game")
     level1.connect(level2, "To Level 2")
     level2.connect(level3, "To Level 3")
@@ -335,3 +438,6 @@ def create_levels(world: "KDL3World") -> None:
     level4.connect(level5, "To Level 5")
     menu.connect(level6, "To Level 6")  # put the connection on menu, since you can reach it before level 5 on fast goal
     world.multiworld.regions += [menu, level1, level2, level3, level4, level5, level6]
+    generate_rooms(world, levels)
+
+    level6.add_locations({LocationName.goals[world.options.goal]: None}, KDL3Location)

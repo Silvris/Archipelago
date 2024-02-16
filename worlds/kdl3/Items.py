@@ -54,6 +54,15 @@ copy_ability_access_table = {
     "Cutter Ability": ItemData(None, True),
 }
 
+event_item_table = {
+    "Goku": ItemData(None, True),
+    "Little Toad": ItemData(None, True),
+    "Wall": ItemData(None, True),
+    "Donbe": ItemData(None, True),
+    "Mikarin": ItemData(None, True),
+
+}
+
 misc_item_table = {
     "Heart Star": ItemData(0x770020, True, True),
     "1-Up": ItemData(0x770021, False),

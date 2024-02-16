@@ -2,6 +2,7 @@ from worlds.generic.Rules import set_rule, add_rule
 from .Names import LocationName, EnemyAbilities
 from .Locations import location_table
 from .Options import GoalSpeed
+from .Regions import shuffle_doors
 import typing
 
 if typing.TYPE_CHECKING:
@@ -111,6 +112,8 @@ def can_fix_angel_wings(state: "CollectionState", player: int, copy_abilities: t
 
 
 def set_rules(world: "KDL3World") -> None:
+    # Shuffle doors before we set anything else
+    shuffle_doors(world)
     # Level 1
     set_rule(world.multiworld.get_location(LocationName.grass_land_muchi, world.player),
              lambda state: can_reach_chuchu(state, world.player))
