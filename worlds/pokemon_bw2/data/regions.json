@@ -9,27 +9,62 @@
       {
         "name": "Town Map from Hugh's Sister",
         "default": "Town Map",
-        "tags": ["KEY"]
+        "tags": ["KEY"],
+        "script_info": [854, 1550, 442, 1]
       },
       {
         "name": "Hugh's Town Map from Hugh's Sister",
         "default": "Hugh's Town Map",
-        "tags": ["EXTENDED", "KEY"]
+        "tags": ["EXTENDED", "KEY"],
+        "script_info": [854, 1594, 622, 1]
       },
       {
-        "name": "Poke Balls from Bianca",
+        "name": "Gift from Bianca",
         "default": "Poke Ball",
-        "tags": ["GIFT"]
+        "tags": ["GIFT"],
+        "script_info": [870, 500, 4, 10]
       },
       {
-        "name": "Max Revives from Mom",
+        "name": "Gift from Mom",
         "default": "Max Revive",
-        "tags": ["GIFT", "POSTGAME"]
+        "tags": ["GIFT", "POSTGAME"],
+        "script_info": [856, 1202, 29, 2]
       },
       {
         "name": "Basic Badge from Cheren",
         "default": "Basic Badge",
-        "tags": ["BADGE"]
+        "tags": ["BADGE"],
+        "script_info": [978, 984, 120, 1]
+      },
+      {
+        "name": "TM83 from Cheren",
+        "default": "TM83",
+        "tags": ["GIFT"],
+        "script_info": [978, 1064, 410, 1]
+      },
+      {
+        "name": "Gift from Clyde",
+        "default": "Fresh Water",
+        "tags": ["GIFT"],
+        "script_info": [978, 202, 30, 1]
+      },
+      {
+        "name": "Gift from Bianca Post-Gym",
+        "default": "TM27",
+        "tags": ["GIFT"],
+        "script_info": [854, 5181, 354, 1]
+      },
+      {
+        "name": "Gift from Girl after Defeating Cheren",
+        "default": "Ultra Ball",
+        "tags": ["GIFT"],
+        "script_info": [868, 121, 2, 1]
+      },
+      {
+        "name": "Parting Gift",
+        "default": "Potion",
+        "tags": ["GIFT"],
+        "script_info": [[876, 174, 17, 1], [876, 303, 17, 1]]
       }
     ],
     "connections": [
@@ -37,7 +72,14 @@
     ]
   },
   "Route 19": {
-    "locations": [],
+    "locations": [
+      {
+        "name": "Gift from Alder",
+        "default": "Oran Berry",
+        "tags": ["GIFT"],
+        "script_info": [874, 1292, 155, 5]
+      }
+    ],
     "connections": [
       "Aspertia City",
       "Floccesy Town"
@@ -48,7 +90,8 @@
       {
         "name": "Medal Box from Mr. Medal",
         "default": "Medal Box",
-        "tags": ["KEY"]
+        "tags": ["KEY"],
+        "script_info": [1276, 687, 627, 1]
       }
     ],
     "connections": [
@@ -57,7 +100,14 @@
     ]
   },
   "Route 20": {
-    "locations": [],
+    "locations": [
+      {
+        "name": "Gift from Cheren",
+        "default": "Pecha Berry",
+        "tags": ["GIFT"],
+        "script_info": [892, 1003, 151, 3]
+      }
+    ],
     "connections": [
       "Floccesy Town",
       "Floccesy Ranch",
@@ -78,7 +128,26 @@
     ]
   },
   "Floccesy Ranch": {
-    "locations": [],
+    "locations": [
+      {
+        "name": "Gift from Ranch Owner's Wife",
+        "default": "Potion",
+        "tags": ["GIFT"],
+        "script_info": [890, 766, 17, 1]
+      },
+      {
+        "name": "Gift from Hugh",
+        "default": "Parlyz Heal",
+        "tags": ["GIFT"],
+        "script_info": [890, 1377, 22, 1]
+      },
+      {
+        "name": "Projectile from Team Plasma Grunt",
+        "default": "TM21",
+        "tags": ["GIFT"],
+        "script_info": [890, 2053, 348, 1]
+      }
+    ],
     "connections": [
       "Route 20"
     ]
@@ -86,14 +155,40 @@
   "Virbank City": {
     "locations": [
       {
+        "name": "Gift from Gate Attendant",
+        "default": "Great Ball",
+        "tags": ["GIFT"],
+        "script_info": [894, 256, 3, 2]
+      },
+      {
         "name": "HM01 from Roxie",
         "default": "HM01 Cut",
-        "tags": ["HM"]
+        "tags": ["HM"],
+        "script_info": [896, 2164, 420, 1]
+      },
+      {
+        "name": "Gift from Clyde",
+        "default": "Fresh Water",
+        "tags": ["GIFT"],
+        "script_info": [910, 308, 30, 1]
       },
       {
         "name": "Toxic Badge from Roxie",
         "default": "Toxic Badge",
-        "tags": ["BADGE"]
+        "tags": ["BADGE"],
+        "script_info": [1004, 1000, 121, 1]
+      },
+      {
+        "name": "TM09 from Roxie",
+        "default": "TM09",
+        "tags": ["GIFT"],
+        "script_info": [1004, 1098, 336, 1]
+      },
+      {
+        "name": "Gift from Roughneck",
+        "default": "Poke Ball",
+        "tags": ["GIFT"],
+        "script_info": [896, 719, 4, 5]
       }
     ],
     "connections": [
@@ -104,7 +199,20 @@
     ]
   },
   "Virbank Complex": {
-    "locations": [],
+    "locations": [
+      {
+        "name": "Gift from Scientist",
+        "default": "Ether",
+        "tags": ["GIFT"],
+        "script_info": [[914, 1694, 38, 1], [914, 1742, 38, 1]]
+      },
+      {
+        "name": "Gift from Girl",
+        "default": "Great Ball",
+        "tags": ["GIFT"],
+        "script_info": [914, 2222, 3, 5]
+      }
+    ],
     "connections": [
       "Virbank City"
     ]
@@ -120,22 +228,68 @@
       {
         "name": "Bicycle from Harlequin",
         "default": "Bicycle",
-        "tags": ["KEY"]
+        "tags": ["KEY"],
+        "script_info": [56, 997, 450, 1]
+      },
+      {
+        "name": "Gift from Harlequin Hunt",
+        "default": "Rare Candy",
+        "tags": ["GIFT"],
+        "script_info": [[56, 1732, 50, 1], [102, 508, 50, 1], [504, 521, 50, 1]]
+      },
+      {
+        "name": "Gift from Clyde",
+        "default": "Fresh Water",
+        "tags": ["GIFT"],
+        "script_info": [58, 1082, 30, 1]
       },
       {
         "name": "Insect Badge from Burgh",
         "default": "Insect Badge",
-        "tags": ["BADGE"]
+        "tags": ["BADGE"],
+        "script_info": [976, 488, 122, 1]
+      },
+      {
+        "name": "TM76 from Burgh",
+        "default": "TM76",
+        "tags": ["GIFT"],
+        "script_info": [976, 584, 403, 1]
+      },
+      {
+        "name": "Narrow Street - Gift from Guy Behind Dumpster",
+        "default": "TM70",
+        "tags": ["GIFT"],
+        "script_info": [70, 677, 397, 1]
+      },
+      {
+        "name": "Gift from Battle Company CEO",
+        "default": "Exp. Share",
+        "tags": ["GIFT"],
+        "script_info": [88, 879, 216, 1]
+      },
+      {
+        "name": "Battle Company 47F - Reward from Clerk Clemens",
+        "default": "Quick Ball",
+        "tags": ["GIFT"],
+        "script_info": [90, 197, 15, 2]
+      },
+      {
+        "name": "Battle Company 47F - Reward from Clerk Clemens",
+        "default": "Timer Ball",
+        "tags": ["GIFT"],
+        "script_info": [90, 375, 10, 5]
       },
       {
         "name": "Dowsing MCHN from Bianca",
         "default": "Dowsing MCHN",
-        "tags": ["KEY"]
+        "tags": ["KEY"],
+        "script_info": [102, 262, 471, 1]
       },
       {
         "name": "Royal Unova",
         "default": "Rare Candy",
-        "tags": ["GIFT"]
+        "tags": ["GIFT"],
+        "script_info": [78, 116, 42, 1]
       }
     ],
     "connections": [
@@ -150,7 +304,20 @@
       {
         "name": "HM04 from Hugh",
         "default": "HM04 Strength",
-        "tags": ["HM"]
+        "tags": ["HM"],
+        "script_info": [990, 1592, 423, 1]
+      },
+      {
+        "name": "Gift from Male Scientist",
+        "default": "Full Restore",
+        "tags": ["GIFT"],
+        "script_info": [[996, 170, 23, 1],[996, 249, 27, 1],[996, 299, 18, 1]]
+      },
+      {
+        "name": "Gift from Female Scientist",
+        "default": "Revive",
+        "tags": ["GIFT"],
+        "script_info": [[998, 170, 28, 1],[998, 249, 26, 1],[998, 299, 17, 1]]
       }
     ],
     "connections": [
@@ -169,7 +336,32 @@
     "connections": []
   },
   "Route 4": {
-    "locations": [],
+    "locations": [
+      {
+        "name": "Gift from Colress",
+        "default": "Protein",
+        "tags": ["GIFT"],
+        "script_info": [652, 950, 46, 1]
+      },
+      {
+        "name": "Gift from Ace Trainer",
+        "default": "Swift Wing",
+        "tags": ["GIFT", "WHITE"],
+        "script_info": [[654, 557, 565, 5], [654, 656, 565, 1]]
+      },
+      {
+        "name": "Gift from Ace Trainer",
+        "default": "Health Wing",
+        "tags": ["GIFT", "BLACK"],
+        "script_info": [[1058, 585, 570, 5],[1058, 684, 570, 1]]
+      },
+      {
+        "name": "Gift from Maid",
+        "default": "Poke Toy",
+        "tags": ["GIFT"],
+        "script_info": [[1048, 978, 577, 1],[1060, 958, 577, 1]]
+      }
+    ],
     "connections": [
       "Desert Resort",
       "Nimbasa City"
@@ -192,22 +384,56 @@
       {
         "name": "Prop Case from Musical Theatre Owner",
         "default": "Prop Case",
-        "tags": ["KEY"]
+        "tags": ["KEY"],
+        "script_info": [[154, 550, 578, 1],[154, 796, 578, 1],[154, 1078, 578, 1]]
       },
       {
         "name": "Vs. Recorder from Nate/Rosa",
         "default": "Vs. Recorder",
-        "tags": ["KEY"]
+        "tags": ["KEY"],
+        "script_info": [124, 3422, 465, 1]
       },
       {
         "name": "Dropped Item",
         "default": "Dropped Item (Yancy)",
-        "tags": ["KEY"]
+        "tags": ["KEY"],
+        "script_info": [[128, 1101, 637, 1], [128, 1158, 636, 1]]
+      },
+      {
+        "name": "Gift from Beauty in Old Gym",
+        "default": "Parlyz Heal",
+        "tags": ["GIFT"],
+        "script_info": [1170, 1133, 22, 1]
       },
       {
         "name": "Bolt Badge from Elesa",
         "default": "Bolt Badge",
-        "tags": ["BADGE"]
+        "tags": ["BADGE"],
+        "script_info": [126, 470, 123, 1]
+      },
+      {
+        "name": "TM72 from Elesa",
+        "default": "TM72",
+        "tags": ["GIFT"],
+        "script_info": [126, 579, 399, 1]
+      },
+      {
+        "name": "Gift from Clyde",
+        "default": "Fresh Water",
+        "tags": ["GIFT"],
+        "script_info": [[126, 3060, 30, 1], [126, 4118, 30, 1]]
+      },
+      {
+        "name": "Gift from Socialite NE from Center",
+        "default": "Soothe Bell",
+        "tags": ["GIFT"],
+        "script_info": [178, 97, 218, 1]
+      },
+      {
+        "name": "Gift from Ace Trainer North of Center",
+        "default": "Sun Stone",
+        "tags": ["GIFT"],
+        "script_info": [190, 67, 80, 1]
       }
     ],
     "connections": [
@@ -218,7 +444,14 @@
     ]
   },
   "Anville Town": {
-    "locations": [],
+    "locations": [
+      {
+        "name": "Gift from Girl after returning Pansage",
+        "default": "BrightPowder",
+        "tags": ["GIFT"],
+        "script_info": [836, 4487, 213, 1]
+      }
+    ],
     "connections": [
       "Nimbasa City"
     ]
@@ -228,7 +461,14 @@
       {
         "name": "HM02 from Bianca",
         "default": "HM02 Fly",
-        "tags": ["HM"]
+        "tags": ["HM"],
+        "script_info": [658, 582, 421, 1]
+      },
+      {
+        "name": "Purchase from Pokemon Breeder",
+        "default": "Pomeg Berry",
+        "tags": ["GIFT"],
+        "script_info": [[658, 1959, 169, 5],[658, 2016, 170, 5],[658, 2073, 171, 5],[658, 2130, 172, 5],[658, 2187, 173, 5],[658, 2244, 174, 5]]
       }
     ],
     "connections": [
@@ -242,6 +482,12 @@
         "name": "VISIT_DRIFTVEIL_DRAWBRIDGE",
         "default": "VISITED_DRIFTVEIL_DRAWBRIDGE",
         "tags": ["EVENT"]
+      },
+      {
+        "name": "Gift from Youngster",
+        "default": "Heal Powder",
+        "tags": ["GIFT"],
+        "script_info": [506, 302, 36, 1]
       }
     ],
     "connections": [
@@ -254,7 +500,44 @@
       {
         "name": "Quake Badge from Clay",
         "default": "Quake Badge",
-        "tags": ["BADGE"]
+        "tags": ["BADGE"],
+        "script_info": [194, 359, 124, 1]
+      },
+      {
+        "name": "TM78 from Clay",
+        "default": "TM78",
+        "tags": ["GIFT"],
+        "script_info": [194, 468, 405, 1]
+      },
+      {
+        "name": "Gift from Clyde",
+        "default": "Fresh Water",
+        "tags": ["GIFT"],
+        "script_info": [194, 950, 30, 1]
+      },
+      {
+        "name": "Gift from Old Man in Grand Driftveil Hotel",
+        "default": "Shell Bell",
+        "tags": ["GIFT"],
+        "script_info": [202, 182, 253, 1]
+      },
+      {
+        "name": "Gift from Scientist in Driftveil Luxury Suites",
+        "default": "Heart Scale",
+        "tags": ["GIFT"],
+        "script_info": [[204, 448, 93, 1], [204, 602, 93, 1]]
+      },
+      {
+        "name": "Gift from Man in Black in Market",
+        "default": "Expert Belt",
+        "tags": ["GIFT"],
+        "script_info": [210, 950, 268, 1]
+      },
+      {
+        "name": "Gift from Axew in Grand Driftveil Hotel",
+        "default": "Haban Berry",
+        "tags": ["GIFT"],
+        "script_info": [1092, 111, 197, 1]
       }
     ],
     "connections": [
@@ -290,7 +573,14 @@
       {
         "name": "HM03 from Cheren",
         "default": "HM03 Surf",
-        "tags": ["HM"]
+        "tags": ["HM"],
+        "script_info": [664, 291, 422, 1]
+      },
+      {
+        "name": "Gift from Girl",
+        "default": "Shiny Stone",
+        "tags": ["GIFT"],
+        "script_info": [672, 133, 107, 1]
       }
     ],
     "connections": [
@@ -306,7 +596,20 @@
     ]
   },
   "Chargestone Cave": {
-    "locations": [],
+    "locations": [
+      {
+        "name": "Gift 1 from Nugget Brothers",
+        "default": "Nugget",
+        "tags": ["GIFT"],
+        "script_info": [392, 364, 92, 1]
+      },
+      {
+        "name": "Gift 2 from Nugget Brothers",
+        "default": "Big Nugget",
+        "tags": ["GIFT"],
+        "script_info": [392, 410, 581, 1]
+      }
+    ],
     "connections": [
       "Route 6",
       "Mistralton City"
@@ -317,7 +620,92 @@
       {
         "name": "Jet Badge from Skyla",
         "default": "Jet Badge",
-        "tags": ["BADGE"]
+        "tags": ["BADGE"],
+        "script_info": [216, 389, 125, 1]
+      },
+      {
+        "name": "TM62 from Skyla",
+        "default": "TM62",
+        "tags": ["GIFT"],
+        "script_info": [216, 485, 389, 1]
+      },
+      {
+        "name": "Gift from Clyde",
+        "default": "Fresh Water",
+        "tags": ["GIFT"],
+        "script_info": [216, 849, 30, 1]
+      },
+      {
+        "name": "TM40 from Youngster",
+        "default": "TM40",
+        "tags": ["GIFT"],
+        "script_info": [214, 565, 367, 1]
+      },
+      {
+        "name": "Gift from Professor Juniper",
+        "default": "Master Ball",
+        "tags": ["GIFT"],
+        "script_info": [214, 941, 1, 1]
+      },
+      {
+        "name": "Gift from Pilot",
+        "default": "Net Ball",
+        "tags": ["GIFT"],
+        "script_info": [222, 2398, 6, 5]
+      },
+      {
+        "name": "Gift from TM Lover - 10",
+        "default": "HP Up",
+        "tags": ["GIFT", "UNUSED"]
+      },
+      {
+        "name": "Gift from TM Lover - 20",
+        "default": "HP Up",
+        "tags": ["GIFT", "UNUSED"]
+      },
+      {
+        "name": "Gift from TM Lover - 35",
+        "default": "HP Up",
+        "tags": ["GIFT", "UNUSED"]
+      },
+      {
+        "name": "Gift from TM Lover - 50",
+        "default": "HP Up",
+        "tags": ["GIFT", "UNUSED"]
+      },
+      {
+        "name": "Gift from TM Lover - 70",
+        "default": "HP Up",
+        "tags": ["GIFT", "UNUSED"]
+      },
+      {
+        "name": "Gift from TM Lover - 95",
+        "default": "HP Up",
+        "tags": ["GIFT", "UNUSED"]
+      },
+      {
+        "name": "Pep Quiz Reward",
+        "default": "Antidote",
+        "tags": ["GIFT"],
+        "script_info": [[234, 835, 18, 1],[234, 741, 18, 1]]
+      },
+      {
+        "name": "Gift from Pokemon Fan Club Chairman - 25-49",
+        "default": "Exp. Share",
+        "tags": ["GIFT"],
+        "script_info": [238, 595, 216, 1]
+      },
+      {
+        "name": "Gift from Pokemon Fan Club Chairman - 50-98",
+        "default": "Cleanse Tag",
+        "tags": ["GIFT"],
+        "script_info": [238, 471, 224, 1]
+      },
+      {
+        "name": "Gift from Pokemon Fan Club Chairman - 99",
+        "default": "King's Rock",
+        "tags": ["GIFT", "UNREASONABLE"],
+        "script_info": [238, 347, 221, 1]
       }
     ],
     "connections": [
@@ -341,7 +729,14 @@
     ]
   },
   "Celestial Tower": {
-    "locations": [],
+    "locations": [
+      {
+        "name": "Gift from Professor Juniper",
+        "default": "Lucky Egg",
+        "tags": ["GIFT"],
+        "script_info": [[676, 142, 231, 1], [676, 391, 231, 1]]
+      }
+    ],
     "connections": [
       "Route 7"
     ]
@@ -363,13 +758,27 @@
     ]
   },
   "Dragonspiral Tower": {
-    "locations": [],
+    "locations": [
+      {
+        "name": "Gift from Cedric Juniper",
+        "default": "Old Gateau",
+        "tags": ["GIFT"],
+        "script_info": [412, 253, 54, 1]
+      }
+    ],
     "connections": [
       "Icirrus City"
     ]
   },
   "Route 8": {
-    "locations": [],
+    "locations": [
+      {
+        "name": "Gift from Parasol Lady",
+        "default": "Heat Rock",
+        "tags": ["GIFT"],
+        "script_info": [[690, 202, 285, 1],[690, 271, 284, 1],[690, 340, 283, 1],[690, 390, 282, 1]]
+      }
+    ],
     "connections": [
       "Icirrus City",
       "Moor of Icirrus",
@@ -394,7 +803,14 @@
     ]
   },
   "Route 9": {
-    "locations": [],
+    "locations": [
+      {
+        "name": "Gift from Lady",
+        "default": "Energy Root",
+        "tags": ["GIFT"],
+        "script_info": [[700, 1432, 35, 1],[700, 1567, 34, 1]]
+      }
+    ],
     "connections": [
       "Tubeline Bridge",
       "Opelucid City"
@@ -405,7 +821,32 @@
       {
         "name": "Legend Badge from Drayden",
         "default": "Legend Badge",
-        "tags": ["BADGE"]
+        "tags": ["BADGE"],
+        "script_info": [242, 1611, 126, 1]
+      },
+      {
+        "name": "TM82 from Drayden",
+        "default": "TM82",
+        "tags": ["GIFT"],
+        "script_info": [242, 1728, 409, 1]
+      },
+      {
+        "name": "Gift from Clyde",
+        "default": "Fresh Water",
+        "tags": ["GIFT"],
+        "script_info": [242, 2081, 30, 1]
+      },
+      {
+        "name": "Gift from Linebacker in Drayden's House",
+        "default": "Float Stone",
+        "tags": ["GIFT"],
+        "script_info": [248, 48, 539, 1]
+      },
+      {
+        "name": "Gift from Girl in Drayden's House",
+        "default": "Ring Target",
+        "tags": ["GIFT"],
+        "script_info": [248, 257, 543, 1]
       }
     ],
     "connections": [
@@ -426,6 +867,18 @@
         "name": "VISIT_VILLAGE_BRIDGE",
         "default": "VISITED_VILLAGE_BRIDGE",
         "tags": ["EVENT"]
+      },
+      {
+        "name": "Gift from Baker",
+        "default": "Lum Berry",
+        "tags": ["GIFT"],
+        "script_info": [[514, 379, 157, 3], [514, 577, 157, 3]]
+      },
+      {
+        "name": "Gift from Fisherman",
+        "default": "Dive Ball",
+        "tags": ["GIFT"],
+        "script_info": [516, 617, 7, 5]
       }
     ],
     "connections": [
@@ -441,14 +894,40 @@
     ]
   },
   "Lacunosa Town": {
-    "locations": [],
+    "locations": [
+      {
+        "name": "Gift from Executive",
+        "default": "Bluk Berry",
+        "tags": ["GIFT"],
+        "script_info": [[822, 177, 151, 1],[822, 234, 165, 1],[822, 272, 154, 1]]
+      }
+    ],
     "connections": [
       "Route 12",
       "Route 13"
     ]
   },
   "Route 13": {
-    "locations": [],
+    "locations": [
+      {
+        "name": "Gift from Ace Trainer",
+        "default": "White Flute",
+        "tags": ["GIFT"],
+        "script_info": [[740, 688, 65, 1],[740, 745, 66, 1],[740, 802, 67, 1],[740, 859, 68, 1],[740, 916, 69, 1]]
+      },
+      {
+        "name": "Gift from Girl",
+        "default": "Power Lens",
+        "tags": ["GIFT","BLACK"],
+        "script_info": [742, 154, 291, 1]
+      },
+      {
+        "name": "Gift from Girl",
+        "default": "Power Band",
+        "tags": ["GIFT","WHITE"],
+        "script_info": [742, 204, 292, 1]
+      }
+    ],
     "connections": [
       "Lacunosa Town",
       "Giant Chasm",
@@ -460,7 +939,20 @@
       {
         "name": "HM06 from Hugh",
         "default": "HM06 Dive",
-        "tags": ["HM"]
+        "tags": ["HM"],
+        "script_info": [824, 1695, 425, 1]
+      },
+      {
+        "name": "Gift from Zinzolin",
+        "default": "Big Pearl",
+        "tags": ["GIFT"],
+        "script_info": [824, 3327, 89, 1]
+      },
+      {
+        "name": "Gift from Man in Pokemon Center",
+        "default": "Prism Scale",
+        "tags": ["GIFT"],
+        "script_info": [826, 124, 537, 1]
       }
     ],
     "connections": [
@@ -472,7 +964,14 @@
     ]
   },
   "Reversal Mountain": {
-    "locations": [],
+    "locations": [
+      {
+        "name": "Gift from Scientist",
+        "default": "TM54",
+        "tags": ["GIFT"],
+        "script_info": [[1066, 1169, 381, 1],[1078, 1169, 381, 1]]
+      }
+    ],
     "connections": [
       "Undella Town",
       "Lentimas Town",
@@ -484,7 +983,8 @@
       {
         "name": "Lunar Wing",
         "default": "Lunar Wing",
-        "tags": ["KEY"]
+        "tags": ["KEY"],
+        "script_info": [1026, 40, 453, 1]
       }
     ],
     "connections": [
@@ -511,7 +1011,8 @@
       {
         "name": "Reveal Glass from Old Man",
         "default": "Reveal Glass",
-        "tags": ["KEY"]
+        "tags": ["KEY"],
+        "script_info": [752, 408, 638, 1]
       }
     ],
     "connections": [
@@ -519,7 +1020,28 @@
     ]
   },
   "Black City/White Forest": {
-    "locations": [],
+    "locations": [
+      {
+        "name": "Merchant 1",
+        "default": "DeepSeaTooth",
+        "tags": ["GIFT", "POSTGAME"]
+      },
+      {
+        "name": "Merchant 2",
+        "default": "DeepSeaScale",
+        "tags": ["GIFT", "POSTGAME"]
+      },
+      {
+        "name": "Merchant 3",
+        "default": "Dragon Scale",
+        "tags": ["GIFT", "POSTGAME"]
+      },
+      {
+        "name": "Merchant 4",
+        "default": "King's Rock",
+        "tags": ["GIFT", "POSTGAME"]
+      }
+    ],
     "connections": [
       "Route 14",
       "Route 15"
@@ -538,6 +1060,12 @@
         "name": "VISIT_MARVELOUS_BRIDGE",
         "default": "VISITED_MARVELOUS_BRIDGE",
         "tags": ["EVENT"]
+      },
+      {
+        "name": "Gift from Roughneck",
+        "default": "Fresh Water",
+        "tags": ["GIFT"],
+        "script_info": [768, 226, 30, 1]
       }
     ],
     "connections": [
@@ -554,7 +1082,14 @@
     ]
   },
   "Lostlorn Forest": {
-    "locations": [],
+    "locations": [
+      {
+        "name": "TM95 from Backpacker",
+        "default": "TM95",
+        "tags": ["GIFT"],
+        "script_info": [770, 111, 620, 1]
+      }
+    ],
     "connections": [
       "Route 16"
     ]
@@ -565,6 +1100,12 @@
         "name": "VISIT_MARINE_TUBE",
         "default": "VISITED_MARINE_TUBE",
         "tags": ["EVENT"]
+      },
+      {
+        "name": "Gift from Ace Trainer",
+        "default": "Black Sludge",
+        "tags": ["GIFT"],
+        "script_info": [928, 722, 281, 1]
       }
     ],
     "connections": [
@@ -581,7 +1122,14 @@
     ]
   },
   "Abyssal Ruins": {
-    "locations": [],
+    "locations": [
+      {
+        "name": "4F - Relic Crown",
+        "default": "Relic Crown",
+        "tags": ["OVERWORLD"],
+        "script_info": [496, 750, 590, 1]
+      }
+    ],
     "connections": [
       "Undella Bay"
     ]
@@ -606,7 +1154,8 @@
       {
         "name": "Plasma Card",
         "default": "Plasma Card",
-        "tags": ["KEY"]
+        "tags": ["KEY"],
+        "script_info": [1288, 2823, 633, 1]
       }
     ],
     "connections": [
@@ -618,7 +1167,38 @@
       {
         "name": "Wave Badge from Marlon",
         "default": "Wave Badge",
-        "tags": ["BADGE"]
+        "tags": ["BADGE"],
+        "script_info": [946, 510, 127, 1]
+      },
+      {
+        "name": "TM55 from Marlon",
+        "default": "TM55",
+        "tags": ["GIFT"],
+        "script_info": [946, 614, 382, 1]
+      },
+      {
+        "name": "Gift from Clyde",
+        "default": "Fresh Water",
+        "tags": ["GIFT"],
+        "script_info": [946, 1037, 30, 1]
+      },
+      {
+        "name": "Gift from Couple",
+        "default": "Revive",
+        "tags": ["GIFT", "POSTGAME"],
+        "script_info": [936, 370, 28, 1]
+      },
+      {
+        "name": "Gift from Nurse",
+        "default": "Heart Scale",
+        "tags": ["GIFT"],
+        "script_info": [938, 299, 93, 5]
+      },
+      {
+        "name": "Walk the Mienfoo",
+        "default": "Pearl",
+        "tags": ["GIFT"],
+        "script_info": [940, 712, 88, 1]
       }
     ],
     "connections": [
@@ -631,7 +1211,8 @@
       {
         "name": "Colress MCHN from Colress",
         "default": "Colress MCHN",
-        "tags": ["KEY"]
+        "tags": ["KEY"],
+        "script_info": [948, 715, 635, 1]
       }
     ],
     "connections": [
@@ -642,9 +1223,16 @@
   "Giant Chasm": {
     "locations": [
       {
+        "name": "Gift from Rood",
+        "default": "Max Revive",
+        "tags": ["GIFT"],
+        "script_info": [466, 834, 29, 3]
+      },
+      {
         "name": "DNA Splicers",
         "default": "DNA Splicers",
-        "tags": ["KEY"]
+        "tags": ["KEY"],
+        "script_info": [1208, 3855, 628, 1]
       }
     ],
     "connections": [
@@ -657,24 +1245,33 @@
     "locations": [],
     "connections": [
       "Giant Chasm",
+      "Victory Road Entrance"
+    ]
+  },
+  "Victory Road Entrance": {
+    "locations": [
+      {
+        "name": "HM05 From N",
+        "default": "HM05 Waterfall",
+        "tags": ["HM"],
+        "script_info": [1146, 1420, 424, 1]
+      }
+    ],
+    "connections": [
       "Victory Road"
     ]
   },
   "Victory Road": {
     "locations": [
       {
-        "name": "HM05 From N",
-        "default": "HM05 Waterfall",
-        "tags": ["HM"]
-      },
-      {
         "name": "Gift from Hugh",
         "default": "TM24",
-        "tags": ["GIFT"]
+        "tags": ["GIFT"],
+        "script_info": [456, 278, 351, 1]
       }
     ],
     "connections": [
-      "Route 23",
+      "Victory Road Entrance",
       "Pokemon League",
       "N's Castle"
     ]
@@ -684,12 +1281,14 @@
       {
         "name": "Dark Stone from N",
         "default": "Dark Stone",
-        "tags": ["KEY", "BLACK"]
+        "tags": ["KEY", "BLACK"],
+        "script_info": [556, 1985, 617, 1]
       },
       {
         "name": "Light Stone from N",
         "default": "Light Stone",
-        "tags": ["KEY", "WHITE"]
+        "tags": ["KEY", "WHITE"],
+        "script_info": [556, 2023, 616, 1]
       },
       {
         "name": "South of N's Room",
@@ -729,6 +1328,18 @@
         "name": "VISIT_SKYARROW_BRIDGE",
         "default": "VISITED_SKYARROW_BRIDGE",
         "tags": ["EVENT"]
+      },
+      {
+        "name": "Gift from Bridge Fanatic",
+        "default": "Moomoo Milk",
+        "tags": ["GIFT"],
+        "script_info": [498, 984, 33, 12]
+      },
+      {
+        "name": "Gift from Clerk",
+        "default": "Quick Claw",
+        "tags": ["GIFT"],
+        "script_info": [504, 367, 217, 1]
       }
     ],
     "connections": [
@@ -737,7 +1348,26 @@
     ]
   },
   "Pinwheel Forest": {
-    "locations": [],
+    "locations": [
+      {
+        "name": "Smash the Challenge Rock",
+        "default": "Stardust",
+        "tags": ["GIFT"],
+        "script_info": [308, 314, 90, 1]
+      },
+      {
+        "name": "Gift from Cheren",
+        "default": "Up-Grade",
+        "tags": ["GIFT"],
+        "script_info": [310, 401, 252, 1]
+      },
+      {
+        "name": "Gift from Scientist",
+        "default": "Nest Ball",
+        "tags": ["GIFT"],
+        "script_info": [310, 1616, 8, 5]
+      }
+    ],
     "connections": [
       "Skyarrow Bridge",
       "Nacrene City"
@@ -748,7 +1378,26 @@
       {
         "name": "Grubby Hanky from Maid",
         "default": "Grubby Hanky",
-        "tags": ["KEY"]
+        "tags": ["KEY"],
+        "script_info": [52, 645, 634, 1]
+      },
+      {
+        "name": "Gift A from Lenora",
+        "default": "Cover Fossil",
+        "tags": ["GIFT"],
+        "script_info": [34, 1231, 572, 1]
+      },
+      {
+        "name": "Gift B from Lenora",
+        "default": "Plume Fossil",
+        "tags": ["GIFT"],
+        "script_info": [34, 1365, 573, 1]
+      },
+      {
+        "name": "Gift for Grubby Hanky",
+        "default": "Fluffy Tail",
+        "tags": ["GIFT"],
+        "script_info": [52, 779, 64, 1]
       }
     ],
     "connections": [
@@ -757,7 +1406,14 @@
     ]
   },
   "Route 3": {
-    "locations": [],
+    "locations": [
+      {
+        "name": "Gift from School Kid",
+        "default": "Dive Ball",
+        "tags": ["GIFT"],
+        "script_info": [642, 685, 7, 5]
+      }
+    ],
     "connections": [
       "Nacrene City",
       "Striaton City",
@@ -775,7 +1431,20 @@
       {
         "name": "Gracidea from Girl in Pokemon Center",
         "default": "Gracidea",
-        "tags": ["KEY"]
+        "tags": ["KEY"],
+        "script_info": [16, 290, 466, 1]
+      },
+      {
+        "name": "Reward from Monkey Game",
+        "default": "Big Mushroom",
+        "tags": ["GIFT"],
+        "script_info": [14, 6584, 87, 1]
+      },
+      {
+        "name": "Gift from Boy in Trainer's School",
+        "default": "Persim Berry",
+        "tags": ["GIFT"],
+        "script_info": [30, 2054, 156, 3]
       }
     ],
     "connections": [
@@ -785,20 +1454,71 @@
     ]
   },
   "Dreamyard": {
-    "locations": [],
+    "locations": [
+      {
+        "name": "Eon Pokemon - Dropped Item",
+        "default": "Soul Dew",
+        "tags": ["OVERWORLD"],
+        "script_info": [304, 1733, 225, 1]
+      }
+    ],
     "connections": [
       "Striaton City"
     ]
   },
   "Route 2": {
-    "locations": [],
+    "locations": [
+      {
+        "name": "Gift from Lady",
+        "default": "Dawn Stone",
+        "tags": ["GIFT"],
+        "script_info": [638, 521, 109, 1]
+      }
+    ],
     "connections": [
       "Striaton City",
       "Accumula Town"
     ]
   },
   "Accumula Town": {
-    "locations": [],
+    "locations": [
+      {
+        "name": "Gift from Youngster",
+        "default": "Poke Doll",
+        "tags": ["GIFT"],
+        "script_info": [794, 1510, 63, 1]
+      },
+      {
+        "name": "Gift from Lass",
+        "default": "Fluffy Tail",
+        "tags": ["GIFT"],
+        "script_info": [794, 2265, 64, 1]
+      },
+      {
+        "name": "Snivy Quiz",
+        "default": "Grass Gem",
+        "tags": ["GIFT"],
+        "script_info": [808, 326, 551, 1]
+      },
+      {
+        "name": "Tepig Quiz",
+        "default": "Fire Gem",
+        "tags": ["GIFT"],
+        "script_info": [808, 498, 548, 1]
+      },
+      {
+        "name": "Oshawott Quiz",
+        "default": "Water Gem",
+        "tags": ["GIFT"],
+        "script_info": [808, 730, 549, 1]
+      },
+      {
+        "name": "Gift from Pianist",
+        "default": "Metronome",
+        "tags": ["GIFT"],
+        "script_info": [810, 1084, 277, 1]
+      }
+    ],
     "connections": [
       "Route 2",
       "Route 1"
@@ -817,12 +1537,14 @@
       {
         "name": "Super Rod from Cedric Juniper",
         "default": "Super Rod",
-        "tags": ["KEY"]
+        "tags": ["KEY"],
+        "script_info": [792, 518, 447, 1]
       },
       {
         "name": "Permit from Professor Juniper",
         "default": "Permit",
-        "tags": ["KEY"]
+        "tags": ["KEY"],
+        "script_info": [792, 315, 630, 1]
       }
     ],
     "connections": [
@@ -842,7 +1564,8 @@
       {
         "name": "Magma Stone",
         "default": "Magma Stone",
-        "tags": ["KEY"]
+        "tags": ["KEY"],
+        "script_info": [774, 425, 458, 1]
       }
     ],
     "connections": [
@@ -857,7 +1580,14 @@
     ]
   },
   "Plasma Frigate (Route 17)": {
-    "locations": [],
+    "locations": [
+      {
+        "name": "Gift from Colress",
+        "default": "Master Ball",
+        "tags": ["GIFT"],
+        "script_info": [1110, 982, 1, 1]
+      }
+    ],
     "connections": [
       "P2 Laboratory"
     ]

@@ -48,6 +48,12 @@ define_location_data()
 
 def create_regions(world: "PokemonBW2World"):
     tags = {"BADGE", "HM", "KEY", "EVENT"}  # need to always consider the logical placement of these, even if vanilla
+    if world.options.version == 0:
+        tags.add("BLACK")
+    else:
+        tags.add("WHITE")
+    if world.options.gift_items:
+        tags.add("GIFT")
     regions = [Region(region, world.player, world.multiworld) for region in region_data]
     menu = Region("Menu", world.player, world.multiworld)
     sky = Region("Unovan Skies", world.player, world.multiworld)

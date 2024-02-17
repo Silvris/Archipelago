@@ -90,7 +90,7 @@ class PokemonBW2World(World):
         return PokemonBW2Item(name, item.classification, item.code, self.player)
 
     def get_filler_item_name(self) -> str:
-        return self.random.choice(filler_items)
+        return self.random.choice(list(filler_items.keys()))
 
     create_items = generate_itempool
 

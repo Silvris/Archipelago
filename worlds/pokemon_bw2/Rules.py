@@ -53,8 +53,10 @@ def set_rules(world: "PokemonBW2World"):
              lambda state: state.has_all(["HM03 Surf", "HM04 Strength"], world.player))
 
     # Elite 4 condition
+    set_rule(world.multiworld.get_entrance("Victory Road Entrance -> Victory Road", world.player),
+             lambda state: state.count_group("Badges", world.player) >= 8)
+
     set_rule(world.multiworld.get_entrance("Victory Road -> Pokemon League", world.player),
-             lambda state: state.count_group("Badges", world.player) >= 8
-                           and state.has_all(["HM03 Surf", "HM04 Strength"], world.player))
+             lambda state: state.has_all(["HM03 Surf", "HM04 Strength"], world.player))
 
     world.multiworld.completion_condition[world.player] = lambda state: state.has("Victory", world.player)

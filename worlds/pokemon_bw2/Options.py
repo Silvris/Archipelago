@@ -6,7 +6,7 @@ class GameVersion(Choice):
     display_name = "Game Version"
     option_black_2 = 0
     option_white_2 = 1
-    default = 0
+    default = 1
 
 
 class Goal(Choice):
