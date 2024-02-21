@@ -67,7 +67,7 @@ def get_base_rom_bytes() -> bytes:
 def get_base_rom_path(file_name: str = "") -> str:
     options: settings.Settings = settings.get_settings()
     if not file_name:
-        file_name = options["kdl3_options"]["rom_file"]
+        file_name = options["pokemon_bw2_options"]["white_2_rom_file"]
     if not os.path.exists(file_name):
         file_name = Utils.user_path(file_name)
     return file_name
