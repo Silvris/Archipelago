@@ -113,6 +113,7 @@ filler_item_table = {
     "Random Armor": ItemData(24700080, False),
     "Decoration Gift": ItemData(24700081, False),
     "Item Gift": ItemData(24700082, False),
+    "Zenny Bag": ItemData(24700083, False),
 }
 
 filler_weights = {
@@ -120,6 +121,7 @@ filler_weights = {
     "Random Armor": 4,
     "Decoration Gift": 2,
     "Item Gift": 2,
+    "Zenny Bag": 4
 }
 
 item_table = {
@@ -131,7 +133,7 @@ item_table = {
 
 item_name_groups = {
     "Weapons": {name for name in weapon_item_table},
-
+    "Armor": {name for name in armor_item_table}
 }
 
 item_name_to_id = {name: item_table[name].code for name in item_table}

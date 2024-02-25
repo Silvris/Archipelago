@@ -86,11 +86,11 @@ class MHFUWorld(World):
         if self.options.guild_depth:
             max_guild = (0, self.options.guild_depth.value, hub_rank_max[0, self.options.guild_depth.value])
         else:
-            max_guild = None
+            max_guild = (-1, -1, -1)
         if self.options.village_depth:
             max_village = (1, self.options.village_depth.value, hub_rank_max[1, self.options.village_depth.value])
         else:
-            max_village = None
+            max_village = (-1, -1, -1)
         if max_guild[1] == 3:
             max_rarity = 10
         elif max_guild[1] == 2 or max_village[1] == 1:
@@ -152,7 +152,10 @@ class MHFUWorld(World):
         options = self.options.as_dict(
             "death_link",
             "goal",
-            "weapons"
+            "weapons",
+            "quest_randomization",
+            "quest_difficulty_multiplier",
+            "cash_only_equipment"
         )
         options["required_keys"] = self.required_keys
         rank_requirements = {}

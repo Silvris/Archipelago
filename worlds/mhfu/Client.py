@@ -13,10 +13,11 @@ import base64
 import json
 import struct
 
-from NetUtils import NetworkItem
-from .Quests import quest_data, base_id
+from NetUtils import NetworkItem, ClientStatus
+from .Quests import quest_data, base_id, goal_quests
 from .Items import item_name_to_id, item_id_to_name, item_name_groups
-from .data.Equipment import blademaster, gunner
+from .data.Equipment import blademaster, gunner, blademaster_upgrades, gunner_upgrades,\
+    helms, chests, arms, waists, legs
 
 ppsspp_logger = logging.getLogger("PPSSPP")
 PPSSPP_REPORTING = "https://report.ppsspp.org/match/list"
@@ -55,6 +56,8 @@ MHFU_POINTERS = {
         "SHOP_SNS_DUAL": 0x08948158,
         "SHOP_HAMMER_HORN": 0x08948EA6,
         "SHOP_GUNNER": 0x08949C0E,
+        "BLADEMASTER_UPGRADES": 0x0894CEC0,
+        "GUNNER_UPGRADES": 0x08954C88,
         "CURRENT_OVL": 0x09A5A5A0,
         "RESET_ACTION": 0x090AF355,  # byte
         "SET_ACTION": 0x090AF418,  # half
@@ -67,7 +70,7 @@ MHFU_BREAKPOINTS = {
     # logFormat: address, size, enabled, log, read, write, change
     # enabled being "do we want to pause emulation here"
     # disabled effectively acting as an event system
-    "QUEST_LOAD": (0x08A57510, 1, True, True, False, True, False),
+    "QUEST_LOAD": (0x08A57510, 1, True, True, True, False, False),
     "QUEST_COMPLETE": (0x09999DC8, 63, False, True, False, True, True),
 }
 
@@ -92,14 +95,14 @@ KEY_OFFSETS = {
     (0, 3, 1): 84,
     (0, 3, 2): 96,
     (1, 0, 0): 0,
-    (1, 0, 1): 10,
-    (1, 0, 2): 22,
+    (1, 0, 1): 8,
+    (1, 0, 2): 20,
     (1, 0, 3): 34,
     (1, 0, 4): 46,
-    (1, 0, 5): 58,
-    (1, 1, 0): 70,
-    (1, 1, 1): 82,
-    (1, 1, 2): 94
+    (1, 0, 5): 56,
+    (1, 1, 0): 64,
+    (1, 1, 1): 78,
+    (1, 1, 2): 90
 }
 
 WEAPON_GROUPS = {
@@ -131,6 +134,13 @@ async def handle_logs(ctx: MHFUContext, logs: typing.List):
                     # pull the mons
                     mons[mon] = await ctx.ppsspp_read_bytes(large_mon_info_ptr["value"] + quest_base + (idx * 60), 60)
                 print(mons)
+                # apply difficulty modifier
+                info_out = bytearray()
+                for mon in mons:
+                    mon_data = bytearray(base64.b64decode(mons[mon]["base64"]))
+                    mon_data[5] = min(16, max(1, int(ctx.quest_multiplier * mon_data[5])))
+                    info_out.extend(mon_data)
+                await ctx.ppsspp_write_bytes(large_mon_info_ptr["value"] + quest_base, info_out)
             elif breakpoint == "QUEST_COMPLETE":
                 new_checks = []
                 completion_bytes = await ctx.ppsspp_read_bytes(MHFU_POINTERS[ctx.lang]["QUEST_COMPLETE"], 63)
@@ -142,6 +152,9 @@ async def handle_logs(ctx: MHFUContext, logs: typing.List):
                         if quest_completion[flag] & (1 << mask):
                             if base_id + id not in ctx.checked_locations:
                                 new_checks.append(id + base_id)
+                            if id == ctx.goal_quest and not ctx.finished_game:
+                                await ctx.send_msgs([{"cmd": "StatusUpdate", "status": ClientStatus.CLIENT_GOAL}])
+                                ctx.finished_game = True
                         elif base_id + id in ctx.checked_locations:
                             quest_completion[flag] |= (1 << mask)
                 await ctx.ppsspp_write_bytes(MHFU_POINTERS[ctx.lang]["QUEST_COMPLETE"], bytes(quest_completion))
@@ -153,6 +166,7 @@ async def handle_logs(ctx: MHFUContext, logs: typing.List):
                         ppsspp_logger.info(
                             f'New Check: {location} ({len(ctx.locations_checked)}/{len(ctx.missing_locations) + len(ctx.checked_locations)})')
                         await ctx.send_msgs([{"cmd": 'LocationChecks', "locations": [new_check_id]}])
+
             if MHFU_BREAKPOINTS[breakpoint][2]:
                 # this break point stops emulation, we need to restart it
                 await send_and_receive(ctx, json.dumps({"event": "cpu.resume"}), "cpu.resume")
@@ -195,6 +209,7 @@ async def connect_psp(ctx: MHFUContext, target: typing.Optional[int] = None):
         ctx.debugger = None
     with urlopen(Request(PPSSPP_REPORTING, headers={"User-Agent": "Archipelago"})) as http:
         psps = json.loads(http.read())
+    psps = [psp for psp in psps if ":" not in psp["ip"]]
     if len(psps) > 1:
         if not target:
             ppsspp_logger.error("Multiple PPSSPP instances found. Please specify the PPSSPP instance to connect to:\n"
@@ -252,6 +267,7 @@ class MHFUContext(CommonContext):
     recv_index = -1
     death_link = False
     goal: int = 0
+    goal_quest: int = 3233  # This is Ukanlos, pick the furthest out to potentially avoid collision
     unlocked_keys: int = 0
     required_keys: int = 0
     refresh: bool = False
@@ -269,6 +285,10 @@ class MHFUContext(CommonContext):
         9: set(),  # Gunlance
         10: set(),  # Bow
     }
+    armor_status: typing.Set[int] = set()
+    quest_randomization: bool = False
+    quest_multiplier: float = 1.0
+    cash_only: bool = False
 
     async def ppsspp_read_bytes(self, offset, length):
         result = await send_and_receive(self, json.dumps({
@@ -327,7 +347,7 @@ class MHFUContext(CommonContext):
                 address = MHFU_POINTERS[self.lang]["GH_KEYS" if hub == 0 else "VL_KEYS"]
                 address += KEY_OFFSETS[hub, rank, star]
                 data = bytearray()
-                if self.unlocked_keys > self.rank_requirements[hub, rank, star]:
+                if self.unlocked_keys >= self.rank_requirements[hub, rank, star]:
                     data.extend([0] * 10)
                 else:
                     if target > self.rank_requirements[hub, rank, star]:
@@ -340,30 +360,71 @@ class MHFUContext(CommonContext):
             self.ui.update_keys(self.unlocked_keys, target)
 
     async def set_equipment_status(self):
-        for equip_group, length in zip([
-            # "SHOP_HEAD", "SHOP_CHEST", "SHOP_ARM", "SHOP_WAIST","SHOP_LEG",
+        for equip_group, length, remap, equipment_type in zip([
+            "SHOP_HEAD", "SHOP_CHEST", "SHOP_ARM", "SHOP_WAIST", "SHOP_LEG",
             "SHOP_GREAT_LONG", "SHOP_LANCE_GUN", "SHOP_SNS_DUAL", "SHOP_HAMMER_HORN", "SHOP_GUNNER"],
-            [  # 11362, 11310, 11076, 11024, 11284,
-                3406, 3042, 3406, 3224, 7878]):
-            data = bytearray(base64.b64decode((await self.ppsspp_read_bytes(MHFU_POINTERS[self.lang][equip_group], length))["base64"]))
-            if equip_group == "SHOP_GUNNER":
-                remap = gunner
-                equipment_type = 6
-            elif equip_group in ("SHOP_GREAT_LONG", "SHOP_LANCE_GUN", "SHOP_SNS_DUAL", "SHOP_HAMMER_HORN",):
-                remap = blademaster
-                equipment_type = 5
-            else:
-                remap = []
-                equipment_type = 0  # todo: armor
+            [11362, 11310, 11076, 11024, 11284,
+                3406, 3042, 3406, 3224, 7878],
+            [
+                helms, chests, arms, waists, legs, blademaster, blademaster, blademaster, blademaster, gunner],
+            [
+                1, 2, 3, 4, 0, 5, 5, 5, 5, 6]
+        ):
+            create_data = bytearray(base64.b64decode(
+                (await self.ppsspp_read_bytes(MHFU_POINTERS[self.lang][equip_group], length))["base64"]))
             for i in range(length // 0x1A):
-                equip_type, _, equip_id = struct.unpack("BBH", data[0x1A*i: (0x1A*i) + 4])
-                weapon_type, equip_rarity = remap[equip_id]
-                if equip_rarity + 1 not in self.weapon_status[weapon_type]:
-                    data[0x1A*i] = 0x10  # somehow this doesn't crash the game
+                equip_type, _, equip_id = struct.unpack("BBH", create_data[0x1A*i: (0x1A*i) + 4])
+                if equipment_type in (5, 6):
+                    weapon_type, equip_rarity = remap[equip_id]
+                    if equip_rarity + 1 not in self.weapon_status[weapon_type]:
+                        create_data[0x1A*i] = 0x10  # somehow this doesn't crash the game
+                    else:
+                        create_data[0x1A*i] = equipment_type
                 else:
-                    data[0x1A*i] = equipment_type
-                data[(0x1A*i) + 1] = 0x1  # this unhides every weapon/armor, so it should be visible when unlocked
-            await self.ppsspp_write_bytes(MHFU_POINTERS[self.lang][equip_group], bytes(data))
+                    equip_rarity = remap[equip_id]
+                    if equip_rarity + 1 not in self.armor_status:
+                        create_data[0x1A*i] = 0x10
+                    else:
+                        create_data[0x1A*i] = equipment_type
+                create_data[(0x1A*i) + 1] = 0x1  # this unhides every weapon/armor, so it should always be visible
+                if self.cash_only:
+                    create_data[(0x1A*i) + 4: (0x1A*i) + 20] = [0] * 16
+            await self.ppsspp_write_bytes(MHFU_POINTERS[self.lang][equip_group], bytes(create_data))
+
+        bm_upgrade_data = bytearray(base64.b64decode(
+                (await self.ppsspp_read_bytes(MHFU_POINTERS[self.lang]["BLADEMASTER_UPGRADES"], 32200))["base64"]))
+        for i in range(1, 1150):
+            if self.cash_only:
+                bm_upgrade_data[(i*0x1C): (i*0x1C) + 0x10] = [0] * 16
+            for j in range(6):
+                if blademaster_upgrades[i][j] > 0:
+                    weapon_type, equip_rarity = blademaster[blademaster_upgrades[i][j]]
+                    if equip_rarity + 1 not in self.weapon_status[weapon_type]:
+                        bm_upgrade_data[(i * 0x1C) + 0x10 + (2 * j):
+                                        (i * 0x1C) + 0x10 + (2 * j) + 2] = struct.pack("H", 0)
+                    else:
+                        bm_upgrade_data[(i * 0x1C) + 0x10 + (2 * j):
+                                        (i * 0x1C) + 0x10 + (2 * j) + 2] = struct.pack("H", blademaster_upgrades[i][j])
+        await self.ppsspp_write_bytes(MHFU_POINTERS[self.lang]["BLADEMASTER_UPGRADES"], bytes(bm_upgrade_data))
+        gn_upgrade_data = bytearray(base64.b64decode(
+            (await self.ppsspp_read_bytes(MHFU_POINTERS[self.lang]["GUNNER_UPGRADES"], 9912))["base64"]))
+        for i in range(1, 354):
+            if self.cash_only:
+                gn_upgrade_data[(i*0x1C): (i*0x1C) + 0x10] = [0] * 16
+            weapon_type, equip_rarity = gunner[i]
+            if weapon_type != 10:
+                continue  # small optimization here, only bows use the regular upgrade system in FU
+            for j in range(6):
+                if gunner_upgrades[i][j] > 0:
+                    weapon_type, equip_rarity = gunner[gunner_upgrades[i][j]]
+                    if equip_rarity + 1 not in self.weapon_status[weapon_type]:
+                        gn_upgrade_data[(i * 0x1C) + 0x10 + (2 * j):
+                                        (i * 0x1C) + 0x10 + (2 * j) + 2] = struct.pack("H", 0)
+                    else:
+                        gn_upgrade_data[(i * 0x1C) + 0x10 + (2 * j):
+                                        (i * 0x1C) + 0x10 + (2 * j) + 2] = struct.pack("H", gunner_upgrades[i][j])
+        await self.ppsspp_write_bytes(MHFU_POINTERS[self.lang]["GUNNER_UPGRADES"], bytes(gn_upgrade_data))
+        ppsspp_logger.info("Refreshed equipment status.")
 
     async def connect_init(self):
         # set of initialization we need to handle first
@@ -375,25 +436,11 @@ class MHFUContext(CommonContext):
         for item in items:
             if item.item == 24700077:
                 self.unlocked_keys += 1
-            if item_id_to_name[item.item] in item_name_groups["Weapons"]:
+            elif item_id_to_name[item.item] in item_name_groups["Weapons"]:
                 # there's like 50 of these gimme a break
                 local_id = item.item - base_id
-                if local_id >= 55:
-                    # consolidated weapons
-                    if local_id == 55:
-                        # progressive
-                        if not self.weapon_status[0]:
-                            current_max = 0
-                        else:
-                            current_max = max(self.weapon_status[0])
-                        for i in range(11):
-                            self.weapon_status[i].add(current_max + 1)
-                    else:
-                        rarity = local_id - 55
-                        for i in range(11):
-                            self.weapon_status[i].add(rarity)
-                else:
-                    weapon_group = local_id // 11
+                weapon_group = local_id // 11
+                if weapon_group < 11:
                     for weapon in WEAPON_GROUPS[weapon_group]:
                         if not local_id % 11:
                             # progressive
@@ -404,6 +451,30 @@ class MHFUContext(CommonContext):
                             self.weapon_status[weapon].add(current_max + 1)
                         else:
                             self.weapon_status[weapon].add(local_id % 11)
+                else:
+                    if not local_id % 11:
+                        # progressive
+                        if not self.weapon_status[0]:
+                            current_max = 0
+                        else:
+                            current_max = max(self.weapon_status[0])
+                        for i in range(11):
+                            self.weapon_status[i].add(current_max + 1)
+                    else:
+                        rarity = local_id % 11
+                        for i in range(11):
+                            self.weapon_status[i].add(rarity)
+            elif item_id_to_name[item.item] in item_name_groups["Armor"]:
+                local_id = item.item - base_id - 66
+                if local_id == 0:
+                    # progressive
+                    if not self.armor_status:
+                        current_max = 0
+                    else:
+                        current_max = max(self.armor_status)
+                    self.armor_status.add(current_max + 1)
+                else:
+                    self.armor_status.add(local_id)
         self.refresh = True
         self.recv_index = len(items)
 
@@ -440,6 +511,10 @@ class MHFUContext(CommonContext):
             # pick up our slot data
             self.death_link = args["slot_data"]["death_link"]
             self.goal = args["slot_data"]["goal"]
+            self.goal_quest = int(goal_quests[self.goal][1:])
+            self.quest_multiplier = float(args["slot_data"]["quest_difficulty_multiplier"] / 100)
+            self.quest_randomization = args["slot_data"]["quest_randomization"]
+            self.cash_only = args["slot_data"]["cash_only_equipment"]
             self.required_keys = args["slot_data"]["required_keys"]
             for group, value in args["slot_data"]["rank_requirements"].items():
                 hub, rank, star = group.split(",")

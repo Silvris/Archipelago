@@ -1,4 +1,4 @@
-from Options import DeathLink, Choice, Toggle, DefaultOnToggle, PerGameCommonOptions, Range
+from Options import DeathLink, Choice, Toggle, DefaultOnToggle, PerGameCommonOptions, Range, NamedRange
 from dataclasses import dataclass
 
 
@@ -125,6 +125,34 @@ class ProgressiveArmor(Toggle):
     """
     When enabled, armor will be received progressively starting from rarity 1 to rarity 10.
     """
+    display_name = "Progressive Armor"
+
+
+class QuestRandomization(Toggle):
+    """
+    When enabled, quest targets and requirements will be randomized.
+    """
+    display_name = "Quest Randomization"
+
+
+class QuestDifficulty(NamedRange):
+    """
+    Multiplier applied to large monster stats, lower being easier and higher being harder.
+    """
+    range_start = 0
+    range_end = 500
+    default = "vanilla"
+    special_range_names = {
+        "vanilla": 100,
+        "half": 50,
+        "quarter": 25,
+        "double": 200
+    }
+
+
+class CashOnly(Toggle):
+    """When enabled, equipment no longer requires items for crafting/upgrading."""
+    display_name = "Cash-Only Equipment"
 
 
 @dataclass
@@ -141,3 +169,6 @@ class MHFUOptions(PerGameCommonOptions):
     #trap_percentage: TrapPercentage
     weapons: Weapons
     progressive_armor: ProgressiveArmor
+    quest_randomization: QuestRandomization
+    quest_difficulty_multiplier: QuestDifficulty
+    cash_only_equipment: CashOnly
