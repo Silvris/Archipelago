@@ -32,6 +32,14 @@ class MHFUSettings(settings.Group):
 class MHFUWebWorld(WebWorld):
     theme = 'stone'
     tutorials = [
+        Tutorial(
+            "Multiworld Setup Guide",
+            "A guide to setting up the Monster Hunter Freedom Unite randomizer connected to an Archipelago Multiworld.",
+            "English",
+            "setup_en.md",
+            "setup/en",
+            ["Silvris", "IncognitoMan"]
+        )
     ]
 
 
