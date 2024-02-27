@@ -7,7 +7,12 @@
         "star": "0",
         "idx": "01",
         "flag": "0",
-        "mask": "0"
+        "mask": "0",
+        "stage": 11,
+        "monsters": [
+            77
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m00002",
@@ -17,7 +22,12 @@
         "star": "0",
         "idx": "02",
         "flag": "0",
-        "mask": "1"
+        "mask": "1",
+        "stage": 21,
+        "monsters": [
+            68
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m00003",
@@ -27,7 +37,12 @@
         "star": "0",
         "idx": "03",
         "flag": "0",
-        "mask": "2"
+        "mask": "2",
+        "stage": 11,
+        "monsters": [
+            68
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m00004",
@@ -37,7 +52,12 @@
         "star": "0",
         "idx": "04",
         "flag": "0",
-        "mask": "3"
+        "mask": "3",
+        "stage": 11,
+        "monsters": [
+            68
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m00005",
@@ -47,7 +67,12 @@
         "star": "0",
         "idx": "05",
         "flag": "0",
-        "mask": "4"
+        "mask": "4",
+        "stage": 20,
+        "monsters": [
+            52
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m00006",
@@ -57,7 +82,12 @@
         "star": "0",
         "idx": "06",
         "flag": "0",
-        "mask": "5"
+        "mask": "5",
+        "stage": 6,
+        "monsters": [
+            27
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m00007",
@@ -67,7 +97,12 @@
         "star": "0",
         "idx": "07",
         "flag": "0",
-        "mask": "6"
+        "mask": "6",
+        "stage": 6,
+        "monsters": [
+            27
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m00008",
@@ -77,7 +112,12 @@
         "star": "0",
         "idx": "08",
         "flag": "0",
-        "mask": "7"
+        "mask": "7",
+        "stage": 17,
+        "monsters": [
+            8
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m00009",
@@ -87,7 +127,12 @@
         "star": "0",
         "idx": "09",
         "flag": "1",
-        "mask": "0"
+        "mask": "0",
+        "stage": 3,
+        "monsters": [
+            48
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m00010",
@@ -97,7 +142,12 @@
         "star": "0",
         "idx": "10",
         "flag": "1",
-        "mask": "1"
+        "mask": "1",
+        "stage": 3,
+        "monsters": [
+            28
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m00101",
@@ -107,7 +157,12 @@
         "star": "1",
         "idx": "01",
         "flag": "1",
-        "mask": "2"
+        "mask": "2",
+        "stage": 21,
+        "monsters": [
+            15
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m00102",
@@ -117,7 +172,12 @@
         "star": "1",
         "idx": "02",
         "flag": "1",
-        "mask": "3"
+        "mask": "3",
+        "stage": 11,
+        "monsters": [
+            51
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m00103",
@@ -127,7 +187,12 @@
         "star": "1",
         "idx": "03",
         "flag": "1",
-        "mask": "4"
+        "mask": "4",
+        "stage": 6,
+        "monsters": [
+            52
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m00104",
@@ -137,7 +202,12 @@
         "star": "1",
         "idx": "04",
         "flag": "1",
-        "mask": "5"
+        "mask": "5",
+        "stage": 3,
+        "monsters": [
+            21
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m00105",
@@ -147,7 +217,12 @@
         "star": "1",
         "idx": "05",
         "flag": "1",
-        "mask": "6"
+        "mask": "6",
+        "stage": 4,
+        "monsters": [
+            20
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m00106",
@@ -157,7 +232,12 @@
         "star": "1",
         "idx": "06",
         "flag": "1",
-        "mask": "7"
+        "mask": "7",
+        "stage": 18,
+        "monsters": [
+            67
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m00107",
@@ -167,7 +247,12 @@
         "star": "1",
         "idx": "07",
         "flag": "2",
-        "mask": "0"
+        "mask": "0",
+        "stage": 2,
+        "monsters": [
+            6
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m00108",
@@ -177,7 +262,12 @@
         "star": "1",
         "idx": "08",
         "flag": "2",
-        "mask": "1"
+        "mask": "1",
+        "stage": 2,
+        "monsters": [
+            11
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m00109",
@@ -187,7 +277,12 @@
         "star": "1",
         "idx": "09",
         "flag": "2",
-        "mask": "2"
+        "mask": "2",
+        "stage": 6,
+        "monsters": [
+            1
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m01001",
@@ -197,7 +292,10 @@
         "star": "0",
         "idx": "01",
         "flag": "2",
-        "mask": "3"
+        "mask": "3",
+        "stage": 11,
+        "monsters": [],
+        "max_mon": 0
     },
     {
         "qid": "m01002",
@@ -207,7 +305,10 @@
         "star": "0",
         "idx": "02",
         "flag": "2",
-        "mask": "4"
+        "mask": "4",
+        "stage": 6,
+        "monsters": [],
+        "max_mon": 0
     },
     {
         "qid": "m01003",
@@ -217,7 +318,10 @@
         "star": "0",
         "idx": "03",
         "flag": "2",
-        "mask": "5"
+        "mask": "5",
+        "stage": 3,
+        "monsters": [],
+        "max_mon": 0
     },
     {
         "qid": "m01004",
@@ -227,7 +331,12 @@
         "star": "0",
         "idx": "04",
         "flag": "2",
-        "mask": "6"
+        "mask": "6",
+        "stage": 21,
+        "monsters": [
+            77
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m01005",
@@ -237,7 +346,12 @@
         "star": "0",
         "idx": "05",
         "flag": "2",
-        "mask": "7"
+        "mask": "7",
+        "stage": 11,
+        "monsters": [
+            68
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m01006",
@@ -247,7 +361,12 @@
         "star": "0",
         "idx": "06",
         "flag": "3",
-        "mask": "0"
+        "mask": "0",
+        "stage": 11,
+        "monsters": [
+            77
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m01007",
@@ -257,7 +376,12 @@
         "star": "0",
         "idx": "07",
         "flag": "3",
-        "mask": "1"
+        "mask": "1",
+        "stage": 21,
+        "monsters": [
+            68
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m01008",
@@ -267,7 +391,12 @@
         "star": "0",
         "idx": "08",
         "flag": "3",
-        "mask": "2"
+        "mask": "2",
+        "stage": 20,
+        "monsters": [
+            27
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m01009",
@@ -277,7 +406,12 @@
         "star": "0",
         "idx": "09",
         "flag": "3",
-        "mask": "3"
+        "mask": "3",
+        "stage": 6,
+        "monsters": [
+            38
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m01010",
@@ -287,7 +421,12 @@
         "star": "0",
         "idx": "10",
         "flag": "3",
-        "mask": "4"
+        "mask": "4",
+        "stage": 20,
+        "monsters": [
+            27
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m01011",
@@ -297,7 +436,10 @@
         "star": "0",
         "idx": "11",
         "flag": "3",
-        "mask": "5"
+        "mask": "5",
+        "stage": 20,
+        "monsters": [],
+        "max_mon": 0
     },
     {
         "qid": "m01012",
@@ -307,7 +449,12 @@
         "star": "0",
         "idx": "12",
         "flag": "3",
-        "mask": "6"
+        "mask": "6",
+        "stage": 20,
+        "monsters": [
+            52
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m01013",
@@ -317,7 +464,12 @@
         "star": "0",
         "idx": "13",
         "flag": "3",
-        "mask": "7"
+        "mask": "7",
+        "stage": 6,
+        "monsters": [
+            48
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m01014",
@@ -327,7 +479,12 @@
         "star": "0",
         "idx": "14",
         "flag": "4",
-        "mask": "0"
+        "mask": "0",
+        "stage": 3,
+        "monsters": [
+            28
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m01015",
@@ -337,7 +494,12 @@
         "star": "0",
         "idx": "15",
         "flag": "4",
-        "mask": "1"
+        "mask": "1",
+        "stage": 17,
+        "monsters": [
+            8
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m01016",
@@ -347,7 +509,12 @@
         "star": "0",
         "idx": "16",
         "flag": "4",
-        "mask": "2"
+        "mask": "2",
+        "stage": 3,
+        "monsters": [
+            48
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m01017",
@@ -357,7 +524,12 @@
         "star": "0",
         "idx": "17",
         "flag": "4",
-        "mask": "3"
+        "mask": "3",
+        "stage": 3,
+        "monsters": [
+            28
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m01018",
@@ -367,7 +539,12 @@
         "star": "0",
         "idx": "18",
         "flag": "4",
-        "mask": "4"
+        "mask": "4",
+        "stage": 3,
+        "monsters": [
+            28
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m01019",
@@ -377,7 +554,12 @@
         "star": "0",
         "idx": "19",
         "flag": "4",
-        "mask": "5"
+        "mask": "5",
+        "stage": 3,
+        "monsters": [
+            28
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m01020",
@@ -387,7 +569,12 @@
         "star": "0",
         "idx": "20",
         "flag": "4",
-        "mask": "6"
+        "mask": "6",
+        "stage": 4,
+        "monsters": [
+            6
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m01021",
@@ -397,7 +584,12 @@
         "star": "0",
         "idx": "21",
         "flag": "4",
-        "mask": "7"
+        "mask": "7",
+        "stage": 4,
+        "monsters": [
+            68
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m01022",
@@ -407,7 +599,12 @@
         "star": "0",
         "idx": "22",
         "flag": "5",
-        "mask": "0"
+        "mask": "0",
+        "stage": 18,
+        "monsters": [
+            52
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m01101",
@@ -417,7 +614,10 @@
         "star": "1",
         "idx": "01",
         "flag": "5",
-        "mask": "1"
+        "mask": "1",
+        "stage": 4,
+        "monsters": [],
+        "max_mon": 0
     },
     {
         "qid": "m01102",
@@ -427,7 +627,10 @@
         "star": "1",
         "idx": "02",
         "flag": "5",
-        "mask": "2"
+        "mask": "2",
+        "stage": 2,
+        "monsters": [],
+        "max_mon": 0
     },
     {
         "qid": "m01103",
@@ -437,7 +640,10 @@
         "star": "1",
         "idx": "03",
         "flag": "5",
-        "mask": "3"
+        "mask": "3",
+        "stage": 5,
+        "monsters": [],
+        "max_mon": 0
     },
     {
         "qid": "m01104",
@@ -447,7 +653,12 @@
         "star": "1",
         "idx": "04",
         "flag": "5",
-        "mask": "4"
+        "mask": "4",
+        "stage": 21,
+        "monsters": [
+            51
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m01105",
@@ -457,7 +668,12 @@
         "star": "1",
         "idx": "05",
         "flag": "5",
-        "mask": "5"
+        "mask": "5",
+        "stage": 18,
+        "monsters": [
+            15
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m01106",
@@ -467,7 +683,12 @@
         "star": "1",
         "idx": "06",
         "flag": "5",
-        "mask": "6"
+        "mask": "6",
+        "stage": 11,
+        "monsters": [
+            45
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m01107",
@@ -477,7 +698,12 @@
         "star": "1",
         "idx": "07",
         "flag": "5",
-        "mask": "7"
+        "mask": "7",
+        "stage": 11,
+        "monsters": [
+            51
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m01108",
@@ -487,7 +713,12 @@
         "star": "1",
         "idx": "08",
         "flag": "6",
-        "mask": "0"
+        "mask": "0",
+        "stage": 21,
+        "monsters": [
+            77
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m01109",
@@ -497,7 +728,12 @@
         "star": "1",
         "idx": "09",
         "flag": "6",
-        "mask": "1"
+        "mask": "1",
+        "stage": 20,
+        "monsters": [
+            21
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m01110",
@@ -507,7 +743,12 @@
         "star": "1",
         "idx": "10",
         "flag": "6",
-        "mask": "2"
+        "mask": "2",
+        "stage": 6,
+        "monsters": [
+            52
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m01111",
@@ -517,7 +758,12 @@
         "star": "1",
         "idx": "11",
         "flag": "6",
-        "mask": "3"
+        "mask": "3",
+        "stage": 20,
+        "monsters": [
+            48
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m01112",
@@ -527,7 +773,12 @@
         "star": "1",
         "idx": "12",
         "flag": "6",
-        "mask": "4"
+        "mask": "4",
+        "stage": 3,
+        "monsters": [
+            46
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m01113",
@@ -537,7 +788,12 @@
         "star": "1",
         "idx": "13",
         "flag": "6",
-        "mask": "5"
+        "mask": "5",
+        "stage": 17,
+        "monsters": [
+            48
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m01114",
@@ -547,7 +803,12 @@
         "star": "1",
         "idx": "14",
         "flag": "6",
-        "mask": "6"
+        "mask": "6",
+        "stage": 18,
+        "monsters": [
+            39
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m01115",
@@ -557,7 +818,12 @@
         "star": "1",
         "idx": "15",
         "flag": "6",
-        "mask": "7"
+        "mask": "7",
+        "stage": 4,
+        "monsters": [
+            67
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m01116",
@@ -567,7 +833,12 @@
         "star": "1",
         "idx": "16",
         "flag": "7",
-        "mask": "0"
+        "mask": "0",
+        "stage": 4,
+        "monsters": [
+            20
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m01117",
@@ -577,7 +848,12 @@
         "star": "1",
         "idx": "17",
         "flag": "7",
-        "mask": "1"
+        "mask": "1",
+        "stage": 2,
+        "monsters": [
+            6
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m01118",
@@ -587,7 +863,12 @@
         "star": "1",
         "idx": "18",
         "flag": "7",
-        "mask": "2"
+        "mask": "2",
+        "stage": 2,
+        "monsters": [
+            38
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m01119",
@@ -597,7 +878,12 @@
         "star": "1",
         "idx": "19",
         "flag": "7",
-        "mask": "3"
+        "mask": "3",
+        "stage": 19,
+        "monsters": [
+            31
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m01120",
@@ -607,7 +893,12 @@
         "star": "1",
         "idx": "20",
         "flag": "7",
-        "mask": "4"
+        "mask": "4",
+        "stage": 19,
+        "monsters": [
+            67
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m01121",
@@ -617,7 +908,12 @@
         "star": "1",
         "idx": "21",
         "flag": "7",
-        "mask": "5"
+        "mask": "5",
+        "stage": 19,
+        "monsters": [
+            22
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m01122",
@@ -627,7 +923,12 @@
         "star": "1",
         "idx": "22",
         "flag": "7",
-        "mask": "6"
+        "mask": "6",
+        "stage": 5,
+        "monsters": [
+            31
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m01123",
@@ -637,7 +938,12 @@
         "star": "1",
         "idx": "23",
         "flag": "7",
-        "mask": "7"
+        "mask": "7",
+        "stage": 5,
+        "monsters": [
+            67
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m01124",
@@ -647,7 +953,12 @@
         "star": "1",
         "idx": "24",
         "flag": "8",
-        "mask": "0"
+        "mask": "0",
+        "stage": 1,
+        "monsters": [
+            7
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m01125",
@@ -657,7 +968,12 @@
         "star": "1",
         "idx": "25",
         "flag": "8",
-        "mask": "1"
+        "mask": "1",
+        "stage": 6,
+        "monsters": [
+            48
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m01126",
@@ -667,7 +983,12 @@
         "star": "1",
         "idx": "26",
         "flag": "8",
-        "mask": "2"
+        "mask": "2",
+        "stage": 3,
+        "monsters": [
+            21
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m01201",
@@ -677,7 +998,12 @@
         "star": "2",
         "idx": "01",
         "flag": "8",
-        "mask": "3"
+        "mask": "3",
+        "stage": 11,
+        "monsters": [
+            75
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m01202",
@@ -687,7 +1013,12 @@
         "star": "2",
         "idx": "02",
         "flag": "8",
-        "mask": "4"
+        "mask": "4",
+        "stage": 3,
+        "monsters": [
+            75
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m01203",
@@ -697,7 +1028,12 @@
         "star": "2",
         "idx": "03",
         "flag": "8",
-        "mask": "5"
+        "mask": "5",
+        "stage": 3,
+        "monsters": [
+            14
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m01204",
@@ -707,7 +1043,12 @@
         "star": "2",
         "idx": "04",
         "flag": "8",
-        "mask": "6"
+        "mask": "6",
+        "stage": 17,
+        "monsters": [
+            43
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m01205",
@@ -717,7 +1058,12 @@
         "star": "2",
         "idx": "05",
         "flag": "8",
-        "mask": "7"
+        "mask": "7",
+        "stage": 4,
+        "monsters": [
+            17
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m01206",
@@ -727,7 +1073,12 @@
         "star": "2",
         "idx": "06",
         "flag": "9",
-        "mask": "0"
+        "mask": "0",
+        "stage": 19,
+        "monsters": [
+            47
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m01207",
@@ -737,7 +1088,12 @@
         "star": "2",
         "idx": "07",
         "flag": "9",
-        "mask": "1"
+        "mask": "1",
+        "stage": 2,
+        "monsters": [
+            11
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m01208",
@@ -747,7 +1103,12 @@
         "star": "2",
         "idx": "08",
         "flag": "9",
-        "mask": "2"
+        "mask": "2",
+        "stage": 2,
+        "monsters": [
+            49
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m01209",
@@ -757,7 +1118,12 @@
         "star": "2",
         "idx": "09",
         "flag": "9",
-        "mask": "3"
+        "mask": "3",
+        "stage": 6,
+        "monsters": [
+            1
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m01210",
@@ -767,7 +1133,12 @@
         "star": "2",
         "idx": "10",
         "flag": "9",
-        "mask": "4"
+        "mask": "4",
+        "stage": 20,
+        "monsters": [
+            37
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m01211",
@@ -777,7 +1148,12 @@
         "star": "2",
         "idx": "11",
         "flag": "9",
-        "mask": "5"
+        "mask": "5",
+        "stage": 21,
+        "monsters": [
+            33
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m01212",
@@ -787,7 +1163,13 @@
         "star": "2",
         "idx": "12",
         "flag": "9",
-        "mask": "6"
+        "mask": "6",
+        "stage": 2,
+        "monsters": [
+            11,
+            1
+        ],
+        "max_mon": 2
     },
     {
         "qid": "m01213",
@@ -797,7 +1179,12 @@
         "star": "2",
         "idx": "13",
         "flag": "9",
-        "mask": "7"
+        "mask": "7",
+        "stage": 12,
+        "monsters": [
+            60
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m01214",
@@ -807,7 +1194,12 @@
         "star": "2",
         "idx": "14",
         "flag": "10",
-        "mask": "0"
+        "mask": "0",
+        "stage": 3,
+        "monsters": [
+            65
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m01215",
@@ -817,7 +1209,12 @@
         "star": "2",
         "idx": "15",
         "flag": "10",
-        "mask": "1"
+        "mask": "1",
+        "stage": 19,
+        "monsters": [
+            65
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m01216",
@@ -827,7 +1224,12 @@
         "star": "2",
         "idx": "16",
         "flag": "10",
-        "mask": "2"
+        "mask": "2",
+        "stage": 2,
+        "monsters": [
+            59
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m01217",
@@ -837,7 +1239,12 @@
         "star": "2",
         "idx": "17",
         "flag": "10",
-        "mask": "3"
+        "mask": "3",
+        "stage": 4,
+        "monsters": [
+            59
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m01218",
@@ -847,7 +1254,12 @@
         "star": "2",
         "idx": "18",
         "flag": "10",
-        "mask": "4"
+        "mask": "4",
+        "stage": 1,
+        "monsters": [
+            55
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m01219",
@@ -857,7 +1269,13 @@
         "star": "2",
         "idx": "19",
         "flag": "10",
-        "mask": "5"
+        "mask": "5",
+        "stage": 18,
+        "monsters": [
+            15,
+            15
+        ],
+        "max_mon": 2
     },
     {
         "qid": "m01220",
@@ -867,7 +1285,12 @@
         "star": "2",
         "idx": "20",
         "flag": "10",
-        "mask": "6"
+        "mask": "6",
+        "stage": 4,
+        "monsters": [
+            52
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m02001",
@@ -877,7 +1300,12 @@
         "star": "0",
         "idx": "01",
         "flag": "10",
-        "mask": "7"
+        "mask": "7",
+        "stage": 21,
+        "monsters": [
+            77
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m02002",
@@ -887,7 +1315,12 @@
         "star": "0",
         "idx": "02",
         "flag": "11",
-        "mask": "0"
+        "mask": "0",
+        "stage": 20,
+        "monsters": [
+            6
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m02003",
@@ -897,7 +1330,12 @@
         "star": "0",
         "idx": "03",
         "flag": "11",
-        "mask": "1"
+        "mask": "1",
+        "stage": 17,
+        "monsters": [
+            48
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m02004",
@@ -907,7 +1345,12 @@
         "star": "0",
         "idx": "04",
         "flag": "11",
-        "mask": "2"
+        "mask": "2",
+        "stage": 21,
+        "monsters": [
+            77
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m02005",
@@ -917,7 +1360,12 @@
         "star": "0",
         "idx": "05",
         "flag": "11",
-        "mask": "3"
+        "mask": "3",
+        "stage": 21,
+        "monsters": [
+            68
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m02006",
@@ -927,7 +1375,13 @@
         "star": "0",
         "idx": "06",
         "flag": "11",
-        "mask": "4"
+        "mask": "4",
+        "stage": 6,
+        "monsters": [
+            27,
+            27
+        ],
+        "max_mon": 2
     },
     {
         "qid": "m02007",
@@ -937,7 +1391,12 @@
         "star": "0",
         "idx": "07",
         "flag": "11",
-        "mask": "5"
+        "mask": "5",
+        "stage": 20,
+        "monsters": [
+            48
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m02008",
@@ -947,7 +1406,13 @@
         "star": "0",
         "idx": "08",
         "flag": "11",
-        "mask": "6"
+        "mask": "6",
+        "stage": 3,
+        "monsters": [
+            28,
+            28
+        ],
+        "max_mon": 2
     },
     {
         "qid": "m02009",
@@ -957,7 +1422,13 @@
         "star": "0",
         "idx": "09",
         "flag": "11",
-        "mask": "7"
+        "mask": "7",
+        "stage": 3,
+        "monsters": [
+            8,
+            28
+        ],
+        "max_mon": 2
     },
     {
         "qid": "m02010",
@@ -967,7 +1438,13 @@
         "star": "0",
         "idx": "10",
         "flag": "12",
-        "mask": "0"
+        "mask": "0",
+        "stage": 3,
+        "monsters": [
+            48,
+            48
+        ],
+        "max_mon": 2
     },
     {
         "qid": "m02011",
@@ -977,7 +1454,13 @@
         "star": "0",
         "idx": "11",
         "flag": "12",
-        "mask": "1"
+        "mask": "1",
+        "stage": 18,
+        "monsters": [
+            6,
+            38
+        ],
+        "max_mon": 2
     },
     {
         "qid": "m02012",
@@ -987,7 +1470,13 @@
         "star": "0",
         "idx": "12",
         "flag": "12",
-        "mask": "2"
+        "mask": "2",
+        "stage": 18,
+        "monsters": [
+            52,
+            68
+        ],
+        "max_mon": 2
     },
     {
         "qid": "m02013",
@@ -997,7 +1486,12 @@
         "star": "0",
         "idx": "13",
         "flag": "12",
-        "mask": "3"
+        "mask": "3",
+        "stage": 6,
+        "monsters": [
+            80
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m02101",
@@ -1007,7 +1501,12 @@
         "star": "1",
         "idx": "01",
         "flag": "12",
-        "mask": "6"
+        "mask": "6",
+        "stage": 18,
+        "monsters": [
+            20
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m02102",
@@ -1017,7 +1516,12 @@
         "star": "1",
         "idx": "02",
         "flag": "12",
-        "mask": "7"
+        "mask": "7",
+        "stage": 2,
+        "monsters": [
+            38
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m02103",
@@ -1027,7 +1531,12 @@
         "star": "1",
         "idx": "03",
         "flag": "13",
-        "mask": "0"
+        "mask": "0",
+        "stage": 19,
+        "monsters": [
+            22
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m02104",
@@ -1037,7 +1546,13 @@
         "star": "1",
         "idx": "04",
         "flag": "13",
-        "mask": "1"
+        "mask": "1",
+        "stage": 21,
+        "monsters": [
+            51,
+            51
+        ],
+        "max_mon": 2
     },
     {
         "qid": "m02105",
@@ -1047,7 +1562,13 @@
         "star": "1",
         "idx": "05",
         "flag": "13",
-        "mask": "2"
+        "mask": "2",
+        "stage": 11,
+        "monsters": [
+            51,
+            68
+        ],
+        "max_mon": 2
     },
     {
         "qid": "m02106",
@@ -1057,7 +1578,13 @@
         "star": "1",
         "idx": "06",
         "flag": "13",
-        "mask": "3"
+        "mask": "3",
+        "stage": 21,
+        "monsters": [
+            15,
+            68
+        ],
+        "max_mon": 2
     },
     {
         "qid": "m02107",
@@ -1067,7 +1594,12 @@
         "star": "1",
         "idx": "07",
         "flag": "13",
-        "mask": "4"
+        "mask": "4",
+        "stage": 4,
+        "monsters": [
+            45
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m02108",
@@ -1077,7 +1609,13 @@
         "star": "1",
         "idx": "08",
         "flag": "13",
-        "mask": "5"
+        "mask": "5",
+        "stage": 20,
+        "monsters": [
+            20,
+            39
+        ],
+        "max_mon": 2
     },
     {
         "qid": "m02109",
@@ -1087,7 +1625,13 @@
         "star": "1",
         "idx": "09",
         "flag": "13",
-        "mask": "6"
+        "mask": "6",
+        "stage": 6,
+        "monsters": [
+            21,
+            46
+        ],
+        "max_mon": 2
     },
     {
         "qid": "m02110",
@@ -1097,7 +1641,13 @@
         "star": "1",
         "idx": "10",
         "flag": "13",
-        "mask": "7"
+        "mask": "7",
+        "stage": 20,
+        "monsters": [
+            1,
+            27
+        ],
+        "max_mon": 2
     },
     {
         "qid": "m02111",
@@ -1107,7 +1657,12 @@
         "star": "1",
         "idx": "11",
         "flag": "14",
-        "mask": "0"
+        "mask": "0",
+        "stage": 3,
+        "monsters": [
+            21
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m02112",
@@ -1117,7 +1672,13 @@
         "star": "1",
         "idx": "12",
         "flag": "14",
-        "mask": "1"
+        "mask": "1",
+        "stage": 3,
+        "monsters": [
+            46,
+            28
+        ],
+        "max_mon": 2
     },
     {
         "qid": "m02113",
@@ -1127,7 +1688,13 @@
         "star": "1",
         "idx": "13",
         "flag": "14",
-        "mask": "2"
+        "mask": "2",
+        "stage": 18,
+        "monsters": [
+            31,
+            68
+        ],
+        "max_mon": 2
     },
     {
         "qid": "m02114",
@@ -1137,7 +1704,13 @@
         "star": "1",
         "idx": "14",
         "flag": "14",
-        "mask": "3"
+        "mask": "3",
+        "stage": 4,
+        "monsters": [
+            67,
+            68
+        ],
+        "max_mon": 2
     },
     {
         "qid": "m02115",
@@ -1147,7 +1720,13 @@
         "star": "1",
         "idx": "15",
         "flag": "14",
-        "mask": "4"
+        "mask": "4",
+        "stage": 4,
+        "monsters": [
+            39,
+            68
+        ],
+        "max_mon": 2
     },
     {
         "qid": "m02116",
@@ -1157,7 +1736,12 @@
         "star": "1",
         "idx": "16",
         "flag": "14",
-        "mask": "5"
+        "mask": "5",
+        "stage": 2,
+        "monsters": [
+            11
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m02117",
@@ -1167,7 +1751,13 @@
         "star": "1",
         "idx": "17",
         "flag": "14",
-        "mask": "6"
+        "mask": "6",
+        "stage": 5,
+        "monsters": [
+            67,
+            67
+        ],
+        "max_mon": 2
     },
     {
         "qid": "m02118",
@@ -1177,7 +1767,13 @@
         "star": "1",
         "idx": "18",
         "flag": "14",
-        "mask": "7"
+        "mask": "7",
+        "stage": 5,
+        "monsters": [
+            22,
+            31
+        ],
+        "max_mon": 2
     },
     {
         "qid": "m02119",
@@ -1187,7 +1783,12 @@
         "star": "1",
         "idx": "19",
         "flag": "15",
-        "mask": "0"
+        "mask": "0",
+        "stage": 19,
+        "monsters": [
+            22
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m02120",
@@ -1197,7 +1798,12 @@
         "star": "1",
         "idx": "20",
         "flag": "15",
-        "mask": "1"
+        "mask": "1",
+        "stage": 1,
+        "monsters": [
+            50
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m02121",
@@ -1207,7 +1813,12 @@
         "star": "1",
         "idx": "21",
         "flag": "15",
-        "mask": "2"
+        "mask": "2",
+        "stage": 21,
+        "monsters": [
+            51
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m02122",
@@ -1217,7 +1828,12 @@
         "star": "1",
         "idx": "22",
         "flag": "15",
-        "mask": "3"
+        "mask": "3",
+        "stage": 11,
+        "monsters": [
+            33
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m02123",
@@ -1227,7 +1843,12 @@
         "star": "1",
         "idx": "23",
         "flag": "15",
-        "mask": "4"
+        "mask": "4",
+        "stage": 31,
+        "monsters": [
+            79
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m02124",
@@ -1237,7 +1858,12 @@
         "star": "1",
         "idx": "24",
         "flag": "15",
-        "mask": "5"
+        "mask": "5",
+        "stage": 31,
+        "monsters": [
+            82
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m02125",
@@ -1247,7 +1873,12 @@
         "star": "1",
         "idx": "25",
         "flag": "15",
-        "mask": "6"
+        "mask": "6",
+        "stage": 20,
+        "monsters": [
+            38
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m02126",
@@ -1257,7 +1888,12 @@
         "star": "1",
         "idx": "26",
         "flag": "15",
-        "mask": "7"
+        "mask": "7",
+        "stage": 3,
+        "monsters": [
+            48
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m02127",
@@ -1267,7 +1903,12 @@
         "star": "1",
         "idx": "27",
         "flag": "16",
-        "mask": "0"
+        "mask": "0",
+        "stage": 18,
+        "monsters": [
+            45
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m02201",
@@ -1277,7 +1918,13 @@
         "star": "2",
         "idx": "01",
         "flag": "16",
-        "mask": "4"
+        "mask": "4",
+        "stage": 21,
+        "monsters": [
+            75,
+            75
+        ],
+        "max_mon": 2
     },
     {
         "qid": "m02202",
@@ -1287,7 +1934,12 @@
         "star": "2",
         "idx": "02",
         "flag": "16",
-        "mask": "5"
+        "mask": "5",
+        "stage": 11,
+        "monsters": [
+            53
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m02203",
@@ -1297,7 +1949,12 @@
         "star": "2",
         "idx": "03",
         "flag": "16",
-        "mask": "6"
+        "mask": "6",
+        "stage": 3,
+        "monsters": [
+            75
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m02204",
@@ -1307,7 +1964,13 @@
         "star": "2",
         "idx": "04",
         "flag": "16",
-        "mask": "7"
+        "mask": "7",
+        "stage": 6,
+        "monsters": [
+            37,
+            27
+        ],
+        "max_mon": 2
     },
     {
         "qid": "m02205",
@@ -1317,7 +1980,13 @@
         "star": "2",
         "idx": "05",
         "flag": "17",
-        "mask": "0"
+        "mask": "0",
+        "stage": 3,
+        "monsters": [
+            14,
+            28
+        ],
+        "max_mon": 2
     },
     {
         "qid": "m02206",
@@ -1327,7 +1996,12 @@
         "star": "2",
         "idx": "06",
         "flag": "17",
-        "mask": "1"
+        "mask": "1",
+        "stage": 3,
+        "monsters": [
+            43
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m02207",
@@ -1337,7 +2011,13 @@
         "star": "2",
         "idx": "07",
         "flag": "17",
-        "mask": "2"
+        "mask": "2",
+        "stage": 17,
+        "monsters": [
+            14,
+            43
+        ],
+        "max_mon": 2
     },
     {
         "qid": "m02208",
@@ -1347,7 +2027,12 @@
         "star": "2",
         "idx": "08",
         "flag": "17",
-        "mask": "3"
+        "mask": "3",
+        "stage": 19,
+        "monsters": [
+            53
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m02209",
@@ -1357,7 +2042,13 @@
         "star": "2",
         "idx": "09",
         "flag": "17",
-        "mask": "4"
+        "mask": "4",
+        "stage": 5,
+        "monsters": [
+            17,
+            31
+        ],
+        "max_mon": 2
     },
     {
         "qid": "m02210",
@@ -1367,7 +2058,12 @@
         "star": "2",
         "idx": "10",
         "flag": "17",
-        "mask": "5"
+        "mask": "5",
+        "stage": 18,
+        "monsters": [
+            47
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m02211",
@@ -1377,7 +2073,13 @@
         "star": "2",
         "idx": "11",
         "flag": "17",
-        "mask": "6"
+        "mask": "6",
+        "stage": 2,
+        "monsters": [
+            11,
+            1
+        ],
+        "max_mon": 2
     },
     {
         "qid": "m02212",
@@ -1387,7 +2089,13 @@
         "star": "2",
         "idx": "12",
         "flag": "17",
-        "mask": "7"
+        "mask": "7",
+        "stage": 2,
+        "monsters": [
+            49,
+            37
+        ],
+        "max_mon": 2
     },
     {
         "qid": "m02213",
@@ -1397,7 +2105,12 @@
         "star": "2",
         "idx": "13",
         "flag": "18",
-        "mask": "0"
+        "mask": "0",
+        "stage": 2,
+        "monsters": [
+            49
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m02214",
@@ -1407,7 +2120,12 @@
         "star": "2",
         "idx": "14",
         "flag": "18",
-        "mask": "1"
+        "mask": "1",
+        "stage": 15,
+        "monsters": [
+            41
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m02215",
@@ -1417,7 +2135,12 @@
         "star": "2",
         "idx": "15",
         "flag": "18",
-        "mask": "2"
+        "mask": "2",
+        "stage": 15,
+        "monsters": [
+            42
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m02216",
@@ -1427,7 +2150,13 @@
         "star": "2",
         "idx": "16",
         "flag": "18",
-        "mask": "3"
+        "mask": "3",
+        "stage": 8,
+        "monsters": [
+            33,
+            33
+        ],
+        "max_mon": 2
     },
     {
         "qid": "m02217",
@@ -1437,7 +2166,12 @@
         "star": "2",
         "idx": "17",
         "flag": "18",
-        "mask": "4"
+        "mask": "4",
+        "stage": 21,
+        "monsters": [
+            54
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m02218",
@@ -1447,7 +2181,12 @@
         "star": "2",
         "idx": "18",
         "flag": "18",
-        "mask": "5"
+        "mask": "5",
+        "stage": 20,
+        "monsters": [
+            54
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m02219",
@@ -1457,7 +2196,12 @@
         "star": "2",
         "idx": "19",
         "flag": "18",
-        "mask": "6"
+        "mask": "6",
+        "stage": 12,
+        "monsters": [
+            65
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m02220",
@@ -1467,7 +2211,12 @@
         "star": "2",
         "idx": "20",
         "flag": "18",
-        "mask": "7"
+        "mask": "7",
+        "stage": 19,
+        "monsters": [
+            65
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m02221",
@@ -1477,7 +2226,12 @@
         "star": "2",
         "idx": "21",
         "flag": "19",
-        "mask": "0"
+        "mask": "0",
+        "stage": 2,
+        "monsters": [
+            59
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m02222",
@@ -1487,7 +2241,12 @@
         "star": "2",
         "idx": "22",
         "flag": "19",
-        "mask": "1"
+        "mask": "1",
+        "stage": 4,
+        "monsters": [
+            59
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m02223",
@@ -1497,7 +2256,12 @@
         "star": "2",
         "idx": "23",
         "flag": "19",
-        "mask": "2"
+        "mask": "2",
+        "stage": 7,
+        "monsters": [
+            2
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m02224",
@@ -1507,7 +2271,12 @@
         "star": "2",
         "idx": "24",
         "flag": "19",
-        "mask": "3"
+        "mask": "3",
+        "stage": 8,
+        "monsters": [
+            36
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m02225",
@@ -1517,7 +2286,12 @@
         "star": "2",
         "idx": "25",
         "flag": "19",
-        "mask": "4"
+        "mask": "4",
+        "stage": 12,
+        "monsters": [
+            55
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m02226",
@@ -1527,7 +2301,12 @@
         "star": "2",
         "idx": "26",
         "flag": "19",
-        "mask": "5"
+        "mask": "5",
+        "stage": 8,
+        "monsters": [
+            76
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m02227",
@@ -1537,7 +2316,12 @@
         "star": "2",
         "idx": "27",
         "flag": "19",
-        "mask": "6"
+        "mask": "6",
+        "stage": 15,
+        "monsters": [
+            71
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m02228",
@@ -1547,7 +2331,12 @@
         "star": "2",
         "idx": "28",
         "flag": "19",
-        "mask": "7"
+        "mask": "7",
+        "stage": 30,
+        "monsters": [
+            81
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m02229",
@@ -1557,7 +2346,12 @@
         "star": "2",
         "idx": "29",
         "flag": "20",
-        "mask": "0"
+        "mask": "0",
+        "stage": 20,
+        "monsters": [
+            81
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m02230",
@@ -1567,7 +2361,13 @@
         "star": "2",
         "idx": "30",
         "flag": "20",
-        "mask": "1"
+        "mask": "1",
+        "stage": 9,
+        "monsters": [
+            1,
+            37
+        ],
+        "max_mon": 2
     },
     {
         "qid": "m02231",
@@ -1577,7 +2377,12 @@
         "star": "2",
         "idx": "31",
         "flag": "20",
-        "mask": "2"
+        "mask": "2",
+        "stage": 3,
+        "monsters": [
+            14
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m02232",
@@ -1587,7 +2392,12 @@
         "star": "2",
         "idx": "32",
         "flag": "20",
-        "mask": "3"
+        "mask": "3",
+        "stage": 8,
+        "monsters": [
+            33
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m02233",
@@ -1597,7 +2407,12 @@
         "star": "2",
         "idx": "33",
         "flag": "20",
-        "mask": "4"
+        "mask": "4",
+        "stage": 11,
+        "monsters": [
+            15
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m02234",
@@ -1607,7 +2422,12 @@
         "star": "2",
         "idx": "34",
         "flag": "20",
-        "mask": "5"
+        "mask": "5",
+        "stage": 16,
+        "monsters": [
+            6
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m02235",
@@ -1617,7 +2437,12 @@
         "star": "2",
         "idx": "35",
         "flag": "20",
-        "mask": "6"
+        "mask": "6",
+        "stage": 19,
+        "monsters": [
+            22
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m02236",
@@ -1627,7 +2452,12 @@
         "star": "2",
         "idx": "36",
         "flag": "20",
-        "mask": "7"
+        "mask": "7",
+        "stage": 3,
+        "monsters": [
+            48
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m03001",
@@ -1637,7 +2467,12 @@
         "star": "0",
         "idx": "01",
         "flag": "21",
-        "mask": "4"
+        "mask": "4",
+        "stage": 30,
+        "monsters": [
+            79
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m03002",
@@ -1647,7 +2482,13 @@
         "star": "0",
         "idx": "02",
         "flag": "21",
-        "mask": "5"
+        "mask": "5",
+        "stage": 26,
+        "monsters": [
+            6,
+            80
+        ],
+        "max_mon": 2
     },
     {
         "qid": "m03003",
@@ -1657,7 +2498,12 @@
         "star": "0",
         "idx": "03",
         "flag": "21",
-        "mask": "6"
+        "mask": "6",
+        "stage": 27,
+        "monsters": [
+            46
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m03004",
@@ -1667,7 +2513,12 @@
         "star": "0",
         "idx": "04",
         "flag": "21",
-        "mask": "7"
+        "mask": "7",
+        "stage": 28,
+        "monsters": [
+            39
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m03005",
@@ -1677,7 +2528,12 @@
         "star": "0",
         "idx": "05",
         "flag": "22",
-        "mask": "0"
+        "mask": "0",
+        "stage": 11,
+        "monsters": [
+            15
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m03006",
@@ -1687,7 +2543,12 @@
         "star": "0",
         "idx": "06",
         "flag": "22",
-        "mask": "1"
+        "mask": "1",
+        "stage": 30,
+        "monsters": [
+            79
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m03007",
@@ -1697,7 +2558,12 @@
         "star": "0",
         "idx": "07",
         "flag": "22",
-        "mask": "2"
+        "mask": "2",
+        "stage": 20,
+        "monsters": [
+            80
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m03008",
@@ -1707,7 +2573,12 @@
         "star": "0",
         "idx": "08",
         "flag": "22",
-        "mask": "3"
+        "mask": "3",
+        "stage": 26,
+        "monsters": [
+            82
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m03009",
@@ -1717,7 +2588,13 @@
         "star": "0",
         "idx": "09",
         "flag": "22",
-        "mask": "4"
+        "mask": "4",
+        "stage": 30,
+        "monsters": [
+            82,
+            82
+        ],
+        "max_mon": 2
     },
     {
         "qid": "m03010",
@@ -1727,7 +2604,13 @@
         "star": "0",
         "idx": "10",
         "flag": "22",
-        "mask": "5"
+        "mask": "5",
+        "stage": 4,
+        "monsters": [
+            6,
+            38
+        ],
+        "max_mon": 2
     },
     {
         "qid": "m03011",
@@ -1737,7 +2620,12 @@
         "star": "0",
         "idx": "11",
         "flag": "22",
-        "mask": "6"
+        "mask": "6",
+        "stage": 26,
+        "monsters": [
+            48
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m03012",
@@ -1747,7 +2635,12 @@
         "star": "0",
         "idx": "12",
         "flag": "22",
-        "mask": "7"
+        "mask": "7",
+        "stage": 27,
+        "monsters": [
+            86
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m03013",
@@ -1757,7 +2650,13 @@
         "star": "0",
         "idx": "13",
         "flag": "23",
-        "mask": "0"
+        "mask": "0",
+        "stage": 3,
+        "monsters": [
+            48,
+            86
+        ],
+        "max_mon": 2
     },
     {
         "qid": "m03014",
@@ -1767,7 +2666,12 @@
         "star": "0",
         "idx": "14",
         "flag": "23",
-        "mask": "1"
+        "mask": "1",
+        "stage": 26,
+        "monsters": [
+            15
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m03015",
@@ -1777,7 +2681,12 @@
         "star": "0",
         "idx": "15",
         "flag": "23",
-        "mask": "2"
+        "mask": "2",
+        "stage": 21,
+        "monsters": [
+            45
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m03016",
@@ -1787,7 +2696,13 @@
         "star": "0",
         "idx": "16",
         "flag": "23",
-        "mask": "3"
+        "mask": "3",
+        "stage": 28,
+        "monsters": [
+            45,
+            45
+        ],
+        "max_mon": 2
     },
     {
         "qid": "m03017",
@@ -1797,7 +2712,12 @@
         "star": "0",
         "idx": "17",
         "flag": "23",
-        "mask": "4"
+        "mask": "4",
+        "stage": 27,
+        "monsters": [
+            21
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m03018",
@@ -1807,7 +2727,12 @@
         "star": "0",
         "idx": "18",
         "flag": "23",
-        "mask": "5"
+        "mask": "5",
+        "stage": 26,
+        "monsters": [
+            46
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m03019",
@@ -1817,7 +2742,12 @@
         "star": "0",
         "idx": "19",
         "flag": "23",
-        "mask": "6"
+        "mask": "6",
+        "stage": 18,
+        "monsters": [
+            52
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m03020",
@@ -1827,7 +2757,12 @@
         "star": "0",
         "idx": "20",
         "flag": "23",
-        "mask": "7"
+        "mask": "7",
+        "stage": 26,
+        "monsters": [
+            85
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m03021",
@@ -1837,7 +2772,12 @@
         "star": "0",
         "idx": "21",
         "flag": "24",
-        "mask": "0"
+        "mask": "0",
+        "stage": 31,
+        "monsters": [
+            85
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m03022",
@@ -1847,7 +2787,12 @@
         "star": "0",
         "idx": "22",
         "flag": "24",
-        "mask": "1"
+        "mask": "1",
+        "stage": 20,
+        "monsters": [
+            20
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m03023",
@@ -1857,7 +2802,13 @@
         "star": "0",
         "idx": "23",
         "flag": "24",
-        "mask": "2"
+        "mask": "2",
+        "stage": 28,
+        "monsters": [
+            39,
+            39
+        ],
+        "max_mon": 2
     },
     {
         "qid": "m03024",
@@ -1867,7 +2818,12 @@
         "star": "0",
         "idx": "24",
         "flag": "24",
-        "mask": "3"
+        "mask": "3",
+        "stage": 6,
+        "monsters": [
+            38
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m03025",
@@ -1877,7 +2833,12 @@
         "star": "0",
         "idx": "25",
         "flag": "24",
-        "mask": "4"
+        "mask": "4",
+        "stage": 4,
+        "monsters": [
+            85
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m03101",
@@ -1887,7 +2848,13 @@
         "star": "1",
         "idx": "01",
         "flag": "25",
-        "mask": "2"
+        "mask": "2",
+        "stage": 16,
+        "monsters": [
+            38,
+            79
+        ],
+        "max_mon": 2
     },
     {
         "qid": "m03102",
@@ -1897,7 +2864,12 @@
         "star": "1",
         "idx": "02",
         "flag": "25",
-        "mask": "3"
+        "mask": "3",
+        "stage": 29,
+        "monsters": [
+            22
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m03103",
@@ -1907,7 +2879,13 @@
         "star": "1",
         "idx": "03",
         "flag": "25",
-        "mask": "4"
+        "mask": "4",
+        "stage": 31,
+        "monsters": [
+            81,
+            79
+        ],
+        "max_mon": 2
     },
     {
         "qid": "m03104",
@@ -1917,7 +2895,12 @@
         "star": "1",
         "idx": "04",
         "flag": "25",
-        "mask": "5"
+        "mask": "5",
+        "stage": 28,
+        "monsters": [
+            81
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m03105",
@@ -1927,7 +2910,13 @@
         "star": "1",
         "idx": "05",
         "flag": "25",
-        "mask": "6"
+        "mask": "6",
+        "stage": 30,
+        "monsters": [
+            81,
+            81
+        ],
+        "max_mon": 2
     },
     {
         "qid": "m03106",
@@ -1937,7 +2926,12 @@
         "star": "1",
         "idx": "06",
         "flag": "25",
-        "mask": "7"
+        "mask": "7",
+        "stage": 5,
+        "monsters": [
+            83
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m03107",
@@ -1947,7 +2941,13 @@
         "star": "1",
         "idx": "07",
         "flag": "26",
-        "mask": "0"
+        "mask": "0",
+        "stage": 19,
+        "monsters": [
+            83,
+            83
+        ],
+        "max_mon": 2
     },
     {
         "qid": "m03108",
@@ -1957,7 +2957,13 @@
         "star": "1",
         "idx": "08",
         "flag": "26",
-        "mask": "1"
+        "mask": "1",
+        "stage": 9,
+        "monsters": [
+            48,
+            67
+        ],
+        "max_mon": 2
     },
     {
         "qid": "m03109",
@@ -1967,7 +2973,12 @@
         "star": "1",
         "idx": "09",
         "flag": "26",
-        "mask": "2"
+        "mask": "2",
+        "stage": 19,
+        "monsters": [
+            67
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m03110",
@@ -1977,7 +2988,12 @@
         "star": "1",
         "idx": "10",
         "flag": "26",
-        "mask": "3"
+        "mask": "3",
+        "stage": 28,
+        "monsters": [
+            87
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m03111",
@@ -1987,7 +3003,13 @@
         "star": "1",
         "idx": "11",
         "flag": "26",
-        "mask": "4"
+        "mask": "4",
+        "stage": 18,
+        "monsters": [
+            67,
+            87
+        ],
+        "max_mon": 2
     },
     {
         "qid": "m03112",
@@ -1997,7 +3019,12 @@
         "star": "1",
         "idx": "12",
         "flag": "26",
-        "mask": "5"
+        "mask": "5",
+        "stage": 2,
+        "monsters": [
+            6
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m03113",
@@ -2007,7 +3034,12 @@
         "star": "1",
         "idx": "13",
         "flag": "26",
-        "mask": "6"
+        "mask": "6",
+        "stage": 29,
+        "monsters": [
+            11
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m03114",
@@ -2017,7 +3049,13 @@
         "star": "1",
         "idx": "14",
         "flag": "26",
-        "mask": "7"
+        "mask": "7",
+        "stage": 16,
+        "monsters": [
+            49,
+            79
+        ],
+        "max_mon": 2
     },
     {
         "qid": "m03115",
@@ -2027,7 +3065,12 @@
         "star": "1",
         "idx": "15",
         "flag": "27",
-        "mask": "0"
+        "mask": "0",
+        "stage": 28,
+        "monsters": [
+            1
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m03116",
@@ -2037,7 +3080,12 @@
         "star": "1",
         "idx": "16",
         "flag": "27",
-        "mask": "1"
+        "mask": "1",
+        "stage": 26,
+        "monsters": [
+            37
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m03117",
@@ -2047,7 +3095,12 @@
         "star": "1",
         "idx": "17",
         "flag": "27",
-        "mask": "2"
+        "mask": "2",
+        "stage": 31,
+        "monsters": [
+            40
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m03118",
@@ -2057,7 +3110,13 @@
         "star": "1",
         "idx": "18",
         "flag": "27",
-        "mask": "3"
+        "mask": "3",
+        "stage": 6,
+        "monsters": [
+            78,
+            78
+        ],
+        "max_mon": 2
     },
     {
         "qid": "m03119",
@@ -2067,7 +3126,12 @@
         "star": "1",
         "idx": "19",
         "flag": "27",
-        "mask": "4"
+        "mask": "4",
+        "stage": 11,
+        "monsters": [
+            51
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m03120",
@@ -2077,7 +3141,12 @@
         "star": "1",
         "idx": "20",
         "flag": "27",
-        "mask": "5"
+        "mask": "5",
+        "stage": 27,
+        "monsters": [
+            84
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m03121",
@@ -2087,7 +3156,12 @@
         "star": "1",
         "idx": "21",
         "flag": "27",
-        "mask": "6"
+        "mask": "6",
+        "stage": 3,
+        "monsters": [
+            84
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m03122",
@@ -2097,7 +3171,13 @@
         "star": "1",
         "idx": "22",
         "flag": "27",
-        "mask": "7"
+        "mask": "7",
+        "stage": 29,
+        "monsters": [
+            22,
+            22
+        ],
+        "max_mon": 2
     },
     {
         "qid": "m03123",
@@ -2107,7 +3187,12 @@
         "star": "1",
         "idx": "23",
         "flag": "28",
-        "mask": "0"
+        "mask": "0",
+        "stage": 6,
+        "monsters": [
+            86
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m03124",
@@ -2117,7 +3202,12 @@
         "star": "1",
         "idx": "24",
         "flag": "28",
-        "mask": "1"
+        "mask": "1",
+        "stage": 30,
+        "monsters": [
+            82
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m03125",
@@ -2127,7 +3217,12 @@
         "star": "1",
         "idx": "25",
         "flag": "28",
-        "mask": "2"
+        "mask": "2",
+        "stage": 2,
+        "monsters": [
+            6
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m03126",
@@ -2137,7 +3232,12 @@
         "star": "1",
         "idx": "26",
         "flag": "28",
-        "mask": "3"
+        "mask": "3",
+        "stage": 9,
+        "monsters": [
+            48
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m03127",
@@ -2147,7 +3247,12 @@
         "star": "1",
         "idx": "27",
         "flag": "28",
-        "mask": "4"
+        "mask": "4",
+        "stage": 1,
+        "monsters": [
+            50
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m03201",
@@ -2157,7 +3262,12 @@
         "star": "2",
         "idx": "01",
         "flag": "29",
-        "mask": "0"
+        "mask": "0",
+        "stage": 11,
+        "monsters": [
+            75
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m03202",
@@ -2167,7 +3277,13 @@
         "star": "2",
         "idx": "02",
         "flag": "29",
-        "mask": "1"
+        "mask": "1",
+        "stage": 3,
+        "monsters": [
+            75,
+            75
+        ],
+        "max_mon": 2
     },
     {
         "qid": "m03203",
@@ -2177,7 +3293,12 @@
         "star": "2",
         "idx": "03",
         "flag": "29",
-        "mask": "2"
+        "mask": "2",
+        "stage": 27,
+        "monsters": [
+            14
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m03204",
@@ -2187,7 +3308,12 @@
         "star": "2",
         "idx": "04",
         "flag": "29",
-        "mask": "3"
+        "mask": "3",
+        "stage": 17,
+        "monsters": [
+            43
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m03205",
@@ -2197,7 +3323,13 @@
         "star": "2",
         "idx": "05",
         "flag": "29",
-        "mask": "4"
+        "mask": "4",
+        "stage": 27,
+        "monsters": [
+            43,
+            43
+        ],
+        "max_mon": 2
     },
     {
         "qid": "m03206",
@@ -2207,7 +3339,12 @@
         "star": "2",
         "idx": "06",
         "flag": "29",
-        "mask": "5"
+        "mask": "5",
+        "stage": 28,
+        "monsters": [
+            17
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m03207",
@@ -2217,7 +3354,12 @@
         "star": "2",
         "idx": "07",
         "flag": "29",
-        "mask": "6"
+        "mask": "6",
+        "stage": 5,
+        "monsters": [
+            47
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m03208",
@@ -2227,7 +3369,13 @@
         "star": "2",
         "idx": "08",
         "flag": "29",
-        "mask": "7"
+        "mask": "7",
+        "stage": 29,
+        "monsters": [
+            47,
+            47
+        ],
+        "max_mon": 2
     },
     {
         "qid": "m03209",
@@ -2237,7 +3385,12 @@
         "star": "2",
         "idx": "09",
         "flag": "30",
-        "mask": "0"
+        "mask": "0",
+        "stage": 13,
+        "monsters": [
+            41
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m03210",
@@ -2247,7 +3400,12 @@
         "star": "2",
         "idx": "10",
         "flag": "30",
-        "mask": "1"
+        "mask": "1",
+        "stage": 13,
+        "monsters": [
+            42
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m03211",
@@ -2257,7 +3415,13 @@
         "star": "2",
         "idx": "11",
         "flag": "30",
-        "mask": "2"
+        "mask": "2",
+        "stage": 9,
+        "monsters": [
+            42,
+            41
+        ],
+        "max_mon": 2
     },
     {
         "qid": "m03212",
@@ -2267,7 +3431,12 @@
         "star": "2",
         "idx": "12",
         "flag": "30",
-        "mask": "3"
+        "mask": "3",
+        "stage": 29,
+        "monsters": [
+            89
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m03213",
@@ -2277,7 +3446,13 @@
         "star": "2",
         "idx": "13",
         "flag": "30",
-        "mask": "4"
+        "mask": "4",
+        "stage": 9,
+        "monsters": [
+            53,
+            53
+        ],
+        "max_mon": 2
     },
     {
         "qid": "m03214",
@@ -2287,7 +3462,12 @@
         "star": "2",
         "idx": "14",
         "flag": "30",
-        "mask": "5"
+        "mask": "5",
+        "stage": 13,
+        "monsters": [
+            33
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m03215",
@@ -2297,7 +3477,12 @@
         "star": "2",
         "idx": "15",
         "flag": "30",
-        "mask": "6"
+        "mask": "6",
+        "stage": 28,
+        "monsters": [
+            33
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m03216",
@@ -2307,7 +3492,12 @@
         "star": "2",
         "idx": "16",
         "flag": "30",
-        "mask": "7"
+        "mask": "7",
+        "stage": 3,
+        "monsters": [
+            14
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m03217",
@@ -2317,7 +3507,12 @@
         "star": "2",
         "idx": "17",
         "flag": "31",
-        "mask": "0"
+        "mask": "0",
+        "stage": 28,
+        "monsters": [
+            37
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m03218",
@@ -2327,7 +3522,12 @@
         "star": "2",
         "idx": "18",
         "flag": "31",
-        "mask": "1"
+        "mask": "1",
+        "stage": 5,
+        "monsters": [
+            83
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m03219",
@@ -2337,7 +3537,12 @@
         "star": "2",
         "idx": "19",
         "flag": "31",
-        "mask": "2"
+        "mask": "2",
+        "stage": 21,
+        "monsters": [
+            75
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m03220",
@@ -2347,7 +3552,12 @@
         "star": "2",
         "idx": "20",
         "flag": "31",
-        "mask": "3"
+        "mask": "3",
+        "stage": 22,
+        "monsters": [
+            15
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m03221",
@@ -2357,7 +3567,12 @@
         "star": "2",
         "idx": "21",
         "flag": "31",
-        "mask": "4"
+        "mask": "4",
+        "stage": 9,
+        "monsters": [
+            43
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m03222",
@@ -2367,7 +3582,12 @@
         "star": "2",
         "idx": "22",
         "flag": "31",
-        "mask": "5"
+        "mask": "5",
+        "stage": 17,
+        "monsters": [
+            54
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m03223",
@@ -2377,7 +3597,12 @@
         "star": "2",
         "idx": "23",
         "flag": "31",
-        "mask": "6"
+        "mask": "6",
+        "stage": 20,
+        "monsters": [
+            54
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m03224",
@@ -2387,7 +3612,12 @@
         "star": "2",
         "idx": "24",
         "flag": "31",
-        "mask": "7"
+        "mask": "7",
+        "stage": 18,
+        "monsters": [
+            65
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m03225",
@@ -2397,7 +3627,12 @@
         "star": "2",
         "idx": "25",
         "flag": "32",
-        "mask": "0"
+        "mask": "0",
+        "stage": 19,
+        "monsters": [
+            65
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m03226",
@@ -2407,7 +3642,12 @@
         "star": "2",
         "idx": "26",
         "flag": "32",
-        "mask": "1"
+        "mask": "1",
+        "stage": 20,
+        "monsters": [
+            59
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m03227",
@@ -2417,7 +3657,12 @@
         "star": "2",
         "idx": "27",
         "flag": "32",
-        "mask": "2"
+        "mask": "2",
+        "stage": 4,
+        "monsters": [
+            59
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m03228",
@@ -2427,7 +3672,12 @@
         "star": "2",
         "idx": "28",
         "flag": "32",
-        "mask": "3"
+        "mask": "3",
+        "stage": 14,
+        "monsters": [
+            58
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m03229",
@@ -2437,7 +3687,12 @@
         "star": "2",
         "idx": "29",
         "flag": "32",
-        "mask": "4"
+        "mask": "4",
+        "stage": 12,
+        "monsters": [
+            55
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m03230",
@@ -2447,7 +3702,12 @@
         "star": "2",
         "idx": "30",
         "flag": "32",
-        "mask": "5"
+        "mask": "5",
+        "stage": 7,
+        "monsters": [
+            2
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m03231",
@@ -2457,7 +3717,12 @@
         "star": "2",
         "idx": "31",
         "flag": "32",
-        "mask": "6"
+        "mask": "6",
+        "stage": 8,
+        "monsters": [
+            36
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m03232",
@@ -2467,7 +3732,12 @@
         "star": "2",
         "idx": "32",
         "flag": "32",
-        "mask": "7"
+        "mask": "7",
+        "stage": 15,
+        "monsters": [
+            71
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m03233",
@@ -2477,7 +3747,12 @@
         "star": "2",
         "idx": "33",
         "flag": "33",
-        "mask": "0"
+        "mask": "0",
+        "stage": 23,
+        "monsters": [
+            88
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m04001",
@@ -2487,7 +3762,12 @@
         "star": "0",
         "idx": "01",
         "flag": "-1",
-        "mask": "-1"
+        "mask": "-1",
+        "stage": 11,
+        "monsters": [
+            77
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m04002",
@@ -2497,7 +3777,12 @@
         "star": "0",
         "idx": "02",
         "flag": "-1",
-        "mask": "-1"
+        "mask": "-1",
+        "stage": 6,
+        "monsters": [
+            6
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m04003",
@@ -2507,7 +3792,12 @@
         "star": "0",
         "idx": "03",
         "flag": "-1",
-        "mask": "-1"
+        "mask": "-1",
+        "stage": 3,
+        "monsters": [
+            48
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m04004",
@@ -2517,7 +3807,13 @@
         "star": "0",
         "idx": "04",
         "flag": "-1",
-        "mask": "-1"
+        "mask": "-1",
+        "stage": 4,
+        "monsters": [
+            52,
+            68
+        ],
+        "max_mon": 2
     },
     {
         "qid": "m04005",
@@ -2527,7 +3823,13 @@
         "star": "0",
         "idx": "05",
         "flag": "-1",
-        "mask": "-1"
+        "mask": "-1",
+        "stage": 2,
+        "monsters": [
+            11,
+            1
+        ],
+        "max_mon": 2
     },
     {
         "qid": "m04006",
@@ -2537,7 +3839,13 @@
         "star": "0",
         "idx": "06",
         "flag": "-1",
-        "mask": "-1"
+        "mask": "-1",
+        "stage": 5,
+        "monsters": [
+            17,
+            31
+        ],
+        "max_mon": 2
     },
     {
         "qid": "m04007",
@@ -2547,7 +3855,12 @@
         "star": "0",
         "idx": "07",
         "flag": "-1",
-        "mask": "-1"
+        "mask": "-1",
+        "stage": 30,
+        "monsters": [
+            78
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m10001",
@@ -2557,7 +3870,10 @@
         "star": "0",
         "idx": "01",
         "flag": "34",
-        "mask": "7"
+        "mask": "7",
+        "stage": 11,
+        "monsters": [],
+        "max_mon": 0
     },
     {
         "qid": "m10002",
@@ -2567,7 +3883,10 @@
         "star": "0",
         "idx": "02",
         "flag": "35",
-        "mask": "0"
+        "mask": "0",
+        "stage": 11,
+        "monsters": [],
+        "max_mon": 0
     },
     {
         "qid": "m10003",
@@ -2577,7 +3896,10 @@
         "star": "0",
         "idx": "03",
         "flag": "35",
-        "mask": "1"
+        "mask": "1",
+        "stage": 11,
+        "monsters": [],
+        "max_mon": 0
     },
     {
         "qid": "m10004",
@@ -2587,7 +3909,12 @@
         "star": "0",
         "idx": "04",
         "flag": "35",
-        "mask": "2"
+        "mask": "2",
+        "stage": 21,
+        "monsters": [
+            75
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m10005",
@@ -2597,7 +3924,10 @@
         "star": "0",
         "idx": "05",
         "flag": "35",
-        "mask": "3"
+        "mask": "3",
+        "stage": 21,
+        "monsters": [],
+        "max_mon": 0
     },
     {
         "qid": "m10101",
@@ -2607,7 +3937,10 @@
         "star": "1",
         "idx": "01",
         "flag": "35",
-        "mask": "4"
+        "mask": "4",
+        "stage": 11,
+        "monsters": [],
+        "max_mon": 0
     },
     {
         "qid": "m10102",
@@ -2617,7 +3950,10 @@
         "star": "1",
         "idx": "02",
         "flag": "35",
-        "mask": "5"
+        "mask": "5",
+        "stage": 6,
+        "monsters": [],
+        "max_mon": 0
     },
     {
         "qid": "m10103",
@@ -2627,7 +3963,10 @@
         "star": "1",
         "idx": "03",
         "flag": "35",
-        "mask": "6"
+        "mask": "6",
+        "stage": 3,
+        "monsters": [],
+        "max_mon": 0
     },
     {
         "qid": "m10104",
@@ -2637,7 +3976,12 @@
         "star": "1",
         "idx": "04",
         "flag": "35",
-        "mask": "7"
+        "mask": "7",
+        "stage": 11,
+        "monsters": [
+            77
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m10105",
@@ -2647,7 +3991,12 @@
         "star": "1",
         "idx": "05",
         "flag": "36",
-        "mask": "0"
+        "mask": "0",
+        "stage": 11,
+        "monsters": [
+            68
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m10106",
@@ -2657,7 +4006,12 @@
         "star": "1",
         "idx": "06",
         "flag": "36",
-        "mask": "1"
+        "mask": "1",
+        "stage": 11,
+        "monsters": [
+            77
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m10107",
@@ -2667,7 +4021,12 @@
         "star": "1",
         "idx": "07",
         "flag": "36",
-        "mask": "2"
+        "mask": "2",
+        "stage": 21,
+        "monsters": [
+            68
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m10108",
@@ -2677,7 +4036,12 @@
         "star": "1",
         "idx": "08",
         "flag": "36",
-        "mask": "3"
+        "mask": "3",
+        "stage": 21,
+        "monsters": [
+            75
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m10109",
@@ -2687,7 +4051,12 @@
         "star": "1",
         "idx": "09",
         "flag": "36",
-        "mask": "4"
+        "mask": "4",
+        "stage": 6,
+        "monsters": [
+            27
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m10110",
@@ -2697,7 +4066,12 @@
         "star": "1",
         "idx": "10",
         "flag": "36",
-        "mask": "5"
+        "mask": "5",
+        "stage": 20,
+        "monsters": [
+            6
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m10111",
@@ -2707,7 +4081,12 @@
         "star": "1",
         "idx": "11",
         "flag": "36",
-        "mask": "6"
+        "mask": "6",
+        "stage": 20,
+        "monsters": [
+            52
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m10112",
@@ -2717,7 +4096,12 @@
         "star": "1",
         "idx": "12",
         "flag": "36",
-        "mask": "7"
+        "mask": "7",
+        "stage": 6,
+        "monsters": [
+            27
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m10113",
@@ -2727,7 +4111,10 @@
         "star": "1",
         "idx": "13",
         "flag": "37",
-        "mask": "0"
+        "mask": "0",
+        "stage": 6,
+        "monsters": [],
+        "max_mon": 0
     },
     {
         "qid": "m10114",
@@ -2737,7 +4124,12 @@
         "star": "1",
         "idx": "14",
         "flag": "37",
-        "mask": "1"
+        "mask": "1",
+        "stage": 6,
+        "monsters": [
+            27
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m10115",
@@ -2747,7 +4139,12 @@
         "star": "1",
         "idx": "15",
         "flag": "37",
-        "mask": "2"
+        "mask": "2",
+        "stage": 3,
+        "monsters": [
+            28
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m10116",
@@ -2757,7 +4154,12 @@
         "star": "1",
         "idx": "16",
         "flag": "37",
-        "mask": "3"
+        "mask": "3",
+        "stage": 3,
+        "monsters": [
+            8
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m10117",
@@ -2767,7 +4169,12 @@
         "star": "1",
         "idx": "17",
         "flag": "37",
-        "mask": "4"
+        "mask": "4",
+        "stage": 3,
+        "monsters": [
+            28
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m10118",
@@ -2777,7 +4184,12 @@
         "star": "1",
         "idx": "18",
         "flag": "37",
-        "mask": "5"
+        "mask": "5",
+        "stage": 3,
+        "monsters": [
+            8
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m10201",
@@ -2787,7 +4199,10 @@
         "star": "2",
         "idx": "01",
         "flag": "37",
-        "mask": "6"
+        "mask": "6",
+        "stage": 4,
+        "monsters": [],
+        "max_mon": 0
     },
     {
         "qid": "m10202",
@@ -2797,7 +4212,10 @@
         "star": "2",
         "idx": "02",
         "flag": "37",
-        "mask": "7"
+        "mask": "7",
+        "stage": 2,
+        "monsters": [],
+        "max_mon": 0
     },
     {
         "qid": "m10203",
@@ -2807,7 +4225,12 @@
         "star": "2",
         "idx": "03",
         "flag": "38",
-        "mask": "0"
+        "mask": "0",
+        "stage": 11,
+        "monsters": [
+            15
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m10204",
@@ -2817,7 +4240,12 @@
         "star": "2",
         "idx": "04",
         "flag": "38",
-        "mask": "1"
+        "mask": "1",
+        "stage": 21,
+        "monsters": [
+            77
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m10205",
@@ -2827,7 +4255,12 @@
         "star": "2",
         "idx": "05",
         "flag": "38",
-        "mask": "2"
+        "mask": "2",
+        "stage": 21,
+        "monsters": [
+            77
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m10206",
@@ -2837,7 +4270,12 @@
         "star": "2",
         "idx": "06",
         "flag": "38",
-        "mask": "3"
+        "mask": "3",
+        "stage": 20,
+        "monsters": [
+            48
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m10207",
@@ -2847,7 +4285,12 @@
         "star": "2",
         "idx": "07",
         "flag": "38",
-        "mask": "4"
+        "mask": "4",
+        "stage": 20,
+        "monsters": [
+            46
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m10208",
@@ -2857,7 +4300,12 @@
         "star": "2",
         "idx": "08",
         "flag": "38",
-        "mask": "5"
+        "mask": "5",
+        "stage": 6,
+        "monsters": [
+            52
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m10209",
@@ -2867,7 +4315,12 @@
         "star": "2",
         "idx": "09",
         "flag": "38",
-        "mask": "6"
+        "mask": "6",
+        "stage": 20,
+        "monsters": [
+            39
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m10210",
@@ -2877,7 +4330,12 @@
         "star": "2",
         "idx": "10",
         "flag": "38",
-        "mask": "7"
+        "mask": "7",
+        "stage": 3,
+        "monsters": [
+            48
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m10211",
@@ -2887,7 +4345,12 @@
         "star": "2",
         "idx": "11",
         "flag": "39",
-        "mask": "0"
+        "mask": "0",
+        "stage": 3,
+        "monsters": [
+            21
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m10212",
@@ -2897,7 +4360,12 @@
         "star": "2",
         "idx": "12",
         "flag": "39",
-        "mask": "1"
+        "mask": "1",
+        "stage": 3,
+        "monsters": [
+            28
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m10213",
@@ -2907,7 +4375,12 @@
         "star": "2",
         "idx": "13",
         "flag": "39",
-        "mask": "2"
+        "mask": "2",
+        "stage": 18,
+        "monsters": [
+            20
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m10214",
@@ -2917,7 +4390,12 @@
         "star": "2",
         "idx": "14",
         "flag": "39",
-        "mask": "3"
+        "mask": "3",
+        "stage": 18,
+        "monsters": [
+            38
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m10215",
@@ -2927,7 +4405,12 @@
         "star": "2",
         "idx": "15",
         "flag": "39",
-        "mask": "4"
+        "mask": "4",
+        "stage": 4,
+        "monsters": [
+            52
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m10216",
@@ -2937,7 +4420,12 @@
         "star": "2",
         "idx": "16",
         "flag": "39",
-        "mask": "5"
+        "mask": "5",
+        "stage": 4,
+        "monsters": [
+            31
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m10217",
@@ -2947,7 +4435,12 @@
         "star": "2",
         "idx": "17",
         "flag": "39",
-        "mask": "6"
+        "mask": "6",
+        "stage": 2,
+        "monsters": [
+            6
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m10218",
@@ -2957,7 +4450,12 @@
         "star": "2",
         "idx": "18",
         "flag": "39",
-        "mask": "7"
+        "mask": "7",
+        "stage": 2,
+        "monsters": [
+            6
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m10301",
@@ -2967,7 +4465,10 @@
         "star": "3",
         "idx": "01",
         "flag": "40",
-        "mask": "0"
+        "mask": "0",
+        "stage": 5,
+        "monsters": [],
+        "max_mon": 0
     },
     {
         "qid": "m10302",
@@ -2977,7 +4478,12 @@
         "star": "3",
         "idx": "02",
         "flag": "40",
-        "mask": "1"
+        "mask": "1",
+        "stage": 11,
+        "monsters": [
+            51
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m10303",
@@ -2987,7 +4493,12 @@
         "star": "3",
         "idx": "03",
         "flag": "40",
-        "mask": "2"
+        "mask": "2",
+        "stage": 18,
+        "monsters": [
+            45
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m10304",
@@ -2997,7 +4508,12 @@
         "star": "3",
         "idx": "04",
         "flag": "40",
-        "mask": "3"
+        "mask": "3",
+        "stage": 20,
+        "monsters": [
+            78
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m10305",
@@ -3007,7 +4523,13 @@
         "star": "3",
         "idx": "05",
         "flag": "40",
-        "mask": "4"
+        "mask": "4",
+        "stage": 20,
+        "monsters": [
+            27,
+            27
+        ],
+        "max_mon": 2
     },
     {
         "qid": "m10306",
@@ -3017,7 +4539,12 @@
         "star": "3",
         "idx": "06",
         "flag": "40",
-        "mask": "5"
+        "mask": "5",
+        "stage": 20,
+        "monsters": [
+            52
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m10307",
@@ -3027,7 +4554,12 @@
         "star": "3",
         "idx": "07",
         "flag": "40",
-        "mask": "6"
+        "mask": "6",
+        "stage": 17,
+        "monsters": [
+            26
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m10308",
@@ -3037,7 +4569,12 @@
         "star": "3",
         "idx": "08",
         "flag": "40",
-        "mask": "7"
+        "mask": "7",
+        "stage": 3,
+        "monsters": [
+            44
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m10309",
@@ -3047,7 +4584,12 @@
         "star": "3",
         "idx": "09",
         "flag": "41",
-        "mask": "0"
+        "mask": "0",
+        "stage": 4,
+        "monsters": [
+            67
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m10310",
@@ -3057,7 +4599,13 @@
         "star": "3",
         "idx": "10",
         "flag": "41",
-        "mask": "1"
+        "mask": "1",
+        "stage": 18,
+        "monsters": [
+            6,
+            38
+        ],
+        "max_mon": 2
     },
     {
         "qid": "m10311",
@@ -3067,7 +4615,12 @@
         "star": "3",
         "idx": "11",
         "flag": "41",
-        "mask": "2"
+        "mask": "2",
+        "stage": 5,
+        "monsters": [
+            31
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m10312",
@@ -3077,7 +4630,12 @@
         "star": "3",
         "idx": "12",
         "flag": "41",
-        "mask": "3"
+        "mask": "3",
+        "stage": 5,
+        "monsters": [
+            22
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m10313",
@@ -3087,7 +4645,12 @@
         "star": "3",
         "idx": "13",
         "flag": "41",
-        "mask": "4"
+        "mask": "4",
+        "stage": 19,
+        "monsters": [
+            67
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m10314",
@@ -3097,7 +4660,12 @@
         "star": "3",
         "idx": "14",
         "flag": "41",
-        "mask": "5"
+        "mask": "5",
+        "stage": 19,
+        "monsters": [
+            22
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m10315",
@@ -3107,7 +4675,12 @@
         "star": "3",
         "idx": "15",
         "flag": "41",
-        "mask": "6"
+        "mask": "6",
+        "stage": 5,
+        "monsters": [
+            31
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m10316",
@@ -3117,7 +4690,12 @@
         "star": "3",
         "idx": "16",
         "flag": "41",
-        "mask": "7"
+        "mask": "7",
+        "stage": 5,
+        "monsters": [
+            67
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m10317",
@@ -3127,7 +4705,12 @@
         "star": "3",
         "idx": "17",
         "flag": "42",
-        "mask": "0"
+        "mask": "0",
+        "stage": 21,
+        "monsters": [
+            54
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m10318",
@@ -3137,7 +4720,12 @@
         "star": "3",
         "idx": "18",
         "flag": "42",
-        "mask": "1"
+        "mask": "1",
+        "stage": 20,
+        "monsters": [
+            54
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m10319",
@@ -3147,7 +4735,10 @@
         "star": "3",
         "idx": "19",
         "flag": "42",
-        "mask": "2"
+        "mask": "2",
+        "stage": 10,
+        "monsters": [],
+        "max_mon": 0
     },
     {
         "qid": "m10401",
@@ -3157,7 +4748,12 @@
         "star": "4",
         "idx": "01",
         "flag": "42",
-        "mask": "4"
+        "mask": "4",
+        "stage": 21,
+        "monsters": [
+            75
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m10402",
@@ -3167,7 +4763,12 @@
         "star": "4",
         "idx": "02",
         "flag": "42",
-        "mask": "5"
+        "mask": "5",
+        "stage": 21,
+        "monsters": [
+            33
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m10403",
@@ -3177,7 +4778,13 @@
         "star": "4",
         "idx": "03",
         "flag": "42",
-        "mask": "6"
+        "mask": "6",
+        "stage": 11,
+        "monsters": [
+            51,
+            51
+        ],
+        "max_mon": 2
     },
     {
         "qid": "m10404",
@@ -3187,7 +4794,13 @@
         "star": "4",
         "idx": "04",
         "flag": "42",
-        "mask": "7"
+        "mask": "7",
+        "stage": 20,
+        "monsters": [
+            20,
+            39
+        ],
+        "max_mon": 2
     },
     {
         "qid": "m10405",
@@ -3197,7 +4810,12 @@
         "star": "4",
         "idx": "05",
         "flag": "43",
-        "mask": "0"
+        "mask": "0",
+        "stage": 3,
+        "monsters": [
+            75
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m10406",
@@ -3207,7 +4825,12 @@
         "star": "4",
         "idx": "06",
         "flag": "43",
-        "mask": "1"
+        "mask": "1",
+        "stage": 3,
+        "monsters": [
+            14
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m10407",
@@ -3217,7 +4840,12 @@
         "star": "4",
         "idx": "07",
         "flag": "43",
-        "mask": "2"
+        "mask": "2",
+        "stage": 17,
+        "monsters": [
+            43
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m10408",
@@ -3227,7 +4855,13 @@
         "star": "4",
         "idx": "08",
         "flag": "43",
-        "mask": "3"
+        "mask": "3",
+        "stage": 17,
+        "monsters": [
+            48,
+            48
+        ],
+        "max_mon": 2
     },
     {
         "qid": "m10409",
@@ -3237,7 +4871,12 @@
         "star": "4",
         "idx": "09",
         "flag": "43",
-        "mask": "4"
+        "mask": "4",
+        "stage": 18,
+        "monsters": [
+            47
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m10410",
@@ -3247,7 +4886,12 @@
         "star": "4",
         "idx": "10",
         "flag": "43",
-        "mask": "5"
+        "mask": "5",
+        "stage": 2,
+        "monsters": [
+            38
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m10411",
@@ -3257,7 +4901,12 @@
         "star": "4",
         "idx": "11",
         "flag": "43",
-        "mask": "6"
+        "mask": "6",
+        "stage": 5,
+        "monsters": [
+            17
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m10412",
@@ -3267,7 +4916,10 @@
         "star": "4",
         "idx": "12",
         "flag": "43",
-        "mask": "7"
+        "mask": "7",
+        "stage": 15,
+        "monsters": [],
+        "max_mon": 0
     },
     {
         "qid": "m10413",
@@ -3277,7 +4929,12 @@
         "star": "4",
         "idx": "13",
         "flag": "44",
-        "mask": "0"
+        "mask": "0",
+        "stage": 5,
+        "monsters": [
+            64
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m10414",
@@ -3287,7 +4944,12 @@
         "star": "4",
         "idx": "14",
         "flag": "44",
-        "mask": "1"
+        "mask": "1",
+        "stage": 15,
+        "monsters": [
+            64
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m10415",
@@ -3297,7 +4959,12 @@
         "star": "4",
         "idx": "15",
         "flag": "44",
-        "mask": "2"
+        "mask": "2",
+        "stage": 2,
+        "monsters": [
+            59
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m10416",
@@ -3307,7 +4974,12 @@
         "star": "4",
         "idx": "16",
         "flag": "44",
-        "mask": "3"
+        "mask": "3",
+        "stage": 4,
+        "monsters": [
+            59
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m10417",
@@ -3317,7 +4989,12 @@
         "star": "4",
         "idx": "17",
         "flag": "44",
-        "mask": "4"
+        "mask": "4",
+        "stage": 18,
+        "monsters": [
+            15
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m10418",
@@ -3327,7 +5004,13 @@
         "star": "4",
         "idx": "18",
         "flag": "44",
-        "mask": "5"
+        "mask": "5",
+        "stage": 4,
+        "monsters": [
+            52,
+            52
+        ],
+        "max_mon": 2
     },
     {
         "qid": "m10501",
@@ -3337,7 +5020,13 @@
         "star": "5",
         "idx": "01",
         "flag": "45",
-        "mask": "0"
+        "mask": "0",
+        "stage": 2,
+        "monsters": [
+            11,
+            1
+        ],
+        "max_mon": 2
     },
     {
         "qid": "m10502",
@@ -3347,7 +5036,13 @@
         "star": "5",
         "idx": "02",
         "flag": "45",
-        "mask": "1"
+        "mask": "1",
+        "stage": 6,
+        "monsters": [
+            21,
+            46
+        ],
+        "max_mon": 2
     },
     {
         "qid": "m10503",
@@ -3357,7 +5052,12 @@
         "star": "5",
         "idx": "03",
         "flag": "45",
-        "mask": "2"
+        "mask": "2",
+        "stage": 20,
+        "monsters": [
+            37
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m10504",
@@ -3367,7 +5067,13 @@
         "star": "5",
         "idx": "04",
         "flag": "45",
-        "mask": "3"
+        "mask": "3",
+        "stage": 17,
+        "monsters": [
+            14,
+            43
+        ],
+        "max_mon": 2
     },
     {
         "qid": "m10505",
@@ -3377,7 +5083,12 @@
         "star": "5",
         "idx": "05",
         "flag": "45",
-        "mask": "4"
+        "mask": "4",
+        "stage": 3,
+        "monsters": [
+            65
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m10506",
@@ -3387,7 +5098,12 @@
         "star": "5",
         "idx": "06",
         "flag": "45",
-        "mask": "5"
+        "mask": "5",
+        "stage": 19,
+        "monsters": [
+            65
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m10507",
@@ -3397,7 +5113,13 @@
         "star": "5",
         "idx": "07",
         "flag": "45",
-        "mask": "6"
+        "mask": "6",
+        "stage": 5,
+        "monsters": [
+            67,
+            67
+        ],
+        "max_mon": 2
     },
     {
         "qid": "m10508",
@@ -3407,7 +5129,12 @@
         "star": "5",
         "idx": "08",
         "flag": "45",
-        "mask": "7"
+        "mask": "7",
+        "stage": 2,
+        "monsters": [
+            49
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m10509",
@@ -3417,7 +5144,12 @@
         "star": "5",
         "idx": "09",
         "flag": "46",
-        "mask": "0"
+        "mask": "0",
+        "stage": 12,
+        "monsters": [
+            55
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m10510",
@@ -3427,7 +5159,13 @@
         "star": "5",
         "idx": "10",
         "flag": "46",
-        "mask": "1"
+        "mask": "1",
+        "stage": 9,
+        "monsters": [
+            53,
+            53
+        ],
+        "max_mon": 2
     },
     {
         "qid": "m10511",
@@ -3437,7 +5175,12 @@
         "star": "5",
         "idx": "11",
         "flag": "46",
-        "mask": "2"
+        "mask": "2",
+        "stage": 1,
+        "monsters": [
+            7
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m11001",
@@ -3447,7 +5190,12 @@
         "star": "0",
         "idx": "01",
         "flag": "46",
-        "mask": "6"
+        "mask": "6",
+        "stage": 18,
+        "monsters": [
+            68
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m11002",
@@ -3457,7 +5205,12 @@
         "star": "0",
         "idx": "02",
         "flag": "46",
-        "mask": "7"
+        "mask": "7",
+        "stage": 10,
+        "monsters": [
+            79
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m11003",
@@ -3467,7 +5220,10 @@
         "star": "0",
         "idx": "03",
         "flag": "47",
-        "mask": "0"
+        "mask": "0",
+        "stage": 10,
+        "monsters": [],
+        "max_mon": 0
     },
     {
         "qid": "m11004",
@@ -3477,7 +5233,13 @@
         "star": "0",
         "idx": "04",
         "flag": "47",
-        "mask": "1"
+        "mask": "1",
+        "stage": 6,
+        "monsters": [
+            80,
+            27
+        ],
+        "max_mon": 2
     },
     {
         "qid": "m11005",
@@ -3487,7 +5249,12 @@
         "star": "0",
         "idx": "05",
         "flag": "47",
-        "mask": "2"
+        "mask": "2",
+        "stage": 30,
+        "monsters": [
+            82
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m11006",
@@ -3497,7 +5264,13 @@
         "star": "0",
         "idx": "06",
         "flag": "47",
-        "mask": "3"
+        "mask": "3",
+        "stage": 27,
+        "monsters": [
+            8,
+            28
+        ],
+        "max_mon": 2
     },
     {
         "qid": "m11007",
@@ -3507,7 +5280,12 @@
         "star": "0",
         "idx": "07",
         "flag": "47",
-        "mask": "4"
+        "mask": "4",
+        "stage": 28,
+        "monsters": [
+            20
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m11008",
@@ -3517,7 +5295,13 @@
         "star": "0",
         "idx": "08",
         "flag": "47",
-        "mask": "5"
+        "mask": "5",
+        "stage": 4,
+        "monsters": [
+            39,
+            68
+        ],
+        "max_mon": 2
     },
     {
         "qid": "m11009",
@@ -3527,7 +5311,12 @@
         "star": "0",
         "idx": "09",
         "flag": "47",
-        "mask": "6"
+        "mask": "6",
+        "stage": 28,
+        "monsters": [
+            22
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m11010",
@@ -3537,7 +5326,12 @@
         "star": "0",
         "idx": "10",
         "flag": "47",
-        "mask": "7"
+        "mask": "7",
+        "stage": 26,
+        "monsters": [
+            15
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m11011",
@@ -3547,7 +5341,13 @@
         "star": "0",
         "idx": "11",
         "flag": "48",
-        "mask": "0"
+        "mask": "0",
+        "stage": 11,
+        "monsters": [
+            45,
+            77
+        ],
+        "max_mon": 2
     },
     {
         "qid": "m11012",
@@ -3557,7 +5357,12 @@
         "star": "0",
         "idx": "12",
         "flag": "48",
-        "mask": "1"
+        "mask": "1",
+        "stage": 4,
+        "monsters": [
+            52
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m11013",
@@ -3567,7 +5372,12 @@
         "star": "0",
         "idx": "13",
         "flag": "48",
-        "mask": "2"
+        "mask": "2",
+        "stage": 6,
+        "monsters": [
+            48
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m11014",
@@ -3577,7 +5387,12 @@
         "star": "0",
         "idx": "14",
         "flag": "48",
-        "mask": "3"
+        "mask": "3",
+        "stage": 6,
+        "monsters": [
+            6
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m11101",
@@ -3587,7 +5402,12 @@
         "star": "1",
         "idx": "01",
         "flag": "49",
-        "mask": "3"
+        "mask": "3",
+        "stage": 9,
+        "monsters": [
+            31
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m11102",
@@ -3597,7 +5417,13 @@
         "star": "1",
         "idx": "02",
         "flag": "49",
-        "mask": "4"
+        "mask": "4",
+        "stage": 31,
+        "monsters": [
+            82,
+            82
+        ],
+        "max_mon": 2
     },
     {
         "qid": "m11103",
@@ -3607,7 +5433,12 @@
         "star": "1",
         "idx": "03",
         "flag": "49",
-        "mask": "5"
+        "mask": "5",
+        "stage": 27,
+        "monsters": [
+            21
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m11104",
@@ -3617,7 +5448,13 @@
         "star": "1",
         "idx": "04",
         "flag": "49",
-        "mask": "6"
+        "mask": "6",
+        "stage": 26,
+        "monsters": [
+            46,
+            46
+        ],
+        "max_mon": 2
     },
     {
         "qid": "m11105",
@@ -3627,7 +5464,12 @@
         "star": "1",
         "idx": "05",
         "flag": "49",
-        "mask": "7"
+        "mask": "7",
+        "stage": 16,
+        "monsters": [
+            40
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m11106",
@@ -3637,7 +5479,12 @@
         "star": "1",
         "idx": "06",
         "flag": "50",
-        "mask": "0"
+        "mask": "0",
+        "stage": 3,
+        "monsters": [
+            26
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m11107",
@@ -3647,7 +5494,13 @@
         "star": "1",
         "idx": "07",
         "flag": "50",
-        "mask": "1"
+        "mask": "1",
+        "stage": 27,
+        "monsters": [
+            26,
+            44
+        ],
+        "max_mon": 2
     },
     {
         "qid": "m11108",
@@ -3657,7 +5510,13 @@
         "star": "1",
         "idx": "08",
         "flag": "50",
-        "mask": "2"
+        "mask": "2",
+        "stage": 2,
+        "monsters": [
+            6,
+            38
+        ],
+        "max_mon": 2
     },
     {
         "qid": "m11109",
@@ -3667,7 +5526,13 @@
         "star": "1",
         "idx": "09",
         "flag": "50",
-        "mask": "3"
+        "mask": "3",
+        "stage": 29,
+        "monsters": [
+            22,
+            22
+        ],
+        "max_mon": 2
     },
     {
         "qid": "m11110",
@@ -3677,7 +5542,12 @@
         "star": "1",
         "idx": "10",
         "flag": "50",
-        "mask": "4"
+        "mask": "4",
+        "stage": 5,
+        "monsters": [
+            67
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m11111",
@@ -3687,7 +5557,12 @@
         "star": "1",
         "idx": "11",
         "flag": "50",
-        "mask": "5"
+        "mask": "5",
+        "stage": 21,
+        "monsters": [
+            51
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m11112",
@@ -3697,7 +5572,12 @@
         "star": "1",
         "idx": "12",
         "flag": "50",
-        "mask": "6"
+        "mask": "6",
+        "stage": 3,
+        "monsters": [
+            21
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m11113",
@@ -3707,7 +5587,12 @@
         "star": "1",
         "idx": "13",
         "flag": "50",
-        "mask": "7"
+        "mask": "7",
+        "stage": 18,
+        "monsters": [
+            52
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m11114",
@@ -3717,7 +5602,12 @@
         "star": "1",
         "idx": "14",
         "flag": "51",
-        "mask": "0"
+        "mask": "0",
+        "stage": 6,
+        "monsters": [
+            20
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m11115",
@@ -3727,7 +5617,12 @@
         "star": "1",
         "idx": "15",
         "flag": "51",
-        "mask": "1"
+        "mask": "1",
+        "stage": 26,
+        "monsters": [
+            15
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m11116",
@@ -3737,7 +5632,12 @@
         "star": "1",
         "idx": "16",
         "flag": "51",
-        "mask": "2"
+        "mask": "2",
+        "stage": 12,
+        "monsters": [
+            60
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m11117",
@@ -3747,7 +5647,12 @@
         "star": "1",
         "idx": "17",
         "flag": "51",
-        "mask": "3"
+        "mask": "3",
+        "stage": 5,
+        "monsters": [
+            64
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m11118",
@@ -3757,7 +5662,12 @@
         "star": "1",
         "idx": "18",
         "flag": "51",
-        "mask": "4"
+        "mask": "4",
+        "stage": 17,
+        "monsters": [
+            64
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m11119",
@@ -3767,7 +5677,12 @@
         "star": "1",
         "idx": "19",
         "flag": "51",
-        "mask": "5"
+        "mask": "5",
+        "stage": 1,
+        "monsters": [
+            50
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m11201",
@@ -3777,7 +5692,12 @@
         "star": "2",
         "idx": "01",
         "flag": "52",
-        "mask": "4"
+        "mask": "4",
+        "stage": 30,
+        "monsters": [
+            81
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m11202",
@@ -3787,7 +5707,12 @@
         "star": "2",
         "idx": "02",
         "flag": "52",
-        "mask": "5"
+        "mask": "5",
+        "stage": 26,
+        "monsters": [
+            81
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m11203",
@@ -3797,7 +5722,13 @@
         "star": "2",
         "idx": "03",
         "flag": "52",
-        "mask": "6"
+        "mask": "6",
+        "stage": 21,
+        "monsters": [
+            75,
+            75
+        ],
+        "max_mon": 2
     },
     {
         "qid": "m11204",
@@ -3807,7 +5738,12 @@
         "star": "2",
         "idx": "04",
         "flag": "52",
-        "mask": "7"
+        "mask": "7",
+        "stage": 29,
+        "monsters": [
+            11
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m11205",
@@ -3817,7 +5753,12 @@
         "star": "2",
         "idx": "05",
         "flag": "53",
-        "mask": "0"
+        "mask": "0",
+        "stage": 27,
+        "monsters": [
+            1
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m11206",
@@ -3827,7 +5768,13 @@
         "star": "2",
         "idx": "06",
         "flag": "53",
-        "mask": "1"
+        "mask": "1",
+        "stage": 16,
+        "monsters": [
+            49,
+            37
+        ],
+        "max_mon": 2
     },
     {
         "qid": "m11207",
@@ -3837,7 +5784,12 @@
         "star": "2",
         "idx": "07",
         "flag": "53",
-        "mask": "2"
+        "mask": "2",
+        "stage": 17,
+        "monsters": [
+            14
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m11208",
@@ -3847,7 +5799,13 @@
         "star": "2",
         "idx": "08",
         "flag": "53",
-        "mask": "3"
+        "mask": "3",
+        "stage": 27,
+        "monsters": [
+            43,
+            43
+        ],
+        "max_mon": 2
     },
     {
         "qid": "m11209",
@@ -3857,7 +5815,13 @@
         "star": "2",
         "idx": "09",
         "flag": "53",
-        "mask": "4"
+        "mask": "4",
+        "stage": 29,
+        "monsters": [
+            17,
+            31
+        ],
+        "max_mon": 2
     },
     {
         "qid": "m11210",
@@ -3867,7 +5831,13 @@
         "star": "2",
         "idx": "10",
         "flag": "53",
-        "mask": "5"
+        "mask": "5",
+        "stage": 29,
+        "monsters": [
+            47,
+            47
+        ],
+        "max_mon": 2
     },
     {
         "qid": "m11211",
@@ -3877,7 +5847,12 @@
         "star": "2",
         "idx": "11",
         "flag": "53",
-        "mask": "6"
+        "mask": "6",
+        "stage": 13,
+        "monsters": [
+            41
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m11212",
@@ -3887,7 +5862,12 @@
         "star": "2",
         "idx": "12",
         "flag": "53",
-        "mask": "7"
+        "mask": "7",
+        "stage": 13,
+        "monsters": [
+            42
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m11213",
@@ -3897,7 +5877,13 @@
         "star": "2",
         "idx": "13",
         "flag": "54",
-        "mask": "0"
+        "mask": "0",
+        "stage": 28,
+        "monsters": [
+            42,
+            41
+        ],
+        "max_mon": 2
     },
     {
         "qid": "m11214",
@@ -3907,7 +5893,12 @@
         "star": "2",
         "idx": "14",
         "flag": "54",
-        "mask": "1"
+        "mask": "1",
+        "stage": 19,
+        "monsters": [
+            53
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m11215",
@@ -3917,7 +5908,12 @@
         "star": "2",
         "idx": "15",
         "flag": "54",
-        "mask": "2"
+        "mask": "2",
+        "stage": 26,
+        "monsters": [
+            33
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m11216",
@@ -3927,7 +5923,12 @@
         "star": "2",
         "idx": "16",
         "flag": "54",
-        "mask": "3"
+        "mask": "3",
+        "stage": 11,
+        "monsters": [
+            51
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m11217",
@@ -3937,7 +5938,12 @@
         "star": "2",
         "idx": "17",
         "flag": "54",
-        "mask": "4"
+        "mask": "4",
+        "stage": 5,
+        "monsters": [
+            17
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m11218",
@@ -3947,7 +5953,12 @@
         "star": "2",
         "idx": "18",
         "flag": "54",
-        "mask": "5"
+        "mask": "5",
+        "stage": 16,
+        "monsters": [
+            6
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m11219",
@@ -3957,7 +5968,12 @@
         "star": "2",
         "idx": "19",
         "flag": "54",
-        "mask": "6"
+        "mask": "6",
+        "stage": 27,
+        "monsters": [
+            26
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m11220",
@@ -3967,7 +5983,12 @@
         "star": "2",
         "idx": "20",
         "flag": "54",
-        "mask": "7"
+        "mask": "7",
+        "stage": 2,
+        "monsters": [
+            59
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m11221",
@@ -3977,7 +5998,12 @@
         "star": "2",
         "idx": "21",
         "flag": "55",
-        "mask": "0"
+        "mask": "0",
+        "stage": 20,
+        "monsters": [
+            59
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m11222",
@@ -3987,7 +6013,12 @@
         "star": "2",
         "idx": "22",
         "flag": "55",
-        "mask": "1"
+        "mask": "1",
+        "stage": 12,
+        "monsters": [
+            65
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m11223",
@@ -3997,7 +6028,12 @@
         "star": "2",
         "idx": "23",
         "flag": "55",
-        "mask": "2"
+        "mask": "2",
+        "stage": 18,
+        "monsters": [
+            65
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m11224",
@@ -4007,7 +6043,12 @@
         "star": "2",
         "idx": "24",
         "flag": "55",
-        "mask": "3"
+        "mask": "3",
+        "stage": 1,
+        "monsters": [
+            55
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m11225",
@@ -4017,7 +6058,12 @@
         "star": "2",
         "idx": "25",
         "flag": "55",
-        "mask": "4"
+        "mask": "4",
+        "stage": 8,
+        "monsters": [
+            76
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m11226",
@@ -4027,7 +6073,12 @@
         "star": "2",
         "idx": "26",
         "flag": "55",
-        "mask": "5"
+        "mask": "5",
+        "stage": 9,
+        "monsters": [
+            11
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m20001",
@@ -4037,7 +6088,10 @@
         "star": "0",
         "idx": "01",
         "flag": "56",
-        "mask": "2"
+        "mask": "2",
+        "stage": 11,
+        "monsters": [],
+        "max_mon": 0
     },
     {
         "qid": "m20002",
@@ -4047,7 +6101,10 @@
         "star": "0",
         "idx": "02",
         "flag": "56",
-        "mask": "3"
+        "mask": "3",
+        "stage": 11,
+        "monsters": [],
+        "max_mon": 0
     },
     {
         "qid": "m20003",
@@ -4057,7 +6114,10 @@
         "star": "0",
         "idx": "03",
         "flag": "56",
-        "mask": "4"
+        "mask": "4",
+        "stage": 11,
+        "monsters": [],
+        "max_mon": 0
     },
     {
         "qid": "m20004",
@@ -4067,7 +6127,10 @@
         "star": "0",
         "idx": "04",
         "flag": "56",
-        "mask": "5"
+        "mask": "5",
+        "stage": 11,
+        "monsters": [],
+        "max_mon": 0
     },
     {
         "qid": "m20005",
@@ -4077,7 +6140,10 @@
         "star": "0",
         "idx": "05",
         "flag": "56",
-        "mask": "6"
+        "mask": "6",
+        "stage": 11,
+        "monsters": [],
+        "max_mon": 0
     },
     {
         "qid": "m20006",
@@ -4087,7 +6153,10 @@
         "star": "0",
         "idx": "06",
         "flag": "56",
-        "mask": "7"
+        "mask": "7",
+        "stage": 11,
+        "monsters": [],
+        "max_mon": 0
     },
     {
         "qid": "m20007",
@@ -4097,7 +6166,12 @@
         "star": "0",
         "idx": "07",
         "flag": "57",
-        "mask": "0"
+        "mask": "0",
+        "stage": 11,
+        "monsters": [
+            77
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m20008",
@@ -4107,7 +6181,10 @@
         "star": "0",
         "idx": "08",
         "flag": "57",
-        "mask": "1"
+        "mask": "1",
+        "stage": 11,
+        "monsters": [],
+        "max_mon": 0
     },
     {
         "qid": "m20009",
@@ -4117,7 +6194,10 @@
         "star": "0",
         "idx": "09",
         "flag": "57",
-        "mask": "2"
+        "mask": "2",
+        "stage": 11,
+        "monsters": [],
+        "max_mon": 0
     },
     {
         "qid": "m20010",
@@ -4127,7 +6207,10 @@
         "star": "0",
         "idx": "10",
         "flag": "57",
-        "mask": "3"
+        "mask": "3",
+        "stage": 11,
+        "monsters": [],
+        "max_mon": 0
     },
     {
         "qid": "m20011",
@@ -4137,7 +6220,10 @@
         "star": "0",
         "idx": "11",
         "flag": "57",
-        "mask": "4"
+        "mask": "4",
+        "stage": 11,
+        "monsters": [],
+        "max_mon": 0
     },
     {
         "qid": "m20012",
@@ -4147,7 +6233,10 @@
         "star": "0",
         "idx": "12",
         "flag": "57",
-        "mask": "5"
+        "mask": "5",
+        "stage": 11,
+        "monsters": [],
+        "max_mon": 0
     },
     {
         "qid": "m20013",
@@ -4157,7 +6246,10 @@
         "star": "0",
         "idx": "13",
         "flag": "57",
-        "mask": "6"
+        "mask": "6",
+        "stage": 11,
+        "monsters": [],
+        "max_mon": 0
     },
     {
         "qid": "m20014",
@@ -4167,7 +6259,10 @@
         "star": "0",
         "idx": "14",
         "flag": "57",
-        "mask": "7"
+        "mask": "7",
+        "stage": 11,
+        "monsters": [],
+        "max_mon": 0
     },
     {
         "qid": "m20015",
@@ -4177,7 +6272,10 @@
         "star": "0",
         "idx": "15",
         "flag": "58",
-        "mask": "0"
+        "mask": "0",
+        "stage": 11,
+        "monsters": [],
+        "max_mon": 0
     },
     {
         "qid": "m20016",
@@ -4187,7 +6285,10 @@
         "star": "0",
         "idx": "16",
         "flag": "58",
-        "mask": "1"
+        "mask": "1",
+        "stage": 11,
+        "monsters": [],
+        "max_mon": 0
     },
     {
         "qid": "m20017",
@@ -4197,7 +6298,10 @@
         "star": "0",
         "idx": "17",
         "flag": "58",
-        "mask": "2"
+        "mask": "2",
+        "stage": 11,
+        "monsters": [],
+        "max_mon": 0
     },
     {
         "qid": "m20018",
@@ -4207,7 +6311,10 @@
         "star": "0",
         "idx": "18",
         "flag": "58",
-        "mask": "3"
+        "mask": "3",
+        "stage": 11,
+        "monsters": [],
+        "max_mon": 0
     },
     {
         "qid": "m21001",
@@ -4217,7 +6324,12 @@
         "star": "0",
         "idx": "01",
         "flag": "58",
-        "mask": "4"
+        "mask": "4",
+        "stage": 9,
+        "monsters": [
+            6
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m21002",
@@ -4227,7 +6339,12 @@
         "star": "0",
         "idx": "02",
         "flag": "58",
-        "mask": "5"
+        "mask": "5",
+        "stage": 9,
+        "monsters": [
+            52
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m21003",
@@ -4237,7 +6354,12 @@
         "star": "0",
         "idx": "03",
         "flag": "58",
-        "mask": "6"
+        "mask": "6",
+        "stage": 9,
+        "monsters": [
+            15
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m21004",
@@ -4247,7 +6369,12 @@
         "star": "0",
         "idx": "04",
         "flag": "58",
-        "mask": "7"
+        "mask": "7",
+        "stage": 9,
+        "monsters": [
+            48
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m21005",
@@ -4257,7 +6384,12 @@
         "star": "0",
         "idx": "05",
         "flag": "59",
-        "mask": "0"
+        "mask": "0",
+        "stage": 9,
+        "monsters": [
+            51
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m21006",
@@ -4267,7 +6399,12 @@
         "star": "0",
         "idx": "06",
         "flag": "59",
-        "mask": "1"
+        "mask": "1",
+        "stage": 9,
+        "monsters": [
+            78
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m21007",
@@ -4277,7 +6414,12 @@
         "star": "0",
         "idx": "07",
         "flag": "59",
-        "mask": "2"
+        "mask": "2",
+        "stage": 9,
+        "monsters": [
+            75
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m21008",
@@ -4287,7 +6429,12 @@
         "star": "0",
         "idx": "08",
         "flag": "59",
-        "mask": "3"
+        "mask": "3",
+        "stage": 9,
+        "monsters": [
+            14
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m21009",
@@ -4297,7 +6444,12 @@
         "star": "0",
         "idx": "09",
         "flag": "59",
-        "mask": "4"
+        "mask": "4",
+        "stage": 9,
+        "monsters": [
+            17
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m21010",
@@ -4307,7 +6459,12 @@
         "star": "0",
         "idx": "10",
         "flag": "59",
-        "mask": "5"
+        "mask": "5",
+        "stage": 9,
+        "monsters": [
+            33
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m21011",
@@ -4317,7 +6474,12 @@
         "star": "0",
         "idx": "11",
         "flag": "59",
-        "mask": "6"
+        "mask": "6",
+        "stage": 3,
+        "monsters": [
+            8
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m21012",
@@ -4327,7 +6489,12 @@
         "star": "0",
         "idx": "12",
         "flag": "59",
-        "mask": "7"
+        "mask": "7",
+        "stage": 20,
+        "monsters": [
+            21
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m21013",
@@ -4337,7 +6504,12 @@
         "star": "0",
         "idx": "13",
         "flag": "60",
-        "mask": "0"
+        "mask": "0",
+        "stage": 4,
+        "monsters": [
+            67
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m21014",
@@ -4347,7 +6519,12 @@
         "star": "0",
         "idx": "14",
         "flag": "60",
-        "mask": "1"
+        "mask": "1",
+        "stage": 2,
+        "monsters": [
+            11
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m21015",
@@ -4357,7 +6534,12 @@
         "star": "0",
         "idx": "15",
         "flag": "60",
-        "mask": "2"
+        "mask": "2",
+        "stage": 11,
+        "monsters": [
+            53
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m21016",
@@ -4367,7 +6549,12 @@
         "star": "0",
         "idx": "16",
         "flag": "60",
-        "mask": "3"
+        "mask": "3",
+        "stage": 30,
+        "monsters": [
+            82
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m21017",
@@ -4377,7 +6564,12 @@
         "star": "0",
         "idx": "17",
         "flag": "60",
-        "mask": "4"
+        "mask": "4",
+        "stage": 26,
+        "monsters": [
+            85
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m21018",
@@ -4387,7 +6579,12 @@
         "star": "0",
         "idx": "18",
         "flag": "60",
-        "mask": "5"
+        "mask": "5",
+        "stage": 27,
+        "monsters": [
+            86
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m21019",
@@ -4397,7 +6594,12 @@
         "star": "0",
         "idx": "19",
         "flag": "60",
-        "mask": "6"
+        "mask": "6",
+        "stage": 31,
+        "monsters": [
+            81
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m21020",
@@ -4407,7 +6609,12 @@
         "star": "0",
         "idx": "20",
         "flag": "60",
-        "mask": "7"
+        "mask": "7",
+        "stage": 27,
+        "monsters": [
+            84
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m21021",
@@ -4417,7 +6624,12 @@
         "star": "0",
         "idx": "21",
         "flag": "61",
-        "mask": "0"
+        "mask": "0",
+        "stage": 19,
+        "monsters": [
+            83
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m21022",
@@ -4427,7 +6639,12 @@
         "star": "0",
         "idx": "22",
         "flag": "61",
-        "mask": "1"
+        "mask": "1",
+        "stage": 28,
+        "monsters": [
+            87
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m21023",
@@ -4437,7 +6654,12 @@
         "star": "0",
         "idx": "23",
         "flag": "61",
-        "mask": "2"
+        "mask": "2",
+        "stage": 29,
+        "monsters": [
+            89
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m22001",
@@ -4447,7 +6669,12 @@
         "star": "0",
         "idx": "01",
         "flag": "61",
-        "mask": "3"
+        "mask": "3",
+        "stage": 9,
+        "monsters": [
+            38
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m22002",
@@ -4457,7 +6684,12 @@
         "star": "0",
         "idx": "02",
         "flag": "61",
-        "mask": "4"
+        "mask": "4",
+        "stage": 3,
+        "monsters": [
+            8
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m22003",
@@ -4467,7 +6699,12 @@
         "star": "0",
         "idx": "03",
         "flag": "61",
-        "mask": "5"
+        "mask": "5",
+        "stage": 6,
+        "monsters": [
+            1
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m22004",
@@ -4477,7 +6714,12 @@
         "star": "0",
         "idx": "04",
         "flag": "61",
-        "mask": "6"
+        "mask": "6",
+        "stage": 9,
+        "monsters": [
+            52
+        ],
+        "max_mon": 1
     },
     {
         "qid": "m22005",
@@ -4487,7 +6729,13 @@
         "star": "0",
         "idx": "05",
         "flag": "61",
-        "mask": "7"
+        "mask": "7",
+        "stage": 9,
+        "monsters": [
+            67,
+            67
+        ],
+        "max_mon": 2
     },
     {
         "qid": "m22006",
@@ -4497,6 +6745,11 @@
         "star": "0",
         "idx": "06",
         "flag": "62",
-        "mask": "0"
+        "mask": "0",
+        "stage": 9,
+        "monsters": [
+            75
+        ],
+        "max_mon": 1
     }
 ]

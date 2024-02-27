@@ -18,9 +18,10 @@ def can_complete_all_quests(state: "CollectionState", qids: List[str], player: i
     return True
 
 
-def can_hunt_monsters(state: "CollectionState", monsters: List[str], player: int, any = False):
+def can_hunt_monsters(state: "CollectionState", monsters: List[str], player: int, any_monster=False):
     # any means return true if any, else return true if all
     return True
+
 
 def set_rules(world: "MHFUWorld"):
     for hub, rank, star in world.rank_requirements:

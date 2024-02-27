@@ -58,6 +58,7 @@ MHFU_POINTERS = {
         "SHOP_GUNNER": 0x08949C0E,
         "BLADEMASTER_UPGRADES": 0x0894CEC0,
         "GUNNER_UPGRADES": 0x08954C88,
+        "ZENNY": 0x099FF090,
         "CURRENT_OVL": 0x09A5A5A0,
         "RESET_ACTION": 0x090AF355,  # byte
         "SET_ACTION": 0x090AF418,  # half
@@ -120,27 +121,30 @@ async def handle_logs(ctx: MHFUContext, logs: typing.List):
             # we hit a breakpoint
             breakpoint = log["message"].replace("\n", "").rsplit(" ")[-1]
             if breakpoint == "QUEST_LOAD":
-                print(breakpoint)
-                quest_base = MHFU_BREAKPOINTS[breakpoint][0]
-                large_mon_ptr_ptr = quest_base + 0x14
-                large_mon_ptr = (await ctx.ppsspp_read_unsigned(large_mon_ptr_ptr, 32))["value"]
-                large_mon_id_ptr = await ctx.ppsspp_read_unsigned(large_mon_ptr + quest_base + 8, 32)
-                large_mon_info_ptr = await ctx.ppsspp_read_unsigned(large_mon_ptr + 12 + quest_base, 32)
-                large_mons = struct.unpack("IIII",
-                                           base64.b64decode((await ctx.ppsspp_read_bytes(
-                                               large_mon_id_ptr["value"] + quest_base, 16))["base64"]))
-                mons = {}
-                for idx, mon in enumerate([mon for mon in large_mons if mon != 0xFFFFFFFF]):
-                    # pull the mons
-                    mons[mon] = await ctx.ppsspp_read_bytes(large_mon_info_ptr["value"] + quest_base + (idx * 60), 60)
-                print(mons)
-                # apply difficulty modifier
-                info_out = bytearray()
-                for mon in mons:
-                    mon_data = bytearray(base64.b64decode(mons[mon]["base64"]))
-                    mon_data[5] = min(16, max(1, int(ctx.quest_multiplier * mon_data[5])))
-                    info_out.extend(mon_data)
-                await ctx.ppsspp_write_bytes(large_mon_info_ptr["value"] + quest_base, info_out)
+                if ctx.randomize_quest:
+                    quest_base = MHFU_BREAKPOINTS[breakpoint][0]
+                    quest_id = (await ctx.ppsspp_read_unsigned(quest_base + 100, 16))["value"]
+                    large_mon_ptr_ptr = quest_base + 0x14
+                    large_mon_ptr = (await ctx.ppsspp_read_unsigned(large_mon_ptr_ptr, 32))["value"]
+                    large_mon_id_ptr = await ctx.ppsspp_read_unsigned(large_mon_ptr + quest_base + 8, 32)
+                    large_mon_info_ptr = await ctx.ppsspp_read_unsigned(large_mon_ptr + 12 + quest_base, 32)
+                    large_mons = struct.unpack("IIII",
+                                               base64.b64decode((await ctx.ppsspp_read_bytes(
+                                                   large_mon_id_ptr["value"] + quest_base, 16))["base64"]))
+                    mons = {}
+                    for idx, mon in enumerate([mon for mon in large_mons if mon != 0xFFFFFFFF]):
+                        # pull the mons
+                        mons[idx] = await ctx.ppsspp_read_bytes(large_mon_info_ptr["value"] + quest_base + (idx * 60), 60)
+                    print(mons)
+                    # apply difficulty modifier
+                    info_out = bytearray()
+                    for mon in mons:
+                        mon_data = bytearray(base64.b64decode(mons[mon]["base64"]))
+                        mon_data[5] = min(16, max(1, int(ctx.quest_multiplier * mon_data[5])))
+                        info_out.extend(mon_data)
+                    await ctx.ppsspp_write_bytes(large_mon_info_ptr["value"] + quest_base, info_out)
+                # this gets pinged twice during quest load, we edit the first and fall through the second
+                ctx.randomize_quest = not ctx.randomize_quest
             elif breakpoint == "QUEST_COMPLETE":
                 new_checks = []
                 completion_bytes = await ctx.ppsspp_read_bytes(MHFU_POINTERS[ctx.lang]["QUEST_COMPLETE"], 63)
@@ -289,6 +293,10 @@ class MHFUContext(CommonContext):
     quest_randomization: bool = False
     quest_multiplier: float = 1.0
     cash_only: bool = False
+    item_queue: typing.List[NetworkItem] = []
+
+    # intermitten
+    randomize_quest: bool = True
 
     async def ppsspp_read_bytes(self, offset, length):
         result = await send_and_receive(self, json.dumps({
@@ -431,11 +439,25 @@ class MHFUContext(CommonContext):
         await self.get_key_binary()
         await self.set_equipment_status()
 
+    async def pop_item(self):
+        item = self.item_queue.pop()
+
+        if item.item == 24700083:
+            # Zenny Bag
+            current_zenny = (await self.ppsspp_read_unsigned(MHFU_POINTERS[self.lang]["ZENNY"]))["value"]
+            await self.ppsspp_write_unsigned(MHFU_POINTERS[self.lang]["ZENNY"], current_zenny + 500000, 32)
+        else:
+            self.item_queue.append(item)
+
     def receive_items(self, items: typing.List[NetworkItem]):
         # we might need to come up with a data storage solution for weapon/armor gifts, but for now, grant always
         for item in items:
             if item.item == 24700077:
+                # Key Quest
                 self.unlocked_keys += 1
+            elif item.item in range(24700079, 24700083):
+                # Can only handle these in specific ovls
+                self.item_queue.append(item)
             elif item_id_to_name[item.item] in item_name_groups["Weapons"]:
                 # there's like 50 of these gimme a break
                 local_id = item.item - base_id
@@ -544,12 +566,9 @@ async def game_watcher(ctx):
                 # ctx.refresh = False
 
             current_overlay = await ctx.ppsspp_read_string(MHFU_POINTERS[ctx.lang]["CURRENT_OVL"])
-            if current_overlay["value"] != "game_task.ovl":
-                # we are not in a quest, parse quest completion
-                pass
-            else:
-                # we are in a quest
-                pass
+            if current_overlay["value"] in ("game_task.ovl", "lobby_task.ovl"):
+                # we have loaded a character, and are in the lobby or on a hunt
+                await ctx.pop_item()
         except Exception as ex:
             Utils.messagebox("Error", str(ex), True)
 

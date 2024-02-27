@@ -117,10 +117,10 @@ filler_item_table = {
 }
 
 filler_weights = {
-    "Random Weapon": 4,
-    "Random Armor": 4,
-    "Decoration Gift": 2,
-    "Item Gift": 2,
+    "Random Weapon": 1,
+    "Random Armor": 2,
+    "Decoration Gift": 4,
+    "Item Gift": 4,
     "Zenny Bag": 4
 }
 
