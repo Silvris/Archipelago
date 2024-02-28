@@ -141,7 +141,7 @@ class QuestDifficulty(NamedRange):
     """
     range_start = 0
     range_end = 500
-    default = "vanilla"
+    default = 100
     special_range_names = {
         "vanilla": 100,
         "half": 50,
