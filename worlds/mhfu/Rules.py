@@ -1,5 +1,5 @@
 from .Quests import get_quest_by_id, get_proper_name, get_star_name, goal_quests, hub_rank_max
-from typing import TYPE_CHECKING, List
+from typing import TYPE_CHECKING, List, Dict
 from worlds.generic.Rules import add_rule
 
 if TYPE_CHECKING:
@@ -18,9 +18,21 @@ def can_complete_all_quests(state: "CollectionState", qids: List[str], player: i
     return True
 
 
-def can_hunt_monsters(state: "CollectionState", monsters: List[str], player: int, any_monster=False):
+def can_hunt_monsters(state: "CollectionState", quest_monsters: Dict[str, List[int]],
+                      monsters: List[str], player: int, any_monster=False):
     # any means return true if any, else return true if all
-    return True
+    if any_monster:
+        for monster in monsters:
+            monster_quests = [quest for quest in quest_monsters if monster in quest_monsters[quest]]
+            if any(can_complete_quest(state, quest, player) for quest in monster_quests):
+                return True
+        return False
+    else:
+        for monster in monsters:
+            monster_quests = [quest for quest in quest_monsters if monster in quest_monsters[quest]]
+            if not any(can_complete_quest(state, quest, player) for quest in monster_quests):
+                return False
+        return True
 
 
 def set_rules(world: "MHFUWorld"):
@@ -44,8 +56,9 @@ def set_rules(world: "MHFUWorld"):
     # Village
     if world.options.village_depth:
         # Village Low
+        # needs access to Yian Kut-Ku
         add_rule(world.multiworld.get_location(get_proper_name(get_quest_by_id("m10304")), world.player),
-                 lambda state: can_hunt_monsters(state, ["Yian Kut-Ku"], world.player))  # needs access to Yian Kut-Ku
+                 lambda state: can_hunt_monsters(state, world.quest_monsters, ["Yian Kut-Ku"], world.player))
         # bit of a hack for this one, it needs all village low quests completed, but only one other quest has any lock
         # so we just check if we can hit it first
         add_rule(world.multiworld.get_location(get_proper_name(get_quest_by_id("m10510")), world.player),
@@ -54,8 +67,8 @@ def set_rules(world: "MHFUWorld"):
             # Village High
             for quest in ("m11211", "m11212", "m11213"):
                 add_rule(world.multiworld.get_location(get_proper_name(get_quest_by_id(quest)), world.player),
-                         lambda state: can_hunt_monsters(state, ["Yian Kut-Ku", "Rathalos", "Plesioth"], world.player,
-                                                         True))
+                         lambda state: can_hunt_monsters(state, world.quest_monsters,
+                                                         ["Yian Kut-Ku", "Rathalos", "Plesioth"], world.player, True))
                 # needs access to any Bird/Flying/Piscine that aren't a drome
             for quest in ("m11220", "m11221", "m11222", "m11223"):
                 # needs all of the village high quests

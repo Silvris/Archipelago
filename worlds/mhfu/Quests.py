@@ -4,6 +4,7 @@ import orjson
 import os
 
 from BaseClasses import Location, Region
+from .data.MonsterHabitats import monster_habitats
 
 if typing.TYPE_CHECKING:
     from . import MHFUWorld
@@ -144,6 +145,14 @@ def create_ranks(world: "MHFUWorld"):
                         world.player, world.multiworld)
         region.add_locations({get_proper_name(quest): location_name_to_id[get_proper_name(quest)]
                               for quest in valid_quests})
+        if world.options.quest_randomization:
+            world.quest_monsters.update({quest["qid"][1:]:
+                                         world.random.choices(monster_habitats[quest["stage"]],
+                                                              k=len(quest["monsters"]))
+                                         for quest in valid_quests})
+        else:
+            world.quest_monsters.update({quest["qid"][1:]: quest["monsters"]
+                                         for quest in valid_quests})
         world.multiworld.regions.append(region)
     for hub, rank, star in world.rank_requirements:
         region = world.multiworld.get_region(get_star_name(hub, rank, star), world.player)

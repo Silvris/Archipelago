@@ -1,6 +1,6 @@
 import logging
 import typing
-from typing import Dict, Any
+from typing import Dict, Any, List
 from operator import itemgetter
 import settings
 from BaseClasses import Tutorial, ItemClassification, MultiWorld
@@ -63,6 +63,7 @@ class MHFUWorld(World):
         super().__init__(multiworld, player)
         self.location_num: Dict[(int, int, int), int] = {}
         self.rank_requirements: Dict[(int, int, int), int] = {}
+        self.quest_monsters: Dict[str, List[int]] = {}
         self.required_keys: int = 0
 
     def generate_early(self) -> None:
@@ -170,4 +171,5 @@ class MHFUWorld(World):
         for rank in self.rank_requirements:
             rank_requirements[f"{rank[0]},{rank[1]},{rank[2]}"] = self.rank_requirements[rank]
         options["rank_requirements"] = rank_requirements
+        options["quest_monsters"] = self.quest_monsters if self.options.quest_randomization else {}
         return options

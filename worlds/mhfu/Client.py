@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import random
 import typing
 
 from kivy.uix.label import Label
@@ -16,7 +17,8 @@ import struct
 from NetUtils import NetworkItem, ClientStatus
 from .Quests import quest_data, base_id, goal_quests
 from .Items import item_name_to_id, item_id_to_name, item_name_groups
-from .data.Equipment import blademaster, gunner, blademaster_upgrades, gunner_upgrades,\
+from .data.Monsters import elder_dragons
+from .data.Equipment import blademaster, gunner, blademaster_upgrades, gunner_upgrades, \
     helms, chests, arms, waists, legs
 
 ppsspp_logger = logging.getLogger("PPSSPP")
@@ -134,15 +136,52 @@ async def handle_logs(ctx: MHFUContext, logs: typing.List):
                     mons = {}
                     for idx, mon in enumerate([mon for mon in large_mons if mon != 0xFFFFFFFF]):
                         # pull the mons
-                        mons[idx] = await ctx.ppsspp_read_bytes(large_mon_info_ptr["value"] + quest_base + (idx * 60), 60)
+                        mons[idx] = await ctx.ppsspp_read_bytes(large_mon_info_ptr["value"] + quest_base + (idx * 60),
+                                                                60)
                     print(mons)
                     # apply difficulty modifier
-                    info_out = bytearray()
-                    for mon in mons:
-                        mon_data = bytearray(base64.b64decode(mons[mon]["base64"]))
-                        mon_data[5] = min(16, max(1, int(ctx.quest_multiplier * mon_data[5])))
-                        info_out.extend(mon_data)
-                    await ctx.ppsspp_write_bytes(large_mon_info_ptr["value"] + quest_base, info_out)
+                    if mons:
+                        info_out = bytearray()
+                        quest_mons = ctx.quest_monsters[str("%.5i" % quest_id)]
+                        for mon in mons:
+                            mon_data = bytearray(base64.b64decode(mons[mon]["base64"]))
+                            if ctx.quest_randomization:
+                                mon_data[0:4] = struct.pack("I", quest_mons[mon])
+                            mon_data[5] = min(16, max(1, int(ctx.quest_multiplier * mon_data[5])))
+                            info_out.extend(mon_data)
+                        await ctx.ppsspp_write_bytes(large_mon_info_ptr["value"] + quest_base, info_out)
+                        if ctx.quest_randomization:
+
+                            # need to write new monster ids
+                            await ctx.ppsspp_write_bytes(large_mon_id_ptr["value"] + quest_base,
+                                                         struct.pack("IIII", *quest_mons,
+                                                                     *[0xFFFFFFFF] * (4 - len(quest_mons))))
+                            # now pick one to be the quest target
+                            goal_type_1 = (await ctx.ppsspp_read_unsigned(quest_base + 0x6C, 32))["value"]
+                            goal_type_2 = (await ctx.ppsspp_read_unsigned(quest_base + 0x74, 32))["value"]
+                            if goal_type_1 & 1:
+                                # hunting/slaying
+                                target_mon = random.choice(quest_mons)
+                                quest_mons.remove(target_mon)
+                                if target_mon in elder_dragons.values():
+                                    goal_type_1 = 0x513  # Slay
+                                else:
+                                    goal_type_1 = random.choice([0x1, 0x257, 0x513])
+                                await ctx.ppsspp_write_bytes(quest_base + 0x6C,
+                                                             struct.pack("IHH", goal_type_1, target_mon, 1))
+                            if quest_mons and random.random() > 0.5:
+                                # secondary goal
+                                target_mon = random.choice(quest_mons)
+                                quest_mons.remove(target_mon)
+                                if target_mon in elder_dragons.values():
+                                    goal_type_2 = 0x513  # Slay
+                                else:
+                                    goal_type_2 = random.choice([0x1, 0x257, 0x513])
+                                await ctx.ppsspp_write_bytes(quest_base + 0x74,
+                                                             struct.pack("IHH", goal_type_2, target_mon, 1))
+                            elif goal_type_2 & 1:
+                                # need to null these 3
+                                await ctx.ppsspp_write_bytes(quest_base + 0x74, struct.pack("IHH", [0] * 3))
                 # this gets pinged twice during quest load, we edit the first and fall through the second
                 ctx.randomize_quest = not ctx.randomize_quest
             elif breakpoint == "QUEST_COMPLETE":
@@ -291,6 +330,7 @@ class MHFUContext(CommonContext):
     }
     armor_status: typing.Set[int] = set()
     quest_randomization: bool = False
+    quest_monsters: typing.Dict[str, typing.List[int]]
     quest_multiplier: float = 1.0
     cash_only: bool = False
     item_queue: typing.List[NetworkItem] = []
@@ -371,39 +411,39 @@ class MHFUContext(CommonContext):
         for equip_group, length, remap, equipment_type in zip([
             "SHOP_HEAD", "SHOP_CHEST", "SHOP_ARM", "SHOP_WAIST", "SHOP_LEG",
             "SHOP_GREAT_LONG", "SHOP_LANCE_GUN", "SHOP_SNS_DUAL", "SHOP_HAMMER_HORN", "SHOP_GUNNER"],
-            [11362, 11310, 11076, 11024, 11284,
-                3406, 3042, 3406, 3224, 7878],
-            [
-                helms, chests, arms, waists, legs, blademaster, blademaster, blademaster, blademaster, gunner],
-            [
-                1, 2, 3, 4, 0, 5, 5, 5, 5, 6]
+                [11362, 11310, 11076, 11024, 11284,
+                 3406, 3042, 3406, 3224, 7878],
+                [
+                    helms, chests, arms, waists, legs, blademaster, blademaster, blademaster, blademaster, gunner],
+                [
+                    1, 2, 3, 4, 0, 5, 5, 5, 5, 6]
         ):
             create_data = bytearray(base64.b64decode(
                 (await self.ppsspp_read_bytes(MHFU_POINTERS[self.lang][equip_group], length))["base64"]))
             for i in range(length // 0x1A):
-                equip_type, _, equip_id = struct.unpack("BBH", create_data[0x1A*i: (0x1A*i) + 4])
+                equip_type, _, equip_id = struct.unpack("BBH", create_data[0x1A * i: (0x1A * i) + 4])
                 if equipment_type in (5, 6):
                     weapon_type, equip_rarity = remap[equip_id]
                     if equip_rarity + 1 not in self.weapon_status[weapon_type]:
-                        create_data[0x1A*i] = 0x10  # somehow this doesn't crash the game
+                        create_data[0x1A * i] = 0x10  # somehow this doesn't crash the game
                     else:
-                        create_data[0x1A*i] = equipment_type
+                        create_data[0x1A * i] = equipment_type
                 else:
                     equip_rarity = remap[equip_id]
                     if equip_rarity + 1 not in self.armor_status:
-                        create_data[0x1A*i] = 0x10
+                        create_data[0x1A * i] = 0x10
                     else:
-                        create_data[0x1A*i] = equipment_type
-                create_data[(0x1A*i) + 1] = 0x1  # this unhides every weapon/armor, so it should always be visible
+                        create_data[0x1A * i] = equipment_type
+                create_data[(0x1A * i) + 1] = 0x1  # this unhides every weapon/armor, so it should always be visible
                 if self.cash_only:
-                    create_data[(0x1A*i) + 4: (0x1A*i) + 20] = [0] * 16
+                    create_data[(0x1A * i) + 4: (0x1A * i) + 20] = [0] * 16
             await self.ppsspp_write_bytes(MHFU_POINTERS[self.lang][equip_group], bytes(create_data))
 
         bm_upgrade_data = bytearray(base64.b64decode(
-                (await self.ppsspp_read_bytes(MHFU_POINTERS[self.lang]["BLADEMASTER_UPGRADES"], 32200))["base64"]))
+            (await self.ppsspp_read_bytes(MHFU_POINTERS[self.lang]["BLADEMASTER_UPGRADES"], 32200))["base64"]))
         for i in range(1, 1150):
             if self.cash_only:
-                bm_upgrade_data[(i*0x1C): (i*0x1C) + 0x10] = [0] * 16
+                bm_upgrade_data[(i * 0x1C): (i * 0x1C) + 0x10] = [0] * 16
             for j in range(6):
                 if blademaster_upgrades[i][j] > 0:
                     weapon_type, equip_rarity = blademaster[blademaster_upgrades[i][j]]
@@ -418,7 +458,7 @@ class MHFUContext(CommonContext):
             (await self.ppsspp_read_bytes(MHFU_POINTERS[self.lang]["GUNNER_UPGRADES"], 9912))["base64"]))
         for i in range(1, 354):
             if self.cash_only:
-                gn_upgrade_data[(i*0x1C): (i*0x1C) + 0x10] = [0] * 16
+                gn_upgrade_data[(i * 0x1C): (i * 0x1C) + 0x10] = [0] * 16
             weapon_type, equip_rarity = gunner[i]
             if weapon_type != 10:
                 continue  # small optimization here, only bows use the regular upgrade system in FU
@@ -440,14 +480,15 @@ class MHFUContext(CommonContext):
         await self.set_equipment_status()
 
     async def pop_item(self):
-        item = self.item_queue.pop()
+        if self.item_queue:
+            item = self.item_queue.pop()
 
-        if item.item == 24700083:
-            # Zenny Bag
-            current_zenny = (await self.ppsspp_read_unsigned(MHFU_POINTERS[self.lang]["ZENNY"]))["value"]
-            await self.ppsspp_write_unsigned(MHFU_POINTERS[self.lang]["ZENNY"], current_zenny + 500000, 32)
-        else:
-            self.item_queue.append(item)
+            if item.item == 24700083:
+                # Zenny Bag
+                current_zenny = (await self.ppsspp_read_unsigned(MHFU_POINTERS[self.lang]["ZENNY"]))["value"]
+                await self.ppsspp_write_unsigned(MHFU_POINTERS[self.lang]["ZENNY"], current_zenny + 500000, 32)
+            else:
+                self.item_queue.append(item)
 
     def receive_items(self, items: typing.List[NetworkItem]):
         # we might need to come up with a data storage solution for weapon/armor gifts, but for now, grant always
@@ -536,6 +577,7 @@ class MHFUContext(CommonContext):
             self.goal_quest = int(goal_quests[self.goal][1:])
             self.quest_multiplier = float(args["slot_data"]["quest_difficulty_multiplier"] / 100)
             self.quest_randomization = args["slot_data"]["quest_randomization"]
+            self.quest_monsters = args["slot_data"]["quest_monsters"]
             self.cash_only = args["slot_data"]["cash_only_equipment"]
             self.required_keys = args["slot_data"]["required_keys"]
             for group, value in args["slot_data"]["rank_requirements"].items():

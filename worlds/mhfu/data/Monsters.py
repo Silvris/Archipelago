@@ -60,3 +60,65 @@ monster_ids = {
     "Ukanlos": 88,
     "Furious Rajang": 89
 }
+
+elder_dragons = {
+    "Fatalis": 2,
+    "Lao-Shan Lung": 7,
+    "Kirin": 33,
+    "Crimson Fatalis": 36,
+    "Ashen Lao-Shan Lung": 50,
+    "Kushala Daora": 54,
+    "Shen Gaoren": 55,
+    "Yama Tsukami": 58,
+    "Chameleos": 59,
+    "Rusted Kushala Daora": 60,
+    "Lunastra": 64,
+    "Teostra": 65,
+    "White Fatalis": 71,
+    "Akantor": 76,  # These two aren't real EDs, but they share the no-trap functionality, so easier to lump them in
+    "Ukanlos": 88,
+}
+
+flying_wyverns = {
+    "Rathian": 1,
+    "Rathalos": 11,
+    "Diablos": 14,
+    "Khezu": 15,
+    "Gravios": 17,
+    "Plesioth": 21,
+    "Basarios": 22,
+    "Monoblos": 26,
+    "Pink Rathian": 37,
+    "Silver Rathalos": 41,
+    "Gold Rathian": 42,
+    "Black Diablos": 43,
+    "White Monoblos": 44,
+    "Red Khezu": 45,
+    "Green Plesioth": 46,
+    "Black Gravios": 47,
+    "Azure Rathalos": 49,
+    "Tigrex": 75,
+    "Akantor": 76,
+    "Nargacuga": 81,
+    "Ukanlos": 88,
+}
+
+piscene_wyverns = {
+    "Plesioth": 21,
+    "Green Plesioth": 46,
+    "Lavasioth": 83,
+}
+
+bird_wyverns = {
+    "Yian Kut-Ku": 6,
+    "Gypceros": 20,
+    "Velocidrome": 27,
+    "Gendrome": 28,
+    "Iodrome": 31,
+    "Giadrome": 35,
+    "Blue Yian Kut-Ku": 38,
+    "Purple Gypceros": 39,
+    "Scarred Yian Garuga": 40,
+    "Yian Garuga": 78,
+    "Hypnocatrice": 82,
+}
