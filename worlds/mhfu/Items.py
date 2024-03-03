@@ -105,7 +105,7 @@ armor_item_table = {
 
 progression_item_table = {
     "Key Quest": ItemData(24700077, True, True),
-    "Victory": ItemData(24700078, True)
+    "Victory": ItemData(None, True)
 }
 
 filler_item_table = {

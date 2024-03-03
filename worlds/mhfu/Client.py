@@ -70,11 +70,20 @@ MHFU_POINTERS = {
 }
 
 MHFU_BREAKPOINTS = {
-    # logFormat: address, size, enabled, log, read, write, change
+    # logFormat: memory, address, size, enabled, log, read, write, change
     # enabled being "do we want to pause emulation here"
     # disabled effectively acting as an event system
-    "QUEST_LOAD": (0x08A57510, 1, True, True, True, False, False),
-    "QUEST_COMPLETE": (0x09999DC8, 63, False, True, False, True, True),
+    # memory being this is a memory breakpoint, else it's CPU
+    # CPU breakpoints don't use read/write/change
+    "QUEST_LOAD": (True, 0x08A57510, 1, True, True, True, False, False),
+    "QUEST_COMPLETE": (True, 0x09999DC8, 63, False, True, False, True, True),
+    "MONSTER_LOAD": (False, 0x09AAE08C, 1, False, True, False, False, False)
+}
+
+MHFU_BREAKPOINT_ARGS = {
+    # do this so we can just pass the former directly, while parse this one
+    # this lets us pull register info from the breakpoint
+    "MONSTER_LOAD": ["{s1}"]
 }
 
 ACTIONS = {
@@ -119,12 +128,13 @@ WEAPON_GROUPS = {
 
 async def handle_logs(ctx: MHFUContext, logs: typing.List):
     for log in logs:
-        if log["channel"] == "MEMMAP":
+        if log["channel"] in ("MEMMAP", "JIT"):
             # we hit a breakpoint
             breakpoint = log["message"].replace("\n", "").rsplit(" ")[-1]
+            print(breakpoint)
             if breakpoint == "QUEST_LOAD":
                 if ctx.randomize_quest:
-                    quest_base = MHFU_BREAKPOINTS[breakpoint][0]
+                    quest_base = MHFU_BREAKPOINTS[breakpoint][1]
                     quest_id = (await ctx.ppsspp_read_unsigned(quest_base + 100, 16))["value"]
                     large_mon_ptr_ptr = quest_base + 0x14
                     large_mon_ptr = (await ctx.ppsspp_read_unsigned(large_mon_ptr_ptr, 32))["value"]
@@ -140,50 +150,49 @@ async def handle_logs(ctx: MHFUContext, logs: typing.List):
                                                                 60)
                     print(mons)
                     # apply difficulty modifier
-                    if mons:
+                    if mons and ctx.quest_randomization:
                         info_out = bytearray()
                         quest_mons = ctx.quest_monsters[str("%.5i" % quest_id)]
                         for mon in mons:
                             mon_data = bytearray(base64.b64decode(mons[mon]["base64"]))
                             if ctx.quest_randomization:
                                 mon_data[0:4] = struct.pack("I", quest_mons[mon])
-                            mon_data[5] = min(16, max(1, int(ctx.quest_multiplier * mon_data[5])))
                             info_out.extend(mon_data)
                         await ctx.ppsspp_write_bytes(large_mon_info_ptr["value"] + quest_base, info_out)
-                        if ctx.quest_randomization:
-
-                            # need to write new monster ids
-                            await ctx.ppsspp_write_bytes(large_mon_id_ptr["value"] + quest_base,
+                        # need to write new monster ids
+                        await ctx.ppsspp_write_bytes(large_mon_id_ptr["value"] + quest_base,
                                                          struct.pack("IIII", *quest_mons,
                                                                      *[0xFFFFFFFF] * (4 - len(quest_mons))))
-                            # now pick one to be the quest target
-                            goal_type_1 = (await ctx.ppsspp_read_unsigned(quest_base + 0x6C, 32))["value"]
-                            goal_type_2 = (await ctx.ppsspp_read_unsigned(quest_base + 0x74, 32))["value"]
-                            if goal_type_1 & 1:
-                                # hunting/slaying
-                                target_mon = random.choice(quest_mons)
-                                quest_mons.remove(target_mon)
-                                if target_mon in elder_dragons.values():
-                                    goal_type_1 = 0x513  # Slay
-                                else:
-                                    goal_type_1 = random.choice([0x1, 0x257, 0x513])
-                                await ctx.ppsspp_write_bytes(quest_base + 0x6C,
-                                                             struct.pack("IHH", goal_type_1, target_mon, 1))
-                            if quest_mons and random.random() > 0.5:
-                                # secondary goal
-                                target_mon = random.choice(quest_mons)
-                                quest_mons.remove(target_mon)
-                                if target_mon in elder_dragons.values():
-                                    goal_type_2 = 0x513  # Slay
-                                else:
-                                    goal_type_2 = random.choice([0x1, 0x257, 0x513])
-                                await ctx.ppsspp_write_bytes(quest_base + 0x74,
-                                                             struct.pack("IHH", goal_type_2, target_mon, 1))
-                            elif goal_type_2 & 1:
-                                # need to null these 3
-                                await ctx.ppsspp_write_bytes(quest_base + 0x74, struct.pack("IHH", [0] * 3))
+                        # now pick one to be the quest target
+                        target_mon = random.choice(quest_mons)
+                        quest_mons.remove(target_mon)
+                        await ctx.ppsspp_write_bytes(quest_base + 0x70,
+                                                         struct.pack("HH", target_mon, 1))
+                        if quest_mons and random.random() > 0.5:
+                            # secondary goal
+                            target_mon = random.choice(quest_mons)
+                            quest_mons.remove(target_mon)
+                            await ctx.ppsspp_write_bytes(quest_base + 0x78,
+                                                         struct.pack("HH", target_mon, 1))
+                        else:
+                            # need to null these 3
+                            await ctx.ppsspp_write_bytes(quest_base + 0x74, struct.pack("IHH", [0] * 3))
                 # this gets pinged twice during quest load, we edit the first and fall through the second
                 ctx.randomize_quest = not ctx.randomize_quest
+            elif "MONSTER_LOAD" in breakpoint:
+                breakpoint, mon_addr = breakpoint.split("|")
+                mon_address = int(mon_addr, 16)
+                health = (await ctx.ppsspp_read_unsigned(mon_address + 0x2E4, 16))["value"]
+                attack = (await ctx.ppsspp_read_unsigned(mon_address + 0x41E, 16))["value"]
+                print(health)
+                print(attack)
+                health = min(max(int(health * ctx.quest_multiplier), 1), 0xFFFF)
+                attack = min(max(int(attack * ctx.quest_multiplier), 1), 0xFFFF)
+                print(health)
+                print(attack)
+                await ctx.ppsspp_write_unsigned(mon_address + 0x2E4, health, 16)
+                await ctx.ppsspp_write_unsigned(mon_address + 0x41E, attack, 16)
+
             elif breakpoint == "QUEST_COMPLETE":
                 new_checks = []
                 completion_bytes = await ctx.ppsspp_read_bytes(MHFU_POINTERS[ctx.lang]["QUEST_COMPLETE"], 63)
@@ -210,7 +219,7 @@ async def handle_logs(ctx: MHFUContext, logs: typing.List):
                             f'New Check: {location} ({len(ctx.locations_checked)}/{len(ctx.missing_locations) + len(ctx.checked_locations)})')
                         await ctx.send_msgs([{"cmd": 'LocationChecks', "locations": [new_check_id]}])
 
-            if MHFU_BREAKPOINTS[breakpoint][2]:
+            if MHFU_BREAKPOINTS[breakpoint][3]:
                 # this break point stops emulation, we need to restart it
                 await send_and_receive(ctx, json.dumps({"event": "cpu.resume"}), "cpu.resume")
 
@@ -283,9 +292,20 @@ async def connect_psp(ctx: MHFUContext, target: typing.Optional[int] = None):
         ctx.lang = "JP"
     ppsspp_logger.info(f"Connected to PPSSPP {hello['version']} playing Monster Hunter Freedom Unite!")
     for breakpoint in MHFU_BREAKPOINTS:
-        response = await send_and_receive(ctx, json.dumps(
-            dict(zip(["event", "address", "size", "enabled", "log", "read", "write", "change", "logFormat"],
-                     ["memory.breakpoint.add", *MHFU_BREAKPOINTS[breakpoint], breakpoint]))), "memory.breakpoint.add")
+        if MHFU_BREAKPOINTS[breakpoint][0]:
+            response = await send_and_receive(ctx, json.dumps(
+                dict(zip(["event", "address", "size", "enabled", "log", "read", "write", "change", "logFormat"],
+                         ["memory.breakpoint.add", *MHFU_BREAKPOINTS[breakpoint][1:],
+                          '|'.join([breakpoint, *MHFU_BREAKPOINT_ARGS.get(breakpoint, list())])]
+                         ))), "memory.breakpoint.add")
+        else:
+            response = await send_and_receive(ctx, json.dumps(
+                dict(zip(
+                    ["event", "address", "enabled", "log", "logFormat"],
+                    ["cpu.breakpoint.add", MHFU_BREAKPOINTS[breakpoint][1], MHFU_BREAKPOINTS[breakpoint][3],
+                     MHFU_BREAKPOINTS[breakpoint][4], '|'.join([breakpoint, *MHFU_BREAKPOINT_ARGS.get(breakpoint, list())])]
+                ))
+            ), "cpu.breakpoint.add")
     return
 
 
@@ -605,7 +625,7 @@ async def game_watcher(ctx):
             if ctx.refresh:
                 await ctx.get_key_binary()
                 await ctx.set_equipment_status()
-                # ctx.refresh = False
+                ctx.refresh = False
 
             current_overlay = await ctx.ppsspp_read_string(MHFU_POINTERS[ctx.lang]["CURRENT_OVL"])
             if current_overlay["value"] in ("game_task.ovl", "lobby_task.ovl"):

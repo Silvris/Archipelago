@@ -8,7 +8,7 @@ from worlds.AutoWorld import WebWorld, World
 from worlds.LauncherComponents import launch_subprocess, components, Component, Type
 from .Quests import create_ranks, location_name_to_id, base_id, goal_quests,\
     get_quest_by_id, get_proper_name, goal_ranks, hub_rank_max
-from .Items import MHFUItem, item_table, filler_item_table, filler_weights, item_name_to_id, weapons
+from .Items import MHFUItem, item_table, filler_item_table, filler_weights, item_name_to_id, weapons, item_name_groups
 from .Options import MHFUOptions
 from .Rules import set_rules
 
@@ -56,6 +56,7 @@ class MHFUWorld(World):
 
     item_name_to_id: Dict[str, int] = item_name_to_id
     location_name_to_id: Dict[str, int] = location_name_to_id
+    item_names = item_name_groups
 
     create_regions = create_ranks
 
