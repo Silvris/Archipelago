@@ -77,13 +77,15 @@ MHFU_BREAKPOINTS = {
     # CPU breakpoints don't use read/write/change
     "QUEST_LOAD": (True, 0x08A57510, 1, True, True, True, False, False),
     "QUEST_COMPLETE": (True, 0x09999DC8, 63, False, True, False, True, True),
-    "MONSTER_LOAD": (False, 0x09AAE08C, 1, False, True, False, False, False)
+    "MONSTER_LOAD": (False, 0x08871C24, 1, True, True, False, False, False),
+    #"MONSTER_LOAD_RESPAWN": (False, 0x09B18F10, 1, True, True, False, False, False)
 }
 
 MHFU_BREAKPOINT_ARGS = {
     # do this so we can just pass the former directly, while parse this one
     # this lets us pull register info from the breakpoint
-    "MONSTER_LOAD": ["{s1}"]
+    "MONSTER_LOAD": ["{a0}"],
+    #"MONSTER_LOAD_RESPAWN": ["{s2}"],
 }
 
 ACTIONS = {
@@ -119,14 +121,15 @@ KEY_OFFSETS = {
 
 WEAPON_GROUPS = {
     0: [0, 7],
-    1: [3, 9],
+    1: [2, 8],
     2: [4, 6],
-    3: [2, 8],
+    3: [3, 9],
     4: [1, 5, 10]
 }
 
 
 async def handle_logs(ctx: MHFUContext, logs: typing.List):
+    checked_quests = False
     for log in logs:
         if log["channel"] in ("MEMMAP", "JIT"):
             # we hit a breakpoint
@@ -176,24 +179,22 @@ async def handle_logs(ctx: MHFUContext, logs: typing.List):
                                                          struct.pack("HH", target_mon, 1))
                         else:
                             # need to null these 3
-                            await ctx.ppsspp_write_bytes(quest_base + 0x74, struct.pack("IHH", [0] * 3))
+                            await ctx.ppsspp_write_bytes(quest_base + 0x78, struct.pack("HH", 0, 0))
                 # this gets pinged twice during quest load, we edit the first and fall through the second
                 ctx.randomize_quest = not ctx.randomize_quest
             elif "MONSTER_LOAD" in breakpoint:
                 breakpoint, mon_addr = breakpoint.split("|")
                 mon_address = int(mon_addr, 16)
                 health = (await ctx.ppsspp_read_unsigned(mon_address + 0x2E4, 16))["value"]
-                attack = (await ctx.ppsspp_read_unsigned(mon_address + 0x41E, 16))["value"]
-                print(health)
-                print(attack)
                 health = min(max(int(health * ctx.quest_multiplier), 1), 0xFFFF)
-                attack = min(max(int(attack * ctx.quest_multiplier), 1), 0xFFFF)
-                print(health)
-                print(attack)
                 await ctx.ppsspp_write_unsigned(mon_address + 0x2E4, health, 16)
-                await ctx.ppsspp_write_unsigned(mon_address + 0x41E, attack, 16)
+                await ctx.ppsspp_write_unsigned(mon_address + 0x41E, health, 16)
 
             elif breakpoint == "QUEST_COMPLETE":
+                # ~400 of this type get sent on every quest completion
+                # madness, we have to clear some of them
+                if checked_quests:
+                    continue
                 new_checks = []
                 completion_bytes = await ctx.ppsspp_read_bytes(MHFU_POINTERS[ctx.lang]["QUEST_COMPLETE"], 63)
                 quest_completion = bytearray(base64.b64decode(completion_bytes["base64"]))
@@ -218,6 +219,8 @@ async def handle_logs(ctx: MHFUContext, logs: typing.List):
                         ppsspp_logger.info(
                             f'New Check: {location} ({len(ctx.locations_checked)}/{len(ctx.missing_locations) + len(ctx.checked_locations)})')
                         await ctx.send_msgs([{"cmd": 'LocationChecks', "locations": [new_check_id]}])
+
+                checked_quests = True
 
             if MHFU_BREAKPOINTS[breakpoint][3]:
                 # this break point stops emulation, we need to restart it
@@ -506,7 +509,7 @@ class MHFUContext(CommonContext):
             if item.item == 24700083:
                 # Zenny Bag
                 current_zenny = (await self.ppsspp_read_unsigned(MHFU_POINTERS[self.lang]["ZENNY"]))["value"]
-                await self.ppsspp_write_unsigned(MHFU_POINTERS[self.lang]["ZENNY"], current_zenny + 500000, 32)
+                await self.ppsspp_write_unsigned(MHFU_POINTERS[self.lang]["ZENNY"], current_zenny + 50000, 16)
             else:
                 self.item_queue.append(item)
 
@@ -516,7 +519,7 @@ class MHFUContext(CommonContext):
             if item.item == 24700077:
                 # Key Quest
                 self.unlocked_keys += 1
-            elif item.item in range(24700079, 24700083):
+            elif item.item in range(24700079, 24700084):
                 # Can only handle these in specific ovls
                 self.item_queue.append(item)
             elif item_id_to_name[item.item] in item_name_groups["Weapons"]:
