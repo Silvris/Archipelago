@@ -15,7 +15,7 @@ from schema import And, Optional, Or, Schema
 from Utils import get_fuzzy_results, is_iterable_of_str
 
 if typing.TYPE_CHECKING:
-    from BaseClasses import PlandoOptions
+    from BaseClasses import PlandoOptions, LinkedItem
     from worlds.AutoWorld import World
     import pathlib
 
@@ -857,7 +857,7 @@ class OptionList(Option[typing.List[typing.Any]], VerifyKeys):
 
     @classmethod
     def from_any(cls, data: typing.Any):
-        if is_iterable_of_str(data):
+        if type(data) == list:
             cls.verify_keys(data)
             return cls(data)
         return cls.from_text(str(data))
@@ -1033,6 +1033,10 @@ class DeathLink(Toggle):
     """When you die, everyone dies. Of course the reverse is true too."""
     display_name = "Death Link"
 
+class LinkedItem(typing.TypedDict, total=False):
+    game: str
+    item: str
+    replacement_item: Optional[str]
 
 class ItemLinks(OptionList):
     """Share part of your item pool with other players."""
@@ -1041,9 +1045,9 @@ class ItemLinks(OptionList):
     schema = Schema([
         {
             "name": And(str, len),
-            "item_pool": [And(str, len)],
+            "item_groups": [{"name": And(str, len),
+                             "item_pool": {LinkedItem}}],
             Optional("exclude"): [And(str, len)],
-            "replacement_item": Or(And(str, len), None),
             Optional("local_items"): [And(str, len)],
             Optional("non_local_items"): [And(str, len)],
             Optional("link_replacement"): Or(None, bool),
@@ -1051,24 +1055,30 @@ class ItemLinks(OptionList):
     ])
 
     @staticmethod
-    def verify_items(items: typing.List[str], item_link: str, pool_name: str, world, allow_item_groups: bool = True) -> typing.Set:
+    def verify_items(items: typing.List[str], worlds: typing.Set, item_link: str, pool_name: str, allow_item_groups: bool = True) -> typing.Set:
         pool = set()
+        item_names = set()
+        item_name_groups = dict()
+        for world in worlds:
+            item_names.update(world.item_names)
+            item_name_groups.update(world.item_name_groups)
         for item_name in items:
-            if item_name not in world.item_names and (not allow_item_groups or item_name not in world.item_name_groups):
-                picks = get_fuzzy_results(item_name, world.item_names, limit=1)
-                picks_group = get_fuzzy_results(item_name, world.item_name_groups.keys(), limit=1)
+            if item_name not in item_names and (not allow_item_groups or item_name not in item_name_groups):
+                picks = get_fuzzy_results(item_name, list(item_names), limit=1)
+                picks_group = get_fuzzy_results(item_name, list(item_name_groups.keys()), limit=1)
                 picks_group = f" or '{picks_group[0][0]}' ({picks_group[0][1]}% sure)" if allow_item_groups else ""
 
                 raise Exception(f"Item {item_name} from item link {item_link} "
-                                f"is not a valid item from {world.game} for {pool_name}. "
-                                f"Did you mean '{picks[0][0]}' ({picks[0][1]}% sure){picks_group}")
+                                f"is not a valid item from games: {[world.game for world in worlds]} for {pool_name}. " +
+                                (f"Did you mean '{picks[0][0]}' ({picks[0][1]}% sure){picks_group}" if picks else ""))
             if allow_item_groups:
-                pool |= world.item_name_groups.get(item_name, {item_name})
+                pool |= item_name_groups.get(item_name, {item_name})
             else:
                 pool |= {item_name}
         return pool
 
     def verify(self, world: typing.Type[World], player_name: str, plando_options: "PlandoOptions") -> None:
+        from worlds.AutoWorld import AutoWorldRegister
         link: dict
         super(ItemLinks, self).verify(world, player_name, plando_options)
         existing_links = set()
@@ -1076,21 +1086,28 @@ class ItemLinks(OptionList):
             if link["name"] in existing_links:
                 raise Exception(f"You cannot have more than one link named {link['name']}.")
             existing_links.add(link["name"])
-
-            pool = self.verify_items(link["item_pool"], link["name"], "item_pool", world)
+            worlds = {}
+            groups = {}
+            for group in link["item_groups"]:
+                worlds[group["name"]] = {AutoWorldRegister.world_types[item["game"]] for item in group["item_pool"]}
+                groups[group["name"]] = self.verify_items([item["item"] for item in group["item_pool"]], worlds[group["name"]],
+                                                link["name"], "item_pool", False)
+                self.verify_items([item["replacement_item"] for item in group["item_pool"]],
+                                                worlds[group["name"]], link["name"], "item_pool", False)
             local_items = set()
             non_local_items = set()
 
             if "exclude" in link:
-                pool -= self.verify_items(link["exclude"], link["name"], "exclude", world)
-            if link["replacement_item"]:
-                self.verify_items([link["replacement_item"]], link["name"], "replacement_item", world, False)
+                for group in groups:
+                    groups[group["name"]] -= self.verify_items(link["exclude"], worlds[group["name"]], link["name"], "exclude")
             if "local_items" in link:
-                local_items = self.verify_items(link["local_items"], link["name"], "local_items", world)
-                local_items &= pool
+                for group in groups:
+                    local_items = self.verify_items(link["local_items"], worlds[group["name"]], link["name"], "local_items")
+                    local_items &= groups[group["name"]]
             if "non_local_items" in link:
-                non_local_items = self.verify_items(link["non_local_items"], link["name"], "non_local_items", world)
-                non_local_items &= pool
+                for group in groups:
+                    non_local_items = self.verify_items(link["non_local_items"], worlds[group["name"]], link["name"], "non_local_items", world)
+                    non_local_items &= groups[group["name"]]
 
             intersection = local_items.intersection(non_local_items)
             if intersection:
