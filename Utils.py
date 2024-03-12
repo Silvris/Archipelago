@@ -19,6 +19,7 @@ import warnings
 from argparse import Namespace
 from settings import Settings, get_settings
 from typing import BinaryIO, Coroutine, Optional, Set, Dict, Any, Union
+from typing_extensions import TypeGuard
 from yaml import load, load_all, dump
 
 try:
@@ -712,7 +713,7 @@ def messagebox(title: str, text: str, error: bool = False) -> None:
         import ctypes
         style = 0x10 if error else 0x0
         return ctypes.windll.user32.MessageBoxW(0, text, title, style)
-    
+
     # fall back to tk
     try:
         import tkinter
@@ -966,3 +967,10 @@ class RepeatableChain:
 
     def __len__(self):
         return sum(len(iterable) for iterable in self.iterable)
+
+
+def is_iterable_except_str(obj: object) -> TypeGuard[typing.Iterable[typing.Any]]:
+    """ `str` is `Iterable`, but that's not what we want """
+    if isinstance(obj, str):
+        return False
+    return isinstance(obj, typing.Iterable)
