@@ -1,4 +1,5 @@
 from .Quests import get_quest_by_id, get_proper_name, get_star_name, goal_quests, hub_rank_max
+from .data.Monsters import flying_wyverns, piscene_wyverns, bird_wyverns, monster_ids
 from typing import TYPE_CHECKING, List, Dict
 from worlds.generic.Rules import add_rule
 
@@ -21,15 +22,16 @@ def can_complete_all_quests(state: "CollectionState", qids: List[str], player: i
 def can_hunt_monsters(state: "CollectionState", quest_monsters: Dict[str, List[int]],
                       monsters: List[str], player: int, any_monster=False):
     # any means return true if any, else return true if all
+    relevant_mons = [monster_ids[monster] for monster in monsters]
     if any_monster:
-        for monster in monsters:
-            monster_quests = [quest for quest in quest_monsters if monster in quest_monsters[quest]]
+        for monster in relevant_mons:
+            monster_quests = [f"m{quest}" for quest in quest_monsters if monster in quest_monsters[quest]]
             if any(can_complete_quest(state, quest, player) for quest in monster_quests):
                 return True
         return False
     else:
-        for monster in monsters:
-            monster_quests = [quest for quest in quest_monsters if monster in quest_monsters[quest]]
+        for monster in relevant_mons:
+            monster_quests = [f"m{quest}" for quest in quest_monsters if monster in quest_monsters[quest]]
             if not any(can_complete_quest(state, quest, player) for quest in monster_quests):
                 return False
         return True
@@ -68,7 +70,8 @@ def set_rules(world: "MHFUWorld"):
             for quest in ("m11211", "m11212", "m11213"):
                 add_rule(world.multiworld.get_location(get_proper_name(get_quest_by_id(quest)), world.player),
                          lambda state: can_hunt_monsters(state, world.quest_monsters,
-                                                         ["Yian Kut-Ku", "Rathalos", "Plesioth"], world.player, True))
+                                                         [*list(piscene_wyverns.keys()), *list(flying_wyverns.keys()),
+                                                          *list(bird_wyverns.keys())], world.player, True))
                 # needs access to any Bird/Flying/Piscine that aren't a drome
             for quest in ("m11220", "m11221", "m11222", "m11223"):
                 # needs all of the village high quests
