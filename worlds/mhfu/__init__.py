@@ -1,6 +1,6 @@
 import logging
-import typing
-from typing import Dict, Any, List
+import math
+from typing import Dict, Any, List, ClassVar
 from operator import itemgetter
 import settings
 from BaseClasses import Tutorial, ItemClassification, MultiWorld
@@ -52,7 +52,7 @@ class MHFUWorld(World):
     data_version = 0
     options_dataclass = MHFUOptions
     options: MHFUOptions
-    settings: typing.ClassVar[MHFUSettings]
+    settings: ClassVar[MHFUSettings]
 
     item_name_to_id: Dict[str, int] = item_name_to_id
     location_name_to_id: Dict[str, int] = location_name_to_id
@@ -98,7 +98,7 @@ class MHFUWorld(World):
         else:
             max_guild = (-1, -1, -1)
         if self.options.village_depth:
-            max_village = (1, self.options.village_depth.value, hub_rank_max[1, self.options.village_depth.value])
+            max_village = (1, self.options.village_depth.value, hub_rank_max[1, self.options.village_depth.value -1])
         else:
             max_village = (-1, -1, -1)
         if max_guild[1] == 3:
@@ -133,14 +133,17 @@ class MHFUWorld(World):
         # so we lock the entrance by can_reach(Region), which opens a can of worms for rules
         # treasure is sphere 1 always if enabled, since there's only one set of them
         location_count = self.location_num.copy()
+        running_total = 0
         for key in ((0, 0, 0), (0, 0, 1), (0, 4, 0), (2, 0, 0), (2, 1, 0), (2, 2, 0)):
             if key in location_count:
-                location_count.pop(key)
-        rank_order = sorted(location_count, key=itemgetter(1, 2), reverse=True)
-        running_total = self.required_keys
-        for rank in rank_order:
-            running_total -= int(location_count[rank] * (self.options.required_keys.value / 100))
-            self.rank_requirements[rank] = running_total
+                running_total += location_count.pop(key)
+        all_locs = sum(self.location_num.values())
+        rank_order = sorted(location_count, key=lambda tup: tup[1] if tup[0] == 0 else tup[1] + 1)
+        for i, rank in enumerate(rank_order):
+            running_total += location_count[rank]
+            accessible = running_total / all_locs
+            self.rank_requirements[rank] = max(
+                math.floor(self.required_keys * accessible), i)
         itempool += [self.create_item("Key Quest") for _ in range(self.required_keys)]
         itempool += [self.create_item("Key Quest", True) for _ in range(non_required)]
         itempool += [self.create_item(self.get_filler_item_name()) for _ in range(filler_items)]
@@ -152,8 +155,9 @@ class MHFUWorld(World):
     def generate_basic(self) -> None:
         goal_quest = goal_quests[self.options.goal.value]
         quest_name = get_proper_name(get_quest_by_id(goal_quest))
-        self.multiworld.get_location(quest_name, self.player)\
-            .place_locked_item(self.create_item("Victory"))
+        goal_location = self.multiworld.get_location(quest_name, self.player)
+        goal_location.address = None  # This lets us keep the id reserved, even though it's an event this playthrough
+        goal_location.place_locked_item(self.create_item("Victory"))
         self.multiworld.completion_condition[self.player] = lambda state: state.has("Victory", self.player)
 
     set_rules = set_rules

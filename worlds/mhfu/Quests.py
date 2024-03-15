@@ -131,7 +131,7 @@ def create_ranks(world: "MHFUWorld"):
         # if any village depth, we write low rank
         for i in range(hub_rank_max[1, 0]):
             world.rank_requirements[1, 0, i] = 0
-        if world.options.village_depth.value == 2:
+        if world.options.village_depth == world.options.village_depth.option_high_rank:
             for i in range(hub_rank_max[1, 1]):
                 world.rank_requirements[1, 1, i] = 0
     if world.options.training_quests:
