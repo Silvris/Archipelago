@@ -4,11 +4,7 @@ import typing
 import time
 import random
 from struct import pack
-from .community_questions import (question_mapping, answer_addrs,
-                                  correct_answer, incorrect_answer_1,
-                                  incorrect_answer_2, incorrect_answer_3,
-                                  supported_categories, categories_with_questions,
-                                  question_test)
+from .community_questions import question_mapping, answer_addrs, supported_categories, question_test
 
 from NetUtils import ClientStatus, color
 from worlds.AutoSNIClient import SNIClient
@@ -43,6 +39,7 @@ QUESTION_DEBUG = WRAM_START + 0x1544
 
 class MIMSNIClient(SNIClient):
     game = "Mario is Missing"
+    patch_suffix = ".apmim"
 
     async def deathlink_kill_player(self, ctx):
         from SNIClient import DeathState, snes_buffered_write, snes_flush_writes, snes_read
@@ -122,40 +119,37 @@ class MIMSNIClient(SNIClient):
             elif quiz_mode[0] == 0x01:
                 for i in range(len(ctx.slot_info)):
                     active_categories.append(ctx.slot_info[i + 1].game)
-            active_categories.append('General')
+            active_categories.append('Archipelago')
 
         if init_comm_quiz[0] != 0x00:
             question_repeat = True
             loaded_question = await snes_read(ctx, SRAM_START + 0x0012, 0x40)
             loaded_question_raw = loaded_question.decode('ascii')
             current_category = random.choice(active_categories)
+            question_text = ""
+            var_answ_values = [0, 1, 2, 3]
+            var_answ = random.choice(var_answ_values)
             while question_repeat is True:
-                if current_category not in categories_with_questions:
-                    current_category = 'General'
-                var_answ_values = [0, 1, 2, 3]
-                var_answ = random.choice(var_answ_values)
+                if current_category not in question_mapping:
+                    current_category = 'Archipelago'
                 if question_debug[0] != 0x00:
                     question_text = question_test[question_debug[0]]
                 else:
-                    question_text = random.choice(question_mapping[current_category])
+                    question_data = random.choice(question_mapping[current_category])
+                    question_text = question_data["Question"]
                     if question_text == loaded_question_raw:
                         question_repeat = True
                     else:
                         question_repeat = False
             snes_buffered_write(ctx, SRAM_START + 0x0010, bytes([0x04])) #Number of answers
             snes_buffered_write(ctx, SRAM_START + 0x0012, question_text)
-            answer_lookup = {
-                0: incorrect_answer_1,
-                1: incorrect_answer_2,
-                2: incorrect_answer_3
-            }
             for i in range(3):
-                current_answer = answer_lookup[i][question_text]
+                current_answer = question_data[f"Incorrect_{i+1}"]
                 snes_buffered_write(ctx, SRAM_START + answer_addrs[var_answ], current_answer)
                 var_answ_values.remove(var_answ)
                 var_answ = random.choice(var_answ_values)
             var_answ = var_answ_values[0]
-            snes_buffered_write(ctx, SRAM_START + answer_addrs[var_answ], correct_answer[question_text])
+            snes_buffered_write(ctx, SRAM_START + answer_addrs[var_answ], question_data["Correct"])
 
             snes_buffered_write(ctx, SRAM_START + 0x0052, bytes([0x00])) #Question terminator
             snes_buffered_write(ctx, SRAM_START + 0x0074, bytes([0x00])) #Answer terminator
