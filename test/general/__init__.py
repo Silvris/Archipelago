@@ -1,51 +1,78 @@
 from argparse import Namespace
-from typing import List, Optional, Tuple, Type, Union
+from typing import Type, Tuple, List
 
-from BaseClasses import CollectionState, MultiWorld
-from worlds.AutoWorld import World, call_all
+import Options
+from BaseClasses import MultiWorld, CollectionState, Region, Location, Item, ItemClassification
+from worlds.AutoWorld import call_all, World
 
 gen_steps = ("generate_early", "create_regions", "create_items", "set_rules", "generate_basic", "pre_fill")
 
 
-def setup_solo_multiworld(
-    world_type: Type[World], steps: Tuple[str, ...] = gen_steps, seed: Optional[int] = None
-) -> MultiWorld:
+def setup_solo_multiworld(world_type: Type[World], steps: Tuple[str, ...] = gen_steps) -> MultiWorld:
     """
     Creates a multiworld with a single player of `world_type`, sets default options, and calls provided gen steps.
     
     :param world_type: Type of the world to generate a multiworld for
     :param steps: The gen steps that should be called on the generated multiworld before returning. Default calls
     steps through pre_fill
-    :param seed: The seed to be used when creating this multiworld
     """
-    return setup_multiworld(world_type, steps, seed)
-
-
-def setup_multiworld(worlds: Union[List[Type[World]], Type[World]], steps: Tuple[str, ...] = gen_steps,
-    seed: Optional[int] = None) -> MultiWorld:
-    """
-    Creates a multiworld with a player for each provided world type, allowing duplicates, setting default options, and
-    calling the provided gen steps.
-    
-    :param worlds: type/s of worlds to generate a multiworld for
-    :param steps: gen steps that should be called before returning. Default calls through pre_fill
-    :param seed: The seed to be used when creating this multiworld
-    """
-    if not isinstance(worlds, list):
-        worlds = [worlds]
-    players = len(worlds)
-    multiworld = MultiWorld(players)
-    multiworld.game = {player: world_type.game for player, world_type in enumerate(worlds, 1)}
-    multiworld.player_name = {player: f"Tester{player}" for player in multiworld.player_ids}
-    multiworld.set_seed(seed)
+    multiworld = MultiWorld(1)
+    multiworld.game[1] = world_type.game
+    multiworld.player_name = {1: "Tester"}
+    multiworld.set_seed()
     multiworld.state = CollectionState(multiworld)
     args = Namespace()
-    for player, world_type in enumerate(worlds, 1):
-        for key, option in world_type.options_dataclass.type_hints.items():
-            updated_options = getattr(args, key, {})
-            updated_options[player] = option.from_any(option.default)
-            setattr(args, key, updated_options)
+    for name, option in world_type.options_dataclass.type_hints.items():
+        setattr(args, name, {1: option.from_any(option.default)})
     multiworld.set_options(args)
     for step in steps:
         call_all(multiworld, step)
     return multiworld
+
+
+def generate_multiworld(players: int = 1) -> MultiWorld:
+    multiworld = MultiWorld(players)
+    multiworld.player_name = {}
+    multiworld.state = CollectionState(multiworld)
+    for i in range(players):
+        player_id = i+1
+        world = World(multiworld, player_id)
+        multiworld.game[player_id] = f"Game {player_id}"
+        multiworld.worlds[player_id] = world
+        multiworld.player_name[player_id] = "Test Player " + str(player_id)
+        region = Region("Menu", player_id, multiworld, "Menu Region Hint")
+        multiworld.regions.append(region)
+        for option_key, option in Options.PerGameCommonOptions.type_hints.items():
+            if hasattr(multiworld, option_key):
+                getattr(multiworld, option_key).setdefault(player_id, option.from_any(getattr(option, "default")))
+            else:
+                setattr(multiworld, option_key, {player_id: option.from_any(getattr(option, "default"))})
+        # TODO - remove this loop once all worlds use options dataclasses
+        world.options = world.options_dataclass(**{option_key: getattr(multiworld, option_key)[player_id]
+                                                   for option_key in world.options_dataclass.type_hints})
+
+    multiworld.set_seed(0)
+
+    return multiworld
+
+
+def generate_locations(count: int, player_id: int, address: int = None, region: Region = None, tag: str = "") -> List[Location]:
+    locations = []
+    prefix = "player" + str(player_id) + tag + "_location"
+    for i in range(count):
+        name = prefix + str(i)
+        location = Location(player_id, name, address, region)
+        locations.append(location)
+        region.locations.append(location)
+    return locations
+
+
+def generate_items(count: int, player_id: int, advancement: bool = False, code: int = None) -> List[Item]:
+    items = []
+    item_type = "prog" if advancement else ""
+    for i in range(count):
+        name = "player" + str(player_id) + "_" + item_type + "item" + str(i)
+        items.append(Item(name,
+                          ItemClassification.progression if advancement else ItemClassification.filler,
+                          code, player_id))
+    return items
