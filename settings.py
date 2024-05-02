@@ -390,10 +390,10 @@ class FilePath(Path):
         return None
 
     @classmethod
-    def _validate_stream_hashes(cls, f: BinaryIO) -> None:
+    def _validate_stream_hashes(cls, f: BinaryIO) -> typing.Optional[typing.Union[str, bytes]]:
         """Helper to efficiently validate stream against hashes"""
         if not cls.md5s:
-            return  # no hashes to validate against
+            return None  # no hashes to validate against
 
         pos = f.tell()
         try:
@@ -407,9 +407,9 @@ class FilePath(Path):
             for valid_md5 in cls.md5s:
                 if isinstance(valid_md5, str):
                     if valid_md5.lower() == file_md5_hex:
-                        break
+                        return valid_md5
                 elif valid_md5 == file_md5.digest():
-                    break
+                    return valid_md5
             else:
                 raise ValueError(f"Hashes do not match for {cls.__name__}")
         finally:
