@@ -1,7 +1,9 @@
-from typing import Dict
+from worlds.LauncherComponents import components, launch_subprocess, Component, Type
 
-from worlds.AutoWorld import World
-from worlds.LauncherComponents import components
-from .client import launch
 
-components
+def launch_sub():
+    from .client import launch
+    launch_subprocess(launch, "DeathLink Multitool")
+
+
+components.append(Component("DeathLink Multitool", func=launch_sub, component_type=Type.CLIENT))
