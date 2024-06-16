@@ -300,6 +300,7 @@ class WorldTestBase(unittest.TestCase):
                     with self.subTest("Location should be reached", location=location):
                         reachable = location.can_reach(state)
                         self.assertTrue(reachable, f"{location.name} unreachable")
+                        self.fail(f"{location.name}")
             with self.subTest("Beatable"):
                 self.multiworld.state = state
                 self.assertBeatable(True)
