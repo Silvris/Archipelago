@@ -295,15 +295,12 @@ class WorldTestBase(unittest.TestCase):
         with self.subTest("Game", game=self.game):
             excluded = self.multiworld.worlds[self.player].options.exclude_locations.value
             state = self.multiworld.get_all_state(False)
-            try:
                 for location in self.multiworld.get_locations():
                     if location.name not in excluded:
-                        with self.subTest("Location should be reached", location=location):
+                        with self.subTest("Location should be reached", location=location.name):
                             reachable = location.can_reach(state)
                             self.assertTrue(reachable, f"{location.name} unreachable")
                             self.fail(f"{location.name}")
-            except AssertionError:
-                raise AssertionError(f"{location.name} unreachable")
             with self.subTest("Beatable"):
                 self.multiworld.state = state
                 self.assertBeatable(True)
