@@ -297,7 +297,7 @@ class WorldTestBase(unittest.TestCase):
             state = self.multiworld.get_all_state(False)
             for location in self.multiworld.get_locations():
                 if location.name not in excluded:
-                    with self.subTest("Location should be reached", location=location.name):
+                    with self.subTest("Location should be reached", location=str(location)):
                         reachable = location.can_reach(state)
                         self.assertTrue(reachable, f"{location.name} unreachable")
                         self.fail(f"{location.name}")
