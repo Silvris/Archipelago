@@ -177,4 +177,5 @@ class MHFUWorld(World):
             rank_requirements[f"{rank[0]},{rank[1]},{rank[2]}"] = self.rank_requirements[rank]
         options["rank_requirements"] = rank_requirements
         options["quest_monsters"] = self.quest_monsters if self.options.quest_randomization else {}
+        options["set_cutscene"] = not self.options.village_depth.value == 2
         return options

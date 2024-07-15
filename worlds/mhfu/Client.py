@@ -60,6 +60,7 @@ MHFU_POINTERS = {
         "SHOP_GUNNER": 0x08949C0E,
         "BLADEMASTER_UPGRADES": 0x0894CEC0,
         "GUNNER_UPGRADES": 0x08954C88,
+        "NARGA_HYPNOC_CUTSCENE": 0x09995ED4,
         "ZENNY": 0x099FF090,
         "CURRENT_OVL": 0x09A5A5A0,
         "RESET_ACTION": 0x090AF355,  # byte
@@ -77,14 +78,14 @@ MHFU_BREAKPOINTS = {
     # CPU breakpoints don't use read/write/change
     "QUEST_LOAD": (True, 0x08A57510, 1, True, True, True, False, False),
     "QUEST_COMPLETE": (True, 0x09999DC8, 63, False, True, False, True, True),
-    "MONSTER_LOAD": (False, 0x08871C24, 1, True, True, False, False, False),
+    "MONSTER_LOAD": (False, 0x08871C3C, 1, True, True, False, False, False),
     #"MONSTER_LOAD_RESPAWN": (False, 0x09B18F10, 1, True, True, False, False, False)
 }
 
 MHFU_BREAKPOINT_ARGS = {
     # do this so we can just pass the former directly, while parse this one
     # this lets us pull register info from the breakpoint
-    "MONSTER_LOAD": ["{a0}"],
+    "MONSTER_LOAD": ["{v0}"],
     #"MONSTER_LOAD_RESPAWN": ["{s2}"],
 }
 
@@ -357,6 +358,7 @@ class MHFUContext(CommonContext):
     quest_multiplier: float = 1.0
     cash_only: bool = False
     item_queue: typing.List[NetworkItem] = []
+    set_cutscene: typing.Optional[bool] = None
 
     # intermitten
     randomize_quest: bool = True
@@ -610,6 +612,7 @@ class MHFUContext(CommonContext):
             self.recv_index = -1
             self.unlocked_keys = 0
             self.refresh = True
+            self.set_cutscene = args["slot_data"]["set_cutscene"]
         elif cmd == "ReceivedItems":
             self.receive_items(args["items"])
 
@@ -633,6 +636,11 @@ async def game_watcher(ctx):
             current_overlay = await ctx.ppsspp_read_string(MHFU_POINTERS[ctx.lang]["CURRENT_OVL"])
             if current_overlay["value"] in ("game_task.ovl", "lobby_task.ovl"):
                 # we have loaded a character, and are in the lobby or on a hunt
+                if ctx.set_cutscene:
+                    cutscenes = (await ctx.ppsspp_read_unsigned(MHFU_POINTERS[ctx.lang]["NARGA_HYPNOC_CUTSCENE"]))[
+                        "value"]
+                    await ctx.ppsspp_write_unsigned(MHFU_POINTERS[ctx.lang]["NARGA_HYPNOC_CUTSCENE"], cutscenes | 0x60)
+                    ctx.set_cutscene = None
                 await ctx.pop_item()
         except Exception as ex:
             Utils.messagebox("Error", str(ex), True)
