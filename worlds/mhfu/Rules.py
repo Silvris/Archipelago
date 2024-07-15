@@ -152,17 +152,17 @@ def set_rules(world: "MHFUWorld"):
                      lambda state: can_complete_all_quests(state, ["m01009", "m01106", "m01112", "m01114"],
                                                            world.player))
             # special case here, this is actually the end of HR urgents. We can effectively duplicate the rules for it
-            add_rule(world.multiworld.get_location(get_proper_name("m02225"),
+            add_rule(world.multiworld.get_location(get_proper_name(get_quest_by_id("m02225")),
                                                    world.player),
                      lambda state: state.has("Key Quest", world.player, world.rank_requirements[0, 3, 0]
-                     if world.rank_requirements[0, 3, 0] > 0 else world.required_keys))
-            add_rule(world.multiworld.get_location(get_proper_name("m02226"), world.player),
+                     if (0, 3, 0) in world.rank_requirements else world.required_keys))
+            add_rule(world.multiworld.get_location(get_proper_name(get_quest_by_id("m02226")), world.player),
                      lambda state: can_complete_quest(state, "m02225", world.player))
 
             if world.options.guild_depth.value == 3:
                 # Lao, needs all G1/G2. Just wanna push it back a sphere
-                add_rule(world.multiworld.get_location(get_proper_name("m03127"), world.player),
+                add_rule(world.multiworld.get_location(get_proper_name(get_quest_by_id("m03127")), world.player),
                          lambda state: can_complete_quest(state, "m03109", world.player))
                 for quest in ("m03222", "m03223", "m03224", "m03225", "m03226", "m03227"):
-                    add_rule(world.multiworld.get_location(get_proper_name(quest), world.player),
+                    add_rule(world.multiworld.get_location(get_proper_name(get_quest_by_id(quest)), world.player),
                              lambda state: can_complete_quest(state, "m03127", world.player))
