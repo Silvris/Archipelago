@@ -54,8 +54,8 @@ class MHFUWorld(World):
     options: MHFUOptions
     settings: ClassVar[MHFUSettings]
 
-    item_name_to_id: Dict[str, int] = item_name_to_id
-    location_name_to_id: Dict[str, int] = location_name_to_id
+    item_name_to_id = item_name_to_id
+    location_name_to_id = location_name_to_id
     item_names = item_name_groups
 
     create_regions = create_ranks
