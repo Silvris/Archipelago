@@ -258,12 +258,12 @@ class MultiWorld():
                     }
 
         for name, item_link in item_links.items():
-            for group in item_link["item_groups"]:
+            for group_name, group in item_link["item_groups"].items():
                 current_item_name_groups = AutoWorld.AutoWorldRegister.world_types[item_link["game"]].item_name_groups
                 pool = set()
                 local_items = set()
                 non_local_items = set()
-                for item in group["item_pool"]:
+                for item in group:
                     pool |= current_item_name_groups.get(item["item"], {item["item"]})
                 for item in item_link["exclude"]:
                     pool -= current_item_name_groups.get(item["item"], {item["item"]})
@@ -273,7 +273,7 @@ class MultiWorld():
                     non_local_items |= current_item_name_groups.get(item["item"], {item["item"]})
                 local_items &= pool
                 non_local_items &= pool
-                group["item_pool"] = pool
+                item_link["item_groups"][group_name]["item_pool"] = pool
                 item_link["local_items"] = local_items
                 item_link["non_local_items"] = non_local_items
 

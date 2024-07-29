@@ -1293,10 +1293,12 @@ class DeathLink(Toggle):
     display_name = "Death Link"
     rich_text_doc = True
 
+
 class LinkedItem(typing.TypedDict, total=False):
     game: str
     item: str
-    replacement_item: Optional[str]
+    replacement_item: typing.Optional[str]
+
 
 class ItemLinks(OptionList):
     """Share part of your item pool with other players."""
@@ -1307,7 +1309,9 @@ class ItemLinks(OptionList):
         {
             "name": And(str, len),
             "item_groups": [{"name": And(str, len),
-                             "item_pool": {LinkedItem}}],
+                             "item_pool": [{"item": And(str, len),
+                                           "game": And(str, len),
+                                           Optional("replacement_item"): And(str, len)}]}],
             Optional("exclude"): [And(str, len)],
             Optional("local_items"): [And(str, len)],
             Optional("non_local_items"): [And(str, len)],
@@ -1355,6 +1359,7 @@ class ItemLinks(OptionList):
                                                 link["name"], "item_pool", False)
                 self.verify_items([item["replacement_item"] for item in group["item_pool"]],
                                                 worlds[group["name"]], link["name"], "item_pool", False)
+            link["item_groups"] = {group["name"]: group["item_pool"] for group in link["item_groups"]}
             local_items = set()
             non_local_items = set()
 
@@ -1375,7 +1380,6 @@ class ItemLinks(OptionList):
                 raise Exception(f"item_link {link['name']} has {intersection} "
                                 f"items in both its local_items and non_local_items pool.")
             link.setdefault("link_replacement", None)
-            link["item_pool"] = list(pool)
 
 
 class Removed(FreeText):
