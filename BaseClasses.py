@@ -55,6 +55,7 @@ class MultiWorld():
     plando_items: List[List[Dict[str, Any]]]
     plando_connections: List
     worlds: Dict[int, "AutoWorld.World"]
+    teams: int = 1
     groups: Dict[int, Group]
     regions: RegionManager
     itempool: List[Item]
