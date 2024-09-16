@@ -539,14 +539,13 @@ def generate_itempool(world: "PokemonBW2World"):
     if world.options.badges == 0:
         default_tags.append("BADGE")
     itempool = []
-    for location in world.multiworld.regions.location_cache[world.player]:
+    for location in world.multiworld.get_locations(world.player):
         # is this a cursed method of attack for my items, probably!
-        location_info = location_data[location]
+        location_info = location_data[location.name]
         if any(tag in location_info["tags"] for tag in default_tags):
             # grab and create the default item, and place it
-            world.multiworld.get_location(location, world.player)\
-                .place_locked_item(world.create_item(location_info["default"],
-                                                     True if "EVENT" in location_info["tags"] else False))
+            location.place_locked_item(world.create_item(location_info["default"],
+                                       True if "EVENT" in location_info["tags"] else False))
         # else, add the item to the item pool
         elif location_info["default"] in filler_items:
             # generate a random filler instead

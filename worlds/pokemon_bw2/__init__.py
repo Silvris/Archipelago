@@ -69,7 +69,6 @@ class PokemonBW2World(World):
     settings: typing.ClassVar[PokemonBW2Settings]
 
     def __init__(self, multiworld: MultiWorld, player: int):
-        self.stage_shuffle_enabled: bool = False
         self.rom_name = None
         self.rom_name_available_event = threading.Event()
         super().__init__(multiworld, player)
