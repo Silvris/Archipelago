@@ -435,7 +435,7 @@ all_items = {
     #"Friend Ball": ItemData(BASE_OFFSET+497, ItemClassification.filler),
     #"Moon Ball": ItemData(BASE_OFFSET+498, ItemClassification.filler),
     "RageCandyBar": ItemData(BASE_OFFSET+504, ItemClassification.progression),
-    #"Enigma Stone": ItemData(BASE_OFFSET+536, ItemClassification.filler),  # maybe lock with this instead of Soul Dew?
+    #"Enigma Stone": ItemData(BASE_OFFSET+536, ItemClassification.progression),  # maybe lock with this instead of Soul Dew?
     "Prism Scale": ItemData(BASE_OFFSET+537, ItemClassification.progression),
     "Eviolite": ItemData(BASE_OFFSET+538, ItemClassification.useful),
     "Float Stone": ItemData(BASE_OFFSET+539, ItemClassification.useful),
@@ -516,6 +516,7 @@ item_groups = {
     "HM04": {"HM04 Strength"},
     "HM05": {"HM05 Waterfall"},
     "HM06": {"HM06 Dive"},
+    "Dropped Item": {"Dropped Item (Curtis)", "Dropped Item (Yancy)"}
 }
 
 filler_items = {item: all_items[item].code for item in all_items if all_items[item].classification == ItemClassification.filler}
@@ -527,7 +528,7 @@ key_items = {item: all_items[item].code for item in ["Reveal Glass", "Dropped It
                                                      "HM06 Dive", "Basic Badge", "Toxic Badge", "Insect Badge",
                                                      "Bolt Badge", "Quake Badge", "Jet Badge", "Legend Badge",
                                                      "Wave Badge", "Lunar Wing", "Magma Stone", "Gracidea",
-                                                     "Permit", "Super Rod", "Vs. Recorder"]}
+                                                     "Permit", "Super Rod", "Vs. Recorder", "Dropped Item (Curtis)"]}
 
 
 def generate_itempool(world: "PokemonBW2World"):
@@ -538,11 +539,24 @@ def generate_itempool(world: "PokemonBW2World"):
         default_tags.append("HM")
     if world.options.badges == 0:
         default_tags.append("BADGE")
+    excluded_tags = [world.random.choice(["YANCY", "CURTIS"])]
+    if not world.options.overworld_items:
+        excluded_tags.append("OVERWORLD")
+    if not world.options.hidden_items:
+        excluded_tags.append("HIDDEN")
+    if not world.options.gift_items:
+        excluded_tags.append("GIFT")
+    if not world.options.extra_key_items:
+        excluded_tags.append("EXTENDED")
+    if not world.options.include_postgame:
+        excluded_tags.append("POSTGAME")
     itempool = []
     for location in world.multiworld.get_locations(world.player):
         # is this a cursed method of attack for my items, probably!
         location_info = location_data[location.name]
-        if any(tag in location_info["tags"] for tag in default_tags):
+        if any(tag in location_info["tags"] for tag in excluded_tags):
+            continue  # skip this location
+        elif any(tag in location_info["tags"] for tag in default_tags):
             # grab and create the default item, and place it
             location.place_locked_item(world.create_item(location_info["default"],
                                        True if "EVENT" in location_info["tags"] else False))

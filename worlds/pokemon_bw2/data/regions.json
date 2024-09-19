@@ -396,7 +396,13 @@
       {
         "name": "Dropped Item",
         "default": "Dropped Item (Yancy)",
-        "tags": ["KEY"],
+        "tags": ["KEY", "YANCY"],
+        "script_info": [[128, 1101, 637, 1], [128, 1158, 636, 1]]
+      },
+            {
+        "name": "Dropped Item",
+        "default": "Dropped Item (Curtis)",
+        "tags": ["KEY", "CURTIS"],
         "script_info": [[128, 1101, 637, 1], [128, 1158, 636, 1]]
       },
       {

@@ -77,6 +77,13 @@ class ExtraKeyItems(Toggle):
     display_name = "Extra Key Items"
 
 
+class IncludePostgame(Toggle):
+    """
+    Adds locations that are unlocked by defeating the Champion.
+    """
+    display_name = "Include Postgame"
+
+
 class FreeFlyLocation(Choice):
     """
     Grants a free fly location when starting the game. Additionally,
@@ -93,15 +100,18 @@ class RemoveRoadblocks(OptionSet):
     """
     Removes specific NPCs that normally stand in your way until certain events are completed.
 
-    This can open up the world a bit and make your playthrough less linear, but careful how many you remove; it may make too much of your world.
+    This can open up the world a bit and make your playthrough less linear, but careful how many you remove;
+    it may make too much of your world available all at once.
     """
     display_name = "Remove Roadblocks"
     valid_keys = frozenset([
         "Route 20 Hiker",
+        "Castelia City Clowns"
     ])
     default = (
         "Route 20 Hiker"
     )
+
 
 @dataclass
 class PokemonBW2Options(PerGameCommonOptions):
@@ -114,5 +124,6 @@ class PokemonBW2Options(PerGameCommonOptions):
     hidden_items: HiddenItems
     gift_items: GiftItems
     extra_key_items: ExtraKeyItems
+    include_postgame: IncludePostgame
     free_fly_location: FreeFlyLocation
     remove_roadblocks: RemoveRoadblocks
