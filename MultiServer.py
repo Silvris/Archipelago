@@ -427,19 +427,19 @@ class Context:
         self.groups = {slot: slot_info.group_members for slot, slot_info in self.slot_info.items()
                        if slot_info.type == SlotType.group}
 
-        self.clients = {0: {}}
+        self.teams = decoded_obj["teams"]
+        self.clients = {team: {} for team in range(self.teams)}
         slot_info: NetworkSlot
         slot_id: int
-
-        team_0 = self.clients[0]
-        for slot_id, slot_info in self.slot_info.items():
-            team_0[slot_id] = []
-            self.player_names[0, slot_id] = slot_info.name
-            self.player_name_lookup[slot_info.name] = 0, slot_id
-            self.read_data[f"hints_{0}_{slot_id}"] = lambda local_team=0, local_player=slot_id: \
-                list(self.get_rechecked_hints(local_team, local_player))
-            self.read_data[f"client_status_{0}_{slot_id}"] = lambda local_team=0, local_player=slot_id: \
-                self.client_game_state[local_team, local_player]
+        for team in range(self.teams):
+            for slot_id, slot_info in self.slot_info.items():
+                self.clients[team][slot_id] = []
+                self.player_names[team, slot_id] = slot_info.name
+                self.player_name_lookup[slot_info.name] = 0, slot_id
+                self.read_data[f"hints_{team}_{slot_id}"] = lambda local_team=team, local_player=slot_id: \
+                    list(self.get_rechecked_hints(local_team, local_player))
+                self.read_data[f"client_status_{team}_{slot_id}"] = lambda local_team=team, local_player=slot_id: \
+                    self.client_game_state[local_team, local_player]
 
         self.seed_name = decoded_obj["seed_name"]
         self.random.seed(self.seed_name)
@@ -455,8 +455,9 @@ class Context:
         for slot, item_codes in decoded_obj["precollected_items"].items():
             self.start_inventory[slot] = [NetworkItem(item_code, -2, 0) for item_code in item_codes]
 
-        for slot, hints in decoded_obj["precollected_hints"].items():
-            self.hints[0, slot].update(hints)
+        for team in self.clients:
+            for slot, hints in decoded_obj["precollected_hints"].items():
+                self.hints[team, slot].update(hints)
 
         # declare slots that aren't players as done
         for slot, slot_info in self.slot_info.items():
