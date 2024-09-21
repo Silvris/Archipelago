@@ -42,6 +42,7 @@ def main(args, seed=None, baked_server_options: Optional[Dict[str, object]] = No
     multiworld.plando_connections = args.plando_connections.copy()
     multiworld.game = args.game.copy()
     multiworld.player_name = args.name.copy()
+    multiworld.teams = int(args.teams)
     multiworld.sprite = args.sprite.copy()
     multiworld.sprite_pool = args.sprite_pool.copy()
 
@@ -181,7 +182,7 @@ def main(args, seed=None, baked_server_options: Optional[Dict[str, object]] = No
             for player, remaining_items in depletion_pool.items():
                 remaining_items = {name: count for name, count in remaining_items.items() if count}
                 if remaining_items:
-                    logger.warning(f"{multiworld.get_player_name(player)}"
+                    logger.warning(f"{multiworld.get_player_name(0, player)}"
                                     f" is trying to remove items from their pool that don't exist: {remaining_items}")
                     # find all filler we generated for the current player and remove until it matches 
                     removables = [item for item in new_items if item.player == player]
@@ -322,7 +323,8 @@ def main(args, seed=None, baked_server_options: Optional[Dict[str, object]] = No
                 multidata = {
                     "slot_data": slot_data,
                     "slot_info": slot_info,
-                    "connect_names": {name: (0, player) for player, name in multiworld.player_name.items()},
+                    "teams": multiworld.teams,
+                    "connect_names": {name: player for player, name in multiworld.player_name.items()},
                     "locations": locations_data,
                     "checks_in_area": checks_in_area,
                     "server_options": baked_server_options,

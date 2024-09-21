@@ -619,6 +619,9 @@ class GeneratorOptions(Group):
     class Players(int):
         """amount of players, 0 to infer from player files"""
 
+    class Teams(int):
+        """amount of teams, team number will be appended to player names"""
+
     class WeightsFilePath(str):
         """
         general weights file, within the stated player_files_path location
@@ -665,6 +668,7 @@ class GeneratorOptions(Group):
     enemizer_path: EnemizerPath = EnemizerPath("EnemizerCLI/EnemizerCLI.Core")  # + ".exe" is implied on Windows
     player_files_path: PlayerFilesPath = PlayerFilesPath("Players")
     players: Players = Players(0)
+    teams: Teams = Teams(1)
     weights_file_path: WeightsFilePath = WeightsFilePath("weights.yaml")
     meta_file_path: MetaFilePath = MetaFilePath("meta.yaml")
     spoiler: Spoiler = Spoiler(3)
