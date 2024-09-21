@@ -868,6 +868,9 @@ async def process_server_cmd(ctx: CommonContext, args: dict):
         ctx.slot_info.update({int(pid): data for pid, data in args["slot_info"].items()})
         ctx.hint_points = args.get("hint_points", 0)
         ctx.consume_players_package(args["players"])
+        for key in ctx.stored_data_notification_keys.copy():
+            if "_read_hints_" in key:
+                ctx.stored_data_notification_keys.remove(key)
         ctx.stored_data_notification_keys.add(f"_read_hints_{ctx.team}_{ctx.slot}")
         msgs = []
         if ctx.locations_checked:
