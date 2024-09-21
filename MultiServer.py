@@ -435,7 +435,7 @@ class Context:
             for slot_id, slot_info in self.slot_info.items():
                 self.clients[team][slot_id] = []
                 self.player_names[team, slot_id] = slot_info.name
-                self.player_name_lookup[slot_info.name] = 0, slot_id
+                self.player_name_lookup[slot_info.name] = team, slot_id
                 self.read_data[f"hints_{team}_{slot_id}"] = lambda local_team=team, local_player=slot_id: \
                     list(self.get_rechecked_hints(local_team, local_player))
                 self.read_data[f"client_status_{team}_{slot_id}"] = lambda local_team=team, local_player=slot_id: \

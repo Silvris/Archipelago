@@ -194,10 +194,13 @@ def main(args=None) -> Tuple[argparse.Namespace, int]:
                 settings: Tuple[argparse.Namespace, ...] = settings_cache[path] if settings_cache[path] else \
                     tuple(roll_settings(yaml, args.plando) for yaml in weights_cache[path])
                 for settingsObject in settings:
-                    base_name = None
+                    name = None
+                    team_name = None
                     for k, v in vars(settingsObject).items():
-                        if k == "name":
-                            base_name = v
+                        if k == "team_names":
+                            team_name = v
+                        elif k == "name":
+                            name = v
                         elif v is not None:
                             try:
                                 getattr(erargs, k)[player] = v
@@ -205,13 +208,16 @@ def main(args=None) -> Tuple[argparse.Namespace, int]:
                                 setattr(erargs, k, {player: v})
                             except Exception as e:
                                 raise Exception(f"Error setting {k} to {v} for player {player}") from e
-
                     if path == args.weights_file_path:  # if name came from the weights file, just use base player name
-                        base_name = f"Player{player}"
-                    elif not base_name:  # if name was not specified, generate it from filename
-                        base_name = os.path.splitext(os.path.split(path)[-1])[0]
-                    for team in range(erargs.teams):
-                        erargs.name[team, player] = handle_name(f"{base_name}_{team}", player, name_counter)
+                        name = f"Player{player}"
+                    elif not name:  # if name was not specified, generate it from filename
+                        name = os.path.splitext(os.path.split(path)[-1])[0]
+                    if team_name:
+                        name = team_name
+                    elif isinstance(name, str):
+                        name = {team: f"{name}_{team}" for team in range(erargs.teams)}
+                    for team in name:
+                        erargs.name[team, player] = handle_name(name[team], player, name_counter)
 
                     player += 1
             except Exception as e:
@@ -507,6 +513,7 @@ def roll_settings(weights: dict, plando_options: PlandoOptions = PlandoOptions.b
         game_weights = weights[ret.game]
 
     ret.name = get_choice('name', weights)
+    ret.team_names = weights.get('team_names', {})
     for option_key, option in Options.CommonOptions.type_hints.items():
         setattr(ret, option_key, option.from_any(get_choice(option_key, weights, option.default)))
 
