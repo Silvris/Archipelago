@@ -234,6 +234,7 @@ def launch(exe, in_terminal=False):
             return
     subprocess.Popen(exe)
 
+
 def create_shortcut(button, component: Component):
     from pyshortcuts import make_shortcut
     script = sys.argv[0]

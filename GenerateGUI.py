@@ -1,5 +1,11 @@
+import logging
 import os.path
 import Utils
+import typing
+import asyncio
+from Generate import main
+from Main import main as ERmain
+
 from kvui import ScrollBox
 from kivy.metrics import dp
 from kivymd.app import MDApp
@@ -15,6 +21,7 @@ from kivymd.uix.appbar import MDTopAppBar, MDTopAppBarLeadingButtonContainer, MD
 from kivymd.uix.navigationdrawer import (MDNavigationLayout, MDNavigationDrawer, MDNavigationDrawerItem,
                                          MDNavigationDrawerItemText, MDNavigationDrawerItemLeadingIcon,
                                          MDNavigationDrawerLabel, MDNavigationDrawerMenu, MDNavigationDrawerDivider)
+from kivymd.uix.textfield import MDTextField
 
 
 class YamlLabel(MDGridLayout):
@@ -78,11 +85,11 @@ class YamlSelectScreen(MDScreen):
                                   theme_text_color="Custom", text_color=self.theme_cls.onPrimaryColor)
         add_button.bind(on_release=show_filemanager)
         self.layout.add_widget(add_button)
-        menu_button = MDActionTopAppBarButton(icon="menu", theme_text_color="Custom",
-                                              text_color=self.theme_cls.onPrimaryColor)
         self.appbar = MDTopAppBar(
             MDTopAppBarLeadingButtonContainer(
-                menu_button
+                MDActionTopAppBarButton(icon="menu", theme_text_color="Custom",
+                                        text_color=self.theme_cls.onPrimaryColor,
+                                        on_release=MDApp.get_running_app().show_menu)
             ),
             MDTopAppBarTitle(text="Select Player YAML Options", pos_hint={"center_x": 0.5},
                              theme_text_color="Custom", text_color=self.theme_cls.onPrimaryColor),
@@ -94,10 +101,90 @@ class YamlSelectScreen(MDScreen):
         self.add_widget(self.layout)
 
 
+class TextInputStream:
+    buffer: typing.List[str]
+    field: MDTextField
+
+    def write(self, data: str):
+        self.buffer.append(data)
+
+    def flush(self):
+        self.field.set_text(self.field, self.field.text + "\n".join(self.buffer))
+        self.buffer.clear()
+
+    def __init__(self, field: MDTextField):
+        self.field = field
+        self.buffer = []
+
+
+class GenerateScreen(MDScreen):
+    layout: MDRelativeLayout
+    generate_log: MDTextField
+    channel: logging.StreamHandler
+
+    async def async_gen(self):
+        erargs, seed = main()
+        self.logger.addHandler(self.channel)
+        multiworld = ERmain(erargs, seed)
+        self.logger.removeHandler(self.channel)
+
+    def generate(self, _):
+        self.generate_log.text = ""
+        asyncio.run(self.async_gen())
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.processes = []
+        self.layout = MDRelativeLayout()
+        generate_layout = MDGridLayout(spacing=20, cols=1,
+                                       pos_hint={"center_x": 0.5, "center_y": 0.1}, size_hint=(0.5, 0.75))
+        self.generate_log = MDTextField(multiline=True, readonly=True, size_hint=(0.5, 0.9),
+                                        max_height=dp(200), mode="filled")
+        generate_button = MDButton(
+            MDButtonIcon(icon="check-underline"),
+            MDButtonText(text="Generate"),
+            on_release=self.generate,
+
+        )
+        generate_layout.add_widget(generate_button)
+        generate_layout.add_widget(self.generate_log)
+
+        self.layout.add_widget(generate_layout)
+        self.appbar = MDTopAppBar(
+            MDTopAppBarLeadingButtonContainer(
+                MDActionTopAppBarButton(icon="menu", theme_text_color="Custom",
+                                        text_color=self.theme_cls.onPrimaryColor,
+                                        on_release=MDApp.get_running_app().show_menu)
+            ),
+            MDTopAppBarTitle(text="Generate Seed", pos_hint={"center_x": 0.5},
+                             theme_text_color="Custom", text_color=self.theme_cls.onPrimaryColor),
+            pos_hint={"center_y": 0.95, "center_x": 0.5},
+            theme_bg_color="Custom",
+            md_bg_color=self.theme_cls.primaryColor
+        )
+        self.layout.add_widget(self.appbar)
+        self.add_widget(self.layout)
+
+        generate_log = TextInputStream(self.generate_log)
+        self.channel = logging.StreamHandler(generate_log)
+        self.channel.setLevel(logging.INFO)
+        self.logger = logging.getLogger()
+
+
 class GenerateGUI(MDApp):
+    layout: MDRelativeLayout
     screen_manager: MDScreenManager
     yaml_selection: MDScreen
+    generate_menu: MDScreen
     title = "Archipelago Generate"
+    navigation_drawer: MDNavigationDrawer
+
+    def show_menu(self, _):
+        self.navigation_drawer.set_state("toggle")
+
+    def change_screen(self, screen_name: str):
+        self.screen_manager.current = screen_name
+        self.navigation_drawer.set_state("closed")
 
     def build(self):
         from kvui import KivyJSONtoTextParser
@@ -105,15 +192,37 @@ class GenerateGUI(MDApp):
         self.theme_cls.theme_style = getattr(text_colors, "theme_style", "Dark")
         self.theme_cls.primary_palette = getattr(text_colors, "primary_palette", "Green")
         self.yaml_selection = YamlSelectScreen(name="yaml_select")
+        self.generate_menu = GenerateScreen(name="generate")
         navigation_layout = MDNavigationLayout()
-        self.naviation_drawer = MDNavigationDrawer(
-
+        self.navigation_drawer = MDNavigationDrawer(
+            MDNavigationDrawerMenu(
+                MDNavigationDrawerLabel(text="Archipelago Generate"),
+                MDNavigationDrawerItem(
+                    MDNavigationDrawerItemLeadingIcon(icon="note-edit"),
+                    MDNavigationDrawerItemText(text="Edit Host Settings")
+                ),
+                MDNavigationDrawerItem(
+                    MDNavigationDrawerItemLeadingIcon(icon="list-box"),
+                    MDNavigationDrawerItemText(text="Select Player YAMLs"),
+                    on_release=lambda _: self.change_screen("yaml_select")
+                ),
+                MDNavigationDrawerItem(
+                    MDNavigationDrawerItemLeadingIcon(icon="plus"),
+                    MDNavigationDrawerItemText(text="Generate"),
+                    on_release=lambda _: self.change_screen("generate")
+                ),
+                MDNavigationDrawerDivider()
+            ),
+            drawer_type="modal"
         )
         self.screen_manager = MDScreenManager()
 
         self.screen_manager.add_widget(self.yaml_selection)
+        self.screen_manager.add_widget(self.generate_menu)
         self.screen_manager.md_bg_color = self.theme_cls.backgroundColor
-        return self.screen_manager
+        navigation_layout.add_widget(self.screen_manager)
+        navigation_layout.add_widget(self.navigation_drawer)
+        return navigation_layout
 
 
 if __name__ == "__main__":
