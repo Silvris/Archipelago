@@ -50,7 +50,7 @@ class ThreadBarrierProxy:
 
 class MultiWorld():
     debug_types = False
-    player_name: Dict[Tuple[int, int], str]
+    player_name: Dict[int, str]
     plando_texts: List[Dict[str, str]]
     plando_items: List[List[Dict[str, Any]]]
     plando_connections: List
@@ -189,8 +189,7 @@ class MultiWorld():
         world_type = AutoWorld.AutoWorldRegister.world_types[game]
         self.worlds[new_id] = world_type.create_group(self, new_id, players)
         self.worlds[new_id].collect_item = classmethod(AutoWorld.World.collect_item).__get__(self.worlds[new_id])
-        for i in range(1, self.teams + 1):
-            self.player_name[i, new_id] = f"{name}_{i}"
+        self.player_name[new_id] = name
 
         new_group = self.groups[new_id] = Group(name=name, game=game, players=players,
                                                 world=self.worlds[new_id])
@@ -249,7 +248,7 @@ class MultiWorld():
                 else:
                     if item_link["name"] in self.player_name.values():
                         raise Exception(f"Cannot name a ItemLink group the same as a player ({item_link['name']}) "
-                                        f"({self.get_player_name(0, player)}).")
+                                        f"({self.get_player_name(player)}).")
                     item_links[item_link["name"]] = {
                         "players": {player: item_link["replacement_item"]},
                         "item_pool": set(item_link["item_pool"]),
@@ -340,7 +339,7 @@ class MultiWorld():
             for item in self.itempool:
                 count = common_item_count.get(item.player, {}).get(item.name, 0)
                 if count:
-                    loc = Location(group_id, f"Item Link: {item.name} -> {self.player_name[0, item.player]} {count}",
+                    loc = Location(group_id, f"Item Link: {item.name} -> {self.player_name[item.player]} {count}",
                         None, region)
                     loc.access_rule = lambda state, item_name = item.name, group_id_ = group_id, count_ = count: \
                         state.has(item_name, group_id_, count_)
@@ -391,22 +390,21 @@ class MultiWorld():
                      player not in self.groups and self.game[player] == game_name)
 
     def get_name_string_for_object(self, obj) -> str:
-        return obj.name if self.players == 1 else f'{obj.name} ({self.get_player_name(obj.team, obj.player)})'
+        return obj.name if self.players == 1 else f'{obj.name} ({self.get_player_name(obj.player)})'
 
-    def get_player_name(self, team: int, player: int) -> str:
-        return self.player_name[team, player]
+    def get_player_name(self, player: int) -> str:
+        return self.player_name[player]
 
-    def get_file_safe_player_name(self, team: int, player: int) -> str:
-        return Utils.get_file_safe_name(self.get_player_name(team, player))
+    def get_file_safe_player_name(self, player: int) -> str:
+        return Utils.get_file_safe_name(self.get_player_name(player))
 
-    def get_out_file_name_base(self, team: int, player: int) -> str:
+    def get_out_file_name_base(self, player: int) -> str:
         """ the base name (without file extension) for each player's output file for a seed """
-        return f"AP_{self.seed_name}_P{player}_{self.get_file_safe_player_name(team, player).replace(' ', '_')}"
+        return f"AP_{self.seed_name}_P{player}_{self.get_file_safe_player_name(player).replace(' ', '_')}"
 
     @functools.cached_property
     def world_name_lookup(self):
-        return {self.player_name[team, player_id]: (team, player_id)
-                for player_id in self.player_ids for team in range(self.teams)}
+        return {self.player_name[player_id]: player_id for player_id in self.player_ids}
 
     def get_regions(self, player: Optional[int] = None) -> Collection[Region]:
         return self.regions if player is None else self.regions.region_cache[player].values()
@@ -1452,20 +1450,19 @@ class Spoiler:
             outfile.write(f'Plando Options:                  {self.multiworld.plando_options}\n')
             AutoWorld.call_stage(self.multiworld, "write_spoiler_header", outfile)
 
-            for team in range(1, self.multiworld.teams + 1):
-                for player in range(1, self.multiworld.players + 1):
-                    if self.multiworld.players > 1:
-                        outfile.write('\nPlayer %d: %s\n' % (player, self.multiworld.get_player_name(team, player)))
-                    outfile.write('Game:                            %s\n' % self.multiworld.game[player])
+            for player in range(1, self.multiworld.players + 1):
+                if self.multiworld.players > 1:
+                    outfile.write('\nPlayer %d: %s\n' % (player, self.multiworld.get_player_name(player)))
+                outfile.write('Game:                            %s\n' % self.multiworld.game[player])
 
-                    for f_option, option in self.multiworld.worlds[player].options_dataclass.type_hints.items():
-                        write_option(f_option, option)
+                for f_option, option in self.multiworld.worlds[player].options_dataclass.type_hints.items():
+                    write_option(f_option, option)
 
-                    AutoWorld.call_single(self.multiworld, "write_spoiler_header", player, outfile)
+                AutoWorld.call_single(self.multiworld, "write_spoiler_header", player, outfile)
 
             if self.entrances:
                 outfile.write('\n\nEntrances:\n\n')
-                outfile.write('\n'.join(['%s%s %s %s' % (f'{self.multiworld.get_player_name(entry["team"], entry["player"])}: '
+                outfile.write('\n'.join(['%s%s %s %s' % (f'{self.multiworld.get_player_name(entry["player"])}: '
                                                          if self.multiworld.players > 1 else '', entry['entrance'],
                                                          '<=>' if entry['direction'] == 'both' else
                                                          '<=' if entry['direction'] == 'exit' else '=>',
@@ -1473,7 +1470,7 @@ class Spoiler:
 
             AutoWorld.call_all(self.multiworld, "write_spoiler", outfile)
 
-            precollected_items = [f"{item.name} ({self.multiworld.get_player_name(item.team, item.player)})"
+            precollected_items = [f"{item.name} ({self.multiworld.get_player_name(item.player)})"
                                   if self.multiworld.players > 1
                                   else item.name
                                   for item in chain.from_iterable(self.multiworld.precollected_items.values())]
