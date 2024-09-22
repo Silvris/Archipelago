@@ -175,9 +175,9 @@ class SNIContext(CommonContext):
         raise Exception("Invalid ROM detected, "
                         "please verify that you have loaded the correct rom and reconnect your snes (/snes)")
 
-    async def server_auth(self, password_requested: bool = False) -> None:
+    async def server_auth(self, password_requested: bool = False, team_required: bool = False) -> None:
         if password_requested and not self.password:
-            await super(SNIContext, self).server_auth(password_requested)
+            await super(SNIContext, self).server_auth(password_requested, team_required)
         if self.rom is None:
             self.awaiting_rom = True
             snes_logger.info(
@@ -194,6 +194,8 @@ class SNIContext(CommonContext):
         # and let auth be used for what it's meant for.
         self.auth = self.rom
         auth = base64.b64encode(self.rom).decode()
+        if team_required:
+            await self.get_team()
         await self.send_connect(name=auth)
 
     def cancel_snes_autoreconnect(self) -> bool:

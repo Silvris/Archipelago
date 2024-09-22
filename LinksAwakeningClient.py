@@ -545,9 +545,9 @@ class LinksAwakeningContext(CommonContext):
         if self.magpie_enabled:
             create_task_log_exception(self.magpie.send_new_checks(ladxr_ids))
 
-    async def server_auth(self, password_requested: bool = False):
+    async def server_auth(self, password_requested: bool = False, team_required: bool = False):
         if password_requested and not self.password:
-            await super(LinksAwakeningContext, self).server_auth(password_requested)
+            await super(LinksAwakeningContext, self).server_auth(password_requested, team_required)
 
         if self.had_invalid_slot_data:
             # We are connecting when previously we had the wrong ROM or server - just in case
@@ -559,6 +559,8 @@ class LinksAwakeningContext(CommonContext):
         while self.client.auth == None:
             await asyncio.sleep(0.1)
         self.auth = self.client.auth
+        if team_required:
+            await self.get_team()
         await self.send_connect()
 
     def on_package(self, cmd: str, args: dict):

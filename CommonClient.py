@@ -415,7 +415,7 @@ class CommonContext:
     def event_invalid_game(self):
         raise Exception('Invalid Game; please verify that you connected with the right game to the correct world.')
 
-    async def server_auth(self, password_requested: bool = False):
+    async def server_auth(self, password_requested: bool = False, team_required: bool = False):
         if password_requested and not self.password:
             logger.info('Enter the password required to join this game:')
             self.password = await self.console_input()
@@ -427,6 +427,15 @@ class CommonContext:
             if not self.auth:
                 logger.info('Enter slot name:')
                 self.auth = await self.console_input()
+
+    async def get_team(self):
+        if "@" in self.auth:
+            slot_name, team = self.auth.rsplit("@", 1)
+            if team.isdigit():
+                return
+        logger.info('Enter your team number:')
+        team = await self.console_input()
+        self.auth += f"@Team{team}"
 
     async def send_connect(self, **kwargs: typing.Any) -> None:
         """ send `Connect` packet to log in to server """
@@ -831,7 +840,7 @@ async def process_server_cmd(ctx: CommonContext, args: dict):
             data_package_checksums = args.get("datapackage_checksums", {})
             await ctx.prepare_data_package(set(args["games"]), data_package_versions, data_package_checksums)
 
-            await ctx.server_auth(args['password'])
+            await ctx.server_auth(args['password'], args["teams"] > 1)
 
     elif cmd == 'DataPackage':
         ctx.consume_network_data_package(args['data'])
@@ -1005,10 +1014,12 @@ def run_as_textclient():
         items_handling = 0b111  # receive all items for /received
         want_slot_data = False  # Can't use game specific slot_data
 
-        async def server_auth(self, password_requested: bool = False):
+        async def server_auth(self, password_requested: bool = False, team_required: bool = False):
             if password_requested and not self.password:
-                await super(TextContext, self).server_auth(password_requested)
+                await super(TextContext, self).server_auth(password_requested, team_required)
             await self.get_username()
+            if team_required:
+                await self.get_team()
             await self.send_connect()
 
         def on_package(self, cmd: str, args: dict):
