@@ -833,6 +833,7 @@ async def on_client_connected(ctx: Context, client: Client):
         'datapackage_checksums': {game: game_data["checksum"] for game, game_data
                                   in ctx.gamespackage.items() if game in games and "checksum" in game_data},
         'seed_name': ctx.seed_name,
+        'teams': ctx.teams,
         'time': time.time(),
     }])
 
@@ -1242,7 +1243,8 @@ class ClientMessageProcessor(CommonCommandProcessor):
 
     def __call__(self, raw: str) -> typing.Optional[bool]:
         if not raw.startswith("!admin"):
-            self.ctx.broadcast_text_all(self.ctx.get_aliased_name(self.client.team, self.client.slot) + ': ' + raw,
+            self.ctx.broadcast_text_all(self.ctx.get_aliased_name(self.client.team, self.client.slot) +
+                                        ('' if self.ctx.teams == 1 else f" (Team #{self.client.team + 1})") + ': ' + raw,
                                         {"type": "Chat", "team": self.client.team, "slot": self.client.slot, "message": raw})
         return super(ClientMessageProcessor, self).__call__(raw)
 
@@ -1705,7 +1707,7 @@ async def process_client_cmd(ctx: Context, client: Client, args: dict):
             ctx.logger.info(f"A client connection was refused due to: {errors}, the sent connect information was {args}.")
             await ctx.send_msgs(client, [{"cmd": "ConnectionRefused", "errors": list(errors)}])
         else:
-            slot = ctx.connect_names[args['name']]
+            slot = ctx.connect_names[resolved_name]
             if client.auth and client.team is not None and client.slot in ctx.clients[client.team]:
                 ctx.clients[team][slot].remove(client)  # re-auth, remove old entry
                 if client.team != team or client.slot != slot:
@@ -2219,6 +2221,10 @@ class ServerCommandProcessor(CommonCommandProcessor):
             self.ctx.broadcast_all([{"cmd": "RoomUpdate", 'permissions': get_permissions(self.ctx)}])
         elif option_name in {"hint_cost", "location_check_points"}:
             self.ctx.broadcast_all([{"cmd": "RoomUpdate", option_name: getattr(self.ctx, option_name)}])
+        elif option_name == "teams":
+            self.ctx._update_teams()
+            self.ctx.broadcast_all([{"cmd": "RoomUpdate", option_name: getattr(self.ctx, option_name),
+                                    "players": self.ctx.get_players_package()}])
         return True
 
     def _cmd_datastore(self):
