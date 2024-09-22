@@ -581,6 +581,12 @@ class ServerOptions(Group):
         ON = 1
         FULL = 2
 
+    class Teams(int):
+        """
+        Number of teams that should participate in the multiworld.
+        This number can be increased after hosting, but cannot be lowered.
+        """
+
     class LogNetwork(IntEnum):
         """log all server traffic, mostly for dev use"""
         OFF = 0
@@ -591,6 +597,7 @@ class ServerOptions(Group):
     password: Optional[str] = None
     multidata: Optional[str] = None
     savefile: Optional[str] = None
+    teams: Teams = Teams(1)
     disable_save: bool = False
     loglevel: str = "info"
     server_password: Optional[ServerPassword] = None
