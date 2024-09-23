@@ -569,7 +569,8 @@ class Context:
                              "server_password": self.server_password, "password": self.password,
                              "release_mode": self.release_mode,
                              "remaining_mode": self.remaining_mode, "collect_mode": self.collect_mode,
-                             "item_cheat": self.item_cheat, "compatibility": self.compatibility}
+                             "item_cheat": self.item_cheat, "compatibility": self.compatibility,
+                             "teams": self.teams}
 
         }
 
