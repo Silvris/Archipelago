@@ -135,6 +135,10 @@ class KSSWorld(World):
 
     set_rules = set_rules
 
+    def generate_output(self, output_directory: str) -> None:
+        try:
+            patch = KSSProcedurePatch(player=)
+
     def collect(self, state: "CollectionState", item: "Item") -> bool:
         value = super().collect(state, item)
 
