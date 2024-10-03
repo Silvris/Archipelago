@@ -137,6 +137,7 @@ class SNIContext(CommonContext):
     client_handler: typing.Optional[SNIClient]
     awaiting_rom: bool
     rom: typing.Optional[bytes]
+    rom_auth: typing.Optional[bytes]
     prev_rom: typing.Optional[bytes]
 
     hud_message_queue: typing.List[str]  # TODO: str is a guess, is this right?
@@ -163,6 +164,7 @@ class SNIContext(CommonContext):
         self.client_handler = None
         self.awaiting_rom = False
         self.rom = None
+        self.rom_auth = None
         self.prev_rom = None
 
     async def connection_closed(self) -> None:
@@ -192,11 +194,11 @@ class SNIContext(CommonContext):
         # If we need to save something to compare with rom elsewhere,
         # it should probably be in a different variable,
         # and let auth be used for what it's meant for.
-        self.auth = self.rom
-        auth = base64.b64encode(self.rom).decode()
+        self.rom_auth = self.rom
+        self.auth = base64.b64encode(self.rom_auth).decode()
         if team_required:
             await self.get_team()
-        await self.send_connect(name=auth)
+        await self.send_connect(name=self.auth)
 
     def cancel_snes_autoreconnect(self) -> bool:
         if self.snes_autoreconnect_task:
@@ -637,7 +639,7 @@ async def game_watcher(ctx: SNIContext) -> None:
 
         rom_validated = await ctx.client_handler.validate_rom(ctx)
 
-        if not rom_validated or (ctx.auth and ctx.auth != ctx.rom):
+        if not rom_validated or (ctx.rom_auth and ctx.rom_auth != ctx.rom):
             snes_logger.warning("ROM change detected, please reconnect to the multiworld server")
             await ctx.disconnect(allow_autoreconnect=True)
             ctx.client_handler = None

@@ -440,7 +440,7 @@ class CommonContext:
                 logger.info('Enter slot name:')
                 self.auth = await self.console_input()
 
-    async def get_team(self):
+    async def get_team(self, auth=None):
         if "@" in self.auth:
             slot_name, team = self.auth.rsplit("@", 1)
             if team.isdigit():

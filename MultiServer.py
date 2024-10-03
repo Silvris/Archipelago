@@ -1053,11 +1053,14 @@ def register_location_checks(ctx: Context, team: int, slot: int, locations: typi
         for location in new_locations:
             item_id, target_player, flags = ctx.locations[slot][location]
             new_item = NetworkItem(item_id, location, slot, flags)
-            send_items_to(ctx, team, target_player, new_item)
+            target_team = team
+            if flags & 0b111 == 0b100:
+                target_team = ctx.random.choice([t for t in range(ctx.teams) if t != team])
+            send_items_to(ctx, target_team, target_player, new_item)
 
             ctx.logger.info('(Team #%d) %s sent %s to %s (%s)' % (
                 team + 1, ctx.player_names[(team, slot)], ctx.item_names[ctx.slot_info[target_player].game][item_id],
-                ctx.player_names[(team, target_player)], ctx.location_names[ctx.slot_info[slot].game][location]))
+                ctx.player_names[(target_team, target_player)], ctx.location_names[ctx.slot_info[slot].game][location]))
             info_text = json_format_send_event(new_item, target_player)
             ctx.broadcast_team(team, [info_text])
 
