@@ -34,6 +34,11 @@ def can_fight_wind(state: "CollectionState", player: int):
 
 
 def set_rules(world: "KSSWorld"):
+    if "Dyna Blade" in world.options.included_subgames:
+        # Dyna Blade
+        set_rule(world.get_location(location_names.db_switch_1), lambda state: state.has(item_names.mirror,
+                                                                                         world.player))
+
     if "Revenge of Meta Knight" in world.options.included_subgames:
         # Revenge of Meta Knight
         set_rule(world.get_entrance("Chapter 3 -> Chapter 4"), lambda state: can_burn(state, world.player))

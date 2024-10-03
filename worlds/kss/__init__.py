@@ -1,7 +1,10 @@
 import logging
 import settings
-from typing import Dict, List, ClassVar
-from BaseClasses import Tutorial, MultiWorld, CollectionState, ItemClassification, Item
+import os
+import base64
+import threading
+from typing import Dict, List, ClassVar, Any
+from BaseClasses import Tutorial, MultiWorld, CollectionState, Item
 from worlds.AutoWorld import World, WebWorld
 from Options import OptionError
 from .items import (lookup_item_to_id, item_table, item_names, KSSItem, filler_item_weights, copy_abilities,
@@ -9,7 +12,7 @@ from .items import (lookup_item_to_id, item_table, item_names, KSSItem, filler_i
 from .locations import location_table, KSSLocation
 from .options import KSSOptions, subgame_mapping
 from .regions import create_regions
-from .rom import KSS_UHASH
+from .rom import KSS_UHASH, KSSProcedurePatch, patch_rom
 from .rules import set_rules
 
 logger = logging.getLogger("Kirby Super Star")
@@ -58,6 +61,8 @@ class KSSWorld(World):
 
     def __init__(self, multiworld: MultiWorld, player: int):
         super().__init__(multiworld, player)
+        self.rom_name: bytes = bytes()
+        self.rom_name_available_event = threading.Event()
         self.treasure_value = []
 
     def generate_early(self) -> None:
@@ -137,7 +142,27 @@ class KSSWorld(World):
 
     def generate_output(self, output_directory: str) -> None:
         try:
-            patch = KSSProcedurePatch(player=)
+            patch = KSSProcedurePatch(player=self.player, player_name=self.player_name)
+            patch_rom(self, patch)
+
+            self.rom_name = patch.name
+
+            patch.write(os.path.join(output_directory,
+                                     f"{self.multiworld.get_out_file_name_base(self.player)}{patch.patch_file_ending}"))
+        except Exception:
+            raise
+        finally:
+            self.rom_name_available_event.set()
+
+    def modify_multidata(self, multidata: Dict[str, Any]) -> None:
+        # wait for self.rom_name to be available.
+        self.rom_name_available_event.wait()
+        assert isinstance(self.rom_name, bytes)
+        rom_name = getattr(self, "rom_name", None)
+        # we skip in case of error, so that the original error in the output thread is the one that gets raised
+        if rom_name:
+            new_name = base64.b64encode(self.rom_name).decode()
+            multidata["connect_names"][new_name] = multidata["connect_names"][self.multiworld.player_name[self.player]]
 
     def collect(self, state: "CollectionState", item: "Item") -> bool:
         value = super().collect(state, item)
