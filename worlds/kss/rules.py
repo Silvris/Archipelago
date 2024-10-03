@@ -34,19 +34,40 @@ def can_fight_wind(state: "CollectionState", player: int):
 
 
 def set_rules(world: "KSSWorld"):
-    # Revenge of Meta Knight
-    set_rule(world.get_entrance("Chapter 3 -> Chapter 4"), lambda state: can_burn(state, world.player))
+    if "Revenge of Meta Knight" in world.options.included_subgames:
+        # Revenge of Meta Knight
+        set_rule(world.get_entrance("Chapter 3 -> Chapter 4"), lambda state: can_burn(state, world.player))
 
-    # Great Cave Offensive
-    set_rule(world.get_location(location_names.tgco_treasure_13), lambda state: can_cut_rope(state, world.player))
-    set_rule(world.get_location(location_names.tgco_treasure_18), lambda state: can_pierce_walls(state, world.player))
-    set_rule(world.get_location(location_names.tgco_treasure_36), lambda state: can_pierce_floors(state, world.player))
-    set_rule(world.get_location(location_names.tgco_treasure_42), lambda state: state.has(item_names.stone, world.player))
-    set_rule(world.get_location(location_names.tgco_treasure_43), lambda state: can_cut_rope(state, world.player)
-                                                                                and can_pound_stakes(state, world.player))
-    set_rule(world.get_location(location_names.tgco_treasure_45), lambda state: can_burn(state, world.player))
-    set_rule(world.get_location(location_names.tgco_treasure_47), lambda state: can_fight_wind(state, world.player))
-    set_rule(world.get_location(location_names.tgco_treasure_49), lambda state: can_burn(state, world.player))
-    set_rule(world.get_location(location_names.tgco_treasure_53), lambda state: state.has(item_names.wheel, world.player))
-    set_rule(world.get_location(location_names.tgco_treasure_58), lambda state: state.has(item_names.beam, world.player))
+    if "The Great Cave Offensive" in world.options.included_subgames:
+        # Delay setting these rules until we know for sure
+        if world.treasure_value:
+            set_rule(world.get_entrance("Sub-Tree -> Crystal"), lambda state: state.has("Gold", world.player,
+                                                                                        world.treasure_value[0]))
+            set_rule(world.get_entrance("Crystal -> Old Tower"), lambda state: state.has("Gold", world.player,
+                                                                                         world.treasure_value[1]))
+            set_rule(world.get_entrance("Old Tower -> Garden"), lambda state: state.has("Gold", world.player,
+                                                                                        world.treasure_value[2]))
+            set_rule(world.get_location(location_names.tgco_complete), lambda state: state.has("Gold", world.player,
+                                                                                               world.treasure_value[3]))
+        # Great Cave Offensive
+        set_rule(world.get_location(location_names.tgco_treasure_13),
+                 lambda state: can_cut_rope(state, world.player))
+        set_rule(world.get_location(location_names.tgco_treasure_18),
+                 lambda state: can_pierce_walls(state, world.player))
+        set_rule(world.get_location(location_names.tgco_treasure_36),
+                 lambda state: can_pierce_floors(state, world.player))
+        set_rule(world.get_location(location_names.tgco_treasure_42),
+                 lambda state: state.has(item_names.stone, world.player))
+        set_rule(world.get_location(location_names.tgco_treasure_43),
+                 lambda state: can_cut_rope(state, world.player) and can_pound_stakes(state, world.player))
+        set_rule(world.get_location(location_names.tgco_treasure_45),
+                 lambda state: can_burn(state, world.player))
+        set_rule(world.get_location(location_names.tgco_treasure_47),
+                 lambda state: can_fight_wind(state, world.player))
+        set_rule(world.get_location(location_names.tgco_treasure_49),
+                 lambda state: can_burn(state, world.player))
+        set_rule(world.get_location(location_names.tgco_treasure_53),
+                 lambda state: state.has(item_names.wheel, world.player))
+        set_rule(world.get_location(location_names.tgco_treasure_58),
+                 lambda state: state.has(item_names.beam, world.player))
 

@@ -1,5 +1,17 @@
-from Options import PerGameCommonOptions, Range, Choice
+from Options import PerGameCommonOptions, Range, Choice, OptionSet
 from dataclasses import dataclass
+
+
+subgame_mapping = {
+        0: "Spring Breeze",
+        1: "Dyna Blade",
+        2: "Gourmet Race",
+        3: "The Great Cave Offensive",
+        4: "Revenge of Meta Knight",
+        5: "Milky Way Wishes",
+        6: "The Arena"
+}
+
 
 class RequiredSubgames(Range):
     """
@@ -9,6 +21,7 @@ class RequiredSubgames(Range):
     range_start = 1
     range_end = 7
     default = 6
+
 
 class StartingSubgame(Choice):
     """
@@ -24,7 +37,23 @@ class StartingSubgame(Choice):
     option_the_arena = 6
     default = 0
 
+
+class IncludedSubgames(OptionSet):
+    display_name = "Included Subgames"
+    valid_keys = {
+        "Spring Breeze",
+        "Dyna Blade",
+        "Gourmet Race",
+        "The Great Cave Offensive",
+        "Revenge of Meta Knight",
+        "Milky Way Wishes",
+        "The Arena"
+    }
+    default = valid_keys
+
+
 @dataclass
 class KSSOptions(PerGameCommonOptions):
     required_subgames: RequiredSubgames
     starting_subgame: StartingSubgame
+    included_subgames: IncludedSubgames

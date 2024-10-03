@@ -16,23 +16,28 @@ if TYPE_CHECKING:
 class KSSRegion(Region):
     game = "Kirby Super Star"
 
+
 def create_region(name, world: "KSSWorld"):
     return KSSRegion(name, world.player, world.multiworld)
 
+
 def create_trivial_regions(world: "KSSWorld", menu: KSSRegion):
-    gourmet_race = create_region("Gourmet Race", world)
-    gourmet_race.add_locations(gourmet_race_locations, KSSLocation)
-    menu.connect(gourmet_race, None, lambda state: state.has(item_names.gourmet_race, world.player))
-    world.get_location(location_names.gr_complete).place_locked_item(
-        world.create_item(item_names.gourmet_race_complete))
+    if "Gourmet Race" in world.options.included_subgames:
+        gourmet_race = create_region("Gourmet Race", world)
+        gourmet_race.add_locations(gourmet_race_locations, KSSLocation)
+        menu.connect(gourmet_race, None, lambda state: state.has(item_names.gourmet_race, world.player))
+        world.get_location(location_names.gr_complete).place_locked_item(
+            world.create_item(item_names.gourmet_race_complete))
+        world.multiworld.regions.append(gourmet_race)
 
-    arena = create_region("The Arena", world)
-    arena.add_locations(the_arena_locations, KSSLocation)
-    menu.connect(arena, None, lambda state: state.has(item_names.the_arena, world.player))
-    world.get_location(location_names.arena_complete).place_locked_item(
-        world.create_item(item_names.the_arena_complete))
+    if "The Arena" in world.options.included_subgames:
+        arena = create_region("The Arena", world)
+        arena.add_locations(the_arena_locations, KSSLocation)
+        menu.connect(arena, None, lambda state: state.has(item_names.the_arena, world.player))
+        world.get_location(location_names.arena_complete).place_locked_item(
+            world.create_item(item_names.the_arena_complete))
+        world.multiworld.regions.append(arena)
 
-    world.multiworld.regions.extend([gourmet_race, arena])
 
 def create_spring_breeze(world: "KSSWorld", menu: KSSRegion):
     spring_breeze = create_region("Spring Breeze", world)
@@ -55,6 +60,7 @@ def create_spring_breeze(world: "KSSWorld", menu: KSSRegion):
     world.get_location(location_names.sb_complete).place_locked_item(
         world.create_item(item_names.spring_breeze_complete))
     world.multiworld.regions.extend([spring_breeze, green_greens, float_islands, bubbly_clouds, mt_dedede])
+
 
 def create_dyna_blade(world: "KSSWorld", menu: KSSRegion):
     dyna_blade = create_region("Dyna Blade", world)
@@ -79,9 +85,10 @@ def create_dyna_blade(world: "KSSWorld", menu: KSSRegion):
     world.multiworld.regions.extend([dyna_blade, peanut_plains, mallow_castle, cocoa_cave,
                                      candy_mountain, dyna_blade_nest])
 
+
 def create_great_cave_offensive(world: "KSSWorld", menu: KSSRegion):
     tgco = create_region("The Great Cave Offensive", world)
-    subtree = create_region("Subtree", world)
+    subtree = create_region("Sub-Tree", world)
     crystal = create_region("Crystal", world)
     old_tower = create_region("Old Tower", world)
     garden = create_region("Garden", world)
@@ -100,6 +107,7 @@ def create_great_cave_offensive(world: "KSSWorld", menu: KSSRegion):
     world.get_location(location_names.tgco_complete).place_locked_item(
         world.create_item(item_names.great_cave_offensive_complete))
     world.multiworld.regions.extend([tgco, subtree, crystal, old_tower, garden])
+
 
 def create_revenge_meta_knight(world: "KSSWorld", menu: KSSRegion):
     revenge_of_meta_knight = create_region("Revenge of Meta Knight", world)
@@ -128,6 +136,7 @@ def create_revenge_meta_knight(world: "KSSWorld", menu: KSSRegion):
 
     world.multiworld.regions.extend([revenge_of_meta_knight, chapter_1, chapter_2, chapter_3, chapter_4, chapter_5,
                                      chapter_6, chapter_7])
+
 
 def create_milky_way_wishes(world: "KSSWorld", menu: KSSRegion):
     milky_way_wishes = create_region("Milky Way Wishes", world)
@@ -159,12 +168,18 @@ def create_milky_way_wishes(world: "KSSWorld", menu: KSSRegion):
     world.multiworld.regions.extend([milky_way_wishes, floria, aqualiss, skyhigh, hotbeat, cavios,
                                      mecheye, halfmoon, copy_planet])
 
+
 def create_regions(world: "KSSWorld"):
     menu = create_region("Menu", world)
     world.multiworld.regions.append(menu)
     create_trivial_regions(world, menu)
-    create_spring_breeze(world, menu)
-    create_dyna_blade(world, menu)
-    create_great_cave_offensive(world, menu)
-    create_revenge_meta_knight(world, menu)
-    create_milky_way_wishes(world, menu)
+    if "Spring Breeze" in world.options.included_subgames:
+        create_spring_breeze(world, menu)
+    if "Dyna Blade" in world.options.included_subgames:
+        create_dyna_blade(world, menu)
+    if "The Great Cave Offensive" in world.options.included_subgames:
+        create_great_cave_offensive(world, menu)
+    if "Revenge of Meta Knight" in world.options.included_subgames:
+        create_revenge_meta_knight(world, menu)
+    if "Milky Way Wishes" in world.options.included_subgames:
+        create_milky_way_wishes(world, menu)
