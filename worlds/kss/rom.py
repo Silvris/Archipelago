@@ -9,9 +9,10 @@ from typing import Iterable, TYPE_CHECKING, Optional
 if TYPE_CHECKING:
     from . import KSSWorld
 
-KSS_UHASH = ""
+KSS_UHASH = "cb76ea8ac989e71210c89102d91c6c57"
+KSS_VCHASH = ""
 
-starting_stage = 0xAB86F
+starting_stage = 0xAB870
 
 
 class KSSProcedurePatch(APProcedurePatch, APTokenMixin):
@@ -21,7 +22,7 @@ class KSSProcedurePatch(APProcedurePatch, APTokenMixin):
     result_file_ending = ".sfc"
     name: bytearray
     procedure = [
-        ("apply_bsdiff", ["kss_basepatch.bsdiff4"]),
+        ("apply_bsdiff4", ["kss_basepatch.bsdiff4"]),
         ("apply_tokens", ["token_patch.bin"]),
     ]
 
@@ -40,13 +41,16 @@ class KSSProcedurePatch(APProcedurePatch, APTokenMixin):
 def patch_rom(world: "KSSWorld", patch: KSSProcedurePatch):
     patch.write_file("kss_basepatch.bsdiff4", pkgutil.get_data(__name__, os.path.join("data", "kss_basepatch.bsdiff4")))
 
-    patch.write_byte(starting_stage, world.options.starting_subgame.value)
+    patch.write_byte(starting_stage, world.options.starting_subgame.value + 1)
 
     patch_name = bytearray(
         f'KSS{Utils.__version__.replace(".", "")[0:3]}_{world.player}_{world.multiworld.seed:11}\0', 'utf8')[:21]
     patch_name.extend([0] * (21 - len(patch_name)))
     patch.name = bytes(patch_name)
     patch.write_bytes(0x7FC0, patch.name)
+
+    patch.write_file("token_patch.bin", patch.get_token_binary())
+
 
 def get_base_rom_bytes() -> bytes:
     rom_file: str = get_base_rom_path()
@@ -66,7 +70,7 @@ def get_base_rom_bytes() -> bytes:
 def get_base_rom_path(file_name: str = "") -> str:
     options: settings.Settings = settings.get_settings()
     if not file_name:
-        file_name = options["kdl3_options"]["rom_file"]
+        file_name = options["kss_options"]["rom_file"]
     if not os.path.exists(file_name):
         file_name = Utils.user_path(file_name)
     return file_name

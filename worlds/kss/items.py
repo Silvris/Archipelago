@@ -13,13 +13,13 @@ class ItemData(NamedTuple):
     value: int = 0
 
 sub_games = {
-    item_names.spring_breeze: ItemData(BASE_ID + 1, ItemClassification.progression),
-    item_names.dyna_blade: ItemData(BASE_ID + 2, ItemClassification.progression),
-    item_names.gourmet_race: ItemData(BASE_ID + 3, ItemClassification.progression),
-    item_names.great_cave_offensive: ItemData(BASE_ID + 4, ItemClassification.progression),
-    item_names.revenge_of_meta_knight: ItemData(BASE_ID + 5, ItemClassification.progression),
-    item_names.milky_way_wishes: ItemData(BASE_ID + 6, ItemClassification.progression),
-    item_names.the_arena: ItemData(BASE_ID + 7, ItemClassification.progression),
+    item_names.spring_breeze: ItemData(BASE_ID + 0, ItemClassification.progression),
+    item_names.dyna_blade: ItemData(BASE_ID + 1, ItemClassification.progression),
+    item_names.gourmet_race: ItemData(BASE_ID + 2, ItemClassification.progression),
+    item_names.great_cave_offensive: ItemData(BASE_ID + 3, ItemClassification.progression),
+    item_names.revenge_of_meta_knight: ItemData(BASE_ID + 4, ItemClassification.progression),
+    item_names.milky_way_wishes: ItemData(BASE_ID + 5, ItemClassification.progression),
+    item_names.the_arena: ItemData(BASE_ID + 6, ItemClassification.progression),
 }
 
 sub_game_completion = {

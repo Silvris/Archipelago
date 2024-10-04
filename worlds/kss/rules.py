@@ -76,3 +76,6 @@ def set_rules(world: "KSSWorld"):
         set_rule(world.get_location(location_names.tgco_treasure_58),
                  lambda state: state.has(item_names.beam, world.player))
 
+    if "Milky Way Wishes" in world.options.included_subgames:
+        set_rule(world.get_location(location_names.mww_complete),
+                 lambda state: state.has_group_unique("Planets", world.player, 8))

@@ -14,6 +14,7 @@ from .options import KSSOptions, subgame_mapping
 from .regions import create_regions
 from .rom import KSS_UHASH, KSSProcedurePatch, patch_rom
 from .rules import set_rules
+from .client import KSSSNIClient
 
 logger = logging.getLogger("Kirby Super Star")
 

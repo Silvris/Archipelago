@@ -6,6 +6,7 @@ from .items import BASE_ID
 class KSSLocation(Location):
     game = "Kirby Super Star"
 
+
 green_greens_locations = {
     location_names.sb_whispy: BASE_ID + 0,
 }
