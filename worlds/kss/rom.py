@@ -12,7 +12,8 @@ if TYPE_CHECKING:
 KSS_UHASH = "cb76ea8ac989e71210c89102d91c6c57"
 KSS_VCHASH = ""
 
-starting_stage = 0xAB870
+starting_stage = 0xAB888
+goal_requirement = 0xAB88C
 
 
 class KSSProcedurePatch(APProcedurePatch, APTokenMixin):
@@ -41,7 +42,8 @@ class KSSProcedurePatch(APProcedurePatch, APTokenMixin):
 def patch_rom(world: "KSSWorld", patch: KSSProcedurePatch):
     patch.write_file("kss_basepatch.bsdiff4", pkgutil.get_data(__name__, os.path.join("data", "kss_basepatch.bsdiff4")))
 
-    patch.write_byte(starting_stage, world.options.starting_subgame.value + 1)
+    patch.write_byte(starting_stage + 1, world.options.starting_subgame.value + 1)
+    patch.write_byte(goal_requirement + 1, world.options.required_subgames.value)
 
     patch_name = bytearray(
         f'KSS{Utils.__version__.replace(".", "")[0:3]}_{world.player}_{world.multiworld.seed:11}\0', 'utf8')[:21]

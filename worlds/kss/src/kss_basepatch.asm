@@ -100,6 +100,13 @@ org $02A34B
     JML hook_copy_ability
     NOP
 
+org $07E01F
+    NOP #12 ; Milky Way Wishes initialization
+
+org $CA8532
+    JML set_dyna_switch
+    NOP #2 ; we don't really care about these, but lets let it be recoverable
+
 org $CAA6F8
     JML block_mww_planets
     NOP 
@@ -122,10 +129,30 @@ handle_menu_remap:
     NOP
 
 org $CAB86E
+    PHY
     PHX
+    LDA #$0001
+    LDX #$0007
+    LDY #$0000
+    .CompletionLoop:
+    CPX #$0000
+    BEQ .SetStarting
+    BIT !completed_sub_games
+    BEQ .NotComplete
+    INY
+    .NotComplete:
+    DEX
+    ASL
+    BRA .CompletionLoop
+    .SetStarting:
     print "Starting Stage: ", hex(snestopc(realbase()))
     LDA #$0001
     PHA
+    print "Goal Requirement: ", hex(snestopc(realbase()))
+    CPY #$0006
+    BCS .Skip
+    ORA !sound_test
+    .Skip:
     ORA !ap_sub_games
     STA !received_sub_games
     PLA
@@ -139,6 +166,7 @@ org $CAB86E
     .Break:
     STX $7A91
     STX $7A87
+    PLY
     PLX
     RTL
     NOP #19
@@ -703,6 +731,17 @@ block_ability_essence:
     BEQ .NoAbility
     JML $CF76A4
 
+set_dyna_switch:
+    LDA $407A64
+    AND #$00FF
+    STA $28
+    LDA $7A77
+    ORA $28
+    SEP #$20
+    STA $407A64
+    REP #$20
+    STZ $7A77
+    RTL
 
 org $CF3FB1
 hook_check_treasure:
@@ -724,3 +763,9 @@ hook_ability_essence:
 org $CFAA16
 remap_deluxe_essence:
     db $00, $00, $01, $02, $03, $04, $05, $06, $07, $08, $09, $0A, $0B, $0C, $0D, $0E, $0F, $10, $11, $12
+
+org $D1BFD8
+; clear save loading (we're preserving this piece of state)
+; Could probably reroute it, might be something to consider
+    RTL
+    NOP #2
