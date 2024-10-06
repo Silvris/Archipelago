@@ -12,8 +12,8 @@ if TYPE_CHECKING:
 KSS_UHASH = "cb76ea8ac989e71210c89102d91c6c57"
 KSS_VCHASH = ""
 
-starting_stage = 0xAB888
-goal_requirement = 0xAB88C
+starting_stage = 0xAFC89
+goal_requirement = 0xAFC8D
 
 
 class KSSProcedurePatch(APProcedurePatch, APTokenMixin):

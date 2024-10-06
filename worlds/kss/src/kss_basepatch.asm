@@ -129,47 +129,8 @@ handle_menu_remap:
     NOP
 
 org $CAB86E
-    PHY
-    PHX
-    LDA #$0001
-    LDX #$0007
-    LDY #$0000
-    .CompletionLoop:
-    CPX #$0000
-    BEQ .SetStarting
-    BIT !completed_sub_games
-    BEQ .NotComplete
-    INY
-    .NotComplete:
-    DEX
-    ASL
-    BRA .CompletionLoop
-    .SetStarting:
-    print "Starting Stage: ", hex(snestopc(realbase()))
-    LDA #$0001
-    PHA
-    print "Goal Requirement: ", hex(snestopc(realbase()))
-    CPY #$0006
-    BCS .Skip
-    ORA !sound_test
-    .Skip:
-    ORA !ap_sub_games
-    STA !received_sub_games
-    PLA
-    LDX #$0000
-    .Loop:
-    BIT #$0001
-    BNE .Break
-    INX
-    LSR
-    BRA .Loop
-    .Break:
-    STX $7A91
-    STX $7A87
-    PLY
-    PLX
-    RTL
-    NOP #19
+    JML set_starting_stage
+    NOP #49
 
 org $CAB8AA
     LDA #$0005
@@ -741,6 +702,48 @@ set_dyna_switch:
     STA $407A64
     REP #$20
     STZ $7A77
+    RTL
+
+set_starting_stage:
+    PHY
+    PHX
+    LDA #$0001
+    LDX #$0007
+    LDY #$0000
+    .CompletionLoop:
+    CPX #$0000
+    BEQ .SetStarting
+    BIT !completed_sub_games
+    BEQ .NotComplete
+    INY
+    .NotComplete:
+    DEX
+    ASL
+    BRA .CompletionLoop
+    .SetStarting:
+    print "Starting Stage: ", hex(snestopc(realbase()))
+    LDA #$0001
+    PHA
+    print "Goal Requirement: ", hex(snestopc(realbase()))
+    CPY #$0006
+    BCS .Skip
+    ORA #$8000
+    .Skip:
+    ORA !ap_sub_games
+    STA !received_sub_games
+    PLA
+    LDX #$0000
+    .Loop:
+    BIT #$0001
+    BNE .Break
+    INX
+    LSR
+    BRA .Loop
+    .Break:
+    STX $7A91
+    STX $7A87
+    PLY
+    PLX
     RTL
 
 org $CF3FB1
