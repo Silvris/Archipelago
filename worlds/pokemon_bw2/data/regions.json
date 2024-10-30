@@ -4,67 +4,73 @@
       {
         "name": "Pokedex from Bianca",
         "default": "Pokedex",
-        "tags": ["IGNORE", "KEY"]
+        "tags": [["IGNORE", "KEY"]]
       },
       {
         "name": "Town Map from Hugh's Sister",
         "default": "Town Map",
         "tags": ["KEY"],
-        "script_info": [854, 1550, 442, 1]
+        "script_info": [[854, 1550, 442, 1]]
       },
       {
         "name": "Hugh's Town Map from Hugh's Sister",
         "default": "Hugh's Town Map",
         "tags": ["EXTENDED", "KEY"],
-        "script_info": [854, 1594, 622, 1]
+        "script_info": [[854, 1594, 622, 1]]
       },
       {
         "name": "Gift from Bianca",
         "default": "Poke Ball",
         "tags": ["GIFT"],
-        "script_info": [870, 500, 4, 10]
+        "script_info": [[870, 500, 4, 10]]
       },
       {
         "name": "Gift from Mom",
         "default": "Max Revive",
         "tags": ["GIFT", "POSTGAME"],
-        "script_info": [856, 1202, 29, 2]
+        "script_info": [[856, 1202, 29, 2]]
       },
       {
         "name": "Basic Badge from Cheren",
         "default": "Basic Badge",
         "tags": ["BADGE"],
-        "script_info": [978, 984, 120, 1]
+        "script_info": [[978, 984, 120, 1]]
       },
       {
         "name": "TM83 from Cheren",
         "default": "TM83",
         "tags": ["GIFT"],
-        "script_info": [978, 1064, 410, 1]
+        "script_info": [[978, 1064, 410, 1]]
       },
       {
         "name": "Gift from Clyde",
         "default": "Fresh Water",
         "tags": ["GIFT"],
-        "script_info": [978, 202, 30, 1]
+        "script_info": [[978, 202, 30, 1]]
       },
       {
         "name": "Gift from Bianca Post-Gym",
         "default": "TM27",
         "tags": ["GIFT"],
-        "script_info": [854, 5181, 354, 1]
+        "script_info": [[854, 5181, 354, 1]]
       },
       {
         "name": "Gift from Girl after Defeating Cheren",
         "default": "Ultra Ball",
         "tags": ["GIFT"],
-        "script_info": [868, 121, 2, 1]
+        "script_info": [[868, 121, 2, 1]]
       },
       {
         "name": "Parting Gift",
         "default": "Potion",
         "tags": ["GIFT"],
         "script_info": [[876, 174, 17, 1], [876, 303, 17, 1]]
+      },
+      {
+        "name": "Across the Pond",
+        "default": "TM53",
+        "tags": ["OVERWORLD"],
+        "script_info": [[1240, 1602, 380, 1]]
       }
     ],
     "connections": [
@@ -77,7 +83,25 @@
         "name": "Gift from Alder",
         "default": "Oran Berry",
         "tags": ["GIFT"],
-        "script_info": [874, 1292, 155, 5]
+        "script_info": [[874, 1292, 155, 5]]
+      },
+      {
+        "name": "Northern part",
+        "default": "Water Stone",
+        "tags": ["OVERWORLD"],
+        "script_info": [[1240, 1628, 84, 1]]
+      },
+      {
+        "name": "Northeastern part",
+        "default": "Nest Ball",
+        "tags": ["OVERWORLD"],
+        "script_info": [[1240, 1654, 8, 1]]
+      },
+      {
+        "name": "Near the Youngster that shows the shortcut using ledges",
+        "default": "Potion",
+        "tags": ["OVERWORLD"],
+        "script_info": [[1240, 10000, 17, 1]]
       }
     ],
     "connections": [
@@ -92,6 +116,12 @@
         "default": "Medal Box",
         "tags": ["KEY"],
         "script_info": [1276, 687, 627, 1]
+      },
+      {
+        "name": "On the west side of Alder's house",
+        "default": "X Speed",
+        "tags": ["OVERWORLD"],
+        "script_info": [[1240, 1888, 59, 1]]
       }
     ],
     "connections": [
@@ -105,7 +135,55 @@
         "name": "Gift from Cheren",
         "default": "Pecha Berry",
         "tags": ["GIFT"],
-        "script_info": [892, 1003, 151, 3]
+        "script_info": [[892, 1003, 151, 3]]
+      },
+      {
+        "name": "North of Lass Isabel",
+        "default": "Paralyz Heal",
+        "tags": ["OVERWORLD"],
+        "script_info": [[1240, 1680, 22, 1]]
+      },
+      {
+        "name": "North of Youngster Terrell",
+        "default": "Poke Ball",
+        "tags": ["OVERWORLD"],
+        "script_info": [[1240, 1706, 4, 1]]
+      },
+      {
+        "name": "Northeast of Preschooler Lin",
+        "default": "Antidote",
+        "tags": ["OVERWORLD"],
+        "script_info": [[1240, 1732, 18, 1]]
+      },
+      {
+        "name": "East of Nursery Aide Kimya",
+        "default": "Dire Hit",
+        "tags": ["OVERWORLD"],
+        "script_info": [[1240, 1758, 56, 1]]
+      },
+      {
+        "name": "Near Pokemon Ranger Leaf",
+        "default": "Rare Candy",
+        "tags": ["OVERWORLD"],
+        "script_info": [[1240, 1784, 50, 1]]
+      },
+      {
+        "name": "Also near Pokemon Ranger Leaf",
+        "default": "Max Revive",
+        "tags": ["OVERWORLD"],
+        "script_info": [[1240, 1810, 29, 1]]
+      },
+      {
+        "name": "In dark grass",
+        "default": "Great Ball",
+        "tags": ["OVERWORLD"],
+        "script_info": [[1240, 1836, 3, 1]]
+      },
+      {
+        "name": "South of the bridge",
+        "default": "Sticky Barb",
+        "tags": ["OVERWORLD"],
+        "script_info": [[1240, 1862, 288, 1]]
       }
     ],
     "connections": [
@@ -1127,18 +1205,712 @@
       "Seaside Cave"
     ]
   },
-  "Abyssal Ruins": {
+  "Abyssal Ruins (1F)": {
+        "locations": [
+            {
+                "name": "West of the room's center",
+                "default": "Flame Plate",
+                "tags": [
+                    "OVERWORLD"
+                ],
+                "script_info": [
+                    [
+                        1240,
+                        10026,
+                        298,
+                        1
+                    ]
+                ]
+            },
+            {
+                "name": "South of the western entrance",
+                "default": "Zap Plate",
+                "tags": [
+                    "OVERWORLD"
+                ],
+                "script_info": [
+                    [
+                        1240,
+                        10052,
+                        300,
+                        1
+                    ]
+                ]
+            },
+            {
+                "name": "Southwest quadrant",
+                "default": "Meadow Plate",
+                "tags": [
+                    "OVERWORLD"
+                ],
+                "script_info": [
+                    [
+                        1240,
+                        10078,
+                        301,
+                        1
+                    ]
+                ]
+            },
+            {
+                "name": "Southeast quadrant",
+                "default": "Relic Silver",
+                "tags": [
+                    "OVERWORLD"
+                ],
+                "script_info": [
+                    [
+                        1240,
+                        10104,
+                        585,
+                        1
+                    ]
+                ]
+            },
+            {
+                "name": "Southwest corner",
+                "default": "Fist Plate",
+                "tags": [
+                    "OVERWORLD"
+                ],
+                "script_info": [
+                    [
+                        1240,
+                        10130,
+                        303,
+                        1
+                    ]
+                ]
+            },
+            {
+                "name": "Southeast corner",
+                "default": "Toxic Plate",
+                "tags": [
+                    "OVERWORLD"
+                ],
+                "script_info": [
+                    [
+                        1240,
+                        10156,
+                        304,
+                        1
+                    ]
+                ]
+            },
+            {
+                "name": "Southeast quadrant",
+                "default": "Relic Vase",
+                "tags": [
+                    "OVERWORLD"
+                ],
+                "script_info": [
+                    [
+                        1240,
+                        10182,
+                        587,
+                        1
+                    ]
+                ]
+            },
+            {
+                "name": "North of the eastern entrance",
+                "default": "Sky Plate",
+                "tags": [
+                    "OVERWORLD"
+                ],
+                "script_info": [
+                    [
+                        1240,
+                        10208,
+                        306,
+                        1
+                    ]
+                ]
+            },
+            {
+                "name": "North of the room's center",
+                "default": "Mind Plate",
+                "tags": [
+                    "OVERWORLD"
+                ],
+                "script_info": [
+                    [
+                        1240,
+                        10234,
+                        307,
+                        1
+                    ]
+                ]
+            },
+            {
+                "name": "Near the northeast corner",
+                "default": "Insect Plate",
+                "tags": [
+                    "OVERWORLD"
+                ],
+                "script_info": [
+                    [
+                        1240,
+                        10260,
+                        308,
+                        1
+                    ]
+                ]
+            },
+            {
+                "name": "Near the northern entrance",
+                "default": "Stone Plate",
+                "tags": [
+                    "OVERWORLD"
+                ],
+                "script_info": [
+                    [
+                        1240,
+                        10286,
+                        309,
+                        1
+                    ]
+                ]
+            },
+            {
+                "name": "South of the room's center",
+                "default": "Icicle Plate",
+                "tags": [
+                    "OVERWORLD"
+                ],
+                "script_info": [
+                    [
+                        1240,
+                        10312,
+                        302,
+                        1
+                    ]
+                ]
+            },
+            {
+                "name": "North of the western entrance",
+                "default": "Dread Plate",
+                "tags": [
+                    "OVERWORLD"
+                ],
+                "script_info": [
+                    [
+                        1240,
+                        10338,
+                        312,
+                        1
+                    ]
+                ]
+            },
+            {
+                "name": "Northwest quadrant",
+                "default": "Iron Plate",
+                "tags": [
+                    "OVERWORLD"
+                ],
+                "script_info": [
+                    [
+                        1240,
+                        10364,
+                        313,
+                        1
+                    ]
+                ]
+            },
+            {
+                "name": "Inside the northern entrance",
+                "default": "Relic Copper",
+                "tags": [
+                    "OVERWORLD"
+                ],
+                "script_info": [
+                    [
+                        1240,
+                        10390,
+                        584,
+                        1
+                    ]
+                ]
+            },
+            {
+                "name": "Inside the eastern entrance",
+                "default": "Relic Copper",
+                "tags": [
+                    "OVERWORLD"
+                ],
+                "script_info": [
+                    [
+                        1240,
+                        10416,
+                        584,
+                        1
+                    ]
+                ]
+            },
+            {
+                "name": "Southeast of the western entrance",
+                "default": "Relic Copper",
+                "tags": [
+                    "OVERWORLD"
+                ],
+                "script_info": [
+                    [
+                        1240,
+                        10442,
+                        584,
+                        1
+                    ]
+                ]
+            },
+            {
+                "name": "Inside the southern entrance",
+                "default": "Relic Copper",
+                "tags": [
+                    "OVERWORLD"
+                ],
+                "script_info": [
+                    [
+                        1240,
+                        10468,
+                        584,
+                        1
+                    ]
+                ]
+            },
+            {
+                "name": "Northwest quadrant",
+                "default": "Relic Silver",
+                "tags": [
+                    "OVERWORLD"
+                ],
+                "script_info": [
+                    [
+                        1240,
+                        10494,
+                        585,
+                        1
+                    ]
+                ]
+            },
+            {
+                "name": "Northeast quadrant",
+                "default": "Relic Silver",
+                "tags": [
+                    "OVERWORLD"
+                ],
+                "script_info": [
+                    [
+                        1240,
+                        10520,
+                        585,
+                        1
+                    ]
+                ]
+            },
+            {
+                "name": "Southeast quadrant",
+                "default": "Earth Plate",
+                "tags": [
+                    "OVERWORLD"
+                ],
+                "script_info": [
+                    [
+                        1240,
+                        10546,
+                        305,
+                        1
+                    ]
+                ]
+            },
+            {
+                "name": "Southeast quadrant",
+                "default": "Spooky Plate",
+                "tags": [
+                    "OVERWORLD"
+                ],
+                "script_info": [
+                    [
+                        1240,
+                        10572,
+                        310,
+                        1
+                    ]
+                ]
+            },
+            {
+                "name": "Near the northwest corner",
+                "default": "Relic Gold",
+                "tags": [
+                    "OVERWORLD"
+                ],
+                "script_info": [
+                    [
+                        1240,
+                        10598,
+                        586,
+                        1
+                    ]
+                ]
+            },
+            {
+                "name": "East of the room's center",
+                "default": "Relic Gold",
+                "tags": [
+                    "OVERWORLD"
+                ],
+                "script_info": [
+                    [
+                        1240,
+                        10624,
+                        586,
+                        1
+                    ]
+                ]
+            },
+            {
+                "name": "Southwest quadrant",
+                "default": "Relic Gold",
+                "tags": [
+                    "OVERWORLD"
+                ],
+                "script_info": [
+                    [
+                        1240,
+                        10650,
+                        586,
+                        1
+                    ]
+                ]
+            },
+            {
+                "name": "Just north of the room's center",
+                "default": "Relic Statue",
+                "tags": [
+                    "OVERWORLD"
+                ],
+                "script_info": [
+                    [
+                        1240,
+                        10676,
+                        589,
+                        1
+                    ]
+                ]
+            }
+        ],
+    "connections": [
+      "Abyssal Ruins (2F)"
+    ]
+  },
+  "Abyssal Ruins (2F)": {
+        "locations": [
+            {
+                "name": "Near the entrance from 1F",
+                "default": "Relic Copper",
+                "tags": [
+                    "OVERWORLD"
+                ],
+                "script_info": [
+                    [
+                        1240,
+                        10702,
+                        584,
+                        1
+                    ]
+                ]
+            },
+            {
+                "name": "Southwest quadrant",
+                "default": "Relic Copper",
+                "tags": [
+                    "OVERWORLD"
+                ],
+                "script_info": [
+                    [
+                        1240,
+                        10728,
+                        584,
+                        1
+                    ]
+                ]
+            },
+            {
+                "name": "Northeast quadrant",
+                "default": "Relic Silver",
+                "tags": [
+                    "OVERWORLD"
+                ],
+                "script_info": [
+                    [
+                        1240,
+                        10754,
+                        585,
+                        1
+                    ]
+                ]
+            },
+            {
+                "name": "Southwest quadrant",
+                "default": "Relic Silver",
+                "tags": [
+                    "OVERWORLD"
+                ],
+                "script_info": [
+                    [
+                        1240,
+                        10780,
+                        585,
+                        1
+                    ]
+                ]
+            },
+            {
+                "name": "Northwest quadrant",
+                "default": "Relic Gold",
+                "tags": [
+                    "OVERWORLD"
+                ],
+                "script_info": [
+                    [
+                        1240,
+                        10806,
+                        586,
+                        1
+                    ]
+                ]
+            },
+            {
+                "name": "Northeast quadrant",
+                "default": "Relic Gold",
+                "tags": [
+                    "OVERWORLD"
+                ],
+                "script_info": [
+                    [
+                        1240,
+                        10832,
+                        586,
+                        1
+                    ]
+                ]
+            },
+            {
+                "name": "Along the east wall",
+                "default": "Relic Gold",
+                "tags": [
+                    "OVERWORLD"
+                ],
+                "script_info": [
+                    [
+                        1240,
+                        10858,
+                        586,
+                        1
+                    ]
+                ]
+            },
+            {
+                "name": "Northwest corner",
+                "default": "Relic Vase",
+                "tags": [
+                    "OVERWORLD"
+                ],
+                "script_info": [
+                    [
+                        1240,
+                        10884,
+                        587,
+                        1
+                    ]
+                ]
+            },
+            {
+                "name": "Northeast quadrant",
+                "default": "Relic Band",
+                "tags": [
+                    "OVERWORLD"
+                ],
+                "script_info": [
+                    [
+                        1240,
+                        10910,
+                        588,
+                        1
+                    ]
+                ]
+            },
+            {
+                "name": "Southeast corner",
+                "default": "Relic Band",
+                "tags": [
+                    "OVERWORLD"
+                ],
+                "script_info": [
+                    [
+                        1240,
+                        10936,
+                        588,
+                        1
+                    ]
+                ]
+            },
+            {
+                "name": "Southwest corner",
+                "default": "Relic Statue",
+                "tags": [
+                    "OVERWORLD"
+                ],
+                "script_info": [
+                    [
+                        1240,
+                        10962,
+                        589,
+                        1
+                    ]
+                ]
+            }
+        ],
+    "connections": [
+      "Abyssal Ruins (3F)"
+    ]
+  },
+  "Abyssal Ruins (3F)": {
+        "locations": [
+            {
+                "name": "South side",
+                "default": "Relic Silver",
+                "tags": [
+                    "OVERWORLD"
+                ],
+                "script_info": [
+                    [
+                        1240,
+                        10988,
+                        585,
+                        1
+                    ]
+                ]
+            },
+            {
+                "name": "Southwest corner",
+                "default": "Relic Gold",
+                "tags": [
+                    "OVERWORLD"
+                ],
+                "script_info": [
+                    [
+                        1240,
+                        11014,
+                        586,
+                        1
+                    ]
+                ]
+            },
+            {
+                "name": "Northeast corner",
+                "default": "Relic Vase",
+                "tags": [
+                    "OVERWORLD"
+                ],
+                "script_info": [
+                    [
+                        1240,
+                        11040,
+                        587,
+                        1
+                    ]
+                ]
+            },
+            {
+                "name": "Along the west wall",
+                "default": "Relic Vase",
+                "tags": [
+                    "OVERWORLD"
+                ],
+                "script_info": [
+                    [
+                        1240,
+                        11066,
+                        587,
+                        1
+                    ]
+                ]
+            },
+            {
+                "name": "Northeast quadrant",
+                "default": "Relic Band",
+                "tags": [
+                    "OVERWORLD"
+                ],
+                "script_info": [
+                    [
+                        1240,
+                        11092,
+                        588,
+                        1
+                    ]
+                ]
+            },
+            {
+                "name": "In the room's center",
+                "default": "Relic Band",
+                "tags": [
+                    "OVERWORLD"
+                ],
+                "script_info": [
+                    [
+                        1240,
+                        11118,
+                        588,
+                        1
+                    ]
+                ]
+            },
+            {
+                "name": "Southeast quadrant",
+                "default": "Relic Band",
+                "tags": [
+                    "OVERWORLD"
+                ],
+                "script_info": [
+                    [
+                        1240,
+                        11144,
+                        588,
+                        1
+                    ]
+                ]
+            },
+            {
+                "name": "Northwest corner",
+                "default": "Relic Statue",
+                "tags": [
+                    "OVERWORLD"
+                ],
+                "script_info": [
+                    [
+                        1240,
+                        11170,
+                        589,
+                        1
+                    ]
+                ]
+            }
+        ],
+    "connections": [
+      "Abyssal Ruins (4F)"
+    ]
+  },
+  "Abyssal Ruins (4F)": {
     "locations": [
       {
         "name": "4F - Relic Crown",
         "default": "Relic Crown",
         "tags": ["OVERWORLD"],
-        "script_info": [496, 750, 590, 1]
+        "script_info": [[496, 750, 590, 1], [1240, 11196, 590, 1]]
       }
     ],
-    "connections": [
-      "Undella Bay"
-    ]
+    "connections": []
   },
   "Seaside Cave": {
     "locations": [],
