@@ -3,7 +3,6 @@ from __future__ import annotations
 import random
 import typing
 
-from kivy.uix.label import Label
 from operator import itemgetter
 import Utils
 import logging
@@ -78,7 +77,7 @@ MHFU_BREAKPOINTS = {
     # CPU breakpoints don't use read/write/change
     "QUEST_LOAD": (True, 0x08A57510, 1, True, True, True, False, False),
     "QUEST_COMPLETE": (True, 0x09999DC8, 63, False, True, False, True, True),
-    "MONSTER_LOAD": (False, 0x08871C3C, 1, True, True, False, False, False),
+    "MONSTER_LOAD": (False, 0x08871C24, 1, True, True, False, False, False),
     #"MONSTER_LOAD_RESPAWN": (False, 0x09B18F10, 1, True, True, False, False, False)
 }
 
@@ -567,7 +566,7 @@ class MHFUContext(CommonContext):
         self.recv_index = len(items)
 
     def run_gui(self):
-        from kvui import GameManager
+        from kvui import GameManager, Label
 
         class MHFUManager(GameManager):
             logging_pairs = [

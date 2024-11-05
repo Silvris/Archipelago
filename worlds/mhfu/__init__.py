@@ -98,7 +98,7 @@ class MHFUWorld(World):
         else:
             max_guild = (-1, -1, -1)
         if self.options.village_depth:
-            max_village = (1, self.options.village_depth.value, hub_rank_max[1, self.options.village_depth.value -1])
+            max_village = (1, self.options.village_depth.value, hub_rank_max[1, self.options.village_depth.value - 1])
         else:
             max_village = (-1, -1, -1)
         if max_guild[1] == 3:
