@@ -217,6 +217,7 @@ class Context:
     loader = staticmethod(decode)
 
     simple_options = {"hint_cost": int,
+                      "bonus_hint_percent": float,
                       "location_check_points": int,
                       "server_password": str,
                       "password": str,
@@ -252,7 +253,7 @@ class Context:
     logger: logging.Logger
 
     def __init__(self, host: str, port: int, server_password: str, password: str, location_check_points: int,
-                 hint_cost: int, item_cheat: bool, release_mode: str = "disabled", collect_mode="disabled",
+                 hint_cost: int, bonus_hint_percent: float, item_cheat: bool, release_mode: str = "disabled", collect_mode="disabled",
                  countdown_mode: str = "auto", remaining_mode: str = "disabled", auto_shutdown: typing.SupportsFloat = 0, 
                  compatibility: int = 2, log_network: bool = False, logger: logging.Logger = logging.getLogger()):
         self.logger = logger
@@ -281,10 +282,11 @@ class Context:
         self.name_aliases: typing.Dict[team_slot, str] = {}
         self.location_checks = collections.defaultdict(set)
         self.hint_cost = hint_cost
+        self.bonus_hint_percent = bonus_hint_percent
         self.location_check_points = location_check_points
         self.hints_used = collections.defaultdict(int)
         self.hints: typing.Dict[team_slot, typing.Set[Hint]] = collections.defaultdict(set)
-        self.release_mode: str = release_mode
+        self.additional_hints : typing.Dict[team_slot, float] = collections.defaultdict(float)
         self.remaining_mode: str = remaining_mode
         self.collect_mode: str = collect_mode
         self.countdown_mode: str = countdown_mode
@@ -659,6 +661,7 @@ class Context:
             "received_items": self.received_items,
             "hints_used": dict(self.hints_used),
             "hints": dict(self.hints),
+            "additional_hints": dict(self.additional_hints),
             "location_checks": dict(self.location_checks),
             "name_aliases": self.name_aliases,
             "client_game_state": dict(self.client_game_state),
@@ -669,7 +672,8 @@ class Context:
             "random_state": self.random.getstate(),
             "group_collected": dict(self.group_collected),
             "stored_data": self.stored_data,
-            "game_options": {"hint_cost": self.hint_cost, "location_check_points": self.location_check_points,
+            "game_options": {"hint_cost": self.hint_cost, "bonus_hint_percent": self.bonus_hint_percent,
+                             "location_check_points": self.location_check_points,
                              "server_password": self.server_password, "password": self.password,
                              "release_mode": self.release_mode,
                              "remaining_mode": self.remaining_mode, "collect_mode": self.collect_mode,
@@ -688,6 +692,7 @@ class Context:
         self.received_items = savedata["received_items"]
         self.hints_used.update(savedata["hints_used"])
         self.hints.update(savedata["hints"])
+        self.additional_hints.update(savedata["additional_hints"])
 
         self.name_aliases.update(savedata["name_aliases"])
         self.client_game_state.update(savedata["client_game_state"])
@@ -702,6 +707,7 @@ class Context:
 
         if "game_options" in savedata:
             self.hint_cost = savedata["game_options"]["hint_cost"]
+            self.bonus_hint_percent = savedata["game_options"]["bonus_hint_percent"]
             self.location_check_points = savedata["game_options"]["location_check_points"]
             self.server_password = savedata["game_options"]["server_password"]
             self.password = savedata["game_options"]["password"]
@@ -930,6 +936,7 @@ async def on_client_connected(ctx: Context, client: Client):
         'generator_version': ctx.generator_version,
         'permissions': get_permissions(ctx),
         'hint_cost': ctx.hint_cost,
+        'bonus_hint_percent': ctx.bonus_hint_percent,
         'location_check_points': ctx.location_check_points,
         'datapackage_checksums': {game: game_data["checksum"] for game, game_data
                                   in ctx.gamespackage.items() if game in games and "checksum" in game_data},
@@ -1128,6 +1135,15 @@ def send_items_to(ctx: Context, team: int, target_slot: int, *items: NetworkItem
                 get_received_items(ctx, team, target, False).append(item)
             get_received_items(ctx, team, target, True).append(item)
 
+def update_additional_hints(ctx: Context, players: typing.List[team_slot]):
+    for team, player in players:
+        free_hints = 0
+        hint_items = [item for item in get_received_items(ctx, team, player, True) if item.item in (-2, -3)]
+        if hint_items:
+            full_hints = sum(item.item == -2 for item in hint_items)
+            half_hints = sum(item.item == -3 for item in hint_items)
+            free_hints += full_hints + (half_hints << 1)
+        ctx.additional_hints[team, player] = free_hints
 
 def register_location_checks(ctx: Context, team: int, slot: int, locations: typing.Iterable[int],
                              count_activity: bool = True):
@@ -1135,6 +1151,7 @@ def register_location_checks(ctx: Context, team: int, slot: int, locations: typi
     new_locations = set(locations) - ctx.location_checks[team, slot]
     new_locations.intersection_update(slot_locations)  # ignore location IDs unknown to this multidata
     if new_locations:
+        receiving_players = []
         if count_activity:
             ctx.client_activity_timers[team, slot] = datetime.datetime.now(datetime.timezone.utc)
 
@@ -1159,12 +1176,14 @@ def register_location_checks(ctx: Context, team: int, slot: int, locations: typi
                 ctx.broadcast_team(team, info_texts)
                 info_texts.clear()
             info_texts.append(json_format_send_event(new_item, target_player))
+            receiving_players.append((team, target_player))
         ctx.broadcast_team(team, info_texts)
         del info_texts
         del sortable
 
         ctx.location_checks[team, slot] |= new_locations
         send_new_items(ctx)
+        update_additional_hints(ctx, receiving_players)
         ctx.broadcast(ctx.clients[team][slot], [{
             "cmd": "RoomUpdate",
             "hint_points": get_slot_points(ctx, team, slot),
@@ -1834,12 +1853,21 @@ def get_missing_checks(ctx: Context, team: int, slot: int) -> typing.List[int]:
 
 
 def get_client_points(ctx: Context, client: Client) -> int:
-    return (ctx.location_check_points * len(ctx.location_checks[client.team, client.slot]) -
+    checked_locations = sum(len(ctx.location_checks[client.team, slot]) for slot in ctx.slot_info)
+    total_locations = sum(len(ctx.locations[slot]) for slot in ctx.slot_info)
+    print(math.floor((checked_locations / total_locations) * 100))
+    return (ctx.location_check_points * len(ctx.location_checks[client.team, client.slot]) +
+            (math.floor(ctx.additional_hints[client.team, client.slot]) * ctx.get_hint_cost(client.slot)) +
+            (math.floor(((checked_locations / total_locations) * 100) * ctx.bonus_hint_percent)) -
             ctx.get_hint_cost(client.slot) * ctx.hints_used[client.team, client.slot])
 
 
 def get_slot_points(ctx: Context, team: int, slot: int) -> int:
-    return (ctx.location_check_points * len(ctx.location_checks[team, slot]) -
+    checked_locations = sum(len(ctx.location_checks[team, target_slot]) for target_slot in ctx.slot_info)
+    total_locations = sum(len(ctx.locations[target_slot]) for target_slot in ctx.slot_info)
+    return (ctx.location_check_points * len(ctx.location_checks[team, slot]) +
+            (math.floor(ctx.additional_hints[team, slot]) * ctx.get_hint_cost(slot)) +
+            (math.floor((checked_locations // total_locations) * ctx.bonus_hint_percent)) -
             ctx.get_hint_cost(slot) * ctx.hints_used[team, slot])
 
 
@@ -2377,6 +2405,7 @@ class ServerCommandProcessor(CommonCommandProcessor):
                 send_items_to(self.ctx, team, slot, *new_items)
 
                 send_new_items(self.ctx)
+                update_additional_hints(self.ctx, [(team, slot)])
                 self.ctx.broadcast_text_all(
                     'Cheat console: sending ' + ('' if amount == 1 else f'{amount} of ') +
                     f'"{item_name}" to {self.ctx.get_aliased_name(team, slot)}')
@@ -2531,7 +2560,7 @@ class ServerCommandProcessor(CommonCommandProcessor):
         self.output(f"Set option {option_name} to {getattr(self.ctx, option_name)}")
         if option_name in {"release_mode", "remaining_mode", "collect_mode"}:
             self.ctx.broadcast_all([{"cmd": "RoomUpdate", 'permissions': get_permissions(self.ctx)}])
-        elif option_name in {"hint_cost", "location_check_points"}:
+        elif option_name in {"hint_cost", "location_check_points", "bonus_hint_percent"}:
             self.ctx.broadcast_all([{"cmd": "RoomUpdate", option_name: getattr(self.ctx, option_name)}])
         return True
 
@@ -2588,6 +2617,7 @@ def parse_args() -> argparse.Namespace:
                         default=defaults["logtime"], action='store_true')
     parser.add_argument('--location_check_points', default=defaults["location_check_points"], type=int)
     parser.add_argument('--hint_cost', default=defaults["hint_cost"], type=int)
+    parser.add_argument('--bonus_hint_percent', default=defaults["bonus_hint_percent"], type=float)
     parser.add_argument('--disable_item_cheat', default=defaults["disable_item_cheat"], action='store_true')
     parser.add_argument('--release_mode', default=defaults["release_mode"], nargs='?',
                         choices=['auto', 'enabled', 'disabled', "goal", "auto-enabled"], help='''\
@@ -2678,8 +2708,8 @@ async def main(args: argparse.Namespace):
                        add_timestamp=args.logtime)
 
     ctx = Context(args.host, args.port, args.server_password, args.password, args.location_check_points,
-                  args.hint_cost, not args.disable_item_cheat, args.release_mode, args.collect_mode,
-                  args.countdown_mode, args.remaining_mode,
+                  args.hint_cost, args.bonus_hint_percent, not args.disable_item_cheat, args.release_mode,
+                  args.collect_mode, args.countdown_mode, args.remaining_mode,
                   args.auto_shutdown, args.compatibility, args.log_network)
     data_filename = args.multidata
 
