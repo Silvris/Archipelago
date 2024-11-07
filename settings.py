@@ -536,6 +536,11 @@ class ServerOptions(Group):
         for a total of 5
         """
 
+    class BonusHintPercent(float):
+        """
+        Number of additional hint points granted to players per percent of multiworld completion.
+        """
+
     class ReleaseMode(str):
         """
         Release modes
@@ -597,6 +602,7 @@ class ServerOptions(Group):
     disable_item_cheat: Union[DisableItemCheat, bool] = False
     location_check_points: LocationCheckPoints = LocationCheckPoints(1)
     hint_cost: HintCost = HintCost(10)
+    bonus_hint_percent: BonusHintPercent = BonusHintPercent(0)
     release_mode: ReleaseMode = ReleaseMode("auto")
     collect_mode: CollectMode = CollectMode("auto")
     remaining_mode: RemainingMode = RemainingMode("goal")
