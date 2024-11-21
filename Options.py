@@ -1493,10 +1493,6 @@ class PlandoItems(Option[typing.List[PlandoItem]]):
                         if item in world.item_name_groups:
                             value = plando.items.pop(item)
                             group = sorted(world.item_name_groups[item])
-                            for group_item in group:
-                                if group_item in plando.items:
-                                    raise Exception(f"Plando `items` contains both \"{group_item}\" and the group "
-                                                    f"\"{item}\" which contains it. It cannot have both.")
                             if plando.item_group_method == "all":
                                 plando.items.update({key: value for key in group})
                             elif plando.item_group_method == "even":
