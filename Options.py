@@ -1451,8 +1451,6 @@ class PlandoItems(Option[typing.List[PlandoItem]]):
                 percentage = item.get("percentage", 100)
                 if not isinstance(percentage, int):
                     raise Exception(f"Plando `percentage` has to be int, not {type(percentage)}.")
-                if not (0 <= percentage <= 100):
-                    raise Exception(f"Plando `percentage` has to be between 0 and 100 (inclusive) not {percentage}.")
                 if roll_percentage(percentage):
                     count = item.get("count", False)
                     items = item.get("items", [])
@@ -1460,21 +1458,12 @@ class PlandoItems(Option[typing.List[PlandoItem]]):
                         items = item.get("item", None)  # explicitly throw an error here if not present
                         if not items:
                             raise Exception("You must specify at least one item to place items with plando.")
-                        if isinstance(items, str):
-                            items = [items]
-                        elif isinstance(items, dict):
-                            count = 1
-                        else:
-                            raise Exception(f"Plando 'item' has to be string or dictionary, not {type(items)}.")
+                        items = [items]
                     locations = item.get("locations", [])
                     if not locations:
                         locations = item.get("location", [])
-                        if isinstance(locations, str):
+                        if locations:
                             locations = [locations]
-                        if isinstance(locations, list) and locations:
-                            count = 1
-                        elif not isinstance(locations, list):
-                            raise Exception(f"Plando `location` has to be string or list, not {type(locations)}")
                     world = item.get("world", False)
                     from_pool = item.get("from_pool", True)
                     force = item.get("force", "silent")
