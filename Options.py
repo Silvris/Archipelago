@@ -834,7 +834,10 @@ class VerifyKeys(metaclass=FreezeValidKeys):
                                     f"is not a valid location name from {world.game}. "
                                     f"Did you mean '{picks[0][0]}' ({picks[0][1]}% sure)")
 
+    def __iter__(self) -> typing.Iterator[typing.Any]:
+        return self.value.__iter__()
 
+    
 class OptionDict(Option[typing.Dict[str, typing.Any]], VerifyKeys, typing.Mapping[str, typing.Any]):
     default = {}
     supports_weighting = False
@@ -1423,7 +1426,6 @@ class PlandoItem(typing.NamedTuple):
     force: typing.Union[bool, typing.Literal["silent"]] = "silent"
     count: typing.Union[int, bool, typing.Dict[str, int]] = False
     percentage: int = 100
-    item_group_method: typing.Literal["all", "even", "random"] = "all"
 
 
 class PlandoItems(Option[typing.List[PlandoItem]]):
@@ -1444,10 +1446,6 @@ class PlandoItems(Option[typing.List[PlandoItem]]):
         value: typing.List[PlandoItem] = []
         for item in data:
             if isinstance(item, typing.Mapping):
-                item_group_method = item.get("item_group_method", "all")
-                if item_group_method not in ("all", "even", "random"):
-                    raise Exception(f"Plando `item_group_method` has to be \"all\", \"even\", or \"random\", "
-                                    f"not {item_group_method}")
                 percentage = item.get("percentage", 100)
                 if not isinstance(percentage, int):
                     raise Exception(f"Plando `percentage` has to be int, not {type(percentage)}.")
@@ -1458,16 +1456,24 @@ class PlandoItems(Option[typing.List[PlandoItem]]):
                         items = item.get("item", None)  # explicitly throw an error here if not present
                         if not items:
                             raise Exception("You must specify at least one item to place items with plando.")
-                        items = [items]
+                        count = 1
+                        if isinstance(items, str):
+                            items = [items]
+                        elif not isinstance(items, dict):
+                            raise Exception(f"Plando 'item' has to be string or dictionary, not {type(items)}.")
                     locations = item.get("locations", [])
                     if not locations:
                         locations = item.get("location", [])
                         if locations:
+                            count = 1
+                        if isinstance(locations, str):
                             locations = [locations]
+                        if not isinstance(locations, list):
+                            raise Exception(f"Plando `location` has to be string or list, not {type(locations)}")
                     world = item.get("world", False)
                     from_pool = item.get("from_pool", True)
                     force = item.get("force", "silent")
-                    value.append(PlandoItem(items, locations, world, from_pool, force, count, percentage, item_group_method))
+                    value.append(PlandoItem(items, locations, world, from_pool, force, count, percentage))
             elif isinstance(item, PlandoItem):
                 if roll_percentage(item.percentage):
                     value.append(item)
@@ -1504,6 +1510,10 @@ class PlandoItems(Option[typing.List[PlandoItem]]):
                                 plando.items.update({key: 0 for key in group})
                                 for key in random.choices(group, k=value):
                                     plando.items[key] += 1
+                            for group_item in group:
+                                if group_item in plando.items:
+                                    raise Exception(f"Plando `items` contains both \"{group_item}\" and the group "
+                                                    f"\"{item}\" which contains it. It cannot have both.")
                 else:
                     assert isinstance(plando.items, list)  # pycharm can't figure out the hinting without the hint
                     for item in items_copy:
@@ -1577,22 +1587,26 @@ it.
 def get_option_groups(world: typing.Type[World], visibility_level: Visibility = Visibility.template) -> typing.Dict[
         str, typing.Dict[str, typing.Type[Option[typing.Any]]]]:
     """Generates and returns a dictionary for the option groups of a specified world."""
-    option_groups = {option: option_group.name
-                     for option_group in world.web.option_groups
-                     for option in option_group.options}
+    option_to_name = {option: option_name for option_name, option in world.options_dataclass.type_hints.items()}
+
+    ordered_groups = {group.name: group.options for group in world.web.option_groups}
+
     # add a default option group for uncategorized options to get thrown into
-    ordered_groups = ["Game Options"]
-    [ordered_groups.append(group) for group in option_groups.values() if group not in ordered_groups]
-    grouped_options = {group: {} for group in ordered_groups}
-    for option_name, option in world.options_dataclass.type_hints.items():
-        if visibility_level & option.visibility:
-            grouped_options[option_groups.get(option, "Game Options")][option_name] = option
+    if "Game Options" not in ordered_groups:
+        grouped_options = set(option for group in ordered_groups.values() for option in group)
+        ungrouped_options = [option for option in option_to_name if option not in grouped_options]
+        # only add the game options group if we have ungrouped options
+        if ungrouped_options:
+            ordered_groups = {**{"Game Options": ungrouped_options}, **ordered_groups}
 
-    # if the world doesn't have any ungrouped options, this group will be empty so just remove it
-    if not grouped_options["Game Options"]:
-        del grouped_options["Game Options"]
-
-    return grouped_options
+    return {
+        group: {
+            option_to_name[option]: option
+            for option in group_options
+            if (visibility_level in option.visibility and option in option_to_name)
+        }
+        for group, group_options in ordered_groups.items()
+    }
 
 
 def generate_yaml_templates(target_folder: typing.Union[str, "pathlib.Path"], generate_hidden: bool = True) -> None:
