@@ -1449,6 +1449,8 @@ class PlandoItems(Option[typing.List[PlandoItem]]):
                 percentage = item.get("percentage", 100)
                 if not isinstance(percentage, int):
                     raise Exception(f"Plando `percentage` has to be int, not {type(percentage)}.")
+                if not (0 <= percentage <= 100):
+                    raise Exception(f"Plando `percentage` has to be between 0 and 100 (inclusive) not {percentage}.")
                 if roll_percentage(percentage):
                     count = item.get("count", False)
                     items = item.get("items", [])
