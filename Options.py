@@ -1426,6 +1426,7 @@ class PlandoItem(typing.NamedTuple):
     force: typing.Union[bool, typing.Literal["silent"]] = "silent"
     count: typing.Union[int, bool, typing.Dict[str, int]] = False
     percentage: int = 100
+    item_group_method: typing.Literal["all", "even", "random"] = "all"
 
 
 class PlandoItems(Option[typing.List[PlandoItem]]):
@@ -1446,6 +1447,10 @@ class PlandoItems(Option[typing.List[PlandoItem]]):
         value: typing.List[PlandoItem] = []
         for item in data:
             if isinstance(item, typing.Mapping):
+                item_group_method = item.get("item_group_method", "all")
+                if item_group_method not in ("all", "even", "random"):
+                    raise Exception(f"Plando `item_group_method` has to be \"all\", \"even\", or \"random\", "
+                                    f"not {item_group_method}")
                 percentage = item.get("percentage", 100)
                 if not isinstance(percentage, int):
                     raise Exception(f"Plando `percentage` has to be int, not {type(percentage)}.")
@@ -1475,7 +1480,7 @@ class PlandoItems(Option[typing.List[PlandoItem]]):
                     world = item.get("world", False)
                     from_pool = item.get("from_pool", True)
                     force = item.get("force", "silent")
-                    value.append(PlandoItem(items, locations, world, from_pool, force, count, percentage))
+                    value.append(PlandoItem(items, locations, world, from_pool, force, count, percentage, item_group_method))
             elif isinstance(item, PlandoItem):
                 if roll_percentage(item.percentage):
                     value.append(item)
