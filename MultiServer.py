@@ -630,6 +630,8 @@ class Context:
             self.collect_mode = savedata["game_options"]["collect_mode"]
             self.item_cheat = savedata["game_options"]["item_cheat"]
             self.compatibility = savedata["game_options"]["compatibility"]
+            self.teams = savedata["game_options"]["teams"]
+            self._update_teams()
 
         if "group_collected" in savedata:
             self.group_collected = savedata["group_collected"]
