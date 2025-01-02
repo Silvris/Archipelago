@@ -378,6 +378,10 @@ class Context:
         endpoints = (endpoint for endpoint in itertools.chain.from_iterable(self.clients[team].values()))
         async_start(self.broadcast_send_encoded_msgs(endpoints, msgs))
 
+    def broadcast_text_team(self, text: str, additional_arguments: dict = {}):
+        self.logger.info("Notice (team): %s" % text)
+        self.broadcast_team([{**{"cmd": "PrintJSON", "data": [{ "text": text }]}, **additional_arguments}])
+
     def broadcast(self, endpoints: typing.Iterable[Client], msgs: typing.List[dict]):
         msgs = self.dumper(msgs)
         async_start(self.broadcast_send_encoded_msgs(endpoints, msgs))
@@ -1040,7 +1044,7 @@ def update_checked_locations(ctx: Context, team: int, slot: int):
 def release_player(ctx: Context, team: int, slot: int):
     """register any locations that are in the multidata"""
     all_locations = set(ctx.locations[slot])
-    ctx.broadcast_text_all("%s (Team #%d) has released all remaining items from their world."
+    ctx.broadcast_text_team("%s (Team #%d) has released all remaining items from their world."
                            % (ctx.player_names[(team, slot)], team + 1),
                            {"type": "Release", "team": team, "slot": slot})
     register_location_checks(ctx, team, slot, all_locations)
@@ -1051,7 +1055,7 @@ def collect_player(ctx: Context, team: int, slot: int, is_group: bool = False):
     """register any locations that are in the multidata, pointing towards this player"""
     all_locations = ctx.locations.get_for_player(slot)
 
-    ctx.broadcast_text_all("%s (Team #%d) has collected their items from other worlds."
+    ctx.broadcast_text_team("%s (Team #%d) has collected their items from other worlds."
                            % (ctx.player_names[(team, slot)], team + 1),
                            {"type": "Collect", "team": team, "slot": slot})
     for source_player, location_ids in all_locations.items():
