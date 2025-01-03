@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import functools
 from typing import List, Set
 
 from dataclasses import dataclass
@@ -233,6 +234,19 @@ class FinalFantasyXIVGame(Game):
                     is_difficult=False,
                 ),
             ]
+
+        if "Chaotic Alliance Raids" in self.content_types_allowed and len(self.chaotic_alliance_raids()) > 0:
+            objective_list += [
+                GameObjectiveTemplate(
+                    label="Complete the instance DUTY as JOB",
+                    data={
+                        "DUTY": (self.chaotic_alliance_raids, 1),
+                        "JOB": (self.combat_jobs, 1),
+                    },
+                    is_time_consuming=False,
+                    is_difficult=True,
+                ),
+            ]
         
         if "Deep Dungeons" in self.content_types_allowed:
             objective_list += [
@@ -307,7 +321,15 @@ class FinalFantasyXIVGame(Game):
                         weight=1,
                     ),
                 ]
-        
+
+        if "Bozja" in self.content_types_allowed and "Shadowbringers" in self.expansions_accessible:
+            objective_list += [
+                GameObjectiveTemplate(
+                    label="Complete COUNT critical engagements in AREA",
+                    data={"COUNT": ((lambda: list(range(3, 11))), 1), "AREA": (self.bozja_areas, 1)}
+                )
+            ]
+
         if "Gathering" in self.content_types_allowed and len(self.gathering_collectables()) > 0:
             objective_list += [
                 GameObjectiveTemplate(
@@ -1567,6 +1589,20 @@ class FinalFantasyXIVGame(Game):
 
         return sorted(alliance_raids)
 
+    def chaotic_alliance_raids(self):
+        chaotic_alliance_raids = list()
+
+        dawntrail_chaotic_alliance_raids = [
+            "The Cloud of Darkness (Chaotic)",
+        ]
+
+        if "Dawntrail" in self.expansions_accessible:
+            chaotic_alliance_raids.extend(dawntrail_chaotic_alliance_raids)
+
+        return sorted(chaotic_alliance_raids)
+
+
+
     @staticmethod
     def deep_dungeon_floor_range() -> range:
         return range(1,4)
@@ -1701,7 +1737,35 @@ class FinalFantasyXIVGame(Game):
             masked_carnivale.extend(shadowbringers_masked_carnivale)
 
         return sorted(masked_carnivale)
-    
+
+    @functools.cached_property
+    def bozja_areas(self):
+        return ["the Bozjan Southern Front", "Zadnor"]
+
+    @functools.cached_property
+    def bozja_raids(self):
+        return ["Castrum Lacus Litore", "The Dalriada", "Delubrum Reginae"]
+
+    @functools.cached_property
+    def bozja_critical_engagements(self):
+        return [
+            "Kill It with Fire",
+            "The Baying of the Hound(s)",
+            "The Shadow of Death's Hand",
+            "Vigil for the Lost",
+            "Aces High",
+            "Patriot Games",
+            "The Final Furlong",
+            "The Fires of War",
+            "The Hunt for Red Choctober",
+            "Beast of Man",
+            "Metal Fox Chaos",
+            "Rise of the Robots",
+            "Trampled under Hoof",
+            "Where Strode the Behemoth",
+            "And the Flames Went Higher",
+        ]
+
     @staticmethod
     def gathering_collectables_count_range() -> range:
         return range(3,13)
@@ -2995,9 +3059,11 @@ class FinalFantasyXIVContentTypesAllowed(OptionSet):
         "Normal Raids",
         "Savage Raids",
         "Alliance Raids",
+        "Chaotic Alliance Raids"
         "Deep Dungeons",
         "Variant Dungeons",
         "Limited Jobs",
+        "Bozja"
         # PvP
         "Crystalline Conflict",
         "Frontline",
