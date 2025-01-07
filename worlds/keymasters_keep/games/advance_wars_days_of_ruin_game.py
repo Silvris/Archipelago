@@ -58,6 +58,12 @@ class AdvanceWarsDaysOfRuinGame(Game):
                     "TERRAIN": (self.freeplay_terrain, 1),
                 },
             ),
+            GameObjectiveTemplate(
+                label="Promote 5x UNIT to V Rank and have them survive, Commander unit does not count",
+                data={
+                    "UNIT": (self.units_combat, 1),
+                },
+            ),
         ]
 
     def game_objective_templates(self) -> List[GameObjectiveTemplate]:
@@ -358,13 +364,7 @@ class AdvanceWarsDaysOfRuinGame(Game):
         return sorted(self.maps_trials_2p + self.maps_trials_3p + self.maps_trials_4p)
 
     def maps_freeplay_2p(self) -> List[str]:
-        return sorted(
-            self.maps_classic
-            + self.maps_2p
-            + self.maps_3p
-            + self.maps_4p
-            + self.maps_trials_2p
-        )
+        return sorted(self.maps_classic + self.maps_2p + self.maps_trials_2p)
 
     def maps_freeplay_3p(self) -> List[str]:
         return sorted(self.maps_3p + self.maps_trials_3p)
@@ -404,6 +404,33 @@ class AdvanceWarsDaysOfRuinGame(Game):
         ]
 
     @staticmethod
+    def units_combat() -> List[str]:
+        return [
+            "Infantry",
+            "Mech",
+            "Bike",
+            "Recon",
+            "Anti-Air",
+            "Tank",
+            "Medium Tank",
+            "War Tank",
+            "Artillery",
+            "Anti-Tank",
+            "Rockets",
+            "Missiles",
+            "Fighter",
+            "Bomber",
+            "Duster",
+            "B Copter",
+            "Seaplane",
+            "Battleship",
+            "Carrier",
+            "Submarine",
+            "Cruiser",
+            "Gunboat",
+        ]
+
+    @staticmethod
     def units_airfield() -> List[str]:
         return [
             "Fighter",
@@ -436,7 +463,6 @@ class AdvanceWarsDaysOfRuinGame(Game):
     def units_port() -> List[str]:
         return [
             "Battleship",
-            "Carrier",
             "Submarine",
             "Cruiser",
             "Lander",

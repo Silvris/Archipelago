@@ -39,52 +39,90 @@ class CreeperWorld3ArcEternalGame(Game):
                     "WEAPON": (self.player_weapons, 1),
                 },
             ),
+            GameObjectiveTemplate(
+                label="Do not use any power cirlces (the cirlces left by enemies)",
+                data=dict(),
+            ),
+            GameObjectiveTemplate(
+                label="Play on maps no bigger than size: SIZE (if possible)",
+                data={
+                    "SIZE": (self.map_sizes, 1),
+                },
+            ),
         ]
 
     def game_objective_templates(self) -> List[GameObjectiveTemplate]:
         return [
             GameObjectiveTemplate(
-                label="Complete a DMD mission with emitters.  Map Size: SIZE  Enemy Type: ENEMY  Enemy Count: COUNT",
+                label="Complete a DMD mission. Enemies: ENEMY  Count: COUNT",
                 data={
-                    "SIZE": (self.map_sizes_compact, 1),
-                    "ENEMY": (self.enemies, 1),
-                    "COUNT": (self.enemy_counts_compact, 1),
+                    "ENEMY": (self.creep_enemies, 1),
+                    "COUNT": (self.enemy_counts_low, 1),
                 },
                 is_time_consuming=False,
-                is_difficult=True,
-                weight=3,
+                is_difficult=False,
+                weight=2,
             ),
             GameObjectiveTemplate(
-                label="Complete a DMD mission with emitters.  Map Size: SIZE  Enemy Type: ENEMY  Enemy Count: COUNT",
+                label="Complete a DMD mission. Enemies: ENEMY  Count: COUNT",
                 data={
-                    "SIZE": (self.map_sizes_spacious, 1),
-                    "ENEMY": (self.enemies, 1),
-                    "COUNT": (self.enemy_counts_spacious, 1),
+                    "ENEMY": (self.creep_enemies, 1),
+                    "COUNT": (self.enemy_counts_mid, 1),
                 },
                 is_time_consuming=True,
                 is_difficult=False,
-                weight=4,
+                weight=1,
             ),
             GameObjectiveTemplate(
-                label="Complete a DMD mission.  Map Size: SIZE  Enemy Types: All  Enemy Count: COUNT",
+                label="Complete a DMD mission.  Enemies: ENEMY  Count: COUNT",
                 data={
-                    "SIZE": (self.map_sizes_compact, 1),
-                    "COUNT": (self.enemy_counts_compact, 1),
+                    "ENEMY": (self.creep_enemies, 1),
+                    "COUNT": (self.enemy_counts_high, 1),
+                },
+                is_time_consuming=True,
+                is_difficult=False,
+                weight=1,
+            ),
+            GameObjectiveTemplate(
+                label="Complete a DMD mission. Enemies: ENEMY, SPECIALS  Count: COUNT",
+                data={
+                    "ENEMY": (self.creep_enemies, 1),
+                    "SPECIALS": (self.special_enemies, 2),
+                    "COUNT": (self.enemy_counts_low, 1),
+                },
+                is_time_consuming=False,
+                is_difficult=False,
+                weight=3,
+            ),
+            GameObjectiveTemplate(
+                label="Complete a DMD mission. Enemies: ENEMY, SPECIALS  Count: COUNT",
+                data={
+                    "ENEMY": (self.creep_enemies, 1),
+                    "SPECIALS": (self.special_enemies, 2),
+                    "COUNT": (self.enemy_counts_mid, 1),
                 },
                 is_time_consuming=False,
                 is_difficult=True,
                 weight=2,
             ),
             GameObjectiveTemplate(
-                label="Complete a DMD mission.  Map Size: SIZE  Enemy Types: All  Enemy Count: COUNT",
+                label="Complete a DMD mission. Enemies: ENEMY, SPECIALS  Count: COUNT",
                 data={
-                    "SIZE": (self.map_sizes_compact, 1),
-                    "COUNT": (self.enemy_counts_compact, 1),
+                    "ENEMY": (self.creep_enemies, 1),
+                    "SPECIALS": (self.special_enemies, 2),
+                    "COUNT": (self.enemy_counts_high, 1),
                 },
-                is_time_consuming=True,
-                is_difficult=False,
-                weight=3,
+                is_time_consuming=False,
+                is_difficult=True,
+                weight=1,
             ),
+            GameObjectiveTemplate(
+                label="Complete a Next Crazy DMD mission. Alter terrain or reroll if impossible configuration is rolled",
+                data=dict(),
+                is_time_consuming=False,
+                is_difficult=True,
+                weight=2,
+            ),            
             GameObjectiveTemplate(
                 label="Complete the following Arc Eternal mission: MISSION",
                 data={
@@ -138,33 +176,34 @@ class CreeperWorld3ArcEternalGame(Game):
         ]
 
     @staticmethod
-    def map_sizes_compact() -> List[str]:
+    def map_sizes() -> List[str]:
         return [
             "Tiny",
             "Small",
             "Medium",
-        ]
-
-    @staticmethod
-    def map_sizes_spacious() -> List[str]:
-        return [
             "Large",
             "Huge",
             "Max",
         ]
 
     @staticmethod
-    def enemies() -> List[str]:
+    def creep_enemies() -> List[str]:
         return [
-            "Digitalis",
-            "Runner Nests",
+            "Emtters",
+            "Emitters with Digitalis",
+            "Emitters with Digitalis and Runner Nests",
+        ]
+
+    @staticmethod
+    def special_enemies() -> List[str]:
+        return [
             "Spore Towers",
             "Air Exclusion Towers",
             "Inhibitor",
         ]
 
     @staticmethod
-    def enemy_counts_compact() -> List[str]:
+    def enemy_counts_low() -> List[str]:
         return [
             "2-4",
             "4-7",
@@ -172,11 +211,19 @@ class CreeperWorld3ArcEternalGame(Game):
         ]
 
     @staticmethod
-    def enemy_counts_spacious() -> List[str]:
+    def enemy_counts_mid() -> List[str]:
         return [
             "10-13",
             "13-16",
             "16-20",
+        ]
+    
+    @staticmethod
+    def enemy_counts_high() -> List[str]:
+        return [
+            "14-17",
+            "17-21",
+            "21-25",
         ]
 
     @staticmethod

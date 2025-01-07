@@ -45,10 +45,24 @@ class GuitarHeroIIILegendsOfRockGame(Game):
                 data={"TRACK": (self.tracks, 1)},
                 is_time_consuming=False,
                 is_difficult=False,
-                weight=3
+                weight=6
             ),
             GameObjectiveTemplate(
                 label="Get a Full Combo on TRACK",
+                data={"TRACK": (self.tracks, 1)},
+                is_time_consuming=False,
+                is_difficult=True,
+                weight=2
+            ),
+            GameObjectiveTemplate(
+                label="Play TRACK on Bass/Rhythm through Practice Mode",
+                data={"TRACK": (self.tracks, 1)},
+                is_time_consuming=False,
+                is_difficult=False,
+                weight=3
+            ),
+            GameObjectiveTemplate(
+                label="Get a Full Combo on TRACK on Bass/Rhythm through Practice Mode",
                 data={"TRACK": (self.tracks, 1)},
                 is_time_consuming=False,
                 is_difficult=True,

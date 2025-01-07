@@ -11,19 +11,19 @@ from ..enums import KeymastersKeepGamePlatforms
 
 
 @dataclass
-class HollowcureSaveTheFansArchipelagoOptions:
+class HoloCureSaveTheFansArchipelagoOptions:
     pass
 
 
-class HollowcureSaveTheFansGame(Game):
-    name = "Hollowcure: Save the Fans!"
+class HoloCureSaveTheFansGame(Game):
+    name = "HoloCure: Save the Fans!"
     platform = KeymastersKeepGamePlatforms.PC
 
     platforms_other = None
 
     is_adult_only_or_unrated = False
 
-    options_cls = HollowcureSaveTheFansArchipelagoOptions
+    options_cls = HoloCureSaveTheFansArchipelagoOptions
 
     def optional_game_constraint_templates(self) -> List[GameObjectiveTemplate]:
         return list()

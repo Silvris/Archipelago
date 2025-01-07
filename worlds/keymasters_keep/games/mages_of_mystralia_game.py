@@ -76,7 +76,7 @@ class MagesOfMystraliaGame(Game):
                 data={
                     "ELIXER": (self.elixirs, 1),
                 },
-                is_time_consuming=False,
+                is_time_consuming=True,
                 is_difficult=False,
                 weight=2,
             ),
@@ -87,7 +87,7 @@ class MagesOfMystraliaGame(Game):
                     "BEHAVIORS": (self.behaviors, 4),
                 },
                 is_time_consuming=True,
-                is_difficult=False,
+                is_difficult=True,
                 weight=1,
             ),
             GameObjectiveTemplate(
@@ -97,7 +97,18 @@ class MagesOfMystraliaGame(Game):
                     "BEHAVIORS": (self.behaviors, 4),
                 },
                 is_time_consuming=True,
-                is_difficult=False,
+                is_difficult=True,
+                weight=1,
+            ),
+            GameObjectiveTemplate(
+                label="Play the Adventure and get the following  Behaviors: BEHAVIORS  Augment: AUGMENTS  Trigger: TRIGGER",
+                data={
+                    "BEHAVIORS": (self.behaviors, 2),
+                    "AUGMENTS": (self.augments, 1),
+                    "TRIGGER": (self.triggers, 1),
+                },
+                is_time_consuming=True,
+                is_difficult=True,
                 weight=1,
             ),
         ]

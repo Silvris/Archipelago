@@ -57,21 +57,21 @@ class FinalFantasyXIVGame(Game):
         if "FATEs" in self.content_types_allowed or len(self.content_types_allowed) == 0:
             objective_list += [
                 GameObjectiveTemplate(
-                    label="Complete COUNT FATEs in ZONE with gold credit as JOB",
+                    label="Complete COUNT FATEs in ZONE with gold credit (Optional choice of jobs: JOBS)",
                     data={
                         "COUNT": (self.fate_range, 1),
                         "ZONE": (self.zones, 1),
-                        "JOB": (self.combat_jobs, 1),
+                        "JOBS": (self.combat_jobs, 2),
                     },
                     is_time_consuming=False,
                     is_difficult=False,
-                    weight=1,
+                    weight=3,
                 ),
                 GameObjectiveTemplate(
-                    label="Complete one FATE with gold credit in each zone as JOB: ZONE",
+                    label="Complete one FATE with gold credit in each zone: ZONE (Optional choice of jobs: JOBS)",
                     data={
                         "ZONE": (self.zones, 3),
-                        "JOB": (self.combat_jobs, 1),
+                        "JOBS": (self.combat_jobs, 2),
                     },
                     is_time_consuming=False,
                     is_difficult=False,
@@ -82,23 +82,24 @@ class FinalFantasyXIVGame(Game):
             if "Unreasonable Tasks" in self.content_types_allowed:
                 objective_list += [
                     GameObjectiveTemplate(
-                        label="Complete World FATE 'NAME' with gold credit as JOB",
+                        label="Complete World FATE 'NAME' with gold credit (Optional choice of jobs: JOBS)",
                         data={
                             "NAME": (self.world_fates, 1),
-                            "JOB": (self.combat_jobs, 1),
+                            "JOBS": (self.combat_jobs, 2),
                         },
                         is_time_consuming=True,
                         is_difficult=False,
+                        weight=1,
                     ),
                 ]
 
         if "Guildhests" in self.content_types_allowed or len(self.content_types_allowed) == 0:
             objective_list += [
                 GameObjectiveTemplate(
-                    label="Complete the Guildhest 'GUILDHEST' as JOB",
+                    label="Complete the Guildhest 'GUILDHEST' (Optional choice of jobs: JOBS)",
                     data={
                         "GUILDHEST": (self.guildhests, 1),
-                        "JOB": (self.combat_jobs, 1),
+                        "JOBS": (self.combat_jobs, 2),
                     },
                     is_time_consuming=False,
                     is_difficult=False,
@@ -134,14 +135,13 @@ class FinalFantasyXIVGame(Game):
         if "The Hunt" in self.content_types_allowed or len(self.content_types_allowed) == 0:
             objective_list += [
                 GameObjectiveTemplate(
-                    label="Locate and defeat B-rank Hunt mark MARK as JOB",
+                    label="Locate and defeat B-rank Hunt mark MARK",
                     data={
                         "MARK": (self.hunt_b_ranks, 1),
-                        "JOB": (self.combat_jobs, 1),
                     },
                     is_time_consuming=False,
                     is_difficult=False,
-                    weight=1,
+                    weight=4,
                 ),
             ]
 
@@ -154,142 +154,150 @@ class FinalFantasyXIVGame(Game):
                         },
                         is_time_consuming=True,
                         is_difficult=True,
+                        weight=1,
                     ),
                 ]
         
         if "Dungeons" in self.content_types_allowed or len(self.content_types_allowed) == 0:
             objective_list += [
                 GameObjectiveTemplate(
-                    label="Complete the instance DUTY as JOB",
+                    label="Complete the Dungeon 'DUTY' (Optional choice of jobs: JOBS)",
                     data={
                         "DUTY": (self.dungeons, 1),
-                        "JOB": (self.combat_jobs, 1),
+                        "JOBS": (self.combat_jobs, 2),
                     },
                     is_time_consuming=False,
                     is_difficult=False,
+                    weight=4,
                 ),
             ]
         
         if "Trials" in self.content_types_allowed or len(self.content_types_allowed) == 0:
             objective_list += [
                 GameObjectiveTemplate(
-                    label="Complete the instance DUTY as JOB",
+                    label="Complete the Trial 'DUTY' (Optional choice of jobs: JOBS)",
                     data={
                         "DUTY": (self.trials, 1),
-                        "JOB": (self.combat_jobs, 1),
+                        "JOBS": (self.combat_jobs, 2),
                     },
                     is_time_consuming=False,
                     is_difficult=False,
+                    weight=3,
                 ),
             ]
 
         if "Extreme Trials" in self.content_types_allowed:
             objective_list += [
                 GameObjectiveTemplate(
-                    label="Complete the instance DUTY as JOB",
+                    label="Complete the Extreme Trial 'DUTY' (Optional choice of jobs: JOBS)",
                     data={
                         "DUTY": (self.extreme_trials, 1),
-                        "JOB": (self.combat_jobs, 1),
+                        "JOBS": (self.combat_jobs, 2),
                     },
                     is_time_consuming=False,
                     is_difficult=True,
+                    weight=1,
                 ),
             ]
 
         if "Normal Raids" in self.content_types_allowed:
             objective_list += [
                 GameObjectiveTemplate(
-                    label="Complete the instance DUTY as JOB",
+                    label="Complete the Normal Raid 'DUTY' (Optional choice of jobs: JOBS)",
                     data={
                         "DUTY": (self.normal_raids, 1),
-                        "JOB": (self.combat_jobs, 1),
+                        "JOBS": (self.combat_jobs, 2),
                     },
                     is_time_consuming=False,
                     is_difficult=False,
+                    weight=3,
                 ),
             ]
 
         if "Savage Raids" in self.content_types_allowed:
             objective_list += [
                 GameObjectiveTemplate(
-                    label="Complete the instance DUTY as JOB",
+                    label="Complete the Savage Raid 'DUTY' (Optional choice of jobs: JOBS)",
                     data={
                         "DUTY": (self.savage_raids, 1),
-                        "JOB": (self.combat_jobs, 1),
+                        "JOBS": (self.combat_jobs, 2),
                     },
                     is_time_consuming=False,
                     is_difficult=True,
+                    weight=1,
                 ),
             ]
 
         if "Alliance Raids" in self.content_types_allowed:
             objective_list += [
                 GameObjectiveTemplate(
-                    label="Complete the instance DUTY as JOB",
+                    label="Complete the Alliance Raid 'DUTY' (Optional choice of jobs: JOBS)",
                     data={
                         "DUTY": (self.alliance_raids, 1),
-                        "JOB": (self.combat_jobs, 1),
+                        "JOBS": (self.combat_jobs, 2),
                     },
                     is_time_consuming=False,
                     is_difficult=False,
+                    weight=2,
                 ),
             ]
 
-        if "Chaotic Alliance Raids" in self.content_types_allowed and len(self.chaotic_alliance_raids()) > 0:
+        if "Chaotic Alliance Raids" in self.content_types_allowed:
             objective_list += [
                 GameObjectiveTemplate(
-                    label="Complete the instance DUTY as JOB",
+                    label="Complete the Chaotic Alliance Raid 'DUTY' (Optional choice of jobs: JOBS)",
                     data={
                         "DUTY": (self.chaotic_alliance_raids, 1),
-                        "JOB": (self.combat_jobs, 1),
+                        "JOBS": (self.combat_jobs, 2),
                     },
                     is_time_consuming=False,
                     is_difficult=True,
+                    weight=1,
                 ),
             ]
         
         if "Deep Dungeons" in self.content_types_allowed:
             objective_list += [
                 GameObjectiveTemplate(
-                    label="Complete COUNT unique sets of floors in DEEPDUNGEON solo as JOB (prior saves allowed)",
+                    label="Complete COUNT unique sets of floors in DEEPDUNGEON solo (Prior saves allowed, optional choice of jobs: JOBS)",
                     data={
                         "COUNT": (self.deep_dungeon_floor_range, 1),
                         "DEEPDUNGEON": (self.deep_dungeons, 1),
-                        "JOB": (self.combat_jobs, 1),
+                        "JOBS": (self.combat_jobs, 2),
                     },
                     is_time_consuming=True,
                     is_difficult=False,
                     weight=1,
                 ),
                 GameObjectiveTemplate(
-                    label="Obtain 3 Accursed Hoard from a single set of floors in DEEPDUNGEON solo as JOB (prior saves allowed)",
+                    label="Obtain 3 Accursed Hoard from a single set of floors in DEEPDUNGEON solo (Prior saves allowed, optional choice of jobs: JOBS)",
                     data={
                         "DEEPDUNGEON": (self.deep_dungeons, 1),
-                        "JOB": (self.combat_jobs, 1),
+                        "JOBS": (self.combat_jobs, 2),
                     },
                     is_time_consuming=False,
                     is_difficult=False,
-                    weight=1,
+                    weight=2,
                 ),
                 GameObjectiveTemplate(
-                    label="Complete a single set of floors in DEEPDUNGEON solo without triggering any floor traps as JOB (prior saves allowed)",
+                    label="Complete a single set of floors in DEEPDUNGEON solo without triggering any floor traps (Prior saves allowed, optional choice of jobs: JOBS)",
                     data={
                         "DEEPDUNGEON": (self.deep_dungeons, 1),
-                        "JOB": (self.combat_jobs, 1),
+                        "JOBS": (self.combat_jobs, 2),
                     },
                     is_time_consuming=False,
                     is_difficult=False,
-                    weight=1,
+                    weight=2,
                 ),
             ]
 
         if "Variant Dungeons" in self.content_types_allowed and len(self.variant_dungeon_routes()) > 0:
             objective_list += [
                 GameObjectiveTemplate(
-                    label="Complete the Variant Dungeon route which corresponds to the record entry 'ROUTE' as JOB",
+                    label="Complete the Variant Dungeon route which corresponds to the record entry 'ROUTE' (Optional choice of jobs: JOBS)",
                     data={
                         "ROUTE": (self.variant_dungeon_routes, 1),
-                        "JOB": (self.combat_jobs, 1),
+                        "JOBS": (self.combat_jobs, 2),
                     },
                     is_time_consuming=False,
                     is_difficult=False,
@@ -301,14 +309,14 @@ class FinalFantasyXIVGame(Game):
             if "Blue Mage" in self.playable_jobs:
                 objective_list += [
                     GameObjectiveTemplate(
-                        label="In Masked Carnivale, complete the stage STAGE within the TIME Completion Time",
+                        label="In Masked Carnivale, complete the stage 'STAGE' within the TIME Completion Time",
                         data={
                             "STAGE": (self.masked_carnivale, 1),
                             "TIME": (self.masked_carnivale_completion_times, 1),
                         },
                         is_time_consuming=False,
                         is_difficult=False,
-                        weight=2,
+                        weight=3,
                     ),
                     GameObjectiveTemplate(
                         label="In Masked Carnivale, complete the Weekly DIFF Target stage, satisfying all completion requirements within the TIME Completion Time",
@@ -340,7 +348,7 @@ class FinalFantasyXIVGame(Game):
                     },
                     is_time_consuming=False,
                     is_difficult=False,
-                    weight=1,
+                    weight=2,
                 ),
                 GameObjectiveTemplate(
                     label="Turn in at least one of each collectable at the highest tier of collectability to a Collectable Appraiser: ITEMS",
@@ -350,6 +358,35 @@ class FinalFantasyXIVGame(Game):
                     is_time_consuming=False,
                     is_difficult=False,
                     weight=1,
+                ),
+                GameObjectiveTemplate(
+                    label="Turn in COUNTx ITEM to the Firmament Resource Inspector",
+                    data={
+                        "COUNT": (self.firmament_gathering_collectables_count_range, 1),
+                        "ITEM": (self.firmament_gathering_collectables, 1),
+                    },
+                    is_time_consuming=False,
+                    is_difficult=False,
+                    weight=1,
+                ),
+                GameObjectiveTemplate(
+                    label="Turn in COUNTx ITEM to the Firmament Resource Inspector",
+                    data={
+                        "COUNT": (self.firmament_gathering_collectables_count_range, 1),
+                        "ITEM": (self.firmament_high_tier_gathering_collectables, 1),
+                    },
+                    is_time_consuming=False,
+                    is_difficult=False,
+                    weight=1,
+                ),
+                GameObjectiveTemplate(
+                    label="Defeat the following enemies with the Aetheromatic Auger in the Diadem: ENEMIES",
+                    data={
+                        "ENEMIES": (self.diadem_enemies, 3),
+                    },
+                    is_time_consuming=False,
+                    is_difficult=False,
+                    weight=2,
                 ),
             ]
 
@@ -363,12 +400,32 @@ class FinalFantasyXIVGame(Game):
                     },
                     is_time_consuming=False,
                     is_difficult=False,
-                    weight=1,
+                    weight=2,
                 ),
                 GameObjectiveTemplate(
                     label="Turn in at least one of each collectable at the highest tier of collectability to a Collectable Appraiser: ITEMS",
                     data={
                         "ITEMS": (self.fishing_collectables, 6),
+                    },
+                    is_time_consuming=False,
+                    is_difficult=False,
+                    weight=1,
+                ),
+                GameObjectiveTemplate(
+                    label="Turn in COUNTx ITEM to the Firmament Resource Inspector",
+                    data={
+                        "COUNT": (self.firmament_fishing_collectables_count_range, 1),
+                        "ITEM": (self.firmament_fishing_collectables, 1),
+                    },
+                    is_time_consuming=False,
+                    is_difficult=False,
+                    weight=1,
+                ),
+                GameObjectiveTemplate(
+                    label="Turn in COUNTx ITEM to the Firmament Resource Inspector",
+                    data={
+                        "COUNT": (self.firmament_fishing_collectables_count_range, 1),
+                        "ITEM": (self.firmament_high_tier_fishing_collectables, 1),
                     },
                     is_time_consuming=False,
                     is_difficult=False,
@@ -385,6 +442,7 @@ class FinalFantasyXIVGame(Game):
                         },
                         is_time_consuming=True,
                         is_difficult=True,
+                        weight=1,
                     ),
                 ]
 
@@ -398,7 +456,7 @@ class FinalFantasyXIVGame(Game):
                     },
                     is_time_consuming=False,
                     is_difficult=False,
-                    weight=1,
+                    weight=2,
                 ),
                 GameObjectiveTemplate(
                     label="Turn in at least one of each collectable at the highest tier of collectability to a Collectable Appraiser: ITEMS",
@@ -409,25 +467,45 @@ class FinalFantasyXIVGame(Game):
                     is_difficult=False,
                     weight=1,
                 ),
-            ]
-
-        if "Crystalline Conflict" in self.content_types_allowed:
-            objective_list += [
                 GameObjectiveTemplate(
-                    label="Participate in COUNT Crystalline Conflict matches as JOB",
+                    label="Turn in COUNTx ITEM at the highest tier of collectability to the Firmament Collectable Appraiser",
                     data={
-                        "COUNT": (self.crystalline_conflict_match_counts, 1),
-                        "JOB": (self.combat_jobs, 1),
+                        "COUNT": (self.crafting_collectables_count_range, 1),
+                        "ITEM": (self.firmament_crafting_collectables, 1),
                     },
                     is_time_consuming=False,
                     is_difficult=False,
                     weight=1,
                 ),
                 GameObjectiveTemplate(
-                    label="Win COUNT Crystalline Conflict matches as JOB",
+                    label="Turn in COUNTx ITEM at the highest tier of collectability to the Firmament Collectable Appraiser",
+                    data={
+                        "COUNT": (self.crafting_collectables_count_range, 1),
+                        "ITEM": (self.firmament_high_tier_crafting_collectables, 1),
+                    },
+                    is_time_consuming=False,
+                    is_difficult=False,
+                    weight=1,
+                ),
+            ]
+
+        if "Crystalline Conflict" in self.content_types_allowed:
+            objective_list += [
+                GameObjectiveTemplate(
+                    label="Participate in COUNT Crystalline Conflict matches (Optional choice of jobs: JOBS)",
                     data={
                         "COUNT": (self.crystalline_conflict_match_counts, 1),
-                        "JOB": (self.combat_jobs, 1),
+                        "JOBS": (self.combat_jobs, 2),
+                    },
+                    is_time_consuming=False,
+                    is_difficult=False,
+                    weight=2,
+                ),
+                GameObjectiveTemplate(
+                    label="Win COUNT Crystalline Conflict matches (Optional choice of jobs: JOBS)",
+                    data={
+                        "COUNT": (self.crystalline_conflict_match_counts, 1),
+                        "JOBS": (self.combat_jobs, 2),
                     },
                     is_time_consuming=False,
                     is_difficult=True,
@@ -438,21 +516,21 @@ class FinalFantasyXIVGame(Game):
         if "Frontline" in self.content_types_allowed:
             objective_list += [
                 GameObjectiveTemplate(
-                    label="Participate in a Frontline match as JOB",
+                    label="Participate in a Frontline match (Optional choice of jobs: JOBS)",
                     data={
-                        "JOB": (self.combat_jobs, 1),
+                        "JOBS": (self.combat_jobs, 2),
                     },
                     is_time_consuming=False,
                     is_difficult=False,
-                    weight=1,
+                    weight=2,
                 ),
                 GameObjectiveTemplate(
-                    label="Win a Frontline match as JOB",
+                    label="Win a Frontline match (Optional choice of jobs: JOBS)",
                     data={
-                        "JOB": (self.combat_jobs, 1),
+                        "JOBS": (self.combat_jobs, 2),
                     },
-                    is_time_consuming=False,
-                    is_difficult=True,
+                    is_time_consuming=True,
+                    is_difficult=False,
                     weight=1,
                 ),
             ]
@@ -460,21 +538,21 @@ class FinalFantasyXIVGame(Game):
         if "Rival Wings" in self.content_types_allowed:
             objective_list += [
                 GameObjectiveTemplate(
-                    label="Participate in a Rival Wings match as JOB",
+                    label="Participate in a Rival Wings match (Optional choice of jobs: JOBS)",
                     data={
-                        "JOB": (self.combat_jobs, 1),
+                        "JOBS": (self.combat_jobs, 2),
                     },
                     is_time_consuming=False,
                     is_difficult=False,
                     weight=1,
                 ),
                 GameObjectiveTemplate(
-                    label="Win a Rival Wings match as JOB",
+                    label="Win a Rival Wings match (Optional choice of jobs: JOBS)",
                     data={
-                        "JOB": (self.combat_jobs, 1),
+                        "JOBS": (self.combat_jobs, 2),
                     },
-                    is_time_consuming=False,
-                    is_difficult=True,
+                    is_time_consuming=True,
+                    is_difficult=False,
                     weight=1,
                 ),
             ]
@@ -497,7 +575,7 @@ class FinalFantasyXIVGame(Game):
                     },
                     is_time_consuming=True,
                     is_difficult=False,
-                    weight=1,
+                    weight=2,
                 ),
                 GameObjectiveTemplate(
                     label="Claim a Small Item from The Moogle's Paw machine in the Gold Saucer",
@@ -589,6 +667,30 @@ class FinalFantasyXIVGame(Game):
     def expansions(self) -> List[str]:
         return sorted(self.expansions_accessible)
 
+    @property
+    def has_level_60_or_higher(self) -> bool:
+        return ("Heavensward" in self.expansions_accessible or
+                self.has_level_70_or_higher)
+    
+    @property
+    def has_level_70_or_higher(self) -> bool:
+        return ("Stormblood" in self.expansions_accessible or
+                self.has_level_80_or_higher)
+    
+    @property
+    def has_level_80_or_higher(self) -> bool:
+        return ("Shadowbringers" in self.expansions_accessible or
+                self.has_level_90_or_higher)
+    
+    @property
+    def has_level_90_or_higher(self) -> bool:
+        return ("Endwalker" in self.expansions_accessible or
+                self.has_level_100_or_higher)
+    
+    @property
+    def has_level_100_or_higher(self) -> bool:
+        return ("Dawntrail" in self.expansions_accessible)
+    
     @property
     def content_types_allowed(self) -> Set[str]:
         return self.archipelago_options.final_fantasy_xiv_content_types_allowed.value
@@ -1588,8 +1690,8 @@ class FinalFantasyXIVGame(Game):
             alliance_raids.extend(dawntrail_alliance_raids)
 
         return sorted(alliance_raids)
-
-    def chaotic_alliance_raids(self):
+    
+    def chaotic_alliance_raids(self) -> List[str]:
         chaotic_alliance_raids = list()
 
         dawntrail_chaotic_alliance_raids = [
@@ -1600,8 +1702,6 @@ class FinalFantasyXIVGame(Game):
             chaotic_alliance_raids.extend(dawntrail_chaotic_alliance_raids)
 
         return sorted(chaotic_alliance_raids)
-
-
 
     @staticmethod
     def deep_dungeon_floor_range() -> range:
@@ -1921,6 +2021,114 @@ class FinalFantasyXIVGame(Game):
         return sorted(gathering_collectables)
     
     @staticmethod
+    def firmament_gathering_collectables_count_range() -> range:
+        return range(12,25)
+
+    def firmament_gathering_collectables(self) -> List[str]:
+        firmament_gathering_collectables = list()
+
+        miner_collectables = [
+            "Grade 4 Skybuilders' Iron Ore",
+            "Grade 4 Skybuilders' Iron Sand",
+            "Grade 4 Skybuilders' Ore",
+            "Grade 4 Skybuilders' Rock Salt",
+            "Grade 4 Skybuilders' Mythrite Sand",
+            "Grade 4 Skybuilders' Electrum Ore",
+            "Grade 4 Skybuilders' Alumen",
+            "Grade 4 Skybuilders' Spring Water",
+            "Grade 4 Skybuilders' Gold Sand",
+            "Grade 4 Skybuilders' Ragstone",
+        ]
+
+        miner_lv80_collectables = [
+            "Grade 4 Skybuilders' Gold Ore",
+            "Grade 4 Skybuilders' Finest Rock Salt",
+            "Grade 4 Skybuilders' Truespring Water",
+            "Grade 4 Skybuilders' Mineral Sand",
+            "Grade 4 Skybuilders' Bluespirit Ore",
+        ]
+
+        botanist_collectables = [
+            "Grade 4 Skybuilders' Switch",
+            "Grade 4 Skybuilders' Hemp",
+            "Grade 4 Skybuilders' Mahogany Log",
+            "Grade 4 Skybuilders' Sesame",
+            "Grade 4 Skybuilders' Cotton Boll",
+            "Grade 4 Skybuilders' Spruce Log",
+            "Grade 4 Skybuilders' Mistletoe",
+            "Grade 4 Skybuilders' Toad",
+            "Grade 4 Skybuilders' Vine",
+            "Grade 4 Skybuilders' Tea Leaves",
+        ]
+
+        botanist_lv80_collectables = [
+            "Grade 4 Skybuilders' White Cedar Log",
+            "Grade 4 Skybuilders' Primordial Resin",
+            "Grade 4 Skybuilders' Wheat",
+            "Grade 4 Skybuilders' Gossamer Cotton Boll",
+            "Grade 4 Skybuilders' Tortoise",
+        ]
+
+        if self.has_level_80_or_higher:
+            miner_collectables.extend(miner_lv80_collectables)
+            botanist_collectables.extend(botanist_lv80_collectables)
+
+        if "Heavensward" in self.expansions_accessible:
+            if "Miner" in self.playable_jobs:
+                firmament_gathering_collectables.extend(miner_collectables)
+
+            if "Botanist" in self.playable_jobs:
+                firmament_gathering_collectables.extend(botanist_collectables)
+
+        return sorted(firmament_gathering_collectables)
+
+    def firmament_high_tier_gathering_collectables(self) -> List[str]:
+        firmament_high_tier_gathering_collectables = list()
+
+        high_tier_miner_collectables = [
+            "Grade 4 Artisanal Skybuilders' Cloudstone",
+            "Grade 4 Artisanal Skybuilders' Spring Water",
+            "Grade 4 Artisanal Skybuilders' Ice Stalagmite",
+            "Grade 4 Artisanal Skybuilders' Silex",
+            "Grade 4 Artisanal Skybuilders' Prismstone",
+            "Grade 4 Skybuilders' Umbral Flarerock",
+            "Grade 4 Skybuilders' Umbral Levinsand",
+        ]
+
+        high_tier_botanist_collectables = [
+            "Grade 4 Artisanal Skybuilders' Log",
+            "Grade 4 Artisanal Skybuilders' Raspberry",
+            "Grade 4 Artisanal Skybuilders' Caiman",
+            "Grade 4 Artisanal Skybuilders' Cocoon",
+            "Grade 4 Artisanal Skybuilders' Barbgrass",
+            "Grade 4 Skybuilders' Umbral Galewood Branch",
+            "Grade 4 Skybuilders' Umbral Dirtleaf",
+        ]
+
+        if "Heavensward" in self.expansions_accessible and self.has_level_80_or_higher:
+            if "Miner" in self.playable_jobs:
+                firmament_high_tier_gathering_collectables.extend(high_tier_miner_collectables)
+
+            if "Botanist" in self.playable_jobs:
+                firmament_high_tier_gathering_collectables.extend(high_tier_botanist_collectables)
+
+        return sorted(firmament_high_tier_gathering_collectables)
+
+    @staticmethod
+    def diadem_enemies() -> List[str]:
+        return [
+            "Diadem Beast",
+            "Diadem Golem",
+            "Diadem Ice Bomb",
+            "Diadem Zoblyn",
+            "Diadem Bloated Bulb",
+            "Diadem Icetrap",
+            "Diadem Melia",
+            "Diadem Werewood",
+            "Proto-noctilucale",
+        ]
+
+    @staticmethod
     def fishing_collectables_count_range() -> range:
         return range(3,13)
     
@@ -2059,6 +2267,64 @@ class FinalFantasyXIVGame(Game):
             fishing_collectables.extend(dawntrail_fishing_collectables)
 
         return sorted(fishing_collectables)
+
+    @staticmethod
+    def firmament_fishing_collectables_count_range() -> range:
+        return range(3,7)
+
+    def firmament_fishing_collectables(self) -> List[str]:
+        firmament_fishing_collectables = list()
+
+        fisher_collectables = [
+            "Grade 4 Skybuilders' Zagas Khaal",
+            "Grade 4 Skybuilders' Goldsmith Crab",
+            "Grade 4 Skybuilders' Common Bitterling",
+            "Grade 4 Skybuilders' Skyloach",
+            "Grade 4 Skybuilders' Glacier Core",
+            "Grade 4 Skybuilders' Kissing Fish",
+            "Grade 4 Skybuilders' Cavalry Catfish",
+            "Grade 4 Skybuilders' Manasail",
+            "Grade 4 Skybuilders' Starflower",
+            "Grade 4 Skybuilders' Cyan Crab",
+            "Grade 4 Skybuilders' Fickle Krait",
+            "Grade 4 Skybuilders' Proto-hropken",
+        ]
+
+        fisher_lv80_collectables = [
+            "Grade 4 Skybuilders' Ghost Faerie",
+            "Grade 4 Skybuilders' Ashfish",
+            "Grade 4 Skybuilders' Whitehorse",
+            "Grade 4 Skybuilders' Ocean Cloud",
+            "Grade 4 Skybuilders' Black Fanfish",
+            "Grade 4 Skybuilders' Sunfish",
+        ]
+
+        if self.has_level_80_or_higher:
+            fisher_collectables.extend(fisher_lv80_collectables)
+
+        if "Heavensward" in self.expansions_accessible:
+            firmament_fishing_collectables.extend(fisher_collectables)
+
+        return sorted(firmament_fishing_collectables)
+    
+    def firmament_high_tier_fishing_collectables(self) -> List[str]:
+        firmament_high_tier_fishing_collectables = list()
+
+        high_tier_fisher_collectables = [
+            "Grade 4 Artisanal Skybuilders' Sweatfish",
+            "Grade 4 Artisanal Skybuilders' Sculptor",
+            "Grade 4 Artisanal Skybuilders' Little Thalaos",
+            "Grade 4 Artisanal Skybuilders' Lightning Chaser",
+            "Grade 4 Artisanal Skybuilders' Marrella",
+            "Grade 4 Artisanal Skybuilders' Crimson Namitaro",
+            "Grade 4 Artisanal Skybuilders' Griffin",
+            "Grade 4 Artisanal Skybuilders' Meganeura",
+        ]
+
+        if "Heavensward" in self.expansions_accessible and self.has_level_80_or_higher:
+                firmament_high_tier_fishing_collectables.extend(high_tier_fisher_collectables)
+
+        return sorted(firmament_high_tier_fishing_collectables)
 
     def big_fish(self) -> List[str]:
         big_fish = [
@@ -2362,6 +2628,21 @@ class FinalFantasyXIVGame(Game):
             "Thunderswift Trout",
             "Pixel Loach",
         ]
+
+        if "Heavensward" in self.expansions_accessible:
+            big_fish.extend(heavensward_big_fish)
+
+        if "Stormblood" in self.expansions_accessible:
+            big_fish.extend(stormblood_big_fish)
+
+        if "Shadowbringers" in self.expansions_accessible:
+            big_fish.extend(shadowbringers_big_fish)
+
+        if "Endwalker" in self.expansions_accessible:
+            big_fish.extend(endwalker_big_fish)
+
+        if "Dawntrail" in self.expansions_accessible:
+            big_fish.extend(dawntrail_big_fish)
 
         return sorted(big_fish)
 
@@ -2843,6 +3124,231 @@ class FinalFantasyXIVGame(Game):
 
         return sorted(crafting_collectables)
     
+    def firmament_crafting_collectables(self) -> List[str]:
+        firmament_crafting_collectables = list()
+
+        carpenter_collectables = [
+            "Grade 4 Skybuilders' Plywood",
+            "Grade 4 Skybuilders' Crate",
+            "Grade 4 Skybuilders' Spinning Wheel",
+        ]
+
+        carpenter_lv70_collectables = [
+            "Grade 4 Skybuilders' Stepladder",
+        ]
+
+        carpenter_lv80_collectables = [
+            "Grade 4 Skybuilders' Bed",
+        ]
+
+        blacksmith_collectables = [
+            "Grade 4 Skybuilders' Alloy",
+            "Grade 4 Skybuilders' Nails",
+            "Grade 4 Skybuilders' Hatchet",
+        ]
+
+        blacksmith_lv70_collectables = [
+            "Grade 4 Skybuilders' Crosscut Saw",
+        ]
+
+        blacksmith_lv80_collectables = [
+            "Grade 4 Skybuilders' Oven",
+        ]
+
+        armorer_collectables = [
+            "Grade 4 Skybuilders' Steel Plate",
+            "Grade 4 Skybuilders' Rivets",
+            "Grade 4 Skybuilders' Cookpot",
+        ]
+
+        armorer_lv70_collectables = [
+            "Grade 4 Skybuilders' Mesail",
+        ]
+
+        armorer_lv80_collectables = [
+            "Grade 4 Skybuilders' Lamppost",
+        ]
+
+        goldsmith_collectables = [
+            "Grade 4 Skybuilders' Ingot",
+            "Grade 4 Skybuilders' Rings",
+            "Grade 4 Skybuilders' Embroidery Frame",
+        ]
+
+        goldsmith_lv70_collectables = [
+            "Grade 4 Skybuilders' Stone",
+        ]
+
+        goldsmith_lv80_collectables = [
+            "Grade 4 Skybuilders' Brazier",
+        ]
+
+        leatherworker_collectables = [
+            "Grade 4 Skybuilders' Leather",
+            "Grade 4 Skybuilders' Leather Straps",
+            "Grade 4 Skybuilders' Leather Sack", 
+        ]
+
+        leatherworker_lv70_collectables = [
+            "Grade 4 Skybuilders' Longboots",
+        ]
+
+        leatherworker_lv80_collectables = [
+            "Grade 4 Skybuilders' Overalls",
+        ]
+
+        weaver_collectables = [
+            "Grade 4 Skybuilders' Rope",
+            "Grade 4 Skybuilders' Cloth",
+            "Grade 4 Skybuilders' Broom",
+        ]
+
+        weaver_lv70_collectables = [
+            "Grade 4 Skybuilders' Gloves",
+        ]
+
+        weaver_lv80_collectables = [
+            "Grade 4 Skybuilders' Awning",
+        ]
+
+        alchemist_collectables = [
+            "Grade 4 Skybuilders' Ink",
+            "Grade 4 Skybuilders' Plant Oil",
+            "Grade 4 Skybuilders' Holy Water",
+        ]
+
+        alchemist_lv70_collectables = [
+            "Grade 4 Skybuilders' Soap",
+        ]
+
+        alchemist_lv80_collectables = [
+            "Grade 4 Skybuilders' Growth Formula",
+        ]
+
+        culinarian_collectables = [
+            "Grade 4 Skybuilders' Hemp Milk",
+            "Grade 4 Skybuilders' Sesame Cookie",
+            "Grade 4 Skybuilders' Tea",
+        ]
+
+        culinarian_lv70_collectables = [
+            "Grade 4 Skybuilders' All-purpose Infusion",
+        ]
+
+        culinarian_lv80_collectables = [
+            "Grade 4 Skybuilders' Stew",
+        ]
+
+        if self.has_level_70_or_higher:
+            carpenter_collectables.extend(carpenter_lv70_collectables)
+            armorer_collectables.extend(armorer_lv70_collectables)
+            blacksmith_collectables.extend(blacksmith_lv70_collectables)
+            goldsmith_collectables.extend(goldsmith_lv70_collectables)
+            leatherworker_collectables.extend(leatherworker_lv70_collectables)
+            weaver_collectables.extend(weaver_lv70_collectables)
+            alchemist_collectables.extend(alchemist_lv70_collectables)
+            culinarian_collectables.extend(culinarian_lv70_collectables)
+
+        if self.has_level_80_or_higher:
+            carpenter_collectables.extend(carpenter_lv80_collectables)
+            armorer_collectables.extend(armorer_lv80_collectables)
+            blacksmith_collectables.extend(blacksmith_lv80_collectables)
+            goldsmith_collectables.extend(goldsmith_lv80_collectables)
+            leatherworker_collectables.extend(leatherworker_lv80_collectables)
+            weaver_collectables.extend(weaver_lv80_collectables)
+            alchemist_collectables.extend(alchemist_lv80_collectables)
+            culinarian_collectables.extend(culinarian_lv80_collectables)
+
+
+        if "Heavensward" in self.expansions_accessible:
+            if "Carpenter" in self.playable_jobs:
+                firmament_crafting_collectables.extend(carpenter_collectables)
+
+            if "Blacksmith" in self.playable_jobs:
+                firmament_crafting_collectables.extend(blacksmith_collectables)
+
+            if "Armorer" in self.playable_jobs:
+                firmament_crafting_collectables.extend(armorer_collectables)
+
+            if "Goldsmith" in self.playable_jobs:
+                firmament_crafting_collectables.extend(goldsmith_collectables)
+
+            if "Leatherworker" in self.playable_jobs:
+                firmament_crafting_collectables.extend(leatherworker_collectables)
+
+            if "Weaver" in self.playable_jobs:
+                firmament_crafting_collectables.extend(weaver_collectables)
+
+            if "Alchemist" in self.playable_jobs:
+                firmament_crafting_collectables.extend(alchemist_collectables)
+
+            if "Culinarian" in self.playable_jobs:
+                firmament_crafting_collectables.extend(culinarian_collectables)
+
+        return sorted(firmament_crafting_collectables)
+
+    def firmament_high_tier_crafting_collectables(self) -> List[str]:
+        firmament_high_tier_crafting_collectables = list()
+
+        high_tier_carpenter_collectables = [
+            "Grade 4 Artisanal Skybuilders' Icebox",
+        ]
+
+        high_tier_blacksmith_collectables = [
+            "Grade 4 Artisanal Skybuilders' Chocobo Weathervane",
+        ]
+
+        high_tier_armorer_collectables = [
+            "Grade 4 Artisanal Skybuilders' Company Chest",
+        ]
+
+        high_tier_goldsmith_collectables = [
+            "Grade 4 Artisanal Skybuilders' Astroscope",
+        ]
+
+        high_tier_leatherworker_collectables = [
+            "Grade 4 Artisanal Skybuilders' Tool Belt",
+        ]
+
+        high_tier_weaver_collectables = [
+            "Grade 4 Artisanal Skybuilders' Vest",
+        ]
+
+        high_tier_alchemist_collectables = [
+            "Grade 4 Artisanal Skybuilders' Tincture",
+        ]
+
+        high_tier_culinarian_collectables = [
+            "Grade 4 Artisanal Skybuilders' Sorbet",
+        ]
+
+        if "Heavensward" in self.expansions_accessible and self.has_level_80_or_higher:
+            if "Carpenter" in self.playable_jobs:
+                firmament_high_tier_crafting_collectables.extend(high_tier_carpenter_collectables)
+
+            if "Blacksmith" in self.playable_jobs:
+                firmament_high_tier_crafting_collectables.extend(high_tier_blacksmith_collectables)
+
+            if "Armorer" in self.playable_jobs:
+                firmament_high_tier_crafting_collectables.extend(high_tier_armorer_collectables)
+
+            if "Goldsmith" in self.playable_jobs:
+                firmament_high_tier_crafting_collectables.extend(high_tier_goldsmith_collectables)
+
+            if "Leatherworker" in self.playable_jobs:
+                firmament_high_tier_crafting_collectables.extend(high_tier_leatherworker_collectables)
+
+            if "Weaver" in self.playable_jobs:
+                firmament_high_tier_crafting_collectables.extend(high_tier_weaver_collectables)
+
+            if "Alchemist" in self.playable_jobs:
+                firmament_high_tier_crafting_collectables.extend(high_tier_alchemist_collectables)
+
+            if "Culinarian" in self.playable_jobs:
+                firmament_high_tier_crafting_collectables.extend(high_tier_culinarian_collectables)
+
+        return sorted(firmament_high_tier_crafting_collectables)
+
     @staticmethod
     def crystalline_conflict_match_counts() -> range:
         return range(1,6)
@@ -3059,7 +3565,7 @@ class FinalFantasyXIVContentTypesAllowed(OptionSet):
         "Normal Raids",
         "Savage Raids",
         "Alliance Raids",
-        "Chaotic Alliance Raids"
+        "Chaotic Alliance Raids",
         "Deep Dungeons",
         "Variant Dungeons",
         "Limited Jobs",

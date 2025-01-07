@@ -52,7 +52,7 @@ class ReVoltGame(Game):
             GameObjectiveTemplate(
                 label="Play on MODE mode",
                 data={
-                    "COUNT": (self.modes, 1),
+                    "MODE": (self.modes, 1),
                 },
             ),
         ]
