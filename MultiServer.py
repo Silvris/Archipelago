@@ -315,11 +315,17 @@ class Context:
             self.item_names[game].update(archipelago_item_names)
             self.location_names[game].update(archipelago_location_names)
 
-    def item_names_for_game(self, game: str) -> typing.Optional[typing.Dict[str, int]]:
-        return self.gamespackage[game]["item_name_to_id"] if game in self.gamespackage else None
+    def item_names_for_game(self, game: str) -> typing.Dict[str, int]:
+        names = self.gamespackage[game]["item_name_to_id"].copy() if game in self.item_names else {}
+        if game != "Archipelago":
+            names.update(self.gamespackage["Archipelago"]["item_name_to_id"])
+        return names
 
-    def location_names_for_game(self, game: str) -> typing.Optional[typing.Dict[str, int]]:
-        return self.gamespackage[game]["location_name_to_id"] if game in self.gamespackage else None
+    def location_names_for_game(self, game: str) -> typing.Dict[str, int]:
+        names = self.gamespackage[game]["location_name_to_id"].copy() if game in self.location_names else {}
+        if game != "Archipelago":
+            names.update(self.gamespackage["Archipelago"]["location_name_to_id"])
+        return names
 
     # General networking
     async def send_msgs(self, endpoint: Endpoint, msgs: typing.Iterable[dict]) -> bool:
@@ -1071,7 +1077,7 @@ def update_additional_hints(ctx: Context, players: typing.List[team_slot]):
         if hint_items:
             full_hints = sum(item.item == -2 for item in hint_items)
             half_hints = sum(item.item == -3 for item in hint_items)
-            free_hints += full_hints + (half_hints << 1)
+            free_hints += full_hints + (half_hints >> 1)
         ctx.additional_hints[team, player] = free_hints
 
 def register_location_checks(ctx: Context, team: int, slot: int, locations: typing.Iterable[int],

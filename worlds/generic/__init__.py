@@ -32,7 +32,9 @@ class GenericWorld(World):
     game = "Archipelago"
     topology_present = False
     item_name_to_id = {
-        "Nothing": -1
+        "Nothing": -1,
+        "Free Hint": -2,
+        "1/2 Free Hint": -3,
     }
     location_name_to_id = {
         "Cheat Console": -1,
