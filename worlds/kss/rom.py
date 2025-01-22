@@ -5,6 +5,7 @@ import hashlib
 import settings
 from worlds.Files import APProcedurePatch, APTokenMixin, APTokenTypes
 from typing import Iterable, TYPE_CHECKING, Optional
+from struct import pack
 
 if TYPE_CHECKING:
     from . import KSSWorld
@@ -14,6 +15,7 @@ KSS_VCHASH = ""
 
 starting_stage = 0xAFC89
 goal_requirement = 0xAFC8D
+treasure_values = 0xAFCBE
 
 
 class KSSProcedurePatch(APProcedurePatch, APTokenMixin):
@@ -44,6 +46,9 @@ def patch_rom(world: "KSSWorld", patch: KSSProcedurePatch):
 
     patch.write_byte(starting_stage + 1, world.options.starting_subgame.value + 1)
     patch.write_byte(goal_requirement + 1, world.options.required_subgames.value)
+
+    if world.treasure_value:
+        patch.write_bytes(treasure_values, pack("IIII", world.treasure_value))
 
     patch_name = bytearray(
         f'KSS{Utils.__version__.replace(".", "")[0:3]}_{world.player}_{world.multiworld.seed:11}\0', 'utf8')[:21]
