@@ -86,6 +86,13 @@ org $008C29
     NOP
     NOP
 
+org $00BD44
+hook_soft_reset:
+    JSL soft_reset
+    NOP
+    NOP
+    NOP
+
 org $00C46F
 hook_set_star_complete:
     JSL set_treasure
@@ -96,9 +103,18 @@ org $00FFC0
 org $00FFD8
     db $06
 
+org $01922E
+    JML block_tgco_access
+    tgco_access_return:
+    NOP #2
+
 org $02A34B
     JML hook_copy_ability
     NOP
+
+org $07DF95
+    JSL load_game
+    NOP #14 ; TGCO initialization
 
 org $07E01F
     NOP #12 ; Milky Way Wishes initialization
@@ -726,7 +742,7 @@ set_starting_stage:
     PHA
     print "Goal Requirement: ", hex(snestopc(realbase()))
     CPY #$0006
-    BCS .Skip
+    BCC .Skip
     ORA #$8000
     .Skip:
     ORA !ap_sub_games
@@ -745,6 +761,72 @@ set_starting_stage:
     PLY
     PLX
     RTL
+
+soft_reset:
+    JSL save_game
+    LDA #$0000
+    JSL $00D12D
+    RTL
+
+TreasureRequirements:
+    print "Treasures: ", hex(snestopc(realbase()))
+    dd $250000, $500000, $750000, $999999
+
+block_tgco_access:
+    LDA $32EA
+    CMP #$0003
+    BNE .Set
+    LDA [$14]
+    CMP #$000E ; crystal access
+    BEQ .Crystal
+    CMP #$0013 ; Old Tower access
+    BEQ .OldTower
+    CMP #$003A ; Garden access
+    BEQ .Garden
+    CMP #$0035 ; Exit access
+    BEQ .Exit
+    BRA .Set
+    .SetWithPull:
+    PLB
+    .Set:
+    LDA #$0002
+    STA $332A
+    JML tgco_access_return
+    .Crystal:
+    LDY #$0002
+    BRA .check_treasure
+    .OldTower
+    LDY #$0006
+    BRA .check_treasure
+    .Garden:
+    LDY #$000A
+    BRA .check_treasure
+    .Exit:
+    LDY #$000E
+    .check_treasure:
+    PHB
+    LDA #$CA00
+    PHA
+    PLB
+    LDX #$0002
+    LDA !great_cave_gold, X
+    PLB
+    CMP TreasureRequirements, Y
+    BMI .Block
+    BNE .SetWithPull ; branch if greater not equal
+    DEX #2
+    DEY #2
+    LDA #$CA00
+    PHA
+    PLB
+    LDA !great_cave_gold, X
+    PLB
+    CMP TreasureRequirements, Y
+    BMI .Block ; if not minus at this point, has to be greater or equal
+    BRA .SetWithPull
+    .Block:
+    PLB
+    JML $019223
 
 org $CF3FB1
 hook_check_treasure:
@@ -767,8 +849,8 @@ org $CFAA16
 remap_deluxe_essence:
     db $00, $00, $01, $02, $03, $04, $05, $06, $07, $08, $09, $0A, $0B, $0C, $0D, $0E, $0F, $10, $11, $12
 
-org $D1BFD8
-; clear save loading (we're preserving this piece of state)
-; Could probably reroute it, might be something to consider
-    RTL
-    NOP #2
+org $D1BF9D
+save_game:
+
+org $D1BFD6
+load_game:
