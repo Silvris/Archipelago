@@ -48,7 +48,7 @@ def patch_rom(world: "KSSWorld", patch: KSSProcedurePatch):
     patch.write_byte(goal_requirement + 1, world.options.required_subgames.value)
 
     if world.treasure_value:
-        patch.write_bytes(treasure_values, pack("IIII", world.treasure_value))
+        patch.write_bytes(treasure_values, pack("IIII", *world.treasure_value))
 
     patch_name = bytearray(
         f'KSS{Utils.__version__.replace(".", "")[0:3]}_{world.player}_{world.multiworld.seed:11}\0', 'utf8')[:21]
