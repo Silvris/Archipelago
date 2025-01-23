@@ -95,7 +95,8 @@ hook_soft_reset:
 
 org $00C46F
 hook_set_star_complete:
-    JSL set_treasure
+    JML set_star_complete
+    hook_set_star_return:
 
 org $00FFC0
     db "KSS__BASEPATCH_ARCHI"
@@ -827,6 +828,16 @@ block_tgco_access:
     .Block:
     PLB
     JML $019223
+
+set_star_complete:
+    JSL set_treasure
+    print "MWW Mode: ", hex(snestopc(realbase()))
+    LDA #$0000
+    BNE .Return
+    LDA $007A6B
+    STA $001A6B
+    .Return:
+    JML hook_set_star_return
 
 org $CF3FB1
 hook_check_treasure:
