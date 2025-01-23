@@ -122,4 +122,9 @@ def set_rules(world: "KSSWorld"):
                                               item_names.jet, item_names.mirror, item_names.parasol, item_names.plasma,
                                               item_names.stone, item_names.sword, item_names.wing, item_names.yoyo],
                                              world.player))
-        
+
+    if "The Arena" in world.options.included_subgames:
+        for i in range(10, 21):
+            set_rule(world.get_location(f"The Arena - {i} Straight Wins"),
+                     lambda state: state.has_group_unique("Copy Ability", world.player, 5))
+    
