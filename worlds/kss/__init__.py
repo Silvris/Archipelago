@@ -114,6 +114,9 @@ class KSSWorld(World):
             self.multiworld.push_precollected(starting_planet)
             itempool.extend(planet)
 
+            if self.options.milky_way_wishes_mode == "multiworld":
+                itempool.extend(self.create_item(item_names.rainbow_heart) for _ in range(7))
+
         location_count = len(list(self.multiworld.get_unfilled_locations(self.player))) - len(itempool)
         if location_count < 0:
             if "The Great Cave Offensive" in self.options.included_subgames:

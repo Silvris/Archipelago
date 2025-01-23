@@ -28,6 +28,7 @@ KSS_DYNA_COMPLETED = SRAM_1_START + 0x1A63
 KSS_DYNA_SWITCHES = SRAM_1_START + 0x1A64
 KSS_DYNA_IRON_MAM = SRAM_1_START + 0x1A67
 KSS_REVENGE_CHAPTERS = SRAM_1_START + 0x1A69
+KSS_RAINBOW_HEART = SRAM_1_START + 0x1A6D
 KSS_CURRENT_SUBGAMES = SRAM_1_START + 0x1A85
 KSS_COMPLETED_SUBGAMES = SRAM_1_START + 0x1A93
 KSS_ARENA_HIGH_SCORE = SRAM_1_START + 0x1AA1
@@ -80,17 +81,25 @@ class KSSSNIClient(SNIClient):
             return
 
         item = self.item_queue.pop()
-        if item.item & 0xF == 0:
+        if item.item & 0xF == 1:
             # 1-Up
             lives = int.from_bytes(await snes_read(ctx, KSS_KIRBY_LIVES, 2), "little")
             snes_buffered_write(ctx, KSS_KIRBY_LIVES, int.to_bytes(lives + 1, 2, "little"))
-        elif item.item & 0xF == 1:
+        elif item.item & 0xF == 2:
             # Maxim
             snes_buffered_write(ctx, KSS_KIRBY_HP, int.to_bytes(0x46, 2, "little"))
             snes_buffered_write(ctx, KSS_KIRBY_HP + 2, int.to_bytes(0x46, 2, "little"))
-        elif item.item & 0xF == 2:
+        elif item.item & 0xF == 3:
             pass # Invincibility, not implemented
             # it needs to hit IRAM, so have to setup in the rom
+        elif item.item & 0xF == 4:
+            # Rainbow Heart
+            planet_clear = int.from_bytes(await snes_read(ctx, KSS_RAINBOW_HEART, 1), "little")
+            current_total = sum(planet_clear & (1 << x) for x in range(8))
+            new_clear = 0
+            for i in range(min(current_total + 1, 8)):
+                new_clear |= (1 << i)
+            snes_buffered_write(ctx, KSS_RAINBOW_HEART, int.to_bytes(new_clear, 1, "little"))
 
     async def game_watcher(self, ctx: "SNIContext") -> None:
         from SNIClient import snes_read, snes_buffered_write, snes_flush_writes

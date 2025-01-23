@@ -138,10 +138,11 @@ dyna_items = {
     item_names.dyna_blade_ex2: ItemData(BASE_ID + 0x802, ItemClassification.useful),
 }
 
-filler_items = {
+misc_items = {
     item_names.one_up: ItemData(BASE_ID + 0x1001, ItemClassification.filler),
     item_names.maxim_tomato: ItemData(BASE_ID + 0x1002, ItemClassification.filler),
     item_names.invincible_candy: ItemData(BASE_ID + 0x1003, ItemClassification.filler),
+    item_names.rainbow_heart: ItemData(BASE_ID + 0x1004, ItemClassification.progression)
 }
 
 filler_item_weights = {
@@ -157,7 +158,7 @@ item_table = {
     **treasures,
     **planets,
     **dyna_items,
-    **filler_items
+    **misc_items
 }
 
 item_names = {

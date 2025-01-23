@@ -118,6 +118,7 @@ copy_planet = "???"
 # Misc
 dyna_blade_ex1 = "Dyna Blade - Extra 1"
 dyna_blade_ex2 = "Dyna Blade - Extra 2"
+rainbow_heart = "Rainbow Heart"
 one_up = "1-Up"
 maxim_tomato = "Maxim Tomato"
 invincible_candy = "Invincible Candy"
