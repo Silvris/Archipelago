@@ -111,6 +111,11 @@ class KSSSNIClient(SNIClient):
                 unlocked_planets = int.from_bytes(await snes_read(ctx, KSS_RECEIVED_PLANETS, 2), "little")
                 unlocked_planets |= (1 << planet)
                 snes_buffered_write(ctx, KSS_RECEIVED_PLANETS, unlocked_planets.to_bytes(2, "little"))
+            elif item.item & 0x800 != 0:
+                switch = item.item & 0xFF
+                unlocked_switches = int.from_bytes(await snes_read(ctx, KSS_DYNA_SWITCHES, 1), "little")
+                unlocked_switches |= (1 << switch)
+                snes_buffered_write(ctx, KSS_DYNA_SWITCHES, unlocked_switches.to_bytes(1, "little"))
             else:
                 pass
 

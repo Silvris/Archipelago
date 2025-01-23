@@ -113,6 +113,9 @@ org $02A34B
     JML hook_copy_ability
     NOP
 
+org $07DF3E
+    NOP #3 ; Dyna Blade initialization, just need to preserve switch state
+
 org $07DF95
     JSL load_game
     NOP #14 ; TGCO initialization
