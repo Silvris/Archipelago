@@ -6,29 +6,6 @@ if TYPE_CHECKING:
     from BaseClasses import CollectionState
 
 
-def can_burn(state: "CollectionState", player: int):
-    return state.has_any([item_names.fire, item_names.jet, item_names.hammer, item_names.bomb], player)
-
-
-def can_cut_rope(state: "CollectionState", player: int):
-    return state.has_any([item_names.sword, item_names.cutter, item_names.ninja, item_names.wing], player)
-
-
-def can_pound_stakes(state: "CollectionState", player: int):
-    return state.has_any([item_names.hammer, item_names.stone], player)
-
-
-def can_pierce_walls(state: "CollectionState", player: int):
-    return state.has_any([item_names.sword, item_names.wing, item_names.jet, item_names.ice, item_names.fire,
-                          item_names.mirror, item_names.yoyo, item_names.beam, item_names.fighter, item_names.plasma,],
-                         player)
-
-
-def can_pierce_floors(state: "CollectionState", player: int):
-    return state.has_any([item_names.mirror, item_names.beam], player)
-    #TODO: test Jet, Yoyo, Plasma
-
-
 def can_fight_wind(state: "CollectionState", player: int):
     return state.has_any([item_names.wing, item_names.jet, item_names.ninja], player)
 
@@ -41,8 +18,15 @@ def set_rules(world: "KSSWorld"):
 
     if "Revenge of Meta Knight" in world.options.included_subgames:
         # Revenge of Meta Knight
-        set_rule(world.get_entrance("Chapter 3 -> Chapter 4"), lambda state: can_burn(state, world.player))
-
+        set_rule(world.get_entrance("Chapter 3 -> Chapter 4"), lambda state: state.has(item_names.fire, world.player))
+        set_rule(world.get_entrance("Chapter 4 -> Chapter 5"), lambda state: state.has_any([item_names.beam,
+                                                                                            item_names.yoyo,
+                                                                                            item_names.jet,
+                                                                                            item_names.bomb],
+                                                                                           world.player))
+        set_rule(world.get_entrance("Chapter 5 -> Chapter 6"), lambda state: state.has_any([item_names.wing,
+                                                                                            item_names.suplex],
+                                                                                           world.player))
     if "The Great Cave Offensive" in world.options.included_subgames:
         # Delay setting these rules until we know for sure
         if world.treasure_value:
@@ -55,27 +39,87 @@ def set_rules(world: "KSSWorld"):
             set_rule(world.get_location(location_names.tgco_complete), lambda state: state.has("Gold", world.player,
                                                                                                world.treasure_value[3]))
         # Great Cave Offensive
+        set_rule(world.get_location(location_names.tgco_treasure_4),
+                 lambda state: state.has_any([item_names.wing, item_names.plasma], world.player))
+        set_rule(world.get_location(location_names.tgco_treasure_7),
+                 lambda state: state.has_any([item_names.beam, item_names.wing, item_names.plasma], world.player))
         set_rule(world.get_location(location_names.tgco_treasure_13),
-                 lambda state: can_cut_rope(state, world.player))
+                 lambda state: state.has_any([item_names.cutter, item_names.sword, item_names.wing], world.player))
         set_rule(world.get_location(location_names.tgco_treasure_18),
-                 lambda state: can_pierce_walls(state, world.player))
+                 lambda state: state.has_any([item_names.crash, item_names.yoyo,
+                                              item_names.beam, item_names.beam], world.player))
+        set_rule(world.get_location(location_names.tgco_treasure_19),
+                 lambda state: state.has_any([item_names.crash, item_names.yoyo,
+                                              item_names.beam, item_names.beam], world.player))
+        set_rule(world.get_location(location_names.tgco_treasure_20),
+                 lambda state: state.has_any([item_names.crash, item_names.yoyo,
+                                              item_names.beam, item_names.beam], world.player))
+        set_rule(world.get_location(location_names.tgco_treasure_21),
+                 lambda state: state.has_any([item_names.crash, item_names.yoyo,
+                                              item_names.beam, item_names.beam], world.player))
+        set_rule(world.get_location(location_names.tgco_treasure_28),
+                 lambda state: state.has_any([item_names.crash, item_names.yoyo,
+                                              item_names.beam, item_names.beam], world.player))
+        set_rule(world.get_location(location_names.tgco_treasure_31),
+                 lambda state: state.has_any([item_names.hammer, item_names.stone], world.player))
+        set_rule(world.get_location(location_names.tgco_treasure_32),
+                 lambda state: state.has_any([item_names.hammer, item_names.stone], world.player)
+                               and state.has(item_names.fire, world.player))
+        set_rule(world.get_location(location_names.tgco_treasure_33),
+                 lambda state: state.has_any([item_names.hammer, item_names.stone], world.player))
+        set_rule(world.get_location(location_names.tgco_treasure_34),
+                 lambda state: state.has_any([item_names.cutter, item_names.beam, item_names.beam, item_names.hammer,
+                                              item_names.bomb, item_names.jet, item_names.wing, item_names.stone,
+                                              item_names.plasma], world.player))
         set_rule(world.get_location(location_names.tgco_treasure_36),
-                 lambda state: can_pierce_floors(state, world.player))
+                 lambda state: state.has_any([item_names.beam, item_names.yoyo, item_names.plasma], world.player))
+        set_rule(world.get_location(location_names.tgco_treasure_37),
+                 lambda state: state.has_any([item_names.parasol, item_names.yoyo, item_names.beam, item_names.plasma,
+                                              item_names.hammer, item_names.stone, item_names.bomb], world.player))
         set_rule(world.get_location(location_names.tgco_treasure_42),
                  lambda state: state.has(item_names.stone, world.player))
         set_rule(world.get_location(location_names.tgco_treasure_43),
-                 lambda state: can_cut_rope(state, world.player) and can_pound_stakes(state, world.player))
+                 lambda state: state.has_any([item_names.ninja, item_names.sword,  item_names.wing], world.player)
+                               and state.has(item_names.stone, world.player))
         set_rule(world.get_location(location_names.tgco_treasure_45),
-                 lambda state: can_burn(state, world.player))
+                 lambda state: state.has_any([item_names.jet, item_names.fire], world.player))
         set_rule(world.get_location(location_names.tgco_treasure_47),
                  lambda state: can_fight_wind(state, world.player))
         set_rule(world.get_location(location_names.tgco_treasure_49),
-                 lambda state: can_burn(state, world.player))
+                 lambda state: state.has(item_names.jet, world.player))
+        set_rule(world.get_location(location_names.tgco_treasure_52),
+                 lambda state: state.has_any([item_names.parasol, item_names.wing, item_names.plasma], world.player))
         set_rule(world.get_location(location_names.tgco_treasure_53),
                  lambda state: state.has(item_names.wheel, world.player))
         set_rule(world.get_location(location_names.tgco_treasure_58),
-                 lambda state: state.has(item_names.beam, world.player))
+                 lambda state: state.has_any([item_names.beam, item_names.crash], world.player))
+        set_rule(world.get_location(location_names.tgco_treasure_59),
+                 lambda state: state.has_any([item_names.ninja, item_names.sword,  item_names.wing, item_names.cutter],
+                                             world.player))
 
     if "Milky Way Wishes" in world.options.included_subgames:
-        set_rule(world.get_location(location_names.mww_complete),
-                 lambda state: state.has_group_unique("Planets", world.player, 8))
+        if world.options.milky_way_wishes_mode == "local":
+            set_rule(world.get_location(location_names.mww_complete),
+                     lambda state: state.has_group_unique("Planets", world.player, 8))
+        else:
+            set_rule(world.get_location(location_names.mww_complete),
+                     lambda state: state.has("Rainbow Star", world.player, 7))
+
+        set_rule(world.get_location(location_names.mww_sword),
+                 lambda state: state.has_any([item_names.beam, item_names.bomb, item_names.cutter, item_names.fire,
+                                              item_names.hammer, item_names.jet, item_names.mirror, item_names.parasol,
+                                              item_names.plasma, item_names.stone, item_names.wing, item_names.yoyo],
+                                             world.player))
+
+        set_rule(world.get_location(location_names.mww_wheel),
+                 lambda state: state.has_any([item_names.fire, item_names.jet], world.player))
+
+        set_rule(world.get_location(location_names.mww_suplex),
+                 lambda state: state.has_any([item_names.fighter, item_names.yoyo], world.player))
+
+        set_rule(world.get_location(location_names.mww_ninja),
+                 lambda state: state.has_any([item_names.beam, item_names.cutter, item_names.fire, item_names.hammer,
+                                              item_names.jet, item_names.mirror, item_names.parasol, item_names.plasma,
+                                              item_names.stone, item_names.sword, item_names.wing, item_names.yoyo],
+                                             world.player))
+        

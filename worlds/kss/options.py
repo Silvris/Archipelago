@@ -39,6 +39,9 @@ class StartingSubgame(Choice):
 
 
 class IncludedSubgames(OptionSet):
+    """
+    Which subgames should be included as locations.
+    """
     display_name = "Included Subgames"
     valid_keys = {
         "Spring Breeze",
@@ -52,8 +55,22 @@ class IncludedSubgames(OptionSet):
     default = valid_keys
 
 
+class MilkyWayWishesMode(Choice):
+    """
+    Determines how Marx is unlocked in Milky Way Wishes.
+    Local: Marx is unlocked after completing the 7 main planets
+    (Floria, Aqualiss, Skyhigh, Hotbeat, Cavios, Mecheye, Halfmoon)
+    Multiworld: Marx is unlocked after receiving 7 Rainbow Stars scattered across the multiworld
+    """
+    display_name = "Milky Way Wishes Mode"
+    option_local = 0
+    option_multiworld = 1
+    default = 0
+
+
 @dataclass
 class KSSOptions(PerGameCommonOptions):
     required_subgames: RequiredSubgames
     starting_subgame: StartingSubgame
     included_subgames: IncludedSubgames
+    milky_way_wishes_mode: MilkyWayWishesMode
