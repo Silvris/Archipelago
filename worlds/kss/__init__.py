@@ -82,6 +82,8 @@ class KSSWorld(World):
             self.options.required_subgames.value = len(self.options.included_subgames.value)
 
     def create_item(self, name):
+        if name not in item_table:
+            raise Exception(f"{name} is not a valid item name for Kirby Super Star.")
         data = item_table[name]
         return KSSItem(name, data.classification, data.code, self.player)
 
