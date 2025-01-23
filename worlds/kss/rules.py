@@ -1,6 +1,7 @@
 from typing import TYPE_CHECKING
 from .names import location_names, item_names
 from worlds.generic.Rules import set_rule
+
 if TYPE_CHECKING:
     from . import KSSWorld
     from BaseClasses import CollectionState
@@ -18,15 +19,18 @@ def set_rules(world: "KSSWorld"):
 
     if "Revenge of Meta Knight" in world.options.included_subgames:
         # Revenge of Meta Knight
-        set_rule(world.get_entrance("Chapter 3 -> Chapter 4"), lambda state: state.has(item_names.fire, world.player))
-        set_rule(world.get_entrance("Chapter 4 -> Chapter 5"), lambda state: state.has_any([item_names.beam,
-                                                                                            item_names.yoyo,
-                                                                                            item_names.jet,
-                                                                                            item_names.bomb],
-                                                                                           world.player))
-        set_rule(world.get_entrance("Chapter 5 -> Chapter 6"), lambda state: state.has_any([item_names.wing,
-                                                                                            item_names.suplex],
-                                                                                           world.player))
+        set_rule(world.get_entrance("RoMK - Chapter 3 -> RoMK - Chapter 4"),
+                 lambda state: state.has(item_names.fire, world.player))
+        set_rule(world.get_entrance("RoMK - Chapter 4 -> RoMK - Chapter 5"),
+                 lambda state: state.has_any([item_names.beam,
+                                              item_names.yoyo,
+                                              item_names.jet,
+                                              item_names.bomb],
+                                             world.player))
+        set_rule(world.get_entrance("RoMK - Chapter 5 -> RoMK - Chapter 6"),
+                 lambda state: state.has_any([item_names.wing,
+                                              item_names.suplex],
+                                             world.player))
     if "The Great Cave Offensive" in world.options.included_subgames:
         # Delay setting these rules until we know for sure
         if world.treasure_value:
@@ -79,7 +83,7 @@ def set_rules(world: "KSSWorld"):
         set_rule(world.get_location(location_names.tgco_treasure_42),
                  lambda state: state.has(item_names.stone, world.player))
         set_rule(world.get_location(location_names.tgco_treasure_43),
-                 lambda state: state.has_any([item_names.ninja, item_names.sword,  item_names.wing], world.player)
+                 lambda state: state.has_any([item_names.ninja, item_names.sword, item_names.wing], world.player)
                                and state.has(item_names.stone, world.player))
         set_rule(world.get_location(location_names.tgco_treasure_45),
                  lambda state: state.has_any([item_names.jet, item_names.fire], world.player))
@@ -94,7 +98,7 @@ def set_rules(world: "KSSWorld"):
         set_rule(world.get_location(location_names.tgco_treasure_58),
                  lambda state: state.has_any([item_names.beam, item_names.crash], world.player))
         set_rule(world.get_location(location_names.tgco_treasure_59),
-                 lambda state: state.has_any([item_names.ninja, item_names.sword,  item_names.wing, item_names.cutter],
+                 lambda state: state.has_any([item_names.ninja, item_names.sword, item_names.wing, item_names.cutter],
                                              world.player))
 
     if "Milky Way Wishes" in world.options.included_subgames:

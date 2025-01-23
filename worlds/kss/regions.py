@@ -111,18 +111,21 @@ def create_great_cave_offensive(world: "KSSWorld", menu: KSSRegion):
 
 def create_revenge_meta_knight(world: "KSSWorld", menu: KSSRegion):
     revenge_of_meta_knight = create_region("Revenge of Meta Knight", world)
-    chapter_1 = create_region("Chapter 1", world)
-    chapter_2 = create_region("Chapter 2", world)
-    chapter_3 = create_region("Chapter 3", world)
-    chapter_4 = create_region("Chapter 4", world)
-    chapter_5 = create_region("Chapter 5", world)
-    chapter_6 = create_region("Chapter 6", world)
-    chapter_7 = create_region("Chapter 7", world)
+    chapter_1 = create_region("RoMK - Chapter 1", world)
+    chapter_2 = create_region("RoMK - Chapter 2", world)
+    chapter_3 = create_region("RoMK - Chapter 3", world)
+    chapter_4 = create_region("RoMK - Chapter 4", world)
+    chapter_5 = create_region("RoMK - Chapter 5", world)
+    chapter_6 = create_region("RoMK - Chapter 6", world)
+    chapter_7 = create_region("RoMK - Chapter 7", world)
 
-    for region, connection, locations in zip((chapter_1, chapter_2, chapter_3, chapter_4, chapter_5, chapter_6, chapter_7),
-                                             (chapter_2, chapter_3, chapter_4, chapter_5, chapter_6, chapter_7, None),
-                                             (romk_chapter_1_locations, romk_chapter_2_locations, romk_chapter_3_locations,
-                                              romk_chapter_4_locations, romk_chapter_5_locations, romk_chapter_6_locations,
+    for region, connection, locations in zip((chapter_1, chapter_2, chapter_3, chapter_4,
+                                              chapter_5, chapter_6, chapter_7),
+                                             (chapter_2, chapter_3, chapter_4, chapter_5,
+                                              chapter_6, chapter_7, None),
+                                             (romk_chapter_1_locations, romk_chapter_2_locations,
+                                              romk_chapter_3_locations, romk_chapter_4_locations,
+                                              romk_chapter_5_locations, romk_chapter_6_locations,
                                               romk_chapter_7_locations)
                                              ):
         if connection:
@@ -159,7 +162,7 @@ def create_milky_way_wishes(world: "KSSWorld", menu: KSSRegion):
         region.add_locations(locations, KSSLocation)
         milky_way_wishes.connect(region, None, lambda state, required=item: state.has(required, world.player))
 
-    milky_way_wishes.add_locations(space_locations)
+    milky_way_wishes.add_locations(space_locations, KSSLocation)
     menu.connect(milky_way_wishes, None, lambda state: state.has(item_names.milky_way_wishes, world.player))
 
     world.get_location(location_names.mww_complete).place_locked_item(
