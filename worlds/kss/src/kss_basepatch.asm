@@ -744,7 +744,7 @@ set_starting_stage:
     print "Goal Requirement: ", hex(snestopc(realbase()))
     CPY #$0006
     BCC .Skip
-    ORA #$8000
+    ORA #$0080
     .Skip:
     ORA !ap_sub_games
     STA !received_sub_games
