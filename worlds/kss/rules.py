@@ -127,4 +127,3 @@ def set_rules(world: "KSSWorld"):
         for i in range(10, 21):
             set_rule(world.get_location(f"The Arena - {i} Straight Wins"),
                      lambda state: state.has_group_unique("Copy Ability", world.player, 5))
-    

@@ -73,7 +73,7 @@ class KSSSNIClient(SNIClient):
     async def game_watcher(self, ctx: "SNIContext") -> None:
         from SNIClient import snes_read, snes_buffered_write, snes_flush_writes
         current_subgames = int.from_bytes(await snes_read(ctx, KSS_CURRENT_SUBGAMES, 2), "little")
-        if current_subgames & 0x8000 != 0:
+        if current_subgames & 0x0080 != 0:
             await ctx.send_msgs([{"cmd": "StatusUpdate", "status": ClientStatus.CLIENT_GOAL}])
             ctx.finished_game = True
 
@@ -86,7 +86,7 @@ class KSSSNIClient(SNIClient):
                 color(ctx.player_names[item.player], 'yellow'),
                 ctx.location_names.lookup_in_slot(item.location, item.player), recv_count, len(ctx.items_received)))
             snes_buffered_write(ctx, KSS_RECEIVED_ITEMS, recv_count.to_bytes(2, "little"))
-            if item.item & 0xF00 == 0:
+            if item.item & 0xFF00 == 0:
                 # Subgame
                 unlocked_subgames = int.from_bytes(await snes_read(ctx, KSS_RECEIVED_SUBGAMES, 2), "little")
                 unlocked_subgames |= (1 << (item.item & 0xFF))
@@ -156,7 +156,7 @@ class KSSSNIClient(SNIClient):
                 new_checks.append(location)
 
         mww_planets = int.from_bytes(await snes_read(ctx, KSS_COMPLETED_PLANETS, 1), "little")
-        for i in range(8):
+        for i in range(7):
             flag = 1 << i
             location = planet_flags[flag]
             if flag & mww_planets and location not in ctx.checked_locations:
