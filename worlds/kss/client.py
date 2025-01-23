@@ -9,7 +9,7 @@ from NetUtils import ClientStatus, color, NetworkItem
 from worlds.AutoSNIClient import SNIClient
 from typing import TYPE_CHECKING
 from .items import treasures, BASE_ID
-from .client_data import treasure_base_id, boss_flags, deluxe_essence_flags
+from .client_data import treasure_base_id, boss_flags, deluxe_essence_flags, planet_flags
 
 if TYPE_CHECKING:
     from SNIClient import SNIContext
@@ -153,6 +153,13 @@ class KSSSNIClient(SNIClient):
         for i in range(revenge):
             location = BASE_ID + 79 + i
             if location not in ctx.checked_locations:
+                new_checks.append(location)
+
+        mww_planets = int.from_bytes(await snes_read(ctx, KSS_COMPLETED_PLANETS, 1), "little")
+        for i in range(8):
+            flag = 1 << i
+            location = planet_flags[flag]
+            if flag & mww_planets and location not in ctx.checked_locations:
                 new_checks.append(location)
 
         gourmet_race = int.from_bytes(await snes_read(ctx, KSS_GOURMET_RACE_WON, 1), "little")
