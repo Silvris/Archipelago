@@ -19,6 +19,10 @@ snes_logger = logging.getLogger("SNES")
 # FXPAK Pro protocol memory mapping used by SNI
 SRAM_1_START = 0xE00000
 
+KSS_KIRBY_LIVES = SRAM_1_START + 0x137A
+KSS_KIRBY_HP = SRAM_1_START + 0x137C
+KSS_DEMO_STATE = SRAM_1_START + 0x138E
+KSS_GAME_STATE = SRAM_1_START + 0x1390
 KSS_GOURMET_RACE_WON = SRAM_1_START + 0x171D
 KSS_DYNA_COMPLETED = SRAM_1_START + 0x1A63
 KSS_DYNA_SWITCHES = SRAM_1_START + 0x1A64
@@ -70,8 +74,31 @@ class KSSSNIClient(SNIClient):
             await ctx.update_death_link(bool(death_link[0] & 0b1))
         return True
 
+    async def pop_item(self, ctx: "SNIContext", game_state: int):
+        from SNIClient import snes_read, snes_buffered_write
+        if game_state != 3:
+            return
+
+        item = self.item_queue.pop()
+        if item.item & 0xF == 0:
+            # 1-Up
+            lives = int.from_bytes(await snes_read(ctx, KSS_KIRBY_LIVES, 2), "little")
+            snes_buffered_write(ctx, KSS_KIRBY_LIVES, int.to_bytes(lives + 1, 2, "little"))
+        elif item.item & 0xF == 1:
+            # Maxim
+            snes_buffered_write(ctx, KSS_KIRBY_HP, int.to_bytes(0x46, 2, "little"))
+            snes_buffered_write(ctx, KSS_KIRBY_HP + 2, int.to_bytes(0x46, 2, "little"))
+        elif item.item & 0xF == 2:
+            pass # Invincibility, not implemented
+            # it needs to hit IRAM, so have to setup in the rom
+
     async def game_watcher(self, ctx: "SNIContext") -> None:
         from SNIClient import snes_read, snes_buffered_write, snes_flush_writes
+
+        demo_state = int.from_bytes(await snes_read(ctx, KSS_DEMO_STATE, 2), "little")
+        if demo_state:
+            return
+
         current_subgames = int.from_bytes(await snes_read(ctx, KSS_CURRENT_SUBGAMES, 2), "little")
         if current_subgames & 0x0080 != 0:
             await ctx.send_msgs([{"cmd": "StatusUpdate", "status": ClientStatus.CLIENT_GOAL}])
@@ -117,7 +144,9 @@ class KSSSNIClient(SNIClient):
                 unlocked_switches |= (1 << switch)
                 snes_buffered_write(ctx, KSS_DYNA_SWITCHES, unlocked_switches.to_bytes(1, "little"))
             else:
-                pass
+                self.item_queue.append(item)
+
+        await self.pop_item(ctx, int.from_bytes(await snes_read(ctx, KSS_GAME_STATE, 1), "little"))
 
         await snes_flush_writes(ctx)
 
