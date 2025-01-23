@@ -107,7 +107,7 @@ def set_rules(world: "KSSWorld"):
                      lambda state: state.has_group_unique("Planets", world.player, 8))
         else:
             set_rule(world.get_location(location_names.mww_complete),
-                     lambda state: state.has("Rainbow Star", world.player, 7))
+                     lambda state: state.has(item_names.rainbow_star, world.player, 7))
 
         set_rule(world.get_location(location_names.mww_sword),
                  lambda state: state.has_any([item_names.beam, item_names.bomb, item_names.cutter, item_names.fire,

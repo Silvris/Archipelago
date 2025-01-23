@@ -45,7 +45,7 @@ class KSSProcedurePatch(APProcedurePatch, APTokenMixin):
 def patch_rom(world: "KSSWorld", patch: KSSProcedurePatch):
     patch.write_file("kss_basepatch.bsdiff4", pkgutil.get_data(__name__, os.path.join("data", "kss_basepatch.bsdiff4")))
 
-    patch.write_byte(starting_stage + 1, world.options.starting_subgame.value + 1)
+    patch.write_byte(starting_stage + 1, 1 << world.options.starting_subgame.value)
     patch.write_byte(goal_requirement + 1, world.options.required_subgames.value)
 
     if world.treasure_value:

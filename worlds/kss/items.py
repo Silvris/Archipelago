@@ -4,13 +4,16 @@ from .names import item_names
 
 BASE_ID = 0x470000
 
+
 class KSSItem(Item):
     game = "Kirby Super Star"
+
 
 class ItemData(NamedTuple):
     code: Optional[int]
     classification: ItemClassification
     value: int = 0
+
 
 sub_games = {
     item_names.spring_breeze: ItemData(BASE_ID + 0, ItemClassification.progression),
@@ -142,7 +145,7 @@ misc_items = {
     item_names.one_up: ItemData(BASE_ID + 0x1001, ItemClassification.filler),
     item_names.maxim_tomato: ItemData(BASE_ID + 0x1002, ItemClassification.filler),
     item_names.invincible_candy: ItemData(BASE_ID + 0x1003, ItemClassification.filler),
-    item_names.rainbow_heart: ItemData(BASE_ID + 0x1004, ItemClassification.progression)
+    item_names.rainbow_star: ItemData(BASE_ID + 0x1004, ItemClassification.progression)
 }
 
 filler_item_weights = {
@@ -161,7 +164,7 @@ item_table = {
     **misc_items
 }
 
-item_names = {
+item_groups = {
     "Copy Ability": {name for name in copy_abilities},
     "Treasures": {name for name in treasures},
     "Planets": {name for name in planets}

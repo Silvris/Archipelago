@@ -7,9 +7,10 @@ from typing import Dict, List, ClassVar, Any
 from BaseClasses import Tutorial, MultiWorld, CollectionState, Item
 from worlds.AutoWorld import World, WebWorld
 from Options import OptionError
-from .items import (lookup_item_to_id, item_table, item_names, KSSItem, filler_item_weights, copy_abilities,
+from .items import (lookup_item_to_id, item_table, item_groups, KSSItem, filler_item_weights, copy_abilities,
                     sub_games, dyna_items, planets, treasures, sub_game_completion)
 from .locations import location_table, KSSLocation
+from .names import item_names
 from .options import KSSOptions, subgame_mapping
 from .regions import create_regions
 from .rom import KSS_UHASH, KSSProcedurePatch, patch_rom
@@ -51,7 +52,7 @@ class KSSWorld(World):
     item_name_to_id = lookup_item_to_id
     location_name_to_id = {location: location_table[location]
                            for location in location_table if location_table[location]}
-    item_name_groups = item_names
+    item_name_groups = item_groups
     web = KSSWebWorld()
     settings: ClassVar[KSSSettings]
     options_dataclass = KSSOptions
@@ -115,7 +116,7 @@ class KSSWorld(World):
             itempool.extend(planet)
 
             if self.options.milky_way_wishes_mode == "multiworld":
-                itempool.extend(self.create_item(item_names.rainbow_heart) for _ in range(7))
+                itempool.extend(self.create_item(item_names.rainbow_star) for _ in range(7))
 
         location_count = len(list(self.multiworld.get_unfilled_locations(self.player))) - len(itempool)
         if location_count < 0:

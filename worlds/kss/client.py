@@ -28,7 +28,7 @@ KSS_DYNA_COMPLETED = SRAM_1_START + 0x1A63
 KSS_DYNA_SWITCHES = SRAM_1_START + 0x1A64
 KSS_DYNA_IRON_MAM = SRAM_1_START + 0x1A67
 KSS_REVENGE_CHAPTERS = SRAM_1_START + 0x1A69
-KSS_RAINBOW_HEART = SRAM_1_START + 0x1A6D
+KSS_RAINBOW_HEART = SRAM_1_START + 0x1A6B
 KSS_CURRENT_SUBGAMES = SRAM_1_START + 0x1A85
 KSS_COMPLETED_SUBGAMES = SRAM_1_START + 0x1A93
 KSS_ARENA_HIGH_SCORE = SRAM_1_START + 0x1AA1
@@ -38,7 +38,7 @@ KSS_TGC0_GOLD = SRAM_1_START + 0x1B0F  # 3-byte 24-bit int
 KSS_COPY_ABILITIES = SRAM_1_START + 0x1B1D  # originally Milky Way Wishes deluxe essences
 # Remapped for sending
 KSS_SENT_DYNA_SWITCH = SRAM_1_START + 0x7A64
-KSS_COMPLETED_PLANETS = SRAM_1_START + 0x7A6D
+KSS_COMPLETED_PLANETS = SRAM_1_START + 0x7A6B
 KSS_SENT_TGCO_TREASURE = SRAM_1_START + 0x7B05  # 8 bytes
 KSS_SENT_DELUXE_ESSENCE = SRAM_1_START + 0x7B1D  # 3 bytes
 
@@ -79,33 +79,27 @@ class KSSSNIClient(SNIClient):
         from SNIClient import snes_read, snes_buffered_write
         if game_state != 3:
             return
-
-        item = self.item_queue.pop()
-        if item.item & 0xF == 1:
-            # 1-Up
-            lives = int.from_bytes(await snes_read(ctx, KSS_KIRBY_LIVES, 2), "little")
-            snes_buffered_write(ctx, KSS_KIRBY_LIVES, int.to_bytes(lives + 1, 2, "little"))
-        elif item.item & 0xF == 2:
-            # Maxim
-            snes_buffered_write(ctx, KSS_KIRBY_HP, int.to_bytes(0x46, 2, "little"))
-            snes_buffered_write(ctx, KSS_KIRBY_HP + 2, int.to_bytes(0x46, 2, "little"))
-        elif item.item & 0xF == 3:
-            pass # Invincibility, not implemented
-            # it needs to hit IRAM, so have to setup in the rom
-        elif item.item & 0xF == 4:
-            # Rainbow Heart
-            planet_clear = int.from_bytes(await snes_read(ctx, KSS_RAINBOW_HEART, 1), "little")
-            current_total = sum(planet_clear & (1 << x) for x in range(8))
-            new_clear = 0
-            for i in range(min(current_total + 1, 8)):
-                new_clear |= (1 << i)
-            snes_buffered_write(ctx, KSS_RAINBOW_HEART, int.to_bytes(new_clear, 1, "little"))
+        if self.item_queue:
+            item = self.item_queue.pop()
+            if item.item & 0xF == 1:
+                # 1-Up
+                lives = int.from_bytes(await snes_read(ctx, KSS_KIRBY_LIVES, 2), "little")
+                snes_buffered_write(ctx, KSS_KIRBY_LIVES, int.to_bytes(lives + 1, 2, "little"))
+            elif item.item & 0xF == 2:
+                # Maxim
+                snes_buffered_write(ctx, KSS_KIRBY_HP, int.to_bytes(0x46, 2, "little"))
+                snes_buffered_write(ctx, KSS_KIRBY_HP + 2, int.to_bytes(0x46, 2, "little"))
+            elif item.item & 0xF == 3:
+                pass # Invincibility, not implemented
+                # it needs to hit IRAM, so have to setup in the rom
+            else:
+                pass
 
     async def game_watcher(self, ctx: "SNIContext") -> None:
         from SNIClient import snes_read, snes_buffered_write, snes_flush_writes
 
         demo_state = int.from_bytes(await snes_read(ctx, KSS_DEMO_STATE, 2), "little")
-        if demo_state:
+        if not demo_state:
             return
 
         current_subgames = int.from_bytes(await snes_read(ctx, KSS_CURRENT_SUBGAMES, 2), "little")
@@ -153,7 +147,16 @@ class KSSSNIClient(SNIClient):
                 unlocked_switches |= (1 << switch)
                 snes_buffered_write(ctx, KSS_DYNA_SWITCHES, unlocked_switches.to_bytes(1, "little"))
             else:
-                self.item_queue.append(item)
+                if item.item & 0xF == 4:
+                    # Rainbow Heart
+                    planet_clear = int.from_bytes(await snes_read(ctx, KSS_RAINBOW_HEART, 1), "little")
+                    current_total = sum(1 if planet_clear & (1 << x) else 0 for x in range(8))
+                    new_clear = 0
+                    for i in range(min(current_total + 1, 8)):
+                        new_clear |= (1 << i)
+                    snes_buffered_write(ctx, KSS_RAINBOW_HEART, int.to_bytes(new_clear, 1, "little"))
+                else:
+                    self.item_queue.append(item)
 
         await self.pop_item(ctx, int.from_bytes(await snes_read(ctx, KSS_GAME_STATE, 1), "little"))
 
