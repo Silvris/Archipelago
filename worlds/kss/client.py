@@ -176,7 +176,7 @@ class KSSSNIClient(SNIClient):
 
         treasure_flag = int.from_bytes(await snes_read(ctx, KSS_SENT_TGCO_TREASURE, 8), "little")
         for flag in range(60):
-            location = treasure_base_id + flag + 1
+            location = treasure_base_id + flag
             if (1 << flag) & treasure_flag and location not in ctx.checked_locations:
                 new_checks.append(location)
 
