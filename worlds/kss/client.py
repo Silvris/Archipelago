@@ -28,7 +28,7 @@ KSS_DYNA_COMPLETED = SRAM_1_START + 0x1A63
 KSS_DYNA_SWITCHES = SRAM_1_START + 0x1A64
 KSS_DYNA_IRON_MAM = SRAM_1_START + 0x1A67
 KSS_REVENGE_CHAPTERS = SRAM_1_START + 0x1A69
-KSS_RAINBOW_HEART = SRAM_1_START + 0x1A6B
+KSS_RAINBOW_STAR = SRAM_1_START + 0x1A6B
 KSS_CURRENT_SUBGAMES = SRAM_1_START + 0x1A85
 KSS_COMPLETED_SUBGAMES = SRAM_1_START + 0x1A93
 KSS_ARENA_HIGH_SCORE = SRAM_1_START + 0x1AA1
@@ -149,12 +149,12 @@ class KSSSNIClient(SNIClient):
             else:
                 if item.item & 0xF == 4:
                     # Rainbow Heart
-                    planet_clear = int.from_bytes(await snes_read(ctx, KSS_RAINBOW_HEART, 1), "little")
+                    planet_clear = int.from_bytes(await snes_read(ctx, KSS_RAINBOW_STAR, 1), "little")
                     current_total = sum(1 if planet_clear & (1 << x) else 0 for x in range(8))
                     new_clear = 0
                     for i in range(min(current_total + 1, 8)):
                         new_clear |= (1 << i)
-                    snes_buffered_write(ctx, KSS_RAINBOW_HEART, int.to_bytes(new_clear, 1, "little"))
+                    snes_buffered_write(ctx, KSS_RAINBOW_STAR, int.to_bytes(new_clear, 1, "little"))
                 else:
                     self.item_queue.append(item)
 
