@@ -110,6 +110,12 @@ class KSSSNIClient(SNIClient):
             await ctx.send_msgs([{"cmd": "StatusUpdate", "status": ClientStatus.CLIENT_GOAL}])
             ctx.finished_game = True
 
+        save_abilities = 0
+        for ability in [item for item in ctx.items_received if item.item & 0x100]:
+            save_abilities |= (1 << ((ability.item & 0xFF) - 1))
+        for ptr in (KSS_SAVE_ABILITIES, KSS_COPY_ABILITIES):
+            snes_buffered_write(ctx, ptr, int.to_bytes(save_abilities, 3, "little"))
+
         recv_count = int.from_bytes(await snes_read(ctx, KSS_RECEIVED_ITEMS, 2), "little")
         if recv_count < len(ctx.items_received):
             item = ctx.items_received[recv_count]
@@ -125,12 +131,7 @@ class KSSSNIClient(SNIClient):
                 unlocked_subgames |= (1 << (item.item & 0xFF))
                 snes_buffered_write(ctx, KSS_RECEIVED_SUBGAMES, unlocked_subgames.to_bytes(2, "little"))
             elif item.item & 0x100 != 0:
-                # Copy Ability
-                ability = (item.item & 0xFF) - 1
-                unlocked_abilities = int.from_bytes(await snes_read(ctx, KSS_COPY_ABILITIES, 3), "little")
-                unlocked_abilities |= (1 << ability)
-                for ptr in (KSS_SAVE_ABILITIES, KSS_COPY_ABILITIES):
-                    snes_buffered_write(ctx, ptr, unlocked_abilities.to_bytes(3, "little"))
+                pass
             elif item.item & 0x200 != 0:
                 treasure = (item.item & 0xFF) - 1
                 unlocked_treasures = int.from_bytes(await snes_read(ctx, KSS_TGCO_TREASURE, 8), "little")
