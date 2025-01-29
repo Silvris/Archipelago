@@ -33,8 +33,11 @@ KSS_CURRENT_SUBGAMES = SRAM_1_START + 0x1A85
 KSS_COMPLETED_SUBGAMES = SRAM_1_START + 0x1A93
 KSS_ARENA_HIGH_SCORE = SRAM_1_START + 0x1AA1
 KSS_BOSS_DEFEATED = SRAM_1_START + 0x1AE7  # 4 bytes
+KSS_SAVE_TREASURE = SRAM_1_START + 0x1A31  # 8 bytes
 KSS_TGCO_TREASURE = SRAM_1_START + 0x1B05  # 8 bytes
+KSS_SAVE_GOLD = SRAM_1_START + 0x1A3B  # 3-byte 24-bit int
 KSS_TGC0_GOLD = SRAM_1_START + 0x1B0F  # 3-byte 24-bit int
+KSS_SAVE_ABILITIES = SRAM_1_START + 0x1A3F
 KSS_COPY_ABILITIES = SRAM_1_START + 0x1B1D  # originally Milky Way Wishes deluxe essences
 # Remapped for sending
 KSS_SENT_DYNA_SWITCH = SRAM_1_START + 0x7A64
@@ -126,7 +129,8 @@ class KSSSNIClient(SNIClient):
                 ability = (item.item & 0xFF) - 1
                 unlocked_abilities = int.from_bytes(await snes_read(ctx, KSS_COPY_ABILITIES, 3), "little")
                 unlocked_abilities |= (1 << ability)
-                snes_buffered_write(ctx, KSS_COPY_ABILITIES, unlocked_abilities.to_bytes(3, "little"))
+                for ptr in (KSS_SAVE_ABILITIES, KSS_COPY_ABILITIES):
+                    snes_buffered_write(ctx, ptr, unlocked_abilities.to_bytes(3, "little"))
             elif item.item & 0x200 != 0:
                 treasure = (item.item & 0xFF) - 1
                 unlocked_treasures = int.from_bytes(await snes_read(ctx, KSS_TGCO_TREASURE, 8), "little")
@@ -134,8 +138,10 @@ class KSSSNIClient(SNIClient):
                 treasure_info = treasures[ctx.item_names[item.item]]
                 treasure_value += treasure_info.value
                 unlocked_treasures |= (1 << treasure)
-                snes_buffered_write(ctx, KSS_TGCO_TREASURE, unlocked_treasures.to_bytes(8, "little"))
-                snes_buffered_write(ctx, KSS_TGC0_GOLD, treasure_value.to_bytes(3, "little"))
+                for ptr in (KSS_SAVE_TREASURE, KSS_TGCO_TREASURE):
+                    snes_buffered_write(ctx, ptr, unlocked_treasures.to_bytes(8, "little"))
+                for ptr in (KSS_SAVE_GOLD, KSS_TGC0_GOLD):
+                    snes_buffered_write(ctx, ptr, treasure_value.to_bytes(3, "little"))
             elif item.item & 0x400 != 0:
                 planet = item.item & 0xFF
                 unlocked_planets = int.from_bytes(await snes_read(ctx, KSS_RECEIVED_PLANETS, 2), "little")

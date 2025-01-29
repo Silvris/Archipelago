@@ -28,6 +28,7 @@ class KSSProcedurePatch(APProcedurePatch, APTokenMixin):
     procedure = [
         ("apply_bsdiff4", ["kss_basepatch.bsdiff4"]),
         ("apply_tokens", ["token_patch.bin"]),
+        ("calc_snes_crc", [])
     ]
 
 

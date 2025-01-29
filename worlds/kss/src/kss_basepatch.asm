@@ -113,6 +113,9 @@ org $02A34B
     JML hook_copy_ability
     NOP
 
+org $07DEB2
+    NOP #3 ; Grants the initial treasure of TGCO for some reason, probably for the tutorial?
+
 org $07DF3E
     NOP #3 ; Dyna Blade initialization, just need to preserve switch state
 
@@ -845,6 +848,11 @@ set_star_complete:
 org $CF3FB1
 hook_check_treasure:
     JSL check_treasure
+
+org $CF4372
+hook_set_treasure_value:
+    ; we don't actually care about this value, just remove it
+    NOP #22
 
 org $CF44BD
 hook_set_treasure:
