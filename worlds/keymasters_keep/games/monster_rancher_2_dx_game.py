@@ -1169,7 +1169,111 @@ class MonsterRancher2DXGame(Game):
     @staticmethod
     def durahan_techs():
         return [
-            
+            "Swing",
+            "TwisterSlash",
+            "Thunderbolt",
+            "Flash Slash",
+            "Triple Slash",
+            "Slash Combo",
+            "MillionStabs",
+            "Punch Combo",
+            "DeathBringer",
+            "Kick Combo",
+            "V Slash",
+            "Dash Slash",
+            "Charge",
+            "Air Shot",
+            "Jumping Stab",
+            "RollingSlash",
+            "Lightning",
+            "Blast Shot",
+            "Sword Throw",
+            "Gust Slash",
+        ]
+
+    @staticmethod
+    def gaboo_techs():
+        return [
+            "Acid Spit",
+            "Diving Press",
+            "Chop Combo",
+            "Samurai Kick",
+            "Rolling Chop",
+            "Shock Wave",
+            "Back Blow",
+            "ElectricBlow",
+            "Ninja Kick",
+            "Straight",
+            "Cyclone",
+            "Kiss",
+            "Long Punch",
+            "Spit",
+            "Jumping Chop"
+        ]
+
+    @staticmethod
+    def gali_techs():
+        return [
+            "Back Blow",
+            "Fire Wall",
+            "Blaze Wall",
+            "Napalm",
+            "Heavy Blow",
+            "Thwack",
+            "Whirlwind",
+            "Typhoon",
+            "Hurricane",
+            "Spirit Blow",
+            "Smash Whack",
+            "Red Wisp",
+            "Blue Wisp",
+            "Flying Mask",
+            "Spirit Punch",
+            "Giant Blow",
+            "Giant Thwack",
+            "Cutting Mask",
+            "Hashing Mask",
+            "Spirit Smash",
+        ]
+
+    @staticmethod
+    def ghost_techs():
+        return [
+            "Uppercut",
+            "Combination",
+            "Energy Shot",
+            "Surprise",
+            "Astonishment",
+            "Necromancy",
+            "Dove Bomb",
+            "Pigeon Bomb",
+            "Magic Card",
+            "Magic Cards",
+        ]
+
+    @staticmethod
+    def golem_techs():
+        return [
+            "Heavy Punch",
+            "Heavy Kick",
+            "Slap",
+            "Uppercut",
+            "Thwack",
+            "Brow Hit",
+            "Smash Thwack",
+            "Clap Attack",
+            "Palm Strike",
+            "Double Palms",
+            "Heavy Slap",
+            "Diving Press",
+            "Charge",
+            "Roll Assault",
+            "Brow Smash",
+            "Earthquake",
+            "Giant Clap",
+            "Fist Shot",
+            "Fist Missile",
+            "Cyclone"
         ]
 
 class MonsterRancher2DXUnlockedMainBreeds(OptionSet):
