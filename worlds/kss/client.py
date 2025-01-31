@@ -203,7 +203,7 @@ class KSSSNIClient(SNIClient):
             new_checks.append(BASE_ID + 11)
 
         revenge = int.from_bytes(await snes_read(ctx, KSS_REVENGE_CHAPTERS, 1), "little")
-        for i in range(revenge):
+        for i in range(revenge & 0x7):
             location = BASE_ID + 79 + i
             if location not in ctx.checked_locations:
                 new_checks.append(location)
