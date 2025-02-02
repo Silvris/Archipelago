@@ -116,6 +116,39 @@ class KSSSNIClient(SNIClient):
         for ptr in (KSS_SAVE_ABILITIES, KSS_COPY_ABILITIES):
             snes_buffered_write(ctx, ptr, int.to_bytes(save_abilities, 3, "little"))
 
+        known_treasures = int.from_bytes(await snes_read(ctx, KSS_TGCO_TREASURE, 8), "little")
+        treasure_data = 0
+        treasure_value = 0
+        for treasure in [item for item in ctx.items_received if item.item & 0x200]:
+            treasure_info = treasures[ctx.item_names[treasure.item]]
+            treasure_value += treasure_info.value
+            treasure_data |= (1 << treasure.item & 0x200)
+        if treasure_data != known_treasures:
+            for ptr in (KSS_SAVE_TREASURE, KSS_TGCO_TREASURE):
+                snes_buffered_write(ctx, ptr, treasure_data.to_bytes(8, "little"))
+            for ptr in (KSS_SAVE_GOLD, KSS_TGC0_GOLD):
+                snes_buffered_write(ctx, ptr, treasure_value.to_bytes(3, "little"))
+
+        unlocked_planets = int.from_bytes(await snes_read(ctx, KSS_RECEIVED_PLANETS, 2), "little")
+        for planet_item in [item for item in ctx.items_received if item.item & 0x400]:
+            planet = planet_item.item & 0xFF
+            unlocked_planets |= (1 << planet)
+        snes_buffered_write(ctx, KSS_RECEIVED_PLANETS, unlocked_planets.to_bytes(2, "little"))
+
+        unlocked_switches = int.from_bytes(await snes_read(ctx, KSS_DYNA_SWITCHES, 1), "little")
+        for switch_item in [item for item in ctx.items_received if item.item & 0x800]:
+            switch = switch_item.item & 0xFF
+            unlocked_switches |= (1 << switch)
+        snes_buffered_write(ctx, KSS_DYNA_SWITCHES, unlocked_switches.to_bytes(1, "little"))
+
+        planet_clear = int.from_bytes(await snes_read(ctx, KSS_RAINBOW_STAR, 1), "little")
+        current_total = sum(1 for item in ctx.items_received if item.item & 0xFFFF == 0x1004)
+        new_clear = 0
+        for i in range(min(current_total + 1, 8)):
+            new_clear |= (1 << i)
+        if planet_clear != new_clear:
+            snes_buffered_write(ctx, KSS_RAINBOW_STAR, int.to_bytes(new_clear, 1, "little"))
+
         recv_count = int.from_bytes(await snes_read(ctx, KSS_RECEIVED_ITEMS, 2), "little")
         if recv_count < len(ctx.items_received):
             item = ctx.items_received[recv_count]
@@ -130,39 +163,8 @@ class KSSSNIClient(SNIClient):
                 unlocked_subgames = int.from_bytes(await snes_read(ctx, KSS_RECEIVED_SUBGAMES, 2), "little")
                 unlocked_subgames |= (1 << (item.item & 0xFF))
                 snes_buffered_write(ctx, KSS_RECEIVED_SUBGAMES, unlocked_subgames.to_bytes(2, "little"))
-            elif item.item & 0x100 != 0:
-                pass
-            elif item.item & 0x200 != 0:
-                treasure = (item.item & 0xFF) - 1
-                unlocked_treasures = int.from_bytes(await snes_read(ctx, KSS_TGCO_TREASURE, 8), "little")
-                treasure_value = int.from_bytes(await snes_read(ctx, KSS_TGC0_GOLD, 3), "little")
-                treasure_info = treasures[ctx.item_names[item.item]]
-                treasure_value += treasure_info.value
-                unlocked_treasures |= (1 << treasure)
-                for ptr in (KSS_SAVE_TREASURE, KSS_TGCO_TREASURE):
-                    snes_buffered_write(ctx, ptr, unlocked_treasures.to_bytes(8, "little"))
-                for ptr in (KSS_SAVE_GOLD, KSS_TGC0_GOLD):
-                    snes_buffered_write(ctx, ptr, treasure_value.to_bytes(3, "little"))
-            elif item.item & 0x400 != 0:
-                planet = item.item & 0xFF
-                unlocked_planets = int.from_bytes(await snes_read(ctx, KSS_RECEIVED_PLANETS, 2), "little")
-                unlocked_planets |= (1 << planet)
-                snes_buffered_write(ctx, KSS_RECEIVED_PLANETS, unlocked_planets.to_bytes(2, "little"))
-            elif item.item & 0x800 != 0:
-                switch = item.item & 0xFF
-                unlocked_switches = int.from_bytes(await snes_read(ctx, KSS_DYNA_SWITCHES, 1), "little")
-                unlocked_switches |= (1 << switch)
-                snes_buffered_write(ctx, KSS_DYNA_SWITCHES, unlocked_switches.to_bytes(1, "little"))
-            else:
-                if item.item & 0xF == 4:
-                    # Rainbow Heart
-                    planet_clear = int.from_bytes(await snes_read(ctx, KSS_RAINBOW_STAR, 1), "little")
-                    current_total = sum(1 if planet_clear & (1 << x) else 0 for x in range(8))
-                    new_clear = 0
-                    for i in range(min(current_total + 1, 8)):
-                        new_clear |= (1 << i)
-                    snes_buffered_write(ctx, KSS_RAINBOW_STAR, int.to_bytes(new_clear, 1, "little"))
-                else:
+            elif item.item & 0x1000 != 0:
+                if item.item & 0xF != 4:
                     self.item_queue.append(item)
 
         await self.pop_item(ctx, int.from_bytes(await snes_read(ctx, KSS_GAME_STATE, 1), "little"))

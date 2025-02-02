@@ -845,6 +845,10 @@ set_star_complete:
     .Return:
     JML hook_set_star_return
 
+org $CF2933
+remove_dyna_block:
+    LDA #$0000
+
 org $CF3FB1
 hook_check_treasure:
     JSL check_treasure
