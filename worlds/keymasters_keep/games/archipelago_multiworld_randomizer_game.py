@@ -4,7 +4,7 @@ from typing import List
 
 from dataclasses import dataclass
 
-from Options import OptionSet, Toggle
+from Options import OptionSet
 
 from ..game import Game
 from ..game_objective_template import GameObjectiveTemplate
@@ -25,7 +25,7 @@ class ArchipelagoMultiworldRandomizerArchipelagoOptions:
     )
 
     archipelago_multiworld_randomizer_custom_game_selection: ArchipelagoMultiworldRandomizerCustomGameSelection
-    archipelago_multiworld_randomizer_allow_apbingo_objectives: ArchipelagoMultiworldRandomizerAllowAPBingoObjectives
+    archipelago_multiworld_randomizer_objective_types: ArchipelagoMultiworldRandomizerObjectiveTypes
 
 
 class ArchipelagoMultiworldRandomizerGame(Game):
@@ -47,46 +47,45 @@ class ArchipelagoMultiworldRandomizerGame(Game):
         ]
 
     def game_objective_templates(self) -> List[GameObjectiveTemplate]:
-        game_objective_templates: List[GameObjectiveTemplate] = [
-            GameObjectiveTemplate(
-                label="Complete a solo randomizer with GAME",
-                data={"GAME": (self.games, 1)},
-                is_time_consuming=True,
-                is_difficult=False,
-                weight=2,
-            ),
-            GameObjectiveTemplate(
-                label="Complete a multiworld randomizer with GAMES",
-                data={"GAMES": (self.games, 2)},
-                is_time_consuming=True,
-                is_difficult=False,
-                weight=3,
-            ),
-            GameObjectiveTemplate(
-                label="Complete a multiworld randomizer with GAMES",
-                data={"GAMES": (self.games, 3)},
-                is_time_consuming=True,
-                is_difficult=False,
-                weight=4,
-            ),
-        ]
+        game_objective_templates: List[GameObjectiveTemplate] = list()
 
-        if bool(self.archipelago_options.archipelago_multiworld_randomizer_allow_apbingo_objectives):
-            game_objective_templates += [
+        if self.include_solo_randomizer_objectives:
+            game_objective_templates.append(
                 GameObjectiveTemplate(
-                    label="Blackout a SIZExSIZE APBingo board in a multiworld randomizer with GAMES",
-                    data={"GAMES": (self.games, 2), "SIZE": (self.bingo_board_sizes, 1)},
+                    label="Complete a solo randomizer with GAME",
+                    data={
+                        "GAME": (self.games, 1)
+                    },
                     is_time_consuming=True,
                     is_difficult=False,
-                    weight=1,
+                    weight=2,
                 ),
+            )
+
+        if self.include_small_multiworld_randomizer_objectives:
+            game_objective_templates.extend([
                 GameObjectiveTemplate(
-                    label="Blackout a SIZExSIZE APBingo board in a multiworld randomizer with GAMES",
-                    data={"GAMES": (self.games, 3), "SIZE": (self.bingo_board_sizes, 1)},
+                    label="Complete a multiworld randomizer with GAMES",
+                    data={
+                        "GAMES": (self.games, 2)
+                    },
                     is_time_consuming=True,
                     is_difficult=False,
-                    weight=1,
+                    weight=3,
                 ),
+                GameObjectiveTemplate(
+                    label="Complete a multiworld randomizer with GAMES",
+                    data={
+                        "GAMES": (self.games, 3)
+                    },
+                    is_time_consuming=True,
+                    is_difficult=False,
+                    weight=4,
+                ),
+            ])
+
+        if self.include_small_multiworld_randomizer_with_apbingo_objectives:
+            game_objective_templates.extend([
                 GameObjectiveTemplate(
                     label=(
                         "Complete a multiworld randomizer with GAMES and get COUNT bingo(s) on a "
@@ -115,9 +114,53 @@ class ArchipelagoMultiworldRandomizerGame(Game):
                     is_difficult=False,
                     weight=3,
                 ),
-            ]
+            ])
+
+        if self.include_apbingo_blackout_objectives:
+            game_objective_templates.extend([
+                GameObjectiveTemplate(
+                    label="Blackout a SIZExSIZE APBingo board in a multiworld randomizer with GAMES",
+                    data={
+                        "GAMES": (self.games, 2),
+                        "SIZE": (self.bingo_board_sizes, 1)
+                    },
+                    is_time_consuming=True,
+                    is_difficult=False,
+                    weight=1,
+                ),
+                GameObjectiveTemplate(
+                    label="Blackout a SIZExSIZE APBingo board in a multiworld randomizer with GAMES",
+                    data={
+                        "GAMES": (self.games, 3),
+                        "SIZE": (self.bingo_board_sizes, 1)
+                    },
+                    is_time_consuming=True,
+                    is_difficult=False,
+                    weight=1,
+                ),
+            ])
 
         return game_objective_templates
+
+    @property
+    def objective_types(self) -> List[str]:
+        return sorted(self.archipelago_options.archipelago_multiworld_randomizer_objective_types.value)
+
+    @property
+    def include_solo_randomizer_objectives(self) -> bool:
+        return "Solo Randomizer" in self.objective_types
+
+    @property
+    def include_small_multiworld_randomizer_objectives(self) -> bool:
+        return "Small Multiworld Randomizer" in self.objective_types
+
+    @property
+    def include_small_multiworld_randomizer_with_apbingo_objectives(self) -> bool:
+        return "Small Multiworld Randomizer with APBingo" in self.objective_types
+
+    @property
+    def include_apbingo_blackout_objectives(self) -> bool:
+        return "APBingo Blackout" in self.objective_types
 
     @staticmethod
     def hint_costs() -> List[int]:
@@ -153,7 +196,7 @@ class ArchipelagoMultiworldRandomizerGame(Game):
 
     @staticmethod
     def bingo_counts() -> List[int]:
-        return list(range(1, 9))
+        return list(range(1, 7))
 
 
 # Archipelago Options
@@ -449,9 +492,18 @@ class ArchipelagoMultiworldRandomizerCustomGameSelection(OptionSet):
     default = list()
 
 
-class ArchipelagoMultiworldRandomizerAllowAPBingoObjectives(Toggle):
+class ArchipelagoMultiworldRandomizerObjectiveTypes(OptionSet):
     """
-    Determines if APBingo objectives should be considered.
+    Defines which types of Archipelago Multiworld Randomizer objectives to use when generating.
     """
 
-    display_name = "Allow APBingo Objectives"
+    display_name = "Archipelago Multiworld Randomizer Objective Types"
+
+    valid_keys = [
+        "Solo Randomizer",
+        "Small Multiworld Randomizer",
+        "Small Multiworld Randomizer with APBingo",
+        "APBingo Blackout",
+    ]
+
+    default = valid_keys

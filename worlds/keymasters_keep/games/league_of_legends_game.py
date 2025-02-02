@@ -373,7 +373,7 @@ class LeagueOfLegendsGame(Game):
             "Sett",
             "Shaco",
             "Shen",
-            "Syvana",
+            "Shyvana",
             "Singed",
             "Sion",
             "Sivir",

@@ -253,6 +253,7 @@ class Smite2Game(Game):
             "Void Shield",
             "Shifter's Shield",
             "Triton's Conch",
+            "Lernaean Bow",
         ]
 
     @staticmethod
@@ -379,40 +380,47 @@ class Smite2Game(Game):
             "Helm of Radiance",
             "Void Stone",
             "Helm of Darkness",
+            "Lernaean Bow",
         ]
 
     @staticmethod
     def gods() -> List[str]:
         return [
-            "Aphrodite",
-            "Medusa",
-            "Pele",
+            "Agni",
+            "Aladdin",
             "Amaterasu",
             "Anhur",
             "Anubis",
+            "Aphrodite",
             "Ares",
             "Athena",
             "Bacchus",
             "Baron Samedi",
             "Bellona",
+            "Cabrakan",
             "Cernnunos",
             "Chaac",
             "Cupid",
             "Danzaburou",
             "Fenrir",
+            "Geb",
             "Hades",
             "Hecate",
             "Hercules",
+            "Hua Mulan",
+            "Hun Batz",
             "Izanami",
             "Jing Wei",
             "Khepri",
             "Kukulkan",
             "Loki",
+            "Medusa",
             "Mordred",
             "Neith",
             "Nemesis",
             "Nu Wa",
             "Odin",
+            "Pele",
             "Poseidon",
             "Ra",
             "Sobek",
@@ -421,6 +429,8 @@ class Smite2Game(Game):
             "Thanatos",
             "The Morrigan",
             "Thor",
+            "Ullr",
+            "Vulcan",
             "Yemoja",
             "Ymir",
             "Zeus",
@@ -502,6 +512,8 @@ class Smite2Game(Game):
         return [
             "Conquest",
             "Arena",
+            "Assault",
+            "Joust",
         ]
 
 

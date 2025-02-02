@@ -16,6 +16,7 @@ from ..enums import KeymastersKeepGamePlatforms
 @dataclass
 class SlayTheSpireArchipelagoOptions:
     slay_the_spire_modes: SlayTheSpireModes
+    slay_the_spire_characters: SlayTheSpireCharacters
     slay_the_spire_downfall_characters: SlayTheSpireDownfallCharacters
     slay_the_spire_custom_characters: SlayTheSpireCustomCharacters
     slay_the_spire_custom_modes: SlayTheSpireCustomModes
@@ -144,6 +145,10 @@ class SlayTheSpireGame(Game):
         return "Custom" in self.selected_modes
 
     @property
+    def base_characters(self) -> List[str]:
+        return sorted(self.archipelago_options.slay_the_spire_characters.value)
+
+    @property
     def downfall_characters(self) -> List[str]:
         return sorted(self.archipelago_options.slay_the_spire_downfall_characters.value)
 
@@ -166,17 +171,8 @@ class SlayTheSpireGame(Game):
     def include_act_4(self) -> bool:
         return bool(self.archipelago_options.slay_the_spire_include_act_4.value)
 
-    @functools.cached_property
-    def characters_base(self) -> List[str]:
-        return [
-            "The Ironclad",
-            "The Silent",
-            "The Defect",
-            "The Watcher",
-        ]
-
     def characters(self) -> List[str]:
-        characters: List[str] = self.characters_base[:]
+        characters: List[str] = self.base_characters[:]
 
         if "Downfall" in self.modes():
             characters.extend(self.downfall_characters)
@@ -305,6 +301,22 @@ class SlayTheSpireModes(OptionSet):
         "Standard",
         "Downfall",
         "Custom",
+    ]
+
+    default = valid_keys
+
+
+class SlayTheSpireCharacters(OptionSet):
+    """
+    Indicates which Slay the Spire Characters should be considered when generating objectives.
+    """
+
+    display_name = "Slay the Spire Characters"
+    valid_keys = [
+        "The Ironclad",
+        "The Silent",
+        "The Defect",
+        "The Watcher",
     ]
 
     default = valid_keys

@@ -16,6 +16,7 @@ from ..enums import KeymastersKeepGamePlatforms
 @dataclass
 class CytusIIArchipelagoOptions:
     cytus_ii_dlc_owned: CytusIIDLCOwned
+    cytus_ii_difficulties: CytusIIDifficulties
 
 
 class CytusIIGame(Game):
@@ -78,26 +79,6 @@ class CytusIIGame(Game):
     @property
     def has_dlc_capso(self) -> bool:
         return "CAPSO!" in self.dlc_owned
-
-    @property
-    def has_dlc_box_a(self) -> bool:
-        return "Box A" in self.dlc_owned
-
-    @property
-    def has_dlc_box_b(self) -> bool:
-        return "Box B" in self.dlc_owned
-
-    @property
-    def has_dlc_box_c(self) -> bool:
-        return "Box C" in self.dlc_owned
-
-    @property
-    def has_dlc_box_d(self) -> bool:
-        return "Box D" in self.dlc_owned
-
-    @property
-    def has_dlc_box_e(self) -> bool:
-        return "Box E" in self.dlc_owned
 
     @property
     def has_dlc_marvelous_mix_9(self) -> bool:
@@ -226,6 +207,109 @@ class CytusIIGame(Game):
     @property
     def has_dlc_miku_extend_2025(self) -> bool:
         return "Miku Extend 2025" in self.dlc_owned
+
+    @property
+    def has_dlc_game_disc_vol_1(self) -> bool:
+        return "Game Disc vol.1" in self.dlc_owned
+
+    @property
+    def has_dlc_memory_unit_a1(self) -> bool:
+        return "Memory Unit [A1]" in self.dlc_owned
+
+    @property
+    def has_dlc_game_disc_vol_2(self) -> bool:
+        return "Game Disc vol.2" in self.dlc_owned
+
+    @property
+    def has_dlc_memory_unit_a2(self) -> bool:
+        return "Memory Unit [A2]" in self.dlc_owned
+
+    @property
+    def has_dlc_marvelous_mix_vol_6(self) -> bool:
+        return "Marvelous Mix vol.6" in self.dlc_owned
+
+    @property
+    def has_dlc_marvelous_mix_vol_1(self) -> bool:
+        return "Marvelous Mix vol.1" in self.dlc_owned
+
+    @property
+    def has_dlc_marvelous_mix_vol_2(self) -> bool:
+        return "Marvelous Mix vol.2" in self.dlc_owned
+
+    @property
+    def has_dlc_marvelous_mix_vol_3(self) -> bool:
+        return "Marvelous Mix vol.3" in self.dlc_owned
+
+    @property
+    def has_dlc_battle_chaos_2019(self) -> bool:
+        return "Battle CHAOS 2019" in self.dlc_owned
+
+    @property
+    def has_dlc_marvelous_mix_vol_4(self) -> bool:
+        return "Marvelous Mix vol.4" in self.dlc_owned
+
+    @property
+    def has_dlc_emotion_samples_01(self) -> bool:
+        return "Emotion Samples 01" in self.dlc_owned
+
+    @property
+    def has_dlc_emotion_samples_02(self) -> bool:
+        return "Emotion Samples 02" in self.dlc_owned
+
+    @property
+    def has_dlc_featured_article_vol_1(self) -> bool:
+        return "Featured Article Vol.1" in self.dlc_owned
+
+    @property
+    def has_dlc_emotion_samples_03(self) -> bool:
+        return "Emotion Samples 03" in self.dlc_owned
+
+    @property
+    def has_dlc_marvelous_mix_vol_5(self) -> bool:
+        return "Marvelous Mix vol.5" in self.dlc_owned
+
+    @property
+    def has_dlc_djmax_vol_1(self) -> bool:
+        return "DJMAX vol.1" in self.dlc_owned
+
+    @property
+    def has_dlc_djmax_vol_2(self) -> bool:
+        return "DJMAX vol.2" in self.dlc_owned
+
+    @property
+    def has_dlc_muse_dash_vol_1(self) -> bool:
+        return "Muse Dash vol.1" in self.dlc_owned
+
+    @property
+    def has_dlc_muse_dash_vol_2(self) -> bool:
+        return "Muse Dash vol.2" in self.dlc_owned
+
+    @property
+    def has_dlc_marvelous_mix_vol_7(self) -> bool:
+        return "Marvelous Mix vol.7" in self.dlc_owned
+
+    @property
+    def has_dlc_punk_ep_01(self) -> bool:
+        return "PuNK EP 01" in self.dlc_owned
+
+    @property
+    def has_dlc_maimai_dx_plus(self) -> bool:
+        return "maimai DX+" in self.dlc_owned
+
+    @property
+    def has_dlc_initial_g_1st_stage(self) -> bool:
+        return "Initial G 1st Stage" in self.dlc_owned
+
+    @property
+    def has_dlc_initial_g_2nd_stage(self) -> bool:
+        return "Initial G 2nd Stage" in self.dlc_owned
+
+    @property
+    def has_dlc_marvelous_mix_vol_8(self) -> bool:
+        return "Marvelous Mix vol.8" in self.dlc_owned
+
+    def difficulties(self) -> List[str]:
+        return sorted(self.archipelago_options.cytus_ii_difficulties.value)
 
     @functools.cached_property
     def songs_base(self) -> List[str]:
@@ -837,156 +921,6 @@ class CytusIIGame(Game):
         ]
 
     @functools.cached_property
-    def songs_box_e(self) -> List[str]:
-        return [
-            "[ROBO_Head] honeykill",
-            "[ROBO_Head] Exoseven",
-            "[Graff.J] Phantom",
-            "[Graff.J] Whirlwind",
-            "[Graff.J] 東京Funk",
-            "[Graff.J] BREAK FREE",
-            "[Graff.J] DON'T LISTEN TO THIS WHILE DRIVING",
-            "[Graff.J] RESET MAN",
-            "[Graff.J] PERSONA",
-            "[Graff.J] OUT OF THE MATRIX",
-            "[Graff.J] Circus Time",
-            "[Graff.J] Dead V-Code (Special Edit)",
-            "[Graff.J] sweet conflict",
-            "[Graff.J] Centimeter Johnny",
-            "[Graff.J] Obey",
-            "[Graff.J (maimai DX+)] Caliburne ~Story of the Legendary sword~",
-            "[Graff.J (maimai DX+)] DON'T STOP ROCKIN'",
-            "[Graff.J (maimai DX+)] Glorious Crown",
-            "[Graff.J (maimai DX+)] Oshama Scramble!",
-            "[Graff.J (maimai DX+)] 超常マイマイン",
-            "[Crystal PuNK] Crimson Fate",
-            "[Crystal PuNK] Familiar Craze",
-            "[Crystal PuNK] Malstream",
-            "[Crystal PuNK] V.R.W (feat. shully)",
-            "[Crystal PuNK] velkinta feat. Cikado & A-Tse",
-        ]
-
-    @functools.cached_property
-    def songs_box_d(self) -> List[str]:
-        return [
-            "[NEKO#ΦωΦ] Ready to Take the Next Step",
-            "[ROBO_Head] The Devil Will Pray",
-            "[ROBO_Head] ArkLight",
-            "[Graff.J] Code Interceptor",
-            "[Graff.J] La Prière",
-            "[Graff.J (Muse Dash)] Final Step!",
-            "[Graff.J (Muse Dash)] Medusa",
-            "[Graff.J (Muse Dash)] XODUS",
-            "[Graff.J (Muse Dash)] The 89's Momentum",
-            "[Graff.J (Muse Dash)] The 90's Decision",
-            "[Graff.J (Muse Dash)] Blackest Luxury Car",
-            "[Graff.J (Muse Dash)] 粉骨砕身カジノゥ",
-            "[Graff.J (Muse Dash)] 時計の部屋と精神世界",
-            "[Graff.J (Muse Dash)] XING",
-            "[Graff.J (Muse Dash)] Brave My Heart",
-            "[Graff.J (DJMAX)] Ask to Wind Live Mix",
-            "[Graff.J (DJMAX)] End of the Moonlight",
-            "[Graff.J (DJMAX)] Hello Pinky",
-            "[Graff.J (DJMAX)] Nightmare",
-            "[Graff.J (DJMAX)] U.A.D",
-            "[Graff.J (DJMAX)] BlythE",
-            "[Graff.J (DJMAX)] glory day",
-            "[Graff.J (DJMAX)] OBLIVION",
-            "[Graff.J (DJMAX)] Play The Future",
-            "[Graff.J (DJMAX)] We're All Gonna Die",
-        ]
-
-    @functools.cached_property
-    def songs_box_c(self) -> List[str]:
-        return [
-            "[Paff] Orison",
-            "[NEKO#ΦωΦ] Headrush",
-            "[ROBO_Head] tundra",
-            "[ROBO_Head] Zeus",
-            "[Ivy] Drifted Fragments",
-            "[Ivy] DigiGroove",
-            "[Ivy] Heat Ring",
-            "[Ivy] Leaving All Behind",
-            "[Ivy] Symmetry",
-            "[Ivy] Time to Fight",
-            "[Paff] Cityscape",
-            "[Paff] Favorites",
-            "[Paff] Make Me Alive",
-            "[Paff] Light up my love!!",
-            "[Paff] Super attractor",
-            "[Ivy] CODE NAME:SIGMA",
-            "[Ivy] New Challenger Approaching",
-            "[Ivy] What's Your PR.Ice?",
-            "[Ivy] VIS::CRACKED",
-            "[Ivy] Wicked Ceremony",
-            "[Ivy] Cristalisia",
-            "[Ivy] Occidens",
-            "[Ivy] Red Five",
-            "[Ivy] Homebound Train & Moving Thoughts",
-            "[Ivy] iL",
-        ]
-
-    @functools.cached_property
-    def songs_box_b(self) -> List[str]:
-        return [
-            "[Bo Bo] End of fireworks",
-            "[Bo Bo] 神様と羊飼い",
-            "[Paff] Inspiration",
-            "[Paff] No-Effected World",
-            "[NEKO#ΦωΦ] LOUDER MACHINE",
-            "[NEKO#ΦωΦ] Hydra",
-            "[NEKO#ΦωΦ] Liberation",
-            "[NEKO#ΦωΦ] Ramen is God",
-            "[NEKO#ΦωΦ] Re:VeLΔTiØN ～光道ト破壊ノ双白翼～",
-            "[NEKO#ΦωΦ] Rebirth",
-            "[NEKO#ΦωΦ] Walnuts Walkers",
-            "[ROBO_Head] Fade Into Darkness",
-            "[ROBO_Head] SHIRO",
-            "[ROBO_Head] Tunnef's Nightmare",
-            "[Crystal PuNK] Darling Staring...",
-            "[Paff] I Wish You Were Mine",
-            "[Paff] PIXIE DUST",
-            "[NEKO#ΦωΦ] Capybara Kids' Paradise",
-            "[ROBO_Head] Awakening",
-            "[ROBO_Head] Hagiasmos",
-            "[Paff] So In Love",
-            "[NEKO#ΦωΦ] Online",
-            "[NEKO#ΦωΦ] Sunday Night Blues",
-            "[ROBO_Head] Break Through The Barrier",
-            "[ROBO_Head] Dead Master",
-        ]
-
-    @functools.cached_property
-    def songs_box_a(self) -> List[str]:
-        return [
-            "[Crystal PuNK] Imprint",
-            "[ROBO_Head] Symbol (PTB10 Remix)",
-            "[ROBO_Head] Breaching BIOS",
-            "[Graff.J] Curiosity killed the cat",
-            "[Graff.J] REBELLIA",
-            "[ROBO_Head] Accelerator",
-            "[ROBO_Head] Armaros",
-            "[ROBO_Head] Break the Core",
-            "[ROBO_Head] Milky Way Galaxy (SIHanatsuka Remix)",
-            "[ROBO_Head] ViRUS",
-            "[NEKO#ΦωΦ] Blow My Mind (tpz Overheat Remix)",
-            "[NEKO#ΦωΦ] Maboroshi",
-            "[NEKO#ΦωΦ] TOKONOMA Spacewalk",
-            "[NEKO#ΦωΦ] UnNOT!CED",
-            "[NEKO#ΦωΦ] 下水鳴動して鼠一匹",
-            "[ROBO_Head] Sickest City",
-            "[ROBO_Head] Jazzy Glitch Machine",
-            "[ROBO_Head] dimensionalize nervous breakdown (rev.flat)",
-            "[ROBO_Head] cold",
-            "[ROBO_Head] NRG_Tech",
-            "[NEKO#ΦωΦ] PrayStation (HiTECH NINJA Remix)",
-            "[NEKO#ΦωΦ] 100sec Cat Dreams",
-            "[NEKO#ΦωΦ] REmorse",
-            "[NEKO#ΦωΦ] Stranger",
-            "[NEKO#ΦωΦ] 小悪魔×3の大脫走！？",
-        ]
-
-    @functools.cached_property
     def songs_capso(self) -> List[str]:
         return [
             "[Ivy] Bloody Purity",
@@ -1013,6 +947,256 @@ class CytusIIGame(Game):
             "[Miku] M@GICAL☆CURE! LOVE♥SHOT!",
             "[Miku] Miku Fiesta",
             "[Miku] Thousand Little Voices",
+        ]
+
+    @functools.cached_property
+    def songs_game_disc_vol_1(self) -> List[str]:
+        return [
+            "[NEKO#ΦωΦ] PrayStation (HiTECH NINJA Remix)",
+            "[NEKO#ΦωΦ] 100sec Cat Dreams",
+            "[NEKO#ΦωΦ] REmorse",
+            "[NEKO#ΦωΦ] Stranger",
+            "[NEKO#ΦωΦ] 小悪魔×3の大脫走！？",
+        ]
+
+    @functools.cached_property
+    def songs_memory_unit_a1(self) -> List[str]:
+        return [
+            "[ROBO_Head] Sickest City",
+            "[ROBO_Head] Jazzy Glitch Machine",
+            "[ROBO_Head] dimensionalize nervous breakdown (rev.flat)",
+            "[ROBO_Head] cold",
+            "[ROBO_Head] NRG_Tech",
+        ]
+
+    @functools.cached_property
+    def songs_game_disc_vol_2(self) -> List[str]:
+        return [
+            "[NEKO#ΦωΦ] Blow My Mind (tpz Overheat Remix)",
+            "[NEKO#ΦωΦ] Maboroshi",
+            "[NEKO#ΦωΦ] TOKONOMA Spacewalk",
+            "[NEKO#ΦωΦ] UnNOT!CED",
+            "[NEKO#ΦωΦ] 下水鳴動して鼠一匹",
+        ]
+
+    @functools.cached_property
+    def songs_memory_unit_a2(self) -> List[str]:
+        return [
+            "[ROBO_Head] Accelerator",
+            "[ROBO_Head] Armaros",
+            "[ROBO_Head] Break the Core",
+            "[ROBO_Head] Milky Way Galaxy (SIHanatsuka Remix)",
+            "[ROBO_Head] ViRUS",
+        ]
+
+    @functools.cached_property
+    def songs_marvelous_mix_vol_6(self) -> List[str]:
+        return [
+            "[Crystal PuNK] Imprint",
+            "[ROBO_Head] Symbol (PTB10 Remix)",
+            "[ROBO_Head] Breaching BIOS",
+            "[Graff.J] Curiosity killed the cat",
+            "[Graff.J] REBELLIA",
+        ]
+
+    @functools.cached_property
+    def songs_marvelous_mix_vol_1(self) -> List[str]:
+        return [
+            "[Paff] So In Love",
+            "[NEKO#ΦωΦ] Online",
+            "[NEKO#ΦωΦ] Sunday Night Blues",
+            "[ROBO_Head] Break Through The Barrier",
+            "[ROBO_Head] Dead Master",
+        ]
+
+    @functools.cached_property
+    def songs_marvelous_mix_vol_2(self) -> List[str]:
+        return [
+            "[Paff] I Wish You Were Mine",
+            "[Paff] PIXIE DUST",
+            "[NEKO#ΦωΦ] Capybara Kids' Paradise",
+            "[ROBO_Head] Awakening",
+            "[ROBO_Head] Hagiasmos",
+        ]
+
+    @functools.cached_property
+    def songs_marvelous_mix_vol_3(self) -> List[str]:
+        return [
+            "[NEKO#ΦωΦ] Walnuts Walkers",
+            "[ROBO_Head] Fade Into Darkness",
+            "[ROBO_Head] SHIRO",
+            "[ROBO_Head] Tunnef's Nightmare",
+            "[Crystal PuNK] Darling Staring...",
+        ]
+
+    @functools.cached_property
+    def songs_battle_chaos_2019(self) -> List[str]:
+        return [
+            "[NEKO#ΦωΦ] Hydra",
+            "[NEKO#ΦωΦ] Liberation",
+            "[NEKO#ΦωΦ] Ramen is God",
+            "[NEKO#ΦωΦ] Re:VeLΔTiØN ～光道ト破壊ノ双白翼～",
+            "[NEKO#ΦωΦ] Rebirth",
+        ]
+
+    @functools.cached_property
+    def songs_marvelous_mix_vol_4(self) -> List[str]:
+        return [
+            "[Bo Bo] End of fireworks",
+            "[Bo Bo] 神様と羊飼い",
+            "[Paff] Inspiration",
+            "[Paff] No-Effected World",
+            "[NEKO#ΦωΦ] LOUDER MACHINE",
+        ]
+
+    @functools.cached_property
+    def songs_emotion_samples_01(self) -> List[str]:
+        return [
+            "[Ivy] Cristalisia",
+            "[Ivy] Occidens",
+            "[Ivy] Red Five",
+            "[Ivy] Homebound Train & Moving Thoughts",
+            "[Ivy] iL",
+        ]
+
+    @functools.cached_property
+    def songs_emotion_samples_02(self) -> List[str]:
+        return [
+            "[Ivy] CODE NAME:SIGMA",
+            "[Ivy] New Challenger Approaching",
+            "[Ivy] What's Your PR.Ice?",
+            "[Ivy] VIS::CRACKED",
+            "[Ivy] Wicked Ceremony",
+        ]
+
+    @functools.cached_property
+    def songs_featured_article_vol_1(self) -> List[str]:
+        return [
+            "[Paff] Cityscape",
+            "[Paff] Favorites",
+            "[Paff] Make Me Alive",
+            "[Paff] Light up my love!!",
+            "[Paff] Super attractor",
+        ]
+
+    @functools.cached_property
+    def songs_emotion_samples_03(self) -> List[str]:
+        return [
+            "[Ivy] DigiGroove",
+            "[Ivy] Heat Ring",
+            "[Ivy] Leaving All Behind",
+            "[Ivy] Symmetry",
+            "[Ivy] Time to Fight",
+        ]
+
+    @functools.cached_property
+    def songs_marvelous_mix_vol_5(self) -> List[str]:
+        return [
+            "[Paff] Orison",
+            "[NEKO#ΦωΦ] Headrush",
+            "[ROBO_Head] tundra",
+            "[ROBO_Head] Zeus",
+            "[Ivy] Drifted Fragments",
+        ]
+
+    @functools.cached_property
+    def songs_djmax_vol_1(self) -> List[str]:
+        return [
+            "[Graff.J (DJMAX)] BlythE",
+            "[Graff.J (DJMAX)] glory day",
+            "[Graff.J (DJMAX)] OBLIVION",
+            "[Graff.J (DJMAX)] Play The Future",
+            "[Graff.J (DJMAX)] We're All Gonna Die",
+        ]
+
+    @functools.cached_property
+    def songs_djmax_vol_2(self) -> List[str]:
+        return [
+            "[Graff.J (DJMAX)] Ask to Wind Live Mix",
+            "[Graff.J (DJMAX)] End of the Moonlight",
+            "[Graff.J (DJMAX)] Hello Pinky",
+            "[Graff.J (DJMAX)] Nightmare",
+            "[Graff.J (DJMAX)] U.A.D",
+        ]
+
+    @functools.cached_property
+    def songs_muse_dash_vol_1(self) -> List[str]:
+        return [
+            "[Graff.J (Muse Dash)] Blackest Luxury Car",
+            "[Graff.J (Muse Dash)] 粉骨砕身カジノゥ",
+            "[Graff.J (Muse Dash)] 時計の部屋と精神世界",
+            "[Graff.J (Muse Dash)] XING",
+            "[Graff.J (Muse Dash)] Brave My Heart",
+        ]
+
+    @functools.cached_property
+    def songs_muse_dash_vol_2(self) -> List[str]:
+        return [
+            "[Graff.J (Muse Dash)] Final Step!",
+            "[Graff.J (Muse Dash)] Medusa",
+            "[Graff.J (Muse Dash)] XODUS",
+            "[Graff.J (Muse Dash)] The 89's Momentum",
+            "[Graff.J (Muse Dash)] The 90's Decision",
+        ]
+
+    @functools.cached_property
+    def songs_marvelous_mix_vol_7(self) -> List[str]:
+        return [
+            "[NEKO#ΦωΦ] Ready to Take the Next Step",
+            "[ROBO_Head] The Devil Will Pray",
+            "[ROBO_Head] ArkLight",
+            "[Graff.J] Code Interceptor",
+            "[Graff.J] La Prière",
+        ]
+
+    @functools.cached_property
+    def songs_punk_ep_01(self) -> List[str]:
+        return [
+            "[Crystal PuNK] Crimson Fate",
+            "[Crystal PuNK] Familiar Craze",
+            "[Crystal PuNK] Malstream",
+            "[Crystal PuNK] V.R.W (feat. shully)",
+            "[Crystal PuNK] velkinta feat. Cikado & A-Tse",
+        ]
+
+    @functools.cached_property
+    def songs_maimai_dx_plus(self) -> List[str]:
+        return [
+            "[Graff.J (maimai DX+)] Caliburne ~Story of the Legendary sword~",
+            "[Graff.J (maimai DX+)] DON'T STOP ROCKIN'",
+            "[Graff.J (maimai DX+)] Glorious Crown",
+            "[Graff.J (maimai DX+)] Oshama Scramble!",
+            "[Graff.J (maimai DX+)] 超常マイマイン",
+        ]
+
+    @functools.cached_property
+    def songs_initial_g_1st_stage(self) -> List[str]:
+        return [
+            "[Graff.J] Circus Time",
+            "[Graff.J] Dead V-Code (Special Edit)",
+            "[Graff.J] sweet conflict",
+            "[Graff.J] Centimeter Johnny",
+            "[Graff.J] Obey",
+        ]
+
+    @functools.cached_property
+    def songs_initial_g_2nd_stage(self) -> List[str]:
+        return [
+            "[Graff.J] BREAK FREE",
+            "[Graff.J] DON'T LISTEN TO THIS WHILE DRIVING",
+            "[Graff.J] RESET MAN",
+            "[Graff.J] PERSONA",
+            "[Graff.J] OUT OF THE MATRIX",
+        ]
+
+    @functools.cached_property
+    def songs_marvelous_mix_vol_8(self) -> List[str]:
+        return [
+            "[ROBO_Head] honeykill",
+            "[ROBO_Head] Exoseven",
+            "[Graff.J] Phantom",
+            "[Graff.J] Whirlwind",
+            "[Graff.J] 東京Funk",
         ]
 
     def songs(self) -> List[str]:
@@ -1080,30 +1264,62 @@ class CytusIIGame(Game):
             songs.extend(self.songs_chunithm)
         if self.has_dlc_marvelous_mix_9:
             songs.extend(self.songs_marvelous_mix_9)
-        if self.has_dlc_box_e:
-            songs.extend(self.songs_box_e)
-        if self.has_dlc_box_d:
-            songs.extend(self.songs_box_d)
-        if self.has_dlc_box_c:
-            songs.extend(self.songs_box_c)
-        if self.has_dlc_box_b:
-            songs.extend(self.songs_box_b)
-        if self.has_dlc_box_a:
-            songs.extend(self.songs_box_a)
         if self.has_dlc_capso:
             songs.extend(self.songs_capso)
         if self.has_dlc_miku_extend_2025:
             songs.extend(self.songs_miku_extend_2025)
+        if self.has_dlc_game_disc_vol_1:
+            songs.extend(self.songs_game_disc_vol_1)
+        if self.has_dlc_memory_unit_a1:
+            songs.extend(self.songs_memory_unit_a1)
+        if self.has_dlc_game_disc_vol_2:
+            songs.extend(self.songs_game_disc_vol_2)
+        if self.has_dlc_memory_unit_a2:
+            songs.extend(self.songs_memory_unit_a2)
+        if self.has_dlc_marvelous_mix_vol_6:
+            songs.extend(self.songs_marvelous_mix_vol_6)
+        if self.has_dlc_marvelous_mix_vol_1:
+            songs.extend(self.songs_marvelous_mix_vol_1)
+        if self.has_dlc_marvelous_mix_vol_2:
+            songs.extend(self.songs_marvelous_mix_vol_2)
+        if self.has_dlc_marvelous_mix_vol_3:
+            songs.extend(self.songs_marvelous_mix_vol_3)
+        if self.has_dlc_battle_chaos_2019:
+            songs.extend(self.songs_battle_chaos_2019)
+        if self.has_dlc_marvelous_mix_vol_4:
+            songs.extend(self.songs_marvelous_mix_vol_4)
+        if self.has_dlc_emotion_samples_01:
+            songs.extend(self.songs_emotion_samples_01)
+        if self.has_dlc_emotion_samples_02:
+            songs.extend(self.songs_emotion_samples_02)
+        if self.has_dlc_featured_article_vol_1:
+            songs.extend(self.songs_featured_article_vol_1)
+        if self.has_dlc_emotion_samples_03:
+            songs.extend(self.songs_emotion_samples_03)
+        if self.has_dlc_marvelous_mix_vol_5:
+            songs.extend(self.songs_marvelous_mix_vol_5)
+        if self.has_dlc_djmax_vol_1:
+            songs.extend(self.songs_djmax_vol_1)
+        if self.has_dlc_djmax_vol_2:
+            songs.extend(self.songs_djmax_vol_2)
+        if self.has_dlc_muse_dash_vol_1:
+            songs.extend(self.songs_muse_dash_vol_1)
+        if self.has_dlc_muse_dash_vol_2:
+            songs.extend(self.songs_muse_dash_vol_2)
+        if self.has_dlc_marvelous_mix_vol_7:
+            songs.extend(self.songs_marvelous_mix_vol_7)
+        if self.has_dlc_punk_ep_01:
+            songs.extend(self.songs_punk_ep_01)
+        if self.has_dlc_maimai_dx_plus:
+            songs.extend(self.songs_maimai_dx_plus)
+        if self.has_dlc_initial_g_1st_stage:
+            songs.extend(self.songs_initial_g_1st_stage)
+        if self.has_dlc_initial_g_2nd_stage:
+            songs.extend(self.songs_initial_g_2nd_stage)
+        if self.has_dlc_marvelous_mix_vol_8:
+            songs.extend(self.songs_marvelous_mix_vol_8)
 
         return sorted(songs)
-
-    @staticmethod
-    def difficulties() -> List[str]:
-        return [
-            "Easy",
-            "Hard",
-            "Chaos",
-        ]
 
 
 # Archipelago Options
@@ -1114,44 +1330,79 @@ class CytusIIDLCOwned(OptionSet):
 
     display_name = "Cytus II DLC Owned"
     valid_keys = [
+        "Alice",
+        "Amiya",
+        "Aroma",
+        "B.B.K.K.B.K.K. 2023 Remake Selection",
+        "Battle CHAOS 2019",
         "CAPSO!",
-        "Box A",
-        "Box B",
-        "Box C",
-        "Box D",
-        "Box E",
-        "Marvelous Mix vol.9",
         "CHUNITHM",
-        "Marvelous Mix vol.10",
-        "Marvelous Mix vol.11",
+        "Cherry",
+        "ConneR",
         "DEEMO II pt.1",
         "DEEMO II pt.2",
+        "DJMAX vol.1",
+        "DJMAX vol.2",
+        "Emotion Samples 01",
+        "Emotion Samples 02",
+        "Emotion Samples 03",
+        "Featured Article Vol.1",
+        "Game Disc vol.1",
+        "Game Disc vol.2",
+        "Hans",
+        "Ilka",
+        "Initial G 1st Stage",
+        "Initial G 2nd Stage",
+        "JOE",
+        "Kaf",
+        "Kitzuna AI",
+        "maimai DX+",
+        "Marvelous Mix vol.1",
+        "Marvelous Mix vol.2",
+        "Marvelous Mix vol.3",
+        "Marvelous Mix vol.4",
+        "Marvelous Mix vol.5",
+        "Marvelous Mix vol.6",
+        "Marvelous Mix vol.7",
+        "Marvelous Mix vol.8",
+        "Marvelous Mix vol.9",
+        "Marvelous Mix vol.10",
+        "Marvelous Mix vol.11",
         "Marvelous Mix vol.12",
-        "Rayark 12th Collection",
-        "B.B.K.K.B.K.K. 2023 Remake Selection",
-        "Rhythm Games Party 2024",
-        "RAVON",
+        "Memory Unit [A1]",
+        "Memory Unit [A2]",
+        "Miku Extend 2025",
+        "Miku",
+        "Muse Dash vol.1",
+        "Muse Dash vol.2",
+        "NEKO_II",
+        "Neko",
+        "Nora",
         "Paradigm: Reboot pt.1",
         "Paradigm: Reboot pt.2",
-        "Neko",
-        "NEKO_II",
-        "Tairitsu",
-        "Amiya",
-        "Kaf",
-        "Alice",
-        "Hans",
-        "Kitzuna AI",
-        "Miku",
-        "Ilka",
-        "Xenon",
-        "ConneR",
-        "Cherry",
-        "JOE",
-        "Sagar",
+        "PuNK EP 01",
+        "RAVON",
+        "Rayark 12th Collection",
+        "Rhythm Games Party 2024",
         "Rin",
-        "Aroma",
-        "Nora",
-        "Miku Extend 2025",
+        "Sagar",
+        "Tairitsu",
+        "Xenon",
+    ]
+
+    default = valid_keys
+
+
+class CytusIIDifficulties(OptionSet):
+    """
+    Indicates which Cytus II difficulties the player wants to play.
+    """
+
+    display_name = "Cytus II Difficulties"
+    valid_keys = [
+        "Easy",
+        "Hard",
+        "Chaos",
     ]
 
     default = valid_keys
