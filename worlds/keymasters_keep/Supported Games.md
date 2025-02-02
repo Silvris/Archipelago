@@ -1,6 +1,6 @@
 # Keymaster's Keep Supported Games
 
-Keymaster's Keep currently supports 169 games
+Keymaster's Keep currently supports 170 games
 
 ### Games Supported (169)
 * 14 Minesweeper Variants (PC)
@@ -80,6 +80,7 @@ Keymaster's Keep currently supports 169 games
 * Lethal Company (PC)
 * Little Inferno (PC + AND, IOS, SW, WIIU)
 * MONSTER HUNTER RISE (PC + PS4, PS5, SW, XONE, XSX)
+* Monster Rancher 2 DX (PC + SW, IOS, PS1)
 * Made in Abyss: Binary Star Falling into Darkness (PC + PS4, SW)
 * Mages of Mystralia (PC + PS4, SW, XONE)
 * Mario Kart 8 (SW + WIIU)
