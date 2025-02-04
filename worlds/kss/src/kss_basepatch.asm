@@ -747,10 +747,20 @@ set_starting_stage:
     print "Starting Stage: ", hex(snestopc(realbase()))
     LDA #$0001
     PHA
-    print "Goal Requirement: ", hex(snestopc(realbase()))
+    PHA
+    print "Goal Numeric Requirement: ", hex(snestopc(realbase()))
     CPY #$0006
-    BCC .Skip
+    BCC .SkipPull
+    LDA !completed_sub_games
+    print "Goal Specific Requirements: ", hex(snestopc(realbase()))
+    AND #$007F
+    CMP #$007F
+    BNE .SkipPull
+    PLA
     ORA #$0080
+    BRA .Skip
+    .SkipPull:
+    PLA
     .Skip:
     ORA !ap_sub_games
     STA !received_sub_games

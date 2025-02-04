@@ -1,5 +1,6 @@
 from typing import TYPE_CHECKING
 from .names import location_names, item_names
+from .items import sub_game_completion
 from worlds.generic.Rules import set_rule
 
 if TYPE_CHECKING:
@@ -131,3 +132,13 @@ def set_rules(world: "KSSWorld"):
         for i in range(10, 21):
             set_rule(world.get_location(f"The Arena - {i} Straight Wins"),
                      lambda state: state.has_group_unique("Copy Ability", world.player, 5))
+
+    sub_game_complete = list(sub_game_completion.keys())
+    sub_game_required = []
+    for sub_game in sub_game_completion.keys():
+        if sub_game.rsplit(" - ")[0] in world.options.required_subgames:
+            sub_game_required.append(sub_game)
+
+    world.multiworld.completion_condition[world.player] = lambda state: \
+        state.has_all(sub_game_required, world.player) and state.has_from_list(
+        sub_game_complete, world.player, world.options.required_subgame_completions)

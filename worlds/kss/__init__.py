@@ -78,7 +78,12 @@ class KSSWorld(World):
             self.options.starting_subgame.value = self.random.choice([value[0] for value in subgame_mapping.items()
                                                                       if value[1] in self.options.included_subgames])
 
-        if self.options.required_subgames > len(self.options.included_subgames.value):
+        for game in sorted(self.options.required_subgames.value):
+            if game not in self.options.included_subgames.value:
+                logger.warning(F"Required subgame {game} not included, adding to included subgames")
+                self.options.included_subgames.value.add(game)
+
+        if self.options.required_subgame_completions > len(self.options.included_subgames.value):
             logger.warning("Required subgames greater than included subgames, reducing to all included.")
             self.options.required_subgames.value = len(self.options.included_subgames.value)
 
@@ -139,11 +144,6 @@ class KSSWorld(World):
 
         self.treasure_value = [(treasure_value // 4) * i for i in range(1, 5)]
         self.multiworld.itempool += itempool
-
-    def generate_basic(self) -> None:
-        sub_game_complete = list(sub_game_completion.keys())
-        self.multiworld.completion_condition[self.player] = lambda state: state.has_from_list(
-            sub_game_complete, self.player, self.options.required_subgames)
 
     set_rules = set_rules
 

@@ -13,7 +13,7 @@ subgame_mapping = {
 }
 
 
-class RequiredSubgames(Range):
+class RequiredSubgameCompletions(Range):
     """
     How many subgames must be completed for the game to be considered complete.
     """
@@ -21,6 +21,23 @@ class RequiredSubgames(Range):
     range_start = 1
     range_end = 7
     default = 6
+
+
+class RequiredSubgames(OptionSet):
+    """
+    Which subgames are required to be completed for the game to be considered complete.
+    """
+    display_name = "Included Subgames"
+    valid_keys = {
+        "Spring Breeze",
+        "Dyna Blade",
+        "Gourmet Race",
+        "The Great Cave Offensive",
+        "Revenge of Meta Knight",
+        "Milky Way Wishes",
+        "The Arena"
+    }
+    default = ("Milky Way Wishes", )
 
 
 class StartingSubgame(Choice):
@@ -70,6 +87,7 @@ class MilkyWayWishesMode(Choice):
 
 @dataclass
 class KSSOptions(PerGameCommonOptions):
+    required_subgame_completions: RequiredSubgameCompletions
     required_subgames: RequiredSubgames
     starting_subgame: StartingSubgame
     included_subgames: IncludedSubgames

@@ -6,6 +6,7 @@ import settings
 from worlds.Files import APProcedurePatch, APTokenMixin, APTokenTypes
 from typing import Iterable, TYPE_CHECKING, Optional
 from struct import pack
+from .options import subgame_mapping
 
 if TYPE_CHECKING:
     from . import KSSWorld
@@ -14,9 +15,10 @@ KSS_UHASH = "cb76ea8ac989e71210c89102d91c6c57"
 KSS_VCHASH = ""
 
 starting_stage = 0xAFC89
-goal_requirement = 0xAFC8D
-treasure_values = 0xAFCBE
-mww_mode = 0xAFD3C
+goal_numeric = 0xAFC8E
+goal_specific = 0xAFC96
+treasure_values = 0xAFCCE
+mww_mode = 0xAFD4C
 
 
 class KSSProcedurePatch(APProcedurePatch, APTokenMixin):
@@ -47,7 +49,15 @@ def patch_rom(world: "KSSWorld", patch: KSSProcedurePatch):
     patch.write_file("kss_basepatch.bsdiff4", pkgutil.get_data(__name__, os.path.join("data", "kss_basepatch.bsdiff4")))
 
     patch.write_byte(starting_stage + 1, 1 << world.options.starting_subgame.value)
-    patch.write_byte(goal_requirement + 1, world.options.required_subgames.value)
+    patch.write_byte(goal_numeric + 1, world.options.required_subgame_completions.value)
+
+    required_subgames = 0
+    for val, subgame in subgame_mapping.items():
+        if subgame in world.options.required_subgames:
+            required_subgames |= (1 << val)
+
+    patch.write_byte(goal_specific + 1, required_subgames)
+    patch.write_byte(goal_specific + 4, required_subgames)
 
     if world.treasure_value:
         patch.write_bytes(treasure_values, pack("IIII", *world.treasure_value))

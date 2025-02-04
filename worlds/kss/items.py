@@ -1,4 +1,4 @@
-from typing import NamedTuple, Dict, Optional
+from typing import NamedTuple, Dict, Optional, Set
 from BaseClasses import ItemClassification, Item
 from .names import item_names
 
@@ -15,7 +15,7 @@ class ItemData(NamedTuple):
     value: int = 0
 
 
-sub_games = {
+sub_games: Dict[str, ItemData] = {
     item_names.spring_breeze: ItemData(BASE_ID + 0, ItemClassification.progression),
     item_names.dyna_blade: ItemData(BASE_ID + 1, ItemClassification.progression),
     item_names.gourmet_race: ItemData(BASE_ID + 2, ItemClassification.progression),
@@ -25,7 +25,7 @@ sub_games = {
     item_names.the_arena: ItemData(BASE_ID + 6, ItemClassification.progression),
 }
 
-sub_game_completion = {
+sub_game_completion: Dict[str, ItemData] = {
     item_names.spring_breeze_complete: ItemData(None, ItemClassification.progression),
     item_names.dyna_blade_complete: ItemData(None, ItemClassification.progression),
     item_names.gourmet_race_complete: ItemData(None, ItemClassification.progression),
@@ -35,7 +35,7 @@ sub_game_completion = {
     item_names.the_arena_complete: ItemData(None, ItemClassification.progression),
 }
 
-copy_abilities = {
+copy_abilities: Dict[str, ItemData] = {
     item_names.cutter: ItemData(BASE_ID + 0x101, ItemClassification.progression),
     item_names.beam: ItemData(BASE_ID + 0x102, ItemClassification.progression),
     item_names.yoyo: ItemData(BASE_ID + 0x103, ItemClassification.progression),
@@ -62,7 +62,7 @@ copy_abilities = {
     item_names.crash: ItemData(BASE_ID + 0x118, ItemClassification.progression),
 }
 
-treasures = {
+treasures: Dict[str, ItemData] = {
     item_names.gold_medal: ItemData(BASE_ID + 0x201, ItemClassification.progression, 10000),
     item_names.gold_coin: ItemData(BASE_ID + 0x202, ItemClassification.progression, 1000),
     item_names.whip: ItemData(BASE_ID + 0x203, ItemClassification.progression, 6800),
@@ -125,7 +125,7 @@ treasures = {
     item_names.triforce: ItemData(BASE_ID + 0x23C, ItemClassification.progression, 800000),
 }
 
-planets = {
+planets: Dict[str, ItemData] = {
     item_names.floria: ItemData(BASE_ID + 0x400, ItemClassification.progression),
     item_names.hotbeat: ItemData(BASE_ID + 0x401, ItemClassification.progression),
     item_names.skyhigh: ItemData(BASE_ID + 0x402, ItemClassification.progression),
@@ -136,25 +136,25 @@ planets = {
     item_names.copy_planet: ItemData(BASE_ID + 0x407, ItemClassification.progression),
 }
 
-dyna_items = {
+dyna_items: Dict[str, ItemData] = {
     item_names.dyna_blade_ex1: ItemData(BASE_ID + 0x801, ItemClassification.useful),
     item_names.dyna_blade_ex2: ItemData(BASE_ID + 0x802, ItemClassification.useful),
 }
 
-misc_items = {
+misc_items: Dict[str, ItemData] = {
     item_names.one_up: ItemData(BASE_ID + 0x1001, ItemClassification.filler),
     item_names.maxim_tomato: ItemData(BASE_ID + 0x1002, ItemClassification.filler),
     item_names.invincible_candy: ItemData(BASE_ID + 0x1003, ItemClassification.filler),
     item_names.rainbow_star: ItemData(BASE_ID + 0x1004, ItemClassification.progression)
 }
 
-filler_item_weights = {
+filler_item_weights: Dict[str, int] = {
     item_names.one_up: 4,
     item_names.maxim_tomato: 2,
     item_names.invincible_candy: 2
 }
 
-item_table = {
+item_table: Dict[str, ItemData] = {
     **sub_games,
     **sub_game_completion,
     **copy_abilities,
@@ -164,7 +164,7 @@ item_table = {
     **misc_items
 }
 
-item_groups = {
+item_groups: Dict[str, Set[str]] = {
     "Copy Ability": {name for name in copy_abilities},
     "Treasures": {name for name in treasures},
     "Planets": {name for name in planets}
