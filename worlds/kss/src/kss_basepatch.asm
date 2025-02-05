@@ -872,6 +872,10 @@ org $CF44BD
 hook_set_treasure:
     JSL set_treasure
 
+org $CF71EB
+check_deluxe_ability:
+    JSL check_treasure
+
 org $CF73B1
 hook_deluxe_ability:
     JSL set_treasure
