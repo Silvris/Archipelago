@@ -12,7 +12,7 @@ if TYPE_CHECKING:
     from . import KSSWorld
 
 KSS_UHASH = "cb76ea8ac989e71210c89102d91c6c57"
-KSS_VCHASH = ""
+KSS_VCHASH = "5e0be1a462ffaca1351d446b96b25b74"
 
 starting_stage = 0xAFC89
 goal_numeric = 0xAFC8E
@@ -22,7 +22,7 @@ mww_mode = 0xAFD4C
 
 
 class KSSProcedurePatch(APProcedurePatch, APTokenMixin):
-    hash = KSS_UHASH
+    hash = [KSS_UHASH, KSS_VCHASH]
     game = "Kirby Super Star"
     patch_file_ending = ".apkss"
     result_file_ending = ".sfc"
@@ -81,8 +81,8 @@ def get_base_rom_bytes() -> bytes:
 
         basemd5 = hashlib.md5()
         basemd5.update(base_rom_bytes)
-        if basemd5.hexdigest() not in {KSS_UHASH}:
-            raise Exception("Supplied Base Rom does not match known MD5 for US or JP release. "
+        if basemd5.hexdigest() not in {KSS_UHASH, KSS_VCHASH}:
+            raise Exception("Supplied Base Rom does not match known MD5 for US or US VC release. "
                             "Get the correct game and version, then dump it")
         get_base_rom_bytes.base_rom_bytes = base_rom_bytes
     return base_rom_bytes

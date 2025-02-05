@@ -13,7 +13,7 @@ from .locations import location_table, KSSLocation
 from .names import item_names
 from .options import KSSOptions, subgame_mapping
 from .regions import create_regions
-from .rom import KSS_UHASH, KSSProcedurePatch, patch_rom
+from .rom import KSS_UHASH, KSSProcedurePatch, patch_rom, KSS_VCHASH
 from .rules import set_rules
 from .client import KSSSNIClient
 
@@ -25,7 +25,7 @@ class KSSSettings(settings.Group):
         """File name of the KSS JP or EN rom"""
         description = "Kirby Super Star ROM File"
         copy_to = "Kirby Super Star.sfc"
-        md5s = [KSS_UHASH]
+        md5s = [KSS_UHASH, KSS_VCHASH]
 
     rom_file: RomFile = RomFile(RomFile.copy_to)
 
