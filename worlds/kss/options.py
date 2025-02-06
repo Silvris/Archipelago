@@ -37,7 +37,7 @@ class RequiredSubgames(OptionSet):
         "Milky Way Wishes",
         "The Arena"
     }
-    default = ("Milky Way Wishes", )
+    default = ["Milky Way Wishes"]
 
 
 class StartingSubgame(Choice):
@@ -69,7 +69,7 @@ class IncludedSubgames(OptionSet):
         "Milky Way Wishes",
         "The Arena"
     }
-    default = valid_keys
+    default = sorted(valid_keys)
 
 
 class MilkyWayWishesMode(Choice):

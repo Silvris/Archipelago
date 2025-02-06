@@ -33,11 +33,8 @@ KSS_CURRENT_SUBGAMES = SRAM_1_START + 0x1A85
 KSS_COMPLETED_SUBGAMES = SRAM_1_START + 0x1A93
 KSS_ARENA_HIGH_SCORE = SRAM_1_START + 0x1AA1
 KSS_BOSS_DEFEATED = SRAM_1_START + 0x1AE7  # 4 bytes
-KSS_SAVE_TREASURE = SRAM_1_START + 0x1A31  # 8 bytes
 KSS_TGCO_TREASURE = SRAM_1_START + 0x1B05  # 8 bytes
-KSS_SAVE_GOLD = SRAM_1_START + 0x1A3B  # 3-byte 24-bit int
 KSS_TGC0_GOLD = SRAM_1_START + 0x1B0F  # 3-byte 24-bit int
-KSS_SAVE_ABILITIES = SRAM_1_START + 0x1A3F
 KSS_COPY_ABILITIES = SRAM_1_START + 0x1B1D  # originally Milky Way Wishes deluxe essences
 # Remapped for sending
 KSS_SENT_DYNA_SWITCH = SRAM_1_START + 0x7A64
@@ -113,8 +110,7 @@ class KSSSNIClient(SNIClient):
         save_abilities = 0
         for ability in [item for item in ctx.items_received if item.item & 0x100]:
             save_abilities |= (1 << ((ability.item & 0xFF) - 1))
-        for ptr in (KSS_SAVE_ABILITIES, KSS_COPY_ABILITIES):
-            snes_buffered_write(ctx, ptr, int.to_bytes(save_abilities, 3, "little"))
+        snes_buffered_write(ctx, KSS_COPY_ABILITIES, int.to_bytes(save_abilities, 3, "little"))
 
         known_treasures = int.from_bytes(await snes_read(ctx, KSS_TGCO_TREASURE, 8), "little")
         treasure_data = 0
@@ -124,10 +120,8 @@ class KSSSNIClient(SNIClient):
             treasure_value += treasure_info.value
             treasure_data |= (1 << (treasure.item & 0xFF))
         if treasure_data != known_treasures:
-            for ptr in (KSS_SAVE_TREASURE, KSS_TGCO_TREASURE):
-                snes_buffered_write(ctx, ptr, treasure_data.to_bytes(8, "little"))
-            for ptr in (KSS_SAVE_GOLD, KSS_TGC0_GOLD):
-                snes_buffered_write(ctx, ptr, treasure_value.to_bytes(3, "little"))
+            snes_buffered_write(ctx, KSS_TGCO_TREASURE, treasure_data.to_bytes(8, "little"))
+            snes_buffered_write(ctx, KSS_TGC0_GOLD, treasure_value.to_bytes(3, "little"))
 
         unlocked_planets = int.from_bytes(await snes_read(ctx, KSS_RECEIVED_PLANETS, 2), "little")
         for planet_item in [item for item in ctx.items_received if item.item & 0x400]:

@@ -85,7 +85,7 @@ class KSSWorld(World):
 
         if self.options.required_subgame_completions > len(self.options.included_subgames.value):
             logger.warning("Required subgames greater than included subgames, reducing to all included.")
-            self.options.required_subgames.value = len(self.options.included_subgames.value)
+            self.options.required_subgame_completions.value = len(self.options.included_subgames.value)
 
     def create_item(self, name):
         if name not in item_table:
