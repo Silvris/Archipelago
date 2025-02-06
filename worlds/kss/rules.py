@@ -52,16 +52,19 @@ def set_rules(world: "KSSWorld"):
                  lambda state: state.has_any([item_names.cutter, item_names.sword, item_names.wing], world.player))
         set_rule(world.get_location(location_names.tgco_treasure_18),
                  lambda state: state.has_any([item_names.crash, item_names.yoyo,
-                                              item_names.beam, item_names.beam], world.player))
+                                              item_names.bomb, item_names.beam], world.player))
         set_rule(world.get_location(location_names.tgco_treasure_19),
                  lambda state: state.has_any([item_names.crash, item_names.yoyo,
-                                              item_names.beam, item_names.beam], world.player))
+                                              item_names.bomb, item_names.beam], world.player))
         set_rule(world.get_location(location_names.tgco_treasure_20),
                  lambda state: state.has_any([item_names.crash, item_names.yoyo,
-                                              item_names.beam, item_names.beam], world.player))
+                                              item_names.bomb, item_names.beam], world.player))
         set_rule(world.get_location(location_names.tgco_treasure_21),
                  lambda state: state.has_any([item_names.crash, item_names.yoyo,
-                                              item_names.beam, item_names.beam], world.player))
+                                              item_names.bomb, item_names.beam], world.player))
+        set_rule(world.get_location(location_names.tgco_treasure_22),
+                 lambda state: state.has_any([item_names.crash, item_names.yoyo,
+                                              item_names.bomb, item_names.beam], world.player))
         set_rule(world.get_location(location_names.tgco_treasure_28),
                  lambda state: state.has_any([item_names.crash, item_names.yoyo,
                                               item_names.beam, item_names.beam], world.player))
@@ -105,7 +108,10 @@ def set_rules(world: "KSSWorld"):
     if "Milky Way Wishes" in world.options.included_subgames:
         if world.options.milky_way_wishes_mode == "local":
             set_rule(world.get_location(location_names.mww_complete),
-                     lambda state: state.has_group_unique("Planets", world.player, 8))
+                     lambda state: state.has_all([item_names.floria, item_names.aqualiss,
+                                                  item_names.skyhigh, item_names.hotbeat,
+                                                  item_names.cavios, item_names.mecheye,
+                                                  item_names.halfmoon], world.player))
         else:
             set_rule(world.get_location(location_names.mww_complete),
                      lambda state: state.has(item_names.rainbow_star, world.player, 7))

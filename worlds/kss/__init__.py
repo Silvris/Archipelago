@@ -3,6 +3,7 @@ import settings
 import os
 import base64
 import threading
+import math
 from typing import Dict, List, ClassVar, Any
 from BaseClasses import Tutorial, MultiWorld, CollectionState, Item
 from worlds.AutoWorld import World, WebWorld
@@ -110,9 +111,14 @@ class KSSWorld(World):
         if "Dyna Blade" in self.options.included_subgames:
             itempool.extend([self.create_item(name) for name in dyna_items])
         if "The Great Cave Offensive" in self.options.included_subgames:
-            for name, treasure in treasures.items():
+            max_gold = (math.floor((9999990 - self.options.the_great_cave_offensive_required_gold.value) *
+                                  (self.options.the_great_cave_offensive_excess_gold.value / 100))
+                        + self.options.the_great_cave_offensive_required_gold.value)
+            for name, treasure in sorted(treasures.items(), key=(lambda treasure: treasure[1].value), reverse=True):
                 itempool.append(self.create_item(name))
                 treasure_value += treasure.value
+                if treasure_value >= max_gold:
+                    break
         if "Milky Way Wishes" in self.options.included_subgames:
             planet = [self.create_item(name) for name in planets]
             starting_planet = self.random.choice(planet)
@@ -142,7 +148,11 @@ class KSSWorld(World):
                                              weights=list(filler_item_weights.values()),
                                              k=location_count)])
 
-        self.treasure_value = [(treasure_value // 4) * i for i in range(1, 5)]
+        required_gold = min(self.options.the_great_cave_offensive_required_gold.value, treasure_value)
+
+        self.treasure_value = [*[math.floor(required_gold * self.options.the_great_cave_offensive_gold_thresholds[region])
+                                for region in ["Crystal", "Old Tower", "Garden"]],
+                               self.options.the_great_cave_offensive_required_gold.value]
         self.multiworld.itempool += itempool
 
     set_rules = set_rules

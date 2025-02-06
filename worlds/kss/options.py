@@ -1,5 +1,6 @@
-from Options import PerGameCommonOptions, Range, Choice, OptionSet
+from Options import PerGameCommonOptions, Range, Choice, OptionSet, OptionDict
 from dataclasses import dataclass
+from schema import Schema, And, Use, Optional
 
 
 subgame_mapping = {
@@ -71,6 +72,40 @@ class IncludedSubgames(OptionSet):
     }
     default = sorted(valid_keys)
 
+class TheGreatCaveOffensiveRequiredGold(Range):
+    """
+    Required amount of gold that is needed in order to complete The Great Cave Offensive
+    """
+    display_name = "The Great Cave Offensive Required Gold"
+    range_start = 2500000
+    range_end = 9999990
+    default = range_end
+
+class TheGreatCaveOffensiveGoldThresholds(OptionDict):
+    """
+    How much of the required gold is required before allowing access to
+    Crystal/Old Tower/Garden areas in The Great Cave Offensive
+    """
+    display_name = "The Great Cave Offensive Gold Thresholds"
+    valid_keys = ["Crystal", "Old Tower", "Garden"]
+    schema = Schema({
+        Optional(And(str, lambda s: s in ["Crystal", "Old Tower", "Garden"])):
+            And(float, lambda i: 0 <= i <= 1, error="Value must be between 0 and 1")
+    })
+    default = {
+        "Crystal": 0.25,
+        "Old Tower": 0.5,
+        "Garden": 0.75
+    }
+
+class TheGreatCaveOffensiveExcessGold(Range):
+    """
+    How much of the excess gold should be kept within the multiworld.
+    """
+    display_name = "The Great Cave Offensive Excess Gold"
+    range_start = 0
+    range_end = 100
+
 
 class MilkyWayWishesMode(Choice):
     """
@@ -91,4 +126,7 @@ class KSSOptions(PerGameCommonOptions):
     required_subgames: RequiredSubgames
     starting_subgame: StartingSubgame
     included_subgames: IncludedSubgames
+    the_great_cave_offensive_required_gold: TheGreatCaveOffensiveRequiredGold
+    the_great_cave_offensive_excess_gold: TheGreatCaveOffensiveExcessGold
+    the_great_cave_offensive_gold_thresholds: TheGreatCaveOffensiveGoldThresholds
     milky_way_wishes_mode: MilkyWayWishesMode
