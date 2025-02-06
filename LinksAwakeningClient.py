@@ -235,7 +235,7 @@ class RAGameboy():
 
     def check_command_response(self, command: str, response: bytes):
         if command == "VERSION":
-            ok = re.match("\d+\.\d+\.\d+", response.decode('ascii')) is not None
+            ok = re.match(r"\d+\.\d+\.\d+", response.decode('ascii')) is not None
         else:
             ok = response.startswith(command.encode())
         if not ok:
@@ -467,6 +467,8 @@ class LinksAwakeningContext(CommonContext):
 
     def __init__(self, server_address: typing.Optional[str], password: typing.Optional[str], magpie: typing.Optional[bool]) -> None:
         self.client = LinksAwakeningClient()
+        self.slot_data = {}
+
         if magpie:
             self.magpie_enabled = True
             self.magpie = MagpieBridge()
@@ -474,9 +476,7 @@ class LinksAwakeningContext(CommonContext):
 
     def run_gui(self) -> None:
         import webbrowser
-        import kvui
-        from kvui import Button, GameManager
-        from kivy.uix.image import Image
+        from kvui import GameManager, ImageButton
 
         class LADXManager(GameManager):
             logging_pairs = [
@@ -489,16 +489,10 @@ class LinksAwakeningContext(CommonContext):
                 b = super().build()
 
                 if self.ctx.magpie_enabled:
-                    button = Button(text="", size=(30, 30), size_hint_x=None,
-                                    on_press=lambda _: webbrowser.open('https://magpietracker.us/?enable_autotracker=1'))
-                    image = Image(size=(16, 16), texture=magpie_logo())
-                    button.add_widget(image)
-
-                    def set_center(_, center):
-                        image.center = center
-                    button.bind(center=set_center)
-
+                    button = ImageButton(texture=magpie_logo(), fit_mode="cover", image_size=(32, 32), size_hint_x=None,
+                                on_press=lambda _: webbrowser.open('https://magpietracker.us/?enable_autotracker=1'))
                     self.connect_layout.add_widget(button)
+
                 return b
 
         self.ui = LADXManager(self)
@@ -558,12 +552,18 @@ class LinksAwakeningContext(CommonContext):
 
         while self.client.auth == None:
             await asyncio.sleep(0.1)
+
+            # Just return if we're closing
+            if self.exit_event.is_set():
+                return
         self.auth = self.client.auth
         await self.send_connect()
 
     def on_package(self, cmd: str, args: dict):
         if cmd == "Connected":
             self.game = self.slot_info[self.slot].game
+            self.slot_data = args.get("slot_data", {})
+            
         # TODO - use watcher_event
         if cmd == "ReceivedItems":
             for index, item in enumerate(args["items"], start=args["index"]):
@@ -628,6 +628,7 @@ class LinksAwakeningContext(CommonContext):
                             self.magpie.set_checks(self.client.tracker.all_checks)
                             await self.magpie.set_item_tracker(self.client.item_tracker)
                             await self.magpie.send_gps(self.client.gps_tracker)
+                            self.magpie.slot_data = self.slot_data
                         except Exception:
                             # Don't let magpie errors take out the client
                             pass
