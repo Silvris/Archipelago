@@ -36,10 +36,6 @@ def set_rules(world: "KSSWorld"):
                                               item_names.jet,
                                               item_names.bomb],
                                              world.player))
-        set_rule(world.get_location(location_names.romk_chapter_5),
-                 lambda state: state.has_any([item_names.wing,
-                                              item_names.suplex],
-                                             world.player))
         set_rule(world.get_entrance("RoMK - Chapter 5 -> RoMK - Chapter 6"),
                  lambda state: state.has_any([item_names.wing,
                                               item_names.suplex],
