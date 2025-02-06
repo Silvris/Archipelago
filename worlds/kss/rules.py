@@ -20,13 +20,25 @@ def set_rules(world: "KSSWorld"):
 
     if "Revenge of Meta Knight" in world.options.included_subgames:
         # Revenge of Meta Knight
+        set_rule(world.get_location(location_names.romk_chapter_3),
+                 lambda state: state.has(item_names.fire, world.player))
         set_rule(world.get_entrance("RoMK - Chapter 3 -> RoMK - Chapter 4"),
                  lambda state: state.has(item_names.fire, world.player))
+        set_rule(world.get_location(location_names.romk_chapter_4),
+                 lambda state: state.has_any([item_names.beam,
+                                              item_names.yoyo,
+                                              item_names.jet,
+                                              item_names.bomb],
+                                             world.player))
         set_rule(world.get_entrance("RoMK - Chapter 4 -> RoMK - Chapter 5"),
                  lambda state: state.has_any([item_names.beam,
                                               item_names.yoyo,
                                               item_names.jet,
                                               item_names.bomb],
+                                             world.player))
+        set_rule(world.get_location(location_names.romk_chapter_5),
+                 lambda state: state.has_any([item_names.wing,
+                                              item_names.suplex],
                                              world.player))
         set_rule(world.get_entrance("RoMK - Chapter 5 -> RoMK - Chapter 6"),
                  lambda state: state.has_any([item_names.wing,
