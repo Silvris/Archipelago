@@ -72,21 +72,41 @@ class KSSWorld(World):
         # lots here
         if self.options.included_subgames.value.union(
                 {"The Great Cave Offensive", "Milky Way Wishes", "The Arena"}) == {}:
-            raise OptionError("At least one of Great Cave Offensive, Milky Way Wishes, or The Arena must be included")
+            raise OptionError(f"Kirby Super Star ({self.player_name}): At least one of The Great Cave Offensive, "
+                              f"Milky Way Wishes, or The Arena must be included")
 
         if self.options.starting_subgame.current_option_name not in self.options.included_subgames:
-            logger.warning("Starting subgame not included, choosing random.")
+            logger.warning(f"Kirby Super Star ({self.player_name}): Starting subgame not included, choosing random.")
             self.options.starting_subgame.value = self.random.choice([value[0] for value in subgame_mapping.items()
                                                                       if value[1] in self.options.included_subgames])
 
         for game in sorted(self.options.required_subgames.value):
             if game not in self.options.included_subgames.value:
-                logger.warning(F"Required subgame {game} not included, adding to included subgames")
+                logger.warning(F"Kirby Super Star ({self.player_name}): Required subgame {game} not included, "
+                               F"adding to included subgames")
                 self.options.included_subgames.value.add(game)
 
         if self.options.required_subgame_completions > len(self.options.included_subgames.value):
-            logger.warning("Required subgames greater than included subgames, reducing to all included.")
+            logger.warning(f"Kirby Super Star ({self.player_name}): Required subgame count greater than "
+                           f"included subgames, reducing to all included.")
             self.options.required_subgame_completions.value = len(self.options.included_subgames.value)
+
+        if "The Great Cave Offensive" in self.options.included_subgames:
+            # gold threshold validation
+            if (self.options.the_great_cave_offensive_gold_thresholds["Crystal"] >
+                    self.options.the_great_cave_offensive_gold_thresholds["Old Tower"]):
+                logger.warning(f"TGCO ({self.player_name}): Crystal threshold is greater than Old Tower, swapping")
+                temp = self.options.the_great_cave_offensive_gold_thresholds["Old Tower"]
+                self.options.the_great_cave_offensive_gold_thresholds.value["Old Tower"] =\
+                    self.options.the_great_cave_offensive_gold_thresholds["Crystal"]
+                self.options.the_great_cave_offensive_gold_thresholds.value["Crystal"] = temp
+            if (self.options.the_great_cave_offensive_gold_thresholds["Old Tower"] >
+                    self.options.the_great_cave_offensive_gold_thresholds["Garden"]):
+                logger.warning(f"TGCO ({self.player_name}): Old Tower threshold is greater than Garden, swapping")
+                temp = self.options.the_great_cave_offensive_gold_thresholds["Garden"]
+                self.options.the_great_cave_offensive_gold_thresholds.value["Garden"] =\
+                    self.options.the_great_cave_offensive_gold_thresholds["Old Tower"]
+                self.options.the_great_cave_offensive_gold_thresholds.value["Old Tower"] = temp
 
     def create_item(self, name):
         if name not in item_table:

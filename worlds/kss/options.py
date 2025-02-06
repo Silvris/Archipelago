@@ -89,8 +89,8 @@ class TheGreatCaveOffensiveGoldThresholds(OptionDict):
     display_name = "The Great Cave Offensive Gold Thresholds"
     valid_keys = ["Crystal", "Old Tower", "Garden"]
     schema = Schema({
-        Optional(And(str, lambda s: s in ["Crystal", "Old Tower", "Garden"])):
-            And(float, lambda i: 0 <= i <= 1, error="Value must be between 0 and 1")
+        area: And(float, lambda i: 0 <= i <= 1, error="Value must be between 0 and 1")
+        for area in ["Crystal", "Old Tower", "Garden"]
     })
     default = {
         "Crystal": 0.25,
