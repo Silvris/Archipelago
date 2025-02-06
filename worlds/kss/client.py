@@ -118,7 +118,7 @@ class KSSSNIClient(SNIClient):
         for treasure in [item for item in ctx.items_received if item.item & 0x200]:
             treasure_info = treasures[ctx.item_names[treasure.item]]
             treasure_value += treasure_info.value
-            treasure_data |= (1 << (treasure.item & 0xFF))
+            treasure_data |= (1 << ((treasure.item & 0xFF) - 1))
         if treasure_data != known_treasures:
             snes_buffered_write(ctx, KSS_TGCO_TREASURE, treasure_data.to_bytes(8, "little"))
             snes_buffered_write(ctx, KSS_TGC0_GOLD, treasure_value.to_bytes(3, "little"))

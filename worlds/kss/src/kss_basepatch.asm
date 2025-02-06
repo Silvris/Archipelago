@@ -850,8 +850,8 @@ set_star_complete:
     print "MWW Mode: ", hex(snestopc(realbase()))
     LDA #$0000
     BNE .Return
-    LDA $007A6B
-    STA $001A6B
+    LDA $407A6B
+    STA $401A6B
     .Return:
     JML hook_set_star_return
 
