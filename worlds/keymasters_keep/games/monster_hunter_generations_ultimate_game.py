@@ -14,28 +14,28 @@ from ..enums import KeymastersKeepGamePlatforms
 
 
 @dataclass
-class MonsterHunter4UltimateArchipelagoOptions:
-    monster_hunter_4_ultimate_aged_text_monsters: MonsterHunter4UltimateIncludeAgedTextMonsters
-    monster_hunter_4_ultimate_include_apex: MonsterHunter4UltimateIncludeApexMonsters
-    monster_hunter_4_ultimate_include_dlcs: MonsterHunter4UltimateIncludeDLC
+class MonsterHunterGenerationsUltimateArchipelagoOptions:
+    monster_hunter_generations_ultimate_include_rank_dependent_monsters: \
+        MonsterHunterGenerationsUltimateIncludeRankDependentMonsters
+    monster_hunter_generations_ultimate_include_dlc: MonsterHunterGenerationsUltimateIncludeDLC
 
 
-class MonsterHunter4UltimateGame(Game):
-    name = "Monster Hunter 4 Ultimate"
-    platform = KeymastersKeepGamePlatforms._3DS
+class MonsterHunterGenerationsUltimateGame(Game):
+    name = "Monster Hunter Generations Ultimate"
+    platform = KeymastersKeepGamePlatforms.SW
+
+    platforms_other = [
+        KeymastersKeepGamePlatforms._3DS
+    ]
 
     is_adult_only_or_unrated = False
 
-    options_cls = MonsterHunter4UltimateArchipelagoOptions
+    options_cls = MonsterHunterGenerationsUltimateArchipelagoOptions
 
     def optional_game_constraint_templates(self) -> List[GameObjectiveTemplate]:
         return [
             GameObjectiveTemplate(
                 label="Use an element, or status, that the monster resists",
-                data=dict(),
-            ),
-            GameObjectiveTemplate(
-                label="Hunt as an Guild Quest (if applicable)",
                 data=dict(),
             ),
             GameObjectiveTemplate(
@@ -63,8 +63,8 @@ class MonsterHunter4UltimateGame(Game):
                 data=dict(),
             ),
             GameObjectiveTemplate(
-                label="Don't use Wystones",
-                data=dict()
+                label="Use STYLE style",
+                data={"STYLE": (self.styles, 1)}
             )
         ]
 
@@ -215,7 +215,7 @@ class MonsterHunter4UltimateGame(Game):
 
     @property
     def include_rank_dependent_monsters(self) -> bool:
-        return bool(self.archipelago_options.monster_hunter_4_ultimate_aged_text_monsters.value)
+        return bool(self.archipelago_options.monster_hunter_4_ultimate_include_rank_dependent_monsters.value)
 
     @property
     def include_apex_monsters(self):
@@ -225,105 +225,109 @@ class MonsterHunter4UltimateGame(Game):
     def include_dlc(self):
         return bool(self.archipelago_options.monster_hunter_4_ultimate_include_dlc.value)
 
-    def monsters_base(self) -> List[str]:
-        monsters = [
-            "Ash Kecha Wacha",
-            "Azure Rathalos",
+    @staticmethod
+    def monsters_base() -> List[str]:
+        return [
+            "Agnaktor",
+            "Ahtal-Ka",
+            "Arzuros",
+            "Astalos",
+            "Barioth",
+            "Barroth",
             "Basarios",
-            "Berserk Tetsucabra",
-            "Black Diablos",
-            "Black Gravios",
-            "Blue Yian Kut-Ku",
+            "Blangonga",
+            "Bloodbath Diablos",
+            "Boltreaver Astalos"
             "Brachydios",
-            "Brute Tigrex",
+            "Bulldrome",
             "Cephadrome",
             "Congalala",
+            "Crystalbeard Uragaan",
             "Daimyo Hermitaur",
-            "Desert Seltas",
-            "Desert Seltas Queen",
+            "Deadeye Yian Garuga",
             "Deviljho",
             "Diablos",
-            "Emerald Congalala",
+            "Dreadking Rathalos",
+            "Dreadqueen Rathian",
+            "Drilltusk Tetsucabra",
+            "Duramboros",
+            "Elderfrost Gammoth",
             "Furious Rajang",
+            "Gammoth",
             "Gendrome",
-            "Gogmazios",
-            "Gore Magala",  # Needs a GQ
+            "Giadrome",
+            "Glavenus",
+            "Gore Magala",
             "Gravios",
-            "Great Jaggi",  # Very funny, only monster that requires a high rank quest
+            "Great Maccao",
+            "Grimclaw Tigrex",
             "Gypceros",
+            "Hellblade Glavenus",
             "Iodrome",
             "Kecha Wacha",
             "Khezu",
-            "Kirin",  # you need a GQ for this, but otherwise pretty accessible
-            "Kushala Daora",
+            "Kirin",
+            "Lagiacrus",
             "Lagombi",
-            "Monoblos",  # Solo only
+            "Lao-Shan Lung",
+            "Lavasioth",
+            "Malfestio",
+            "Mizutsune",
             "Najarala",
+            "Nakarkos",
+            "Nargacuga",
             "Nerscylla",
-            "Pink Rathian",
-            "Plum Daimyo Hermitaur",
-            "Purple Gypceros",
+            "Nibelsnarf",
+            "Nightcloak Malfestio",
+            "Plesioth",
             "Rajang",
             "Rathalos",
             "Rathian",
-            "Red Khezu",
-            "Ruby Basarios",  # Requires a GQ
-            "Rusted Kushala Daora",
+            "Redhelm Arzuros",
+            "Royal Ludroth",
+            "Rustrazor Ceanataur",
             "Seltas",
             "Seltas Queen",
             "Seregios",
             "Shagaru Magala",
-            "Shouded Nerscylla",
-            "Stygian Zinogre",
-            "Teostra",
+            "Shogun Ceanataur",
+            "Silverwind Ceanataur",
+            "Snowbaron Lagombi",
+            "Soulseer Mizutsune",
+            "Stonefist Hermitaur",
             "Tetsucabra",
-            "Tidal Najarala",
-            "Tigerstripe Zamtrios",
+            "Thunderlord Zinogre",
             "Tigrex",
-            "Ukanlos",
+            "Uragaan",
+            "Valstrax",
             "Velocidrome",
-            "White Monoblos",  # Solo only
+            "Volvidon",
             "Yian Garuga",
             "Yian Kut-Ku",
             "Zamtrios",
             "Zinogre",
         ]
 
-        if self.include_apex_monsters:
-            monsters.extend(["Apex Gravios", "Apex Diablos", "Apex Tidal Najarala", "Apex Tigrex", "Apex Zinogre"])
-
-        return monsters
-
-    def monsters_rank(self) -> List[str]:
-        monsters = [
-            "Molten Tigrex",
-            "Akantor",
+    @staticmethod
+    def monsters_rank() -> List[str]:
+        return [
             "Chaotic Gore Magala",
-            "Shah Dalamadur",
-            "Raging Brachydios",
-            "Crimson Fatalis",
-        ]
-
-        if self.include_apex_monsters:
-            monsters.extend(["Apex Seregios", "Apex Seregios"])
-
-        return monsters
-
-    def monsters_g_dlc(self) -> List[str]:
-        monsters = [
-            "Silver Rathalos",
+            "Teostra",
+            "Chameleos",
+            "Kushala Daora",
             "Gold Rathian",
+            "Silver Rathalos",
+            "Furious Rajang",
             "Savage Deviljho",
-            "Dah'ren Mohran",
-            "Oroshi Kirin",
-            "Dalamadur",
+            "Raging Brachydios",
+            "Akantor",
+            "Ukanlos",
+            "Amatsu",
+            "Alatreon",
             "Fatalis",
-            "Old Fatalis",
+            "Crimson Fatalis",
+            "Old Fatalis"
         ]
-        if self.include_apex_monsters:
-            monsters.append("Apex Deviljho")
-
-        return monsters
 
     def monsters(self) -> List[str]:
         monsters: List[str] = self.monsters_base[:]
@@ -331,28 +335,22 @@ class MonsterHunter4UltimateGame(Game):
         if self.include_rank_dependent_monsters:
             monsters.extend(self.monsters_rank())
 
-        if self.include_dlc:
-            monsters.extend(self.monsters_g_dlc())
-
         return sorted(monsters)
 
     def capturable(self) -> List[str]:
         monsters = self.monsters()
 
         non_capture = [
+            "Ahtal Ka",
             "Akantor",
-            "Ukanlos",
+            "Alatreon",
+            "Amatsu",
             "Kirin",
-            "Oroshi Kirin",
             "Shagaru Magala",
-            "Dah'ren Mohran",
             "Kushala Daora",
             "Rusted Kushala Daora",
             "Teostra",
             "Chameleos",
-            "Dalamadur",
-            "Shah Dalamadur",
-            "Gogmazios",
             "Fatalis",
             "Crimson Fatalis",
             "Old Fatalis"
@@ -362,14 +360,11 @@ class MonsterHunter4UltimateGame(Game):
 
     def variants(self) -> List[str]:
         variants = [
-            "Subspecies",
             "Rare Species",
             "Variant Species",
-            "Frenzied",
+            "Deviant",
+            "Hyper",
         ]
-
-        if self.include_apex_monsters:
-            variants.append("Apex")
 
         return variants
 
@@ -390,25 +385,22 @@ class MonsterHunter4UltimateGame(Game):
             "Light Bowgun",
             "Heavy Bowgun",
             "Bow",
+            "Prowler",
         ]
 
     @functools.cached_property
     def stages_base(self) -> List[str]:
         return [
             "Ancestral Steppe",
-            "Sunken Hollow",
             "Primal Forest",
             "Frozen Seaway",
             "Volcanic Hollow",
-            "Heaven's Mount",
-            "Dunes (Day)",
-            "Dunes (Night)",
+            "Dunes",
             "Sanctuary",
             "Ingle Isle",
             "Polar Field",
             "Battlequarters",
-            "Tower Summit",
-            "Everwood"
+            "Forlorn Arena",
         ]
 
     def stages(self) -> List[str]:
@@ -578,54 +570,96 @@ class MonsterHunter4UltimateGame(Game):
             "20 Minutes",
         ]
 
+    @staticmethod
+    def styles() -> List[str]:
+        return [
+            "Guild",
+            "Aerial",
+            "Striker",
+            "Adept",
+            "Valor",
+            "Alchemy"
+        ]
+
     def arenas(self) -> List[str]:
         arenas = [
-            "Grudge Match: Yian Kut-Ku",
+            "Grudge Match: Malfestio",
+            "Grudge Match: Khezu",
+            "Grudge Match: Najarala",
+            "Grudge Match: Rathalos",
             "Grudge Match: Kecha Wacha",
-            "Grudge Match: Bug Out",
-            "Grudge Match: Zamtrios",
-            "Grudge Match: Brute Tigrex",
-            "Grudge Match: S. Zinogre",
-            "Grudge Match: Deviljho",
-            "Grudge Match: Color Code",
-            "Grudge Match: Dos Gravi",
-            "Grudge Match: Shell Game",
-            "Grudge Match: Fish Fry",
-            "Grudge Match: Tidal Najarala",
-            "Grudge Match: S. Nerscylla",
-            "Grudge Match: Dual Devils",
-            "Grudge Match: Apex Deviljho",
-            "Grudge Match: Triplets",
+            "Grudge Match: Plesioth",
+            "Grudge Match: Brachydios",
+            "Grudge Match: Barioth",
+            "Grudge Match: Yian Garuga",
+            "Grudge Match: Uragaan",
+            "Grudge Match: Seregios",
+            "Grudge Match: Great Maccao",
+            "Grudge Match: Gypceros",
+            "Grudge Match: Bird Wyverns",
+            "Grudge Match: Barroth",
+            "Grudge Match: Tetsucabra",
+            "Grudge Match: Congalala",
         ]
 
         if self.include_dlc:
-            arenas.extend([f"Challenge Quest {i}" for i in range(1, 14)])
-            arenas.extend([f"Party Challenge {i}" for i in range(1, 4)])
-            arenas.extend([f"Monster Fest {i}" for i in range(1, 9)])
-
+            arenas.extend([
+                "XX Trials: Dreadqueen",
+                "XX Trials: Thunderlord",
+                "XX Trials: Silverwind",
+                "XX Trials: Dreadking",
+                "XX Trials: Grimclaw",
+                "XX Trials: Gravios",
+                "XX Trials: Elderfrost",
+                "XX Trials: Hunt-a-thon I",
+                "XX Trials: Hunt-a-thon II",
+                "XX Trials: Stonefist",
+                "XX Trials: Drilltusk",
+                "XX Trials: Redhelm",
+                "XX Trials: Deadeye",
+                "XX Trials: Snowbaron",
+                "XX Trials: Hunt-a-thon III",
+                "Event: Slay a Mizutsune",
+                "Event: Slay a Glavenus",
+                "Event: Slay an Astalos",
+                "Event: Slay a Gammoth",
+                "Event: Slay a Lagiacrus",
+                "Event: Hunt-a-thon 1",
+                "Event: Hunt-a-thon 2",
+                "Event: Hunt-a-thon 3",
+                "Event: Slay a Zinogre",
+                "Event: Slay a Gore Magala",
+                "Event: Slay a Tigrex",
+                "Event: Slay a Rathalos",
+                "Event: Slay a Nargacuga",
+                "Event: Hunt-a-thon 4",
+                "XX Trials: Rathalos",
+                "XX Trials: Tigrex",
+                "XX Trials: Nargacuga",
+                "XX Trials: Zinogre",
+                "XX Trials: Brachydios",
+                "XX Trials: Hunt-a-thon IV",
+                "Event: Slay a Volvidon",
+                "Event: Slay a Royal Ludroth",
+                "Event: Slay a Lagombi",
+                "Event: Slay a Yian Kut-Ku",
+                "Event: Slay an Arzuros",
+                "Event: Hunt-a-thon 5"
+            ])
         return arenas
 
 
-class MonsterHunter4UltimateIncludeAgedTextMonsters(DefaultOnToggle):
+class MonsterHunterGenerationsUltimateIncludeRankDependentMonsters(DefaultOnToggle):
     """
-    Indicates whether to include Monster Hunter 4 Ultimate Aged Text monsters when generating objectives.
-    """
-
-    display_name = "Monster Hunter 4 Ultimate Include Aged Text Monsters"
-
-
-class MonsterHunter4UltimateIncludeApexMonsters(DefaultOnToggle):
-    """
-    Indicates whether to include Monster Hunter 4 Ultimate rank-dependent monsters when generating objectives.
+    Indicates whether to include Monster Hunter Generations Ultimate rank-dependent monsters when generating objectives.
     """
 
-    display_name = "Monster Hunter 4 Ultimate Include Apex Monsters"
+    display_name = "Monster Hunter Generations Ultimate Include Rank Dependent Monsters"
 
 
-class MonsterHunter4UltimateIncludeDLC(DefaultOnToggle):
+class MonsterHunterGenerationsUltimateIncludeDLC(DefaultOnToggle):
     """
-    Indicates whether to include Monster Hunter 4 Ultimate DLC-exclusive monsters when generating objectives.
-    Only G-Rank DLC-exclusive monsters are considered.
+    Indicates whether to include Monster Hunter Generations Ultimate DLC quests when generating objectives
     """
 
-    display_name = "Monster Hunter 4 Ultimate Include DLC Monsters"
+    display_name = "Monster Hunter Generations Ultimate Include DLC"
