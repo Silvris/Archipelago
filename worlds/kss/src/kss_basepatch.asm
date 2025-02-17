@@ -829,7 +829,7 @@ block_tgco_access:
     LDA !great_cave_gold, X
     PLB
     CMP TreasureRequirements, Y
-    BMI .Block
+    BCC .Block
     BNE .SetWithPull ; branch if greater not equal
     DEX #2
     DEY #2
@@ -839,7 +839,7 @@ block_tgco_access:
     LDA !great_cave_gold, X
     PLB
     CMP TreasureRequirements, Y
-    BMI .Block ; if not minus at this point, has to be greater or equal
+    BCC .Block ; if not minus at this point, has to be greater or equal
     BRA .SetWithPull
     .Block:
     PLB
