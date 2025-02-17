@@ -235,6 +235,12 @@ class FactorioStartItems(OptionDict):
     """Mapping of Factorio internal item-name to amount granted on start."""
     display_name = "Starting Items"
     default = {"burner-mining-drill": 4, "stone-furnace": 4,  "raw-fish": 50}
+    schema = Schema(
+        {
+            str: And(int, lambda n: n > 0,
+                     error="amount of starting items has to be a positive integer"),
+        }
+    )
 
 
 class FactorioFreeSampleBlacklist(OptionSet):
@@ -302,6 +308,11 @@ class EvolutionTrapIncrease(Range):
     range_start = 1
     default = 10
     range_end = 100
+
+
+class InventorySpillTrapCount(TrapCount):
+    """Trap items that when received trigger dropping your main inventory and trash inventory onto the ground."""
+    display_name = "Inventory Spill Traps"
 
 
 class FactorioWorldGen(OptionDict):
@@ -484,6 +495,7 @@ class FactorioOptions(PerGameCommonOptions):
     artillery_traps: ArtilleryTrapCount
     atomic_rocket_traps: AtomicRocketTrapCount
     atomic_cliff_remover_traps: AtomicCliffRemoverTrapCount
+    inventory_spill_traps: InventorySpillTrapCount
     attack_traps: AttackTrapCount
     evolution_traps: EvolutionTrapCount
     evolution_trap_increase: EvolutionTrapIncrease
@@ -518,6 +530,7 @@ option_groups: list[OptionGroup] = [
             ArtilleryTrapCount,
             AtomicRocketTrapCount,
             AtomicCliffRemoverTrapCount,
+            InventorySpillTrapCount,
         ],
         start_collapsed=True
     ),
