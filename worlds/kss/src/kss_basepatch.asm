@@ -576,6 +576,7 @@ hook_copy_ability:
     PHX
     PHA
     LDA $746D, X
+    AND #$00FF ; ability items are 0x80XX, need to mask off the flag
     LDY #$0000
     SEC
     SBC #$0001
