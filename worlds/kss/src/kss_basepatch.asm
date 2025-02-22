@@ -636,9 +636,9 @@ WriteBWRAM:
     LDY #$2001
     LDA #$EFFE
     MVN $40, $40
-    LDX #$D000 ; seed info 0x3D000
+    LDX #$FD00 ; seed info 0x3D000
     LDY #$9000 ; target location
-    LDA #$1000
+    LDA #$0300
     MVN $40, $07
     LDX #$FFC0 ; ROM name
     LDY #$8100 ; target

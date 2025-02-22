@@ -1,4 +1,4 @@
-from Options import PerGameCommonOptions, Range, Choice, OptionSet, OptionDict
+from Options import PerGameCommonOptions, Range, Choice, OptionSet, OptionDict, DeathLinkMixin
 from dataclasses import dataclass
 from schema import Schema, And, Use, Optional
 
@@ -72,6 +72,7 @@ class IncludedSubgames(OptionSet):
     }
     default = sorted(valid_keys)
 
+
 class TheGreatCaveOffensiveRequiredGold(Range):
     """
     Required amount of gold that is needed in order to complete The Great Cave Offensive
@@ -80,6 +81,7 @@ class TheGreatCaveOffensiveRequiredGold(Range):
     range_start = 2500000
     range_end = 9999990
     default = range_end
+
 
 class TheGreatCaveOffensiveGoldThresholds(OptionDict):
     """
@@ -97,6 +99,7 @@ class TheGreatCaveOffensiveGoldThresholds(OptionDict):
         "Old Tower": 0.5,
         "Garden": 0.75
     }
+
 
 class TheGreatCaveOffensiveExcessGold(Range):
     """
@@ -121,7 +124,7 @@ class MilkyWayWishesMode(Choice):
 
 
 @dataclass
-class KSSOptions(PerGameCommonOptions):
+class KSSOptions(PerGameCommonOptions, DeathLinkMixin):
     required_subgame_completions: RequiredSubgameCompletions
     required_subgames: RequiredSubgames
     starting_subgame: StartingSubgame

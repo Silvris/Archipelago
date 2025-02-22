@@ -45,6 +45,7 @@ KSS_RECEIVED_ITEMS = SRAM_1_START + 0x8002
 KSS_RECEIVED_PLANETS = SRAM_1_START + 0x8004
 
 KSS_ROMNAME = SRAM_1_START + 0x8100
+KSS_DEATH_LINK_ADDR = SRAM_1_START + 0x9000
 
 
 class KSSSNIClient(SNIClient):
@@ -72,7 +73,7 @@ class KSSSNIClient(SNIClient):
         ctx.items_handling = 0b111  # full remote
         ctx.allow_collect = True
 
-        death_link = [False]  # await snes_read(ctx, KSS_DEATH_LINK_ADDR, 1)
+        death_link = await snes_read(ctx, KSS_DEATH_LINK_ADDR, 1)
         if death_link:
             await ctx.update_death_link(bool(death_link[0] & 0b1))
         return True
@@ -98,7 +99,7 @@ class KSSSNIClient(SNIClient):
                 pass
 
     async def game_watcher(self, ctx: "SNIContext") -> None:
-        from SNIClient import snes_read, snes_buffered_write, snes_flush_writes
+        from SNIClient import snes_read, snes_buffered_write, snes_flush_writes, DeathState
 
         demo_state = int.from_bytes(await snes_read(ctx, KSS_DEMO_STATE, 2), "little")
         if not demo_state:
@@ -108,6 +109,15 @@ class KSSSNIClient(SNIClient):
         if current_subgames & 0x0080 != 0:
             await ctx.send_msgs([{"cmd": "StatusUpdate", "status": ClientStatus.CLIENT_GOAL}])
             ctx.finished_game = True
+
+        game_state = int.from_bytes(await snes_read(ctx, KSS_GAME_STATE, 1), "little")
+
+        if "DeathLink" in ctx.tags and game_state == 3 and ctx.last_death_link + 1 < time.time() \
+                and ctx.death_state == DeathState.alive:
+            kirby_hp = int.from_bytes(await snes_read(ctx, KSS_KIRBY_HP, 2), "little")
+            if kirby_hp == 0:
+                # TODO: see if I can get gamemode specific messages
+                await ctx.handle_deathlink_state(True, f"Pop Star was too much for {ctx.player_names[ctx.slot]}.")
 
         save_abilities = 0
         i = 0
@@ -165,7 +175,7 @@ class KSSSNIClient(SNIClient):
                 if item.item & 0xF != 4:
                     self.item_queue.append(item)
 
-        await self.pop_item(ctx, int.from_bytes(await snes_read(ctx, KSS_GAME_STATE, 1), "little"))
+        await self.pop_item(ctx, game_state)
 
         await snes_flush_writes(ctx)
 

@@ -20,6 +20,8 @@ goal_specific = 0xAFC99
 treasure_values = 0xAFCD1
 mww_mode = 0xAFD4F
 
+slot_data = 0x3FD00
+
 
 class KSSProcedurePatch(APProcedurePatch, APTokenMixin):
     hash = [KSS_UHASH, KSS_VCHASH]
@@ -63,6 +65,8 @@ def patch_rom(world: "KSSWorld", patch: KSSProcedurePatch):
         patch.write_bytes(treasure_values, pack("IIII", *world.treasure_value))
 
     patch.write_byte(mww_mode + 1, world.options.milky_way_wishes_mode.value)
+
+    patch.write_byte(slot_data, world.options.death_link.value)
 
     patch_name = bytearray(
         f'KSS{Utils.__version__.replace(".", "")[0:3]}_{world.player}_{world.multiworld.seed:11}\0', 'utf8')[:21]
