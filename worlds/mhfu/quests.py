@@ -3,6 +3,7 @@ import pkgutil
 import orjson
 import os
 
+from collections import defaultdict
 from BaseClasses import Location, Region
 from .data.monster_habitats import monster_habitats
 
@@ -73,6 +74,29 @@ goal_ranks = {
     8: (0, 3, 2),
 }
 
+rank_sort = defaultdict(lambda: 99, {
+    (0, 0, 0): 0,
+    (0, 0, 1): 1,
+    (0, 0, 2): 2,
+    (0, 1, 0): 3,
+    (1, 0, 0): 4,
+    (1, 0, 1): 5,
+    (0, 1, 1): 6,
+    (1, 0, 2): 7,
+    (1, 0, 3): 8,
+    (1, 0, 4): 9,
+    (1, 0, 5): 10,
+    (0, 1, 2): 11,
+    (1, 1, 0): 12,
+    (0, 2, 0): 13,
+    (1, 1, 1): 14,
+    (0, 2, 1): 15,
+    (1, 1, 2): 16,
+    (0, 2, 2): 17,
+    (0, 3, 0): 18,
+    (0, 3, 1): 19,
+    (0, 3, 2): 20,
+})
 
 class MHFULocation(Location):
     game: str = "Monster Hunter Freedom Unite"

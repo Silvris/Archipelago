@@ -7,7 +7,7 @@ from BaseClasses import Tutorial, ItemClassification, MultiWorld
 from worlds.AutoWorld import WebWorld, World
 from worlds.LauncherComponents import launch_subprocess, components, Component, Type
 from .quests import create_ranks, location_name_to_id, base_id, goal_quests,\
-    get_quest_by_id, get_proper_name, goal_ranks, hub_rank_max
+    get_quest_by_id, get_proper_name, goal_ranks, hub_rank_max, rank_sort
 from .items import MHFUItem, item_table, filler_item_table, filler_weights, item_name_to_id, weapons, item_name_groups
 from .options import MHFUOptions
 from .rules import set_rules
@@ -138,7 +138,7 @@ class MHFUWorld(World):
             if key in location_count:
                 running_total += location_count.pop(key)
         all_locs = sum(self.location_num.values())
-        rank_order = sorted(location_count, key=lambda tup: tup[1] if tup[0] == 0 else tup[1] + 1)
+        rank_order = sorted(location_count, key=lambda tup: rank_sort[tup])
         for i, rank in enumerate(rank_order):
             running_total += location_count[rank]
             accessible = running_total / all_locs
