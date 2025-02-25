@@ -1,5 +1,5 @@
-from .Quests import get_quest_by_id, get_proper_name, get_star_name, goal_quests, hub_rank_max
-from .data.Monsters import flying_wyverns, piscene_wyverns, bird_wyverns, monster_ids
+from .quests import get_quest_by_id, get_proper_name, get_star_name, goal_quests, hub_rank_max
+from .data.monsters import flying_wyverns, piscene_wyverns, bird_wyverns, monster_ids
 from typing import TYPE_CHECKING, List, Dict
 from worlds.generic.Rules import add_rule
 

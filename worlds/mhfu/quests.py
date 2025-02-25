@@ -4,7 +4,7 @@ import orjson
 import os
 
 from BaseClasses import Location, Region
-from .data.MonsterHabitats import monster_habitats
+from .data.monster_habitats import monster_habitats
 
 if typing.TYPE_CHECKING:
     from . import MHFUWorld

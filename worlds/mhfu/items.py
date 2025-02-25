@@ -1,6 +1,6 @@
 import typing
 from BaseClasses import Item
-from .Quests import base_id
+from .quests import base_id
 
 
 class ItemData(typing.NamedTuple):

@@ -14,10 +14,10 @@ import json
 import struct
 
 from NetUtils import NetworkItem, ClientStatus
-from .Quests import quest_data, base_id, goal_quests
-from .Items import item_name_to_id, item_id_to_name, item_name_groups
-from .data.Monsters import elder_dragons
-from .data.Equipment import blademaster, gunner, blademaster_upgrades, gunner_upgrades, \
+from .quests import quest_data, base_id, goal_quests
+from .items import item_name_to_id, item_id_to_name, item_name_groups
+from .data.monsters import elder_dragons
+from .data.equipment import blademaster, gunner, blademaster_upgrades, gunner_upgrades, \
     helms, chests, arms, waists, legs
 
 ppsspp_logger = logging.getLogger("PPSSPP")
