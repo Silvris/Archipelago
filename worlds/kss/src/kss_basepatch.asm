@@ -701,18 +701,19 @@ block_ability_essence:
     BRA .Loop2
     .CheckCopy:
     AND !received_copy_abilities, Y
-    BEQ .NoAbility
+    BEQ .PullNoAbility
     PLA
     PLX
     PLY
     BNE .Return
-    .NoAbility:
+    .PullNoAbility:
     PLA
     PLX
     PLY
+    .NoAbility:
     JML $CF7699
     .Return
-    CMP $749F, X
+    CMP $749F
     BEQ .NoAbility
     JML $CF76A4
 
@@ -880,6 +881,7 @@ check_deluxe_ability:
 org $CF73B1
 hook_deluxe_ability:
     JSL set_treasure
+    NOP #3 ; this is the item count increase
 
 org $CF7694
 hook_ability_essence:
