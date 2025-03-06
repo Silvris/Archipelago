@@ -18,7 +18,7 @@ class RequiredSubgameCompletions(Range):
     """
     How many subgames must be completed for the game to be considered complete.
     """
-    display_name = "Required Sub-Games"
+    display_name = "Required Subgame Completions"
     range_start = 1
     range_end = 7
     default = 6
@@ -28,7 +28,7 @@ class RequiredSubgames(OptionSet):
     """
     Which subgames are required to be completed for the game to be considered complete.
     """
-    display_name = "Included Subgames"
+    display_name = "Required Subgames"
     valid_keys = {
         "Spring Breeze",
         "Dyna Blade",
