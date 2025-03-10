@@ -43,6 +43,9 @@ def validate_wily_5(base: MM2TestBase) -> None:
             # We get exactly one use of Time Stopper during the rush
             # So we want to make sure that use is absolutely needed
             weapon_weight[8] = min(weapon_weight[8], 0.001)
+        if boss_damage[1] < 14:
+            # Functionally, we only get one kill with Atomic Fire, so we should discourage its use unless necessary
+            weapon_weight[1] = min(weapon_weight[1], 0.002)
         while boss_health[boss] > 0:
             if boss_damage[0] > 0:
                 boss_health[boss] = 0  # if we can buster, we should buster
