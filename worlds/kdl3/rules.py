@@ -73,6 +73,13 @@ def can_reach_cutter(state: "CollectionState", player: int) -> bool:
     return state.has("Cutter", player) and state.has("Cutter Ability", player)
 
 
+def can_reach_regions(state: "CollectionState", player: int, regions: typing.List[str]):
+    for region in regions:
+        if not state.can_reach_region(region, player):
+            return False
+    return True
+
+
 ability_map: typing.Dict[str, typing.Callable[["CollectionState", int], bool]] = {
     "No Ability": lambda state, player: True,
     "Burning Ability": can_reach_burning,
@@ -115,6 +122,8 @@ def set_rules(world: "KDL3World") -> None:
     set_rule(world.multiworld.get_location(location_name.grass_land_muchi, world.player),
              lambda state: can_reach_chuchu(state, world.player))
     set_rule(world.multiworld.get_location(location_name.grass_land_chao, world.player),
+             lambda state: state.has(location_name.grass_land_4_goku, world.player))
+    set_rule(world.multiworld.get_location(location_name.grass_land_4_goku, world.player),
              lambda state: can_reach_stone(state, world.player))
     set_rule(world.multiworld.get_location(location_name.grass_land_mine, world.player),
              lambda state: can_reach_kine(state, world.player))
@@ -127,6 +136,8 @@ def set_rules(world: "KDL3World") -> None:
     set_rule(world.multiworld.get_location(location_name.ripple_field_bakasa, world.player),
              lambda state: can_reach_kine(state, world.player) and can_reach_parasol(state, world.player))
     set_rule(world.multiworld.get_location(location_name.ripple_field_toad, world.player),
+             lambda state: state.has(location_name.ripple_field_toad, world.player))
+    set_rule(world.multiworld.get_location(location_name.ripple_field_4_little_toad, world.player),
              lambda state: can_reach_needle(state, world.player))
     set_rule(world.multiworld.get_location(location_name.ripple_field_mama_pitch, world.player),
              lambda state: (can_reach_pitch(state, world.player) and

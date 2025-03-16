@@ -82,6 +82,14 @@ star_item_weights = {
     "Big Star": 4
 }
 
+event_item_table = {
+    "Goku": ItemData(None, True),
+    "Little Toad": ItemData(None, True),
+    "Wall": ItemData(None, True),
+    "Donbe": ItemData(None, True),
+    "Mikarin": ItemData(None, True),
+}
+
 total_filler_weights = {
     **filler_item_weights,
     **star_item_weights

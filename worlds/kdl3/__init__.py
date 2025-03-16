@@ -10,7 +10,7 @@ from .items import item_table, item_names, copy_ability_table, animal_friend_tab
 from .locations import location_table, KDL3Location, level_consumables, consumable_locations, star_locations
 from .names.animal_friend_spawns import animal_friend_spawns, problematic_sets
 from .names.enemy_abilities import vanilla_enemies, enemy_mapping, enemy_restrictive
-from .regions import create_levels, default_levels
+from .regions import create_levels, default_levels, shuffle_doors, door_shuffle_events
 from .options import KDL3Options, kdl3_option_groups
 from .presets import kdl3_options_presets
 from .names import location_name
@@ -130,54 +130,6 @@ class KDL3World(World):
                 for item in [*copy_ability_access_table.keys(), *animal_friend_spawn_table.keys()]]
 
     def pre_fill(self) -> None:
-        if self.options.copy_ability_randomization:
-            # randomize copy abilities
-            valid_abilities = list(copy_ability_access_table.keys())
-            enemies_to_set = list(self.copy_abilities.keys())
-            unplaced_abilities = set(key for key in copy_ability_access_table.keys()
-                                     if key not in ("No Ability", "Cutter Ability", "Burning Ability"))
-            # now for the edge cases
-            for abilities, enemies in enemy_restrictive:
-                available_enemies = list()
-                for enemy in enemies:
-                    if enemy not in enemies_to_set:
-                        if self.copy_abilities[enemy] in abilities:
-                            break
-                    else:
-                        available_enemies.append(enemy)
-                else:
-                    chosen_enemy = self.random.choice(available_enemies)
-                    chosen_ability = self.random.choice(abilities)
-                    self.copy_abilities[chosen_enemy] = chosen_ability
-                    enemies_to_set.remove(chosen_enemy)
-                    unplaced_abilities.discard(chosen_ability)
-            # two less restrictive ones, we need to ensure Cutter and Burning appear before their required stages
-            sand_canyon_5 = self.get_region("Sand Canyon 5 - 9")
-            # this is primarily for typing, but if this ever hits it's fine to crash
-            assert isinstance(sand_canyon_5, KDL3Room)
-            cutter_enemy = self.get_restrictive_copy_ability_placement("Cutter Ability", enemies_to_set,
-                                                                       sand_canyon_5.level, sand_canyon_5.stage)
-            if cutter_enemy:
-                self.copy_abilities[cutter_enemy] = "Cutter Ability"
-                enemies_to_set.remove(cutter_enemy)
-            iceberg_4 = self.get_region("Iceberg 4 - 7")
-            # this is primarily for typing, but if this ever hits it's fine to crash
-            assert isinstance(iceberg_4, KDL3Room)
-            burning_enemy = self.get_restrictive_copy_ability_placement("Burning Ability", enemies_to_set,
-                                                                        iceberg_4.level, iceberg_4.stage)
-            if burning_enemy:
-                self.copy_abilities[burning_enemy] = "Burning Ability"
-                enemies_to_set.remove(burning_enemy)
-            # ensure we place one of every ability
-            if unplaced_abilities and self.options.accessibility != self.options.accessibility.option_minimal:
-                # failsafe, on non-minimal we need to guarantee every copy ability exists
-                for ability in sorted(unplaced_abilities):
-                    enemy = self.random.choice(enemies_to_set)
-                    self.copy_abilities[enemy] = ability
-                    enemies_to_set.remove(enemy)
-            # place remaining
-            for enemy in enemies_to_set:
-                self.copy_abilities[enemy] = self.random.choice(valid_abilities)
         for enemy in enemy_mapping:
             self.multiworld.get_location(enemy, self.player) \
                 .place_locked_item(self.create_item(self.copy_abilities[enemy_mapping[enemy]]))
@@ -306,13 +258,6 @@ class KDL3World(World):
         goal = self.options.goal.value
         goal_location = self.multiworld.get_location(location_name.goals[goal], self.player)
         goal_location.place_locked_item(KDL3Item("Love-Love Rod", ItemClassification.progression, None, self.player))
-        for level in range(1, 6):
-            self.multiworld.get_location(f"Level {level} Boss - Defeated", self.player) \
-                .place_locked_item(
-                KDL3Item(f"Level {level} Boss Defeated", ItemClassification.progression, None, self.player))
-            self.multiworld.get_location(f"Level {level} Boss - Purified", self.player) \
-                .place_locked_item(
-                KDL3Item(f"Level {level} Boss Purified", ItemClassification.progression, None, self.player))
         self.multiworld.completion_condition[self.player] = lambda state: state.has("Love-Love Rod", self.player)
         # this can technically be done at any point before generate_output
         if self.options.allow_bb:
@@ -336,6 +281,65 @@ class KDL3World(World):
             raise
         finally:
             self.rom_name_available_event.set()  # make sure threading continues and errors are collected
+
+    def connect_entrances(self) -> None:
+        if self.options.copy_ability_randomization:
+            # randomize copy abilities
+            valid_abilities = list(copy_ability_access_table.keys())
+            enemies_to_set = list(self.copy_abilities.keys())
+            unplaced_abilities = set(key for key in copy_ability_access_table.keys()
+                                     if key not in ("No Ability", "Cutter Ability", "Burning Ability"))
+            # now for the edge cases
+            for abilities, enemies in enemy_restrictive:
+                available_enemies = list()
+                for enemy in enemies:
+                    if enemy not in enemies_to_set:
+                        if self.copy_abilities[enemy] in abilities:
+                            break
+                    else:
+                        available_enemies.append(enemy)
+                else:
+                    chosen_enemy = self.random.choice(available_enemies)
+                    chosen_ability = self.random.choice(abilities)
+                    self.copy_abilities[chosen_enemy] = chosen_ability
+                    enemies_to_set.remove(chosen_enemy)
+                    unplaced_abilities.discard(chosen_ability)
+            # two less restrictive ones, we need to ensure Cutter and Burning appear before their required stages
+            sand_canyon_5 = self.get_region("Sand Canyon 5 - 9")
+            # this is primarily for typing, but if this ever hits it's fine to crash
+            assert isinstance(sand_canyon_5, KDL3Room)
+            cutter_enemy = self.get_restrictive_copy_ability_placement("Cutter Ability", enemies_to_set,
+                                                                       sand_canyon_5.level, sand_canyon_5.stage)
+            if cutter_enemy:
+                self.copy_abilities[cutter_enemy] = "Cutter Ability"
+                enemies_to_set.remove(cutter_enemy)
+            iceberg_4 = self.get_region("Iceberg 4 - 7")
+            # this is primarily for typing, but if this ever hits it's fine to crash
+            assert isinstance(iceberg_4, KDL3Room)
+            burning_enemy = self.get_restrictive_copy_ability_placement("Burning Ability", enemies_to_set,
+                                                                        iceberg_4.level, iceberg_4.stage)
+            if burning_enemy:
+                self.copy_abilities[burning_enemy] = "Burning Ability"
+                enemies_to_set.remove(burning_enemy)
+            # ensure we place one of every ability
+            if unplaced_abilities and self.options.accessibility != self.options.accessibility.option_minimal:
+                # failsafe, on non-minimal we need to guarantee every copy ability exists
+                for ability in sorted(unplaced_abilities):
+                    enemy = self.random.choice(enemies_to_set)
+                    self.copy_abilities[enemy] = ability
+                    enemies_to_set.remove(enemy)
+            # place remaining
+            for enemy in enemies_to_set:
+                self.copy_abilities[enemy] = self.random.choice(valid_abilities)
+        for level in range(1, 6):
+            self.multiworld.get_location(f"Level {level} Boss - Defeated", self.player) \
+                .place_locked_item(
+                KDL3Item(f"Level {level} Boss Defeated", ItemClassification.progression, None, self.player))
+            self.multiworld.get_location(f"Level {level} Boss - Purified", self.player) \
+                .place_locked_item(
+                KDL3Item(f"Level {level} Boss Purified", ItemClassification.progression, None, self.player))
+        if self.options.door_shuffle:
+            shuffle_doors(self)
 
     def modify_multidata(self, multidata: Dict[str, Any]) -> None:
         # wait for self.rom_name to be available.

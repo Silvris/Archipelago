@@ -1,11 +1,13 @@
 import struct
-from typing import Optional, Dict, TYPE_CHECKING, List, Union
-from BaseClasses import Region, ItemClassification, MultiWorld
+from typing import Optional, Dict, TYPE_CHECKING, List, Union, Tuple
+from BaseClasses import Region, ItemClassification, MultiWorld, Entrance
 from worlds.Files import APTokenTypes
 from .client_addrs import consumable_addrs, star_addrs
 
 if TYPE_CHECKING:
+    from entrance_rando import ERPlacementState
     from .rom import KDL3ProcedurePatch
+    from . import KDL3World
 
 animal_map = {
     "Rick Spawn": 0,
@@ -16,25 +18,64 @@ animal_map = {
     "Pitch Spawn": 5
 }
 
+final_iceberg_rooms = {
+    "Iceberg 6 - 8": "Spark Ability",
+    "Iceberg 6 - 10": "Stone Ability",
+    "Iceberg 6 - 12": "Parasol Ability",
+    "Iceberg 6 - 14": "Ice Ability",
+    "Iceberg 6 - 16": "Cutter Ability",
+    "Iceberg 6 - 18": "Clean Ability",
+    "Iceberg 6 - 20": "Burning Ability",
+    "Iceberg 6 - 22": "Needle Ability",
+}
+
+
+class KDL3Door(Entrance):
+    world: Optional["KDL3World"] = None
+    parent_region: "KDL3Room"
+
+    def can_connect_to(self, other: "KDL3Door", dead_end: bool, state: "ERPlacementState") -> bool:
+        from . import KDL3World
+        world = getattr(self, "world", None)
+        if not world:
+            world = state.world
+            self.world = world
+
+        assert isinstance(world, KDL3World)
+
+        if other.connected_region.name in final_iceberg_rooms:
+            if any(x for x in self.parent_region.enemies if
+                   world.copy_abilities[x] == final_iceberg_rooms[other.connected_region.name]):
+                return super().can_connect_to(other, dead_end, state)
+            else:
+                return False
+        else:
+            return super().can_connect_to(other, dead_end, state)
+
 
 class KDL3Room(Region):
+    entrance_type = KDL3Door
     pointer: int = 0
     level: int = 0
     stage: int = 0
     room: int = 0
     music: int = 0
-    default_exits: List[Dict[str, Union[int, List[str]]]]
+    default_exits: Dict[str, Dict[str, Union[int, str, List[str]]]]
     animal_pointers: List[int]
     enemies: List[str]
     entity_load: List[List[int]]
     consumables: List[Dict[str, Union[int, str]]]
+    entrance_coords: List[List[int]]
+    spawn: List[int]
+    entrance_pointer: int
 
     def __init__(self, name: str, player: int, multiworld: MultiWorld, hint: Optional[str], level: int,
                  stage: int, room: int, pointer: int, music: int,
-                 default_exits: List[Dict[str, List[str]]],
+                 default_exits: Dict[str, Dict[str, Union[int, str, List[str]]]],
                  animal_pointers: List[int], enemies: List[str],
                  entity_load: List[List[int]],
-                 consumables: List[Dict[str, Union[int, str]]], consumable_pointer: int) -> None:
+                 consumables: List[Dict[str, Union[int, str]]], consumable_pointer: int,
+                 entrances: List[List[int]], spawn: List[int], entrance_pointer: int) -> None:
         super().__init__(name, player, multiworld, hint)
         self.level = level
         self.stage = stage
@@ -47,6 +88,9 @@ class KDL3Room(Region):
         self.entity_load = entity_load
         self.consumables = consumables
         self.consumable_pointer = consumable_pointer
+        self.entrance_coords = entrances
+        self.spawn = spawn
+        self.entrance_pointer = entrance_pointer
 
     def patch(self, patch: "KDL3ProcedurePatch", consumables: bool, local_items: bool) -> None:
         patch.write_token(APTokenTypes.WRITE, self.pointer + 2, self.music.to_bytes(1, "little"))

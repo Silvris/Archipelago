@@ -926,3 +926,12 @@ iceberg_5_s32 = "Iceberg 5 - Star 32"
 iceberg_5_s33 = "Iceberg 5 - Star 33"
 iceberg_5_s34 = "Iceberg 5 - Star 34"
 iceberg_6_s1 = "Iceberg 6 - Star 1"
+
+# In-game pickup events for heart stars
+
+grass_land_4_goku = "Grass Land 4 - Goku"
+ripple_field_5_wall = "Ripple Field 5 - Wall"
+ripple_field_4_little_toad = "Ripple Field 4 - Little Toad"
+sand_canyon_4_donbe = "Sand Canyon 4 - Donbe"
+cloudy_park_4_mikarin = "Cloudy Park 4 - Mikarin"
+iceberg_4_shell = "Iceberg 4 - Shell"

@@ -86,6 +86,13 @@ class LevelShuffle(Choice):
     default = 0
 
 
+class DoorShuffle(Toggle):
+    """
+    Shuffles the connections between doors. The Heart Star for each level will remain the same.
+    """
+    display_name = "Door Shuffle"
+
+
 class BossShuffle(PlandoBosses):
     """
     None: Bosses will remain in their vanilla locations
@@ -446,6 +453,7 @@ class KDL3Options(PerGameCommonOptions, DeathLinkMixin):
     ability_trap_weight: AbilityTrapPercentage
     jumping_target: JumpingTarget
     stage_shuffle: LevelShuffle
+    door_shuffle: DoorShuffle
     boss_shuffle: BossShuffle
     allow_bb: BossShuffleAllowBB
     animal_randomization: AnimalRandomization
@@ -471,7 +479,7 @@ kdl3_option_groups: List[OptionGroup] = [
     OptionGroup("Goal Options", [Goal, GoalSpeed, MaxHeartStars, HeartStarsRequired, JumpingTarget, ]),
     OptionGroup("World Options", [RemoteItems, StrictBosses, OpenWorld, OpenWorldBossRequirement, ConsumableChecks,
                                   StarChecks, FillerPercentage, TrapPercentage, GooeyTrapPercentage,
-                                  SlowTrapPercentage, AbilityTrapPercentage, LevelShuffle, BossShuffle,
+                                  SlowTrapPercentage, AbilityTrapPercentage, LevelShuffle, DoorShuffle, BossShuffle,
                                   AnimalRandomization, CopyAbilityRandomization,  BossRequirementRandom,
                                   Gifting, ]),
     OptionGroup("Cosmetic Options", [GameLanguage, BossShuffleAllowBB, KirbyFlavorPreset, KirbyFlavor,
