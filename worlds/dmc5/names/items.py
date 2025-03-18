@@ -33,6 +33,7 @@ dante_air_hike = "Air Hike (Dante)"
 dante_more_orbs = "Get More Orbs (Dante)"
 dante_trigger_heart = "Trigger Heart (Dante)"
 dante_ex_provocation = "EX Provocation (Dante)"
+dante_irregular_full_custom = "Irregular Full Custom (Dante)"
 # Guns
 dante_charge_shot = "Progressive Ivory & Ebony Charge Shot (Dante)"
 dante_coyote_charge_shot = "Progressive Coyote Charge Shot (Dante)"
