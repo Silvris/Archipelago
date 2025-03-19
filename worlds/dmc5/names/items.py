@@ -1,3 +1,16 @@
+# Common Items
+red_orb = "1000 Red Orbs"
+gold_orb = "Gold Orb"
+purple_orb_shard = "Purple Orb Shard"
+purple_orb = "Purple Orb"
+blue_orb_shard = "Blue Orb Shard"
+blue_orb = "Blue Orb"
+nidhogg_hatchling = "Nidhogg Hatchling"
+
+# Split chapter items
+chapter7 = "M7: United Front (Nero/V)"
+chapter13 = "M13: Three Warriors (Nero/V/Dante)"
+
 # Nero Upgrades
 nero_speed = "Speed (Nero)"
 nero_enemy_step = "Enemy Step (Nero)"

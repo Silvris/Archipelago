@@ -22,16 +22,13 @@ chapter_items: Dict[str, ItemData] = {
     locations.chapter4: ItemData(5, True),
     locations.chapter5: ItemData(6, True),
     locations.chapter6: ItemData(7, True),
-    locations.chapter7n: ItemData(8, True),
-    locations.chapter7g: ItemData(9, True),
+    items.chapter7: ItemData(8, True),
     locations.chapter8: ItemData(10, True),
     locations.chapter9: ItemData(11, True),
     locations.chapter10: ItemData(12, True),
     locations.chapter11: ItemData(13, True),
     locations.chapter12: ItemData(14, True),
-    locations.chapter13n: ItemData(15, True),
-    locations.chapter13g: ItemData(16, True),
-    locations.chapter13d: ItemData(17, True),
+    items.chapter13: ItemData(15, True),
     locations.chapter14: ItemData(18, True),
     locations.chapter15: ItemData(19, True),
     locations.chapter16: ItemData(20, True),
@@ -94,10 +91,31 @@ nero_upgrades: Dict[str, ItemData] = {
     items.nero_color_up: ItemData(153, True, True, 2),
 }
 
+misc_items: Dict[str, ItemData] = {
+    items.red_orb: ItemData(800, False, False),
+    items.gold_orb: ItemData(801, False, False),
+    items.purple_orb_shard: ItemData(802, False, True),
+    items.purple_orb: ItemData(803, False, True),
+    items.blue_orb_shard: ItemData(804, False, True),
+    items.blue_orb: ItemData(805, False, True),
+    items.nidhogg_hatchling: ItemData(806, True, False),
+}
+
+filler_item_weights: Dict[str, int] = {
+    items.red_orb: 10,
+    items.gold_orb: 1,
+}
+
 all_items: Dict[str, ItemData] = {
     **chapter_items,
     **vergil_chapter_items,
     **nero_upgrades,
+    **misc_items,
 }
 
 item_lookup = {key: data.code for key, data in all_items.items() if data.code}
+
+item_groups = {
+    "Chapters": {name for name in chapter_items},
+    "Vergil Chapters": {name for name in vergil_chapter_items}
+}
