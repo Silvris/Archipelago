@@ -23,18 +23,18 @@ chapter_items: Dict[str, ItemData] = {
     locations.chapter5: ItemData(6, True),
     locations.chapter6: ItemData(7, True),
     items.chapter7: ItemData(8, True),
-    locations.chapter8: ItemData(10, True),
-    locations.chapter9: ItemData(11, True),
-    locations.chapter10: ItemData(12, True),
-    locations.chapter11: ItemData(13, True),
-    locations.chapter12: ItemData(14, True),
-    items.chapter13: ItemData(15, True),
-    locations.chapter14: ItemData(18, True),
-    locations.chapter15: ItemData(19, True),
-    locations.chapter16: ItemData(20, True),
-    locations.chapter17: ItemData(21, True),
-    locations.chapter18: ItemData(22, True),
-    locations.chapter19: ItemData(23, True),
+    locations.chapter8: ItemData(9, True),
+    locations.chapter9: ItemData(10, True),
+    locations.chapter10: ItemData(11, True),
+    locations.chapter11: ItemData(12, True),
+    locations.chapter12: ItemData(13, True),
+    items.chapter13: ItemData(14, True),
+    locations.chapter14: ItemData(15, True),
+    locations.chapter15: ItemData(16, True),
+    locations.chapter16: ItemData(17, True),
+    locations.chapter17: ItemData(18, True),
+    locations.chapter18: ItemData(19, True),
+    locations.chapter19: ItemData(20, True),
     locations.chapter20: ItemData(None, True),
 }
 
@@ -116,6 +116,6 @@ all_items: Dict[str, ItemData] = {
 item_lookup = {key: data.code for key, data in all_items.items() if data.code}
 
 item_groups = {
-    "Chapters": {name for name in chapter_items},
-    "Vergil Chapters": {name for name in vergil_chapter_items}
+    "Chapters": {name for name in chapter_items if chapter_items[name].code},
+    "Vergil Chapters": {name for name in vergil_chapter_items if vergil_chapter_items[name].code}
 }
