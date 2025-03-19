@@ -1,7 +1,8 @@
+import orjson
 import json
 import os
 import zipfile
-from pathlib import Path
+from pkgutil import get_data
 from random import Random
 from typing import TYPE_CHECKING
 
@@ -309,9 +310,8 @@ def randomize_quest(world: "MHRSWorld", allowed_monsters: list,
                     quest_id: int, quest_targets=None, is_hunting_road=False) -> str:
     if quest_targets is None or is_hunting_road:
         quest_targets = []  # clean the quest targets for Hunting Road
-    base_path = Path(__file__).parent
-    file_path = (base_path / f"quests/q{quest_id}.json").resolve()
-    quest_data = json.load(open(file_path, encoding='utf-8'))
+    json_data = get_data(__package__, f"quests/q{quest_id}.json")
+    quest_data = orjson.loads(json_data)
     if not quest_data:
         raise FileNotFoundError(f"quests/q{quest_id}.json could not be found!")
 
@@ -325,7 +325,7 @@ def randomize_quest(world: "MHRSWorld", allowed_monsters: list,
         stage = 15  # gaismagorm can only spawn in the Yawning Abyss
     elif 1379 in quest_targets:
         stage = 11  # allmother can only spawn in the Coral Palace
-    elif is_hunting_road or world.option.arena_only:
+    elif is_hunting_road or world.options.arena_only:
         stage = world.random.choice(arena_choices)
     else:
         stage = world.random.choice(stage_choices)
