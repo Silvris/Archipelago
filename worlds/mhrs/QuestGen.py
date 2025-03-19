@@ -305,7 +305,7 @@ def generate_valid_monster(stage: int, allowed_monsters: list, slot_random: Rand
     return monster
 
 
-def randomize_quest(multiworld: MultiWorld, player: int, allowed_monsters: list,
+def randomize_quest(world: "MHRSWorld", allowed_monsters: list,
                     quest_id: int, quest_targets=None, is_hunting_road=False) -> str:
     if quest_targets is None or is_hunting_road:
         quest_targets = []  # clean the quest targets for Hunting Road
@@ -325,23 +325,23 @@ def randomize_quest(multiworld: MultiWorld, player: int, allowed_monsters: list,
         stage = 15  # gaismagorm can only spawn in the Yawning Abyss
     elif 1379 in quest_targets:
         stage = 11  # allmother can only spawn in the Coral Palace
-    elif is_hunting_road or multiworld.arena_only[player]:
-        stage = multiworld.per_slot_randoms[player].choice(arena_choices)
+    elif is_hunting_road or world.option.arena_only:
+        stage = world.random.choice(arena_choices)
     else:
-        stage = multiworld.per_slot_randoms[player].choice(stage_choices)
+        stage = world.random.choice(stage_choices)
     if len(quest_targets) > 0:
         mon_num = len(quest_targets)
     elif is_hunting_road:
         mon_num = 5
     else:
-        mon_num = multiworld.per_slot_randoms[player].randint(1, 5)
+        mon_num = world.random.randint(1, 5)
     monsters = list()
     for i in range(0, 5):
         if i < len(quest_targets):
             monsters.append(quest_targets[i])
         else:
             monster = 0 if stage in arena_choices and i >= mon_num else \
-                generate_valid_monster(stage, allowed_monsters, multiworld.per_slot_randoms[player])
+                generate_valid_monster(stage, allowed_monsters, world.random)
             monsters.append(monster)
             if i < mon_num:
                 quest_targets.append(monster)
@@ -350,7 +350,7 @@ def randomize_quest(multiworld: MultiWorld, player: int, allowed_monsters: list,
         normal["TargetTypes"] = [5, 0]
         normal["TargetAmounts"] = [mon_num, 0]
     else:
-        capture = multiworld.per_slot_randoms[player].randint(1, 10)
+        capture = world.random.randint(1, 10)
         quest_type = get_quest_type(quest_targets)
         quest_goals = get_quest_goal(quest_targets)
         if capture > 7 and quest_type == 3:
@@ -363,7 +363,7 @@ def randomize_quest(multiworld: MultiWorld, player: int, allowed_monsters: list,
         normal["TargetMonsters"] = [quest_targets[0], quest_targets[1] if mon_num > 1 else 0]
         normal["TargetAmounts"] = [1, 1 if mon_num > 1 else 0]
     normal["Map"] = stage
-    normal["Carts"] = multiworld.per_slot_randoms[player].choices([1, 3, 5], [5, 85, 10])[0]
+    normal["Carts"] = world.random.choices([1, 3, 5], [5, 85, 10])[0]
 
     for i in range(5):
         normal["Monsters"][i]["Id"] = monsters[i]
@@ -382,97 +382,97 @@ def randomize_quest(multiworld: MultiWorld, player: int, allowed_monsters: list,
 
     if stage == 10:
         normal["ArenaParam"]["FenceDefaultActive"] = False
-        normal["ArenaParam"]["FenceUptime"] = multiworld.per_slot_randoms[player].randint(15, 120)
-        normal["ArenaParam"]["FenceInitialDelay"] = multiworld.per_slot_randoms[player].randint(15, 600)
-        normal["ArenaParam"]["FenceCooldown"] = multiworld.per_slot_randoms[player].randint(15, 240)
+        normal["ArenaParam"]["FenceUptime"] = world.random.randint(15, 120)
+        normal["ArenaParam"]["FenceInitialDelay"] = world.random.randint(15, 600)
+        normal["ArenaParam"]["FenceCooldown"] = world.random.randint(15, 240)
         normal["ArenaParam"]["Pillars"] = [
-            bool(multiworld.per_slot_randoms[player].randint(0, 1)),
-            bool(multiworld.per_slot_randoms[player].randint(0, 1)),
-            bool(multiworld.per_slot_randoms[player].randint(0, 1))
+            bool(world.random.randint(0, 1)),
+            bool(world.random.randint(0, 1)),
+            bool(world.random.randint(0, 1))
         ]
     # vanity
-    normal["BaseTime"] = multiworld.per_slot_randoms[player].randint(0, 23)
-    battle_bgm = multiworld.per_slot_randoms[player].randint(0, 50)
+    normal["BaseTime"] = world.random.randint(0, 23)
+    battle_bgm = world.random.randint(0, 50)
     if battle_bgm == 1 and stage not in {9, 10, 14}:
         battle_bgm = 6
     if battle_bgm == 4 and stage not in {9, 10, 14}:
         battle_bgm = 7
     normal["BattleBGMType"] = battle_bgm
-    clear_bgm = multiworld.per_slot_randoms[player].randint(0, 9)
+    clear_bgm = world.random.randint(0, 9)
     if clear_bgm > 1:
         clear_bgm = 0
     normal["ClearBGMType"] = clear_bgm
 
     # small monster stats
     enemy["SmallMonsters"]["SpawnType"] = stage_zako[stage]
-    enemy["SmallMonsters"]["HealthTable"] = multiworld.per_slot_randoms[player].randint(0, 255)
-    enemy["SmallMonsters"]["AttackTable"] = multiworld.per_slot_randoms[player].randint(0, 255)
-    enemy["SmallMonsters"]["PartTable"] = multiworld.per_slot_randoms[player].randint(0, 255)
-    enemy["SmallMonsters"]["OtherTable"] = multiworld.per_slot_randoms[player].randint(0, 255)
+    enemy["SmallMonsters"]["HealthTable"] = world.random.randint(0, 255)
+    enemy["SmallMonsters"]["AttackTable"] = world.random.randint(0, 255)
+    enemy["SmallMonsters"]["PartTable"] = world.random.randint(0, 255)
+    enemy["SmallMonsters"]["OtherTable"] = world.random.randint(0, 255)
 
     for i in range(5):
         enemy["Monsters"][i][
-            "SetName"] = f"AP_Custom_{multiworld.per_slot_randoms[player].randint(1, stage_set_max[stage])}"
+            "SetName"] = f"AP_Custom_{world.random.randint(1, stage_set_max[stage])}"
         enemy["Monsters"][i]["HealthTable"] = random_normal_integer(
-            multiworld.per_slot_randoms[player],
-            multiworld.average_monster_difficulty[player].value,
-            multiworld.monster_difficulty_deviation[player].value,
+            world.random,
+            world.options.average_monster_difficulty.value,
+            world.options.monster_difficulty_deviation.value,
             0,
             173
         )
         enemy["Monsters"][i]["AttackTable"] = random_normal_integer(
-            multiworld.per_slot_randoms[player],
-            multiworld.average_monster_difficulty[player].value,
-            multiworld.monster_difficulty_deviation[player].value,
+            world.random,
+            world.options.average_monster_difficulty.value,
+            world.options.monster_difficulty_deviation.value,
             0,
             172
         )
         enemy["Monsters"][i]["OtherTable"] = random_normal_integer(
-            multiworld.per_slot_randoms[player],
-            multiworld.average_monster_difficulty[player].value,
-            multiworld.monster_difficulty_deviation[player].value,
+            world.random,
+            world.options.average_monster_difficulty.value,
+            world.options.monster_difficulty_deviation.value,
             0,
             161
         )
         enemy["Monsters"][i]["PartTable"] = random_normal_integer(
-            multiworld.per_slot_randoms[player],
-            multiworld.average_monster_difficulty[player].value,
-            multiworld.monster_difficulty_deviation[player].value,
+            world.random,
+            world.options.average_monster_difficulty.value,
+            world.options.monster_difficulty_deviation.value,
             0,
             178
         )
         enemy["Monsters"][i]["StaminaTable"] = random_normal_integer(
-            multiworld.per_slot_randoms[player],
-            multiworld.average_monster_difficulty[player].value,
-            multiworld.monster_difficulty_deviation[player].value,
+            world.random,
+            world.options.average_monster_difficulty.value,
+            world.options.monster_difficulty_deviation.value,
             0,
             255
         )
         enemy["Monsters"][i]["Size"] = random_normal_integer(
-            multiworld.per_slot_randoms[player],
-            multiworld.average_monster_difficulty[player].value,
-            multiworld.monster_difficulty_deviation[player].value,
+            world.random,
+            world.options.average_monster_difficulty.value,
+            world.options.monster_difficulty_deviation.value,
             0,
             255
         )
-        enemy["Monsters"][i]["SizeTable"] = multiworld.per_slot_randoms[player].randint(0, 41)
-        enemy["Monsters"][i]["Difficulty"] = multiworld.per_slot_randoms[player].randint(0, 2)
-        if multiworld.disable_multiplayer_scaling[player].value:
+        enemy["Monsters"][i]["SizeTable"] = world.random.randint(0, 41)
+        enemy["Monsters"][i]["Difficulty"] = world.random.randint(0, 2)
+        if world.options.disable_multiplayer_scaling.value:
             enemy["Monsters"][i]["MultiTable"] = 0
         else:
-            enemy["Monsters"][i]["MultiTable"] = multiworld.per_slot_randoms[player].randint(0, 25)
+            enemy["Monsters"][i]["MultiTable"] = world.random.randint(0, 25)
 
-        afflicted = multiworld.enable_affliction[player].value
+        afflicted = world.options.enable_affliction.value
         if can_afflict(monsters[i]) and afflicted in [0, 1]:
-            if afflicted == 1 or (afflicted == 0 and multiworld.per_slot_randoms[player].randint(0, 9) > 6):
+            if afflicted == 1 or (afflicted == 0 and world.random.randint(0, 9) > 6):
                 # add affliction
                 enemy["Monsters"][i]["IndividualType"] = 1
         elif monsters[i] in [2072, 2073, 2075, 2134]:
             # this is a risen monster, rng it's level
-            enemy["Monsters"][i]["IndividualType"] = multiworld.per_slot_randoms[player]\
+            enemy["Monsters"][i]["IndividualType"] = world.random\
                 .choices([2, 3, 4, 5], weights=[7, 1, 1, 1])
 
-        if monsters[i] in [392, 549, 594] and multiworld.per_slot_randoms[player].randint(0, 9) == 9:
+        if monsters[i] in [392, 549, 594] and world.random.randint(0, 9) == 9:
             # Hazard monsters, give a 1 in 10 chance for a hazard to spawn
             enemy["Monsters"][i]["SubType"] = 3 if monsters[i] == 392 else 1
 
@@ -483,27 +483,26 @@ def randomize_quest(multiworld: MultiWorld, player: int, allowed_monsters: list,
     return json.dumps(quest_data)
 
 
-def randomize_quests(multiworld: MultiWorld, player: int, final_boss: int) -> dict:
+def randomize_quests(world: "MHRSWorld", final_boss: int) -> dict:
     quest_data = dict()
     allowed_monsters = monster_choices.copy()
 
-    if multiworld.include_apex[player].value in [0, 2]:
+    if world.options.include_apex.value in [0, 2]:
         allowed_monsters.extend([1, 2, 7, 57, 60, 82])
 
-    if multiworld.include_apex[player].value in [0, 1]:
+    if world.options.include_apex.value in [0, 1]:
         allowed_monsters.extend([1793, 1794, 1799, 1849, 1852, 1874])
 
-    if multiworld.include_risen[player].value in [0, 2]:
+    if world.options.include_risen.value in [0, 2]:
         allowed_monsters.extend([24, 25, 27, 72, 1366])
 
-    if multiworld.include_risen[player].value in [0, 1]:
+    if world.options.include_risen.value in [0, 1]:
         allowed_monsters.extend([2072, 2073, 2075, 2120, 2134])
 
-    for quest in get_quest_table(multiworld.master_rank_requirement[player].value):
-        quest_data[quest] = randomize_quest(multiworld, player, allowed_monsters, quest, None)
+    for quest in get_quest_table(world.options.master_rank_requirement.value):
+        quest_data[quest] = randomize_quest(world, allowed_monsters, quest, None)
 
-    quest_data[315618] = randomize_quest(multiworld, player,
-                                         allowed_monsters, 315618, [final_boss_remap[final_boss]],
+    quest_data[315618] = randomize_quest(world, allowed_monsters, 315618, [final_boss_remap[final_boss]],
                                          True if final_boss == 22 else False)
 
     return quest_data
@@ -526,7 +525,7 @@ def generate_quests(world: "MHRSWorld", output_directory: str):
 
     file_dir = world.multiworld.get_out_file_name_base(world.player)
     apmhrs = MHRSZipFile(
-        randomize_quests(world.multiworld, world.player, world.get_final_boss()),
+        randomize_quests(world, world.get_final_boss()),
         file_dir,
         output_directory,
         world.player,

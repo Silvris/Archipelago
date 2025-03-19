@@ -1,6 +1,7 @@
 import typing
 
-from Options import Option, Choice, Range, Toggle, DefaultOnToggle, SpecialRange
+from Options import Choice, Range, Toggle, DefaultOnToggle, NamedRange, PerGameCommonOptions
+from dataclasses import dataclass
 
 
 class MHRSDeathLink(Choice):
@@ -133,7 +134,7 @@ class MasterRankGoal(Range):
     default = 3
 
 
-class AverageMonsterDifficulty(SpecialRange):
+class AverageMonsterDifficulty(NamedRange):
     """
     The base difficulty of the generated monsters. This will be further scaled by the quest's MR.
     """
@@ -144,7 +145,7 @@ class AverageMonsterDifficulty(SpecialRange):
     special_range_names = {
         "easy": 36,
         "normal": 62,
-        "hard": 107
+        "hard": 107,
     }
 
 
@@ -200,7 +201,7 @@ class EnableFollowers(Choice):
     default = 0
 
 
-class FollowerStrength(SpecialRange):
+class FollowerStrength(NamedRange):
     """
     The strength of followers. By default, they do 14% of their theoretical damage.
     """
@@ -212,7 +213,7 @@ class FollowerStrength(SpecialRange):
         "default": 14,
         "double": 28,
         "quadruple": 56,
-        "hunter": 100 
+        "hunter": 100,
     }
 
 
@@ -232,24 +233,24 @@ class DisableMultiplayerScaling(Toggle):
     display_name = "Disable Multiplayer Scaling"
 
 
-mhrs_options: typing.Dict[str, type(Option)] = {
-    "death_link": MHRSDeathLink,
-    "required_keys": RequiredKeys,
-    "total_keys": TotalKeys,
-    "filler_percentage": FillerWeight,
-    "final_quest_target": FinalBoss,
-    "master_rank_requirement": MasterRankGoal,
-    "enable_affliction": EnableAfflicted,
-    "include_apex": Apexes,
-    "include_risen": Risens,
-    "progressive_weapons": ProgressiveWeapons,
-    "consolidate_weapons": ConsolidateWeapons,
-    "progressive_armor": ProgressiveArmor,
-    "arena_only": ArenaOnly,
-    "average_monster_difficulty": AverageMonsterDifficulty,
-    "monster_difficulty_deviation": MonsterDifficultyDeviation,
-    "enable_followers": EnableFollowers,
-    "follower_strength": FollowerStrength,
-    "disable_multiplayer_scaling": DisableMultiplayerScaling,
-    "give_khezu_music": GiveKhezuMusic
-}
+@dataclass
+class MHRSOptions(PerGameCommonOptions):
+    death_link: MHRSDeathLink
+    required_keys: RequiredKeys
+    total_keys: TotalKeys
+    filler_percentage: FillerWeight
+    final_quest_target: FinalBoss
+    master_rank_requirement: MasterRankGoal
+    enable_affliction: EnableAfflicted
+    include_apex: Apexes
+    include_risen: Risens
+    progressive_weapons: ProgressiveWeapons
+    consolidate_weapons: ConsolidateWeapons
+    progressive_armor: ProgressiveArmor
+    arena_only: ArenaOnly
+    average_monster_difficulty: AverageMonsterDifficulty
+    monster_difficulty_deviation: MonsterDifficultyDeviation
+    enable_followers: EnableFollowers
+    follower_strength: FollowerStrength
+    disable_multiplayer_scaling: DisableMultiplayerScaling
+    give_khezu_music: GiveKhezuMusic

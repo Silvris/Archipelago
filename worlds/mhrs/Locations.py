@@ -15,7 +15,7 @@ class MHRSQuest(Location):
 
     def __init__(self, player: int, name: str, address: typing.Optional[int], parent):
         super().__init__(player, name, address, parent)
-        self.event = not address
+
 
 urgent_quests = {
     "1★ - Uninvited Guest": QuestData(315100, "MR1 Urgent", 1, True),

@@ -22,8 +22,7 @@ items and decorations.
 
 ## What does another world's item look like in Sunbreak?
 
-Items belonging to another world are given a unique icon to indicate they are for another player. The item's description
-will say what it is and what world it belongs to.
+A message will appear in the chat window, telling the player what they sent to another player.
 
 ## When a player receives an item, what does it look like?
 

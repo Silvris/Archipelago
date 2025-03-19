@@ -12,7 +12,7 @@ class MHRSRegion(Region):
 
 
 def create_regions(world: "MHRSWorld") -> None:
-    mr = world.multiworld.master_rank_requirement[world.player].value
+    mr = world.options.master_rank_requirement.value
     for i in range(mr, 0, -1):
         region = MHRSRegion(f"Master Rank {i}", world.player, world.multiworld)
         region.add_locations({quest: mhr_quests[quest].id
