@@ -1,6 +1,6 @@
 import typing
 
-from BaseClasses import Region, Entrance
+from BaseClasses import Region
 from .Locations import MHRSQuest, mhr_quests
 
 if typing.TYPE_CHECKING:
@@ -27,7 +27,7 @@ def create_regions(world: "MHRSWorld") -> None:
                                                                                    world.player)})
         world.multiworld.regions.append(region)
     # now just create our MR1 Urgent region
-    menu = MHRSRegion("Menu", world.player, world.multiworld)
+    menu = MHRSRegion("Master Rank 1 Urgent", world.player, world.multiworld)
     menu.add_exits(["Master Rank 1"], {"Master Rank 1": lambda state: state.has(f"Master Rank 1", world.player)})
     menu.add_locations({quest: mhr_quests[quest].id
                         for quest in mhr_quests if mhr_quests[quest].region == "MR1 Urgent"}, MHRSQuest)

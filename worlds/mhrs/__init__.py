@@ -48,6 +48,7 @@ class MHRSWorld(World):
     requirements_base = {1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0}
     key_requirements = dict()
     generate_output = generate_quests
+    origin_region_name = "Master Rank 1 Urgent"
 
     def create_item(self, name: str, force_non_progression=False) -> Item:
         classification = ItemClassification.filler

@@ -8,7 +8,7 @@ from typing import TYPE_CHECKING
 
 from worlds.Files import APContainer
 from .Locations import get_quest_table
-from BaseClasses import MultiWorld
+
 if TYPE_CHECKING:
     from . import MHRSWorld
 stage_choices = [

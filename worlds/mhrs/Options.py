@@ -6,7 +6,7 @@ from dataclasses import dataclass
 
 class MHRSDeathLink(Choice):
     """
-    When you die, everyone dies. Of course the reverse is true too.
+    When you die, everyone dies. Of course, the reverse is true too.
     Cart: Deathlinks are sent when the player carts, receiving a deathlink will cart the player.
     Quest: Deathlinks are sent when the player fails a quest, receiving a deathlink will fail the current quest.
     """
