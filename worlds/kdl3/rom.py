@@ -443,7 +443,8 @@ def patch_rom(world: "KDL3World", patch: KDL3ProcedurePatch) -> None:
             patch.write_token(APTokenTypes.WRITE, 0x4A38D, world.random.choice(music_choices).to_bytes(1, "little"))
 
     for room in rooms:
-        room.patch(patch, bool(world.options.consumables.value), not bool(world.options.remote_items.value))
+        room.patch(patch, bool(world.options.consumables.value), not bool(world.options.remote_items.value),
+                   bool(world.options.door_shuffle.value), world.random)
 
     if world.options.virtual_console in [1, 3]:
         # Flash Reduction

@@ -10,7 +10,7 @@ from .locations import KDL3Location, stage_locations, heart_star_locations, boss
 from .items import copy_ability_access_table
 from .names import location_name
 from .options import BossShuffle
-from .room import KDL3Room
+from .room import KDL3Room, final_iceberg_rooms
 
 if TYPE_CHECKING:
     from . import KDL3World
@@ -44,12 +44,12 @@ first_world_limit = {
 }
 
 door_shuffle_events = {
-    "Grass Land 4 - 6-2": {location_name.grass_land_4_goku: None},
-    "Ripple Field 4 - 2-1": {location_name.ripple_field_4_little_toad: None},
-    "Ripple Field 5 - 8": {location_name.ripple_field_5_wall: None},
-    "Sand Canyon 4 - 6-2": {location_name.sand_canyon_4_donbe: None},
-    "Cloudy Park 4 - 8": {location_name.cloudy_park_4_mikarin: None},
-    "Iceberg 4 - 10-1": {location_name.iceberg_4_shell: None}
+    "Grass Land 4 - 6-2": {location_name.grass_land_4_goku: "Goku"},
+    "Ripple Field 4 - 2-1": {location_name.ripple_field_4_little_toad: "Little Toad"},
+    "Ripple Field 5 - 8": {location_name.ripple_field_5_wall: "Wall"},
+    "Sand Canyon 4 - 6-2": {location_name.sand_canyon_4_donbe: "Donbe"},
+    "Cloudy Park 4 - 8": {location_name.cloudy_park_4_mikarin: "Mikarin"},
+    "Iceberg 4 - 10-1": {location_name.iceberg_4_shell: "Shell"}
 }
 
 heart_star_requirement = {  # Rooms required for the current stage's heart star
@@ -156,7 +156,7 @@ heart_star_requirement = {  # Rooms required for the current stage's heart star
     "Iceberg 6 - 16",
     "Iceberg 6 - 18",
     "Iceberg 6 - 20",
-    "Iceberg 6 - 22"
+    "Iceberg 6 - 22",
     "Iceberg 6 - 23",
     "Iceberg 6 - 24",
 
@@ -229,7 +229,8 @@ def generate_rooms(world: "KDL3World", level_regions: Dict[int, Region]) -> None
                         room_entry["stage"], room_entry["room"], room_entry["pointer"], room_entry["music"],
                         room_entry["default_exits"], room_entry["animal_pointers"], room_entry["enemies"],
                         room_entry["entity_load"], room_entry["consumables"], room_entry["consumables_pointer"],
-                        room_entry["entrances"], room_entry["spawn"], room_entry["entrance_pointer"])
+                        room_entry["entrances"], room_entry["spawn"], room_entry["entrance_pointer"],
+                        room_entry["index"])
         room.add_locations({location: world.location_name_to_id[location] if location in world.location_name_to_id else
         None for location in room_entry["locations"]
                             if (not any(x in location for x in ["1-Up", "Maxim"]) or
@@ -270,6 +271,9 @@ def generate_rooms(world: "KDL3World", level_regions: Dict[int, Region]) -> None
             if any("Complete" in location.name for location in room.locations):
                 room.add_locations({f"{level_names[room.level]} {room.stage} - Stage Completion": None},
                                    KDL3Location)
+        if room.name in door_shuffle_events:
+            for location, item in door_shuffle_events[room.name].items():
+                world.get_location(location).place_locked_item(world.create_item(item))
 
     for level in world.player_levels:
         for stage in range(6):
@@ -426,15 +430,7 @@ def shuffle_doors(world: "KDL3World"):
     exits = []
     entrances = []
 
-    for room in local_rooms:
-        if room.name in non_randomized_rooms or room.name in linked_skip:
-            continue
-        if room.name not in heart_star_requirement:
-            stage_group = available_groups.pop()
-
-        else:
-            stage_group = default_levels[room.level][room.stage - 1] & 0xFF
-
+    def define_randomization_group(room: KDL3Room, stage_group: int):
         room.level = (stage_group // 6) + 1
         room.stage = (stage_group % 6) + 1
 
@@ -454,35 +450,55 @@ def shuffle_doors(world: "KDL3World"):
                     r_entrance.randomization_group = stage_group
                 exits.extend(list(r_room.get_exits()))
                 entrances.extend(list(r_room.entrances))
+
+    for iceberg, ability in final_iceberg_rooms.items():
+        # Iceberg 6 special handling
+        # We have to make a special pool here
+        room = world.get_region(iceberg)
+        assert isinstance(room, KDL3Room)
+        handled_room = next((room for room in local_rooms if
+                            any(world.copy_abilities[enemy] == ability for enemy in room.enemies) and
+                            room.name not in linked_skip and room.name not in heart_star_requirement), None)
+        if not handled_room:
+            # throw proper exception, shouldnt ever reach this
+            raise Exception("Unable to resolve Iceberg 6 rooms.")
+        local_rooms.remove(room)
+        local_rooms.remove(handled_room)
+        stage_group = 29
+        available_groups.remove(stage_group)
+
+        define_randomization_group(room, stage_group)
+        define_randomization_group(handled_room, stage_group)
+
+        # Now grab an entrance to Iceberg 6 and an exit from the handled room
+        source_exit = world.random.choice(handled_room.get_exits())
+        target_entrance = world.random.choice(room.entrances)
+
+        room.entrances.remove(target_entrance)
+        source_exit.connect(room)
+
+        exits.extend(list(handled_room.get_exits()))
+        entrances.extend(list(handled_room.entrances))
+        exits.extend(list(room.get_exits()))
+        entrances.extend(list(room.entrances))
+
+    for room in local_rooms:
+        if room.name in non_randomized_rooms or room.name in linked_skip:
+            continue
+        if room.name not in heart_star_requirement:
+            stage_group = available_groups.pop()
+
+        else:
+            stage_group = default_levels[room.level][room.stage - 1] & 0xFF
+
+        define_randomization_group(room, stage_group)
+
         exits.extend(list(room.get_exits()))
         entrances.extend(list(room.entrances))
 
     er_targets = []
     er_exits = []
     groups = {}
-
-    # Final Iceberg special casing
-    final_iceberg_rooms = [room for room in local_rooms if room.level == 5 and room.stage == 6]
-    collective_enemies = {enemy for room in final_iceberg_rooms for enemy in room.enemies}
-    current_abilities = {world.copy_abilities[enemy] for enemy in collective_enemies}
-    if set(copy_ability_access_table.keys()).difference(current_abilities):
-        required_abilities = sorted(set(copy_ability_access_table.keys()).difference(current_abilities))
-        ability_mapping = {ability: [] for ability in copy_ability_access_table.keys()}
-        for enemy in collective_enemies:
-            ability_mapping[world.copy_abilities[enemy]].append(enemy)
-        for ability in ["No Ability", *sorted(ability_mapping.keys(), key=lambda x: len(ability_mapping[x]))]:
-            while len(ability_mapping[ability]) > 1 or (ability_mapping[ability] and ability == "No Ability"):
-                enemy = ability_mapping[ability].pop()
-                world.copy_abilities[enemy] = required_abilities.pop()
-                if not required_abilities:
-                    break
-            if not required_abilities:
-                break
-        else:
-            raise Exception("Unable to resolve final Iceberg copy abilities")
-
-
-
 
     for group, stage in stage_names.items():
         group = group & 0xFF
@@ -528,8 +544,8 @@ def shuffle_doors(world: "KDL3World"):
         for j in range(6):
             group = groups[world.player_levels[i][j] & 0xFF]
             randomize_entrances(world, False, group_match, False, group[0], group[1])
-    visualize_regions(world.multiworld.get_region("Menu", world.player), "kdl3_doors.puml", show_locations=False)
-    raise NotImplementedError
+    #visualize_regions(world.multiworld.get_region("Menu", world.player), "kdl3_doors.puml", show_locations=False)
+    #raise NotImplementedError
 
 
 def create_levels(world: "KDL3World") -> None:

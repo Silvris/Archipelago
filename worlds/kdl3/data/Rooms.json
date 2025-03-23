@@ -87,7 +87,8 @@
                 1416,
                 152
             ]
-        ]
+        ],
+        "index": 0
     },
     {
         "name": "Grass Land 1 - 1",
@@ -180,7 +181,8 @@
             200
         ],
         "music": 20,
-        "entrances": []
+        "entrances": [],
+        "index": 1
     },
     {
         "name": "Grass Land 1 - 2",
@@ -216,7 +218,8 @@
             152
         ],
         "music": 38,
-        "entrances": []
+        "entrances": [],
+        "index": 2
     },
     {
         "name": "Grass Land 1 - 3",
@@ -287,7 +290,8 @@
             152
         ],
         "music": 20,
-        "entrances": []
+        "entrances": [],
+        "index": 3
     },
     {
         "name": "Grass Land 1 - 4",
@@ -333,7 +337,8 @@
                 56,
                 152
             ]
-        ]
+        ],
+        "index": 4
     },
     {
         "name": "Grass Land 1 - 5",
@@ -360,8 +365,9 @@
             72,
             120
         ],
-        "music": 2053,
-        "entrances": []
+        "music": 5,
+        "entrances": [],
+        "index": 5
     },
     {
         "name": "Grass Land 2 - 0",
@@ -436,7 +442,8 @@
             152
         ],
         "music": 11,
-        "entrances": []
+        "entrances": [],
+        "index": 6
     },
     {
         "name": "Grass Land 2 - 1",
@@ -472,7 +479,8 @@
             152
         ],
         "music": 39,
-        "entrances": []
+        "entrances": [],
+        "index": 7
     },
     {
         "name": "Grass Land 2 - 2",
@@ -551,7 +559,8 @@
                 840,
                 168
             ]
-        ]
+        ],
+        "index": 8
     },
     {
         "name": "Grass Land 2 - 3",
@@ -586,7 +595,8 @@
             152
         ],
         "music": 11,
-        "entrances": []
+        "entrances": [],
+        "index": 9
     },
     {
         "name": "Grass Land 2 - 4",
@@ -673,7 +683,8 @@
                 72,
                 200
             ]
-        ]
+        ],
+        "index": 10
     },
     {
         "name": "Grass Land 2 - 5",
@@ -719,7 +730,8 @@
                 72,
                 152
             ]
-        ]
+        ],
+        "index": 11
     },
     {
         "name": "Grass Land 2 - 6",
@@ -746,8 +758,9 @@
             72,
             120
         ],
-        "music": 2053,
-        "entrances": []
+        "music": 5,
+        "entrances": [],
+        "index": 12
     },
     {
         "name": "Grass Land 3 - 0",
@@ -829,7 +842,8 @@
                 760,
                 152
             ]
-        ]
+        ],
+        "index": 13
     },
     {
         "name": "Grass Land 3 - 1",
@@ -925,7 +939,8 @@
                 72,
                 840
             ]
-        ]
+        ],
+        "index": 14
     },
     {
         "name": "Grass Land 3 - 2",
@@ -979,7 +994,8 @@
             120
         ],
         "music": 19,
-        "entrances": []
+        "entrances": [],
+        "index": 15
     },
     {
         "name": "Grass Land 3 - 3",
@@ -1013,8 +1029,9 @@
             56,
             152
         ],
-        "music": 3615,
-        "entrances": []
+        "music": 31,
+        "entrances": [],
+        "index": 16
     },
     {
         "name": "Grass Land 3 - 4",
@@ -1050,7 +1067,8 @@
             152
         ],
         "music": 40,
-        "entrances": []
+        "entrances": [],
+        "index": 17
     },
     {
         "name": "Grass Land 3 - 5",
@@ -1085,7 +1103,8 @@
             152
         ],
         "music": 8,
-        "entrances": []
+        "entrances": [],
+        "index": 18
     },
     {
         "name": "Grass Land 3 - 6",
@@ -1151,7 +1170,8 @@
                 56,
                 152
             ]
-        ]
+        ],
+        "index": 19
     },
     {
         "name": "Grass Land 3 - 7",
@@ -1178,8 +1198,9 @@
             72,
             120
         ],
-        "music": 2053,
-        "entrances": []
+        "music": 5,
+        "entrances": [],
+        "index": 20
     },
     {
         "name": "Grass Land 4 - 0",
@@ -1251,7 +1272,8 @@
             200
         ],
         "music": 10,
-        "entrances": []
+        "entrances": [],
+        "index": 21
     },
     {
         "name": "Grass Land 4 - 1",
@@ -1335,7 +1357,8 @@
                 696,
                 296
             ]
-        ]
+        ],
+        "index": 22
     },
     {
         "name": "Grass Land 4 - 2",
@@ -1375,7 +1398,8 @@
                 56,
                 72
             ]
-        ]
+        ],
+        "index": 23
     },
     {
         "name": "Grass Land 4 - 3",
@@ -1490,7 +1514,8 @@
                 72,
                 440
             ]
-        ]
+        ],
+        "index": 24
     },
     {
         "name": "Grass Land 4 - 4",
@@ -1558,7 +1583,8 @@
             200
         ],
         "music": 10,
-        "entrances": []
+        "entrances": [],
+        "index": 25
     },
     {
         "name": "Grass Land 4 - 5",
@@ -1638,7 +1664,8 @@
             312
         ],
         "music": 10,
-        "entrances": []
+        "entrances": [],
+        "index": 26
     },
     {
         "name": "Grass Land 4 - 6-1",
@@ -1677,7 +1704,8 @@
             72
         ],
         "music": 10,
-        "entrances": []
+        "entrances": [],
+        "index": 27
     },
     {
         "name": "Grass Land 4 - 6-2",
@@ -1723,7 +1751,8 @@
                 56,
                 200
             ]
-        ]
+        ],
+        "index": 27
     },
     {
         "name": "Grass Land 4 - 7",
@@ -1759,8 +1788,9 @@
             56,
             200
         ],
-        "music": 3076,
-        "entrances": []
+        "music": 4,
+        "entrances": [],
+        "index": 28
     },
     {
         "name": "Grass Land 4 - 8",
@@ -1806,7 +1836,8 @@
                 40,
                 152
             ]
-        ]
+        ],
+        "index": 29
     },
     {
         "name": "Grass Land 4 - 9",
@@ -1842,7 +1873,8 @@
             88
         ],
         "music": 38,
-        "entrances": []
+        "entrances": [],
+        "index": 30
     },
     {
         "name": "Grass Land 4 - 10",
@@ -1869,8 +1901,9 @@
             72,
             120
         ],
-        "music": 2053,
-        "entrances": []
+        "music": 5,
+        "entrances": [],
+        "index": 31
     },
     {
         "name": "Grass Land 5 - 0",
@@ -1941,7 +1974,8 @@
             152
         ],
         "music": 11,
-        "entrances": []
+        "entrances": [],
+        "index": 32
     },
     {
         "name": "Grass Land 5 - 1",
@@ -2015,7 +2049,8 @@
                 312,
                 72
             ]
-        ]
+        ],
+        "index": 33
     },
     {
         "name": "Grass Land 5 - 2",
@@ -2084,7 +2119,8 @@
             88
         ],
         "music": 11,
-        "entrances": []
+        "entrances": [],
+        "index": 34
     },
     {
         "name": "Grass Land 5 - 3",
@@ -2125,7 +2161,8 @@
                 184,
                 152
             ]
-        ]
+        ],
+        "index": 35
     },
     {
         "name": "Grass Land 5 - 4",
@@ -2166,7 +2203,8 @@
                 184,
                 152
             ]
-        ]
+        ],
+        "index": 36
     },
     {
         "name": "Grass Land 5 - 5",
@@ -2212,7 +2250,8 @@
                 56,
                 152
             ]
-        ]
+        ],
+        "index": 37
     },
     {
         "name": "Grass Land 5 - 6",
@@ -2239,8 +2278,9 @@
             72,
             120
         ],
-        "music": 2053,
-        "entrances": []
+        "music": 5,
+        "entrances": [],
+        "index": 38
     },
     {
         "name": "Grass Land 5 - 7",
@@ -2305,7 +2345,8 @@
                 56,
                 72
             ]
-        ]
+        ],
+        "index": 39
     },
     {
         "name": "Grass Land 6 - 0",
@@ -2392,7 +2433,8 @@
                 840,
                 152
             ]
-        ]
+        ],
+        "index": 40
     },
     {
         "name": "Grass Land 6 - 1",
@@ -2478,7 +2520,8 @@
                 216,
                 1144
             ]
-        ]
+        ],
+        "index": 41
     },
     {
         "name": "Grass Land 6 - 2",
@@ -2554,7 +2597,8 @@
                 808,
                 120
             ]
-        ]
+        ],
+        "index": 42
     },
     {
         "name": "Grass Land 6 - 3",
@@ -2620,7 +2664,8 @@
             152
         ],
         "music": 20,
-        "entrances": []
+        "entrances": [],
+        "index": 43
     },
     {
         "name": "Grass Land 6 - 4",
@@ -2698,7 +2743,8 @@
             104
         ],
         "music": 20,
-        "entrances": []
+        "entrances": [],
+        "index": 44
     },
     {
         "name": "Grass Land 6 - 5",
@@ -2744,7 +2790,8 @@
                 56,
                 152
             ]
-        ]
+        ],
+        "index": 45
     },
     {
         "name": "Grass Land 6 - 6",
@@ -2780,7 +2827,8 @@
             152
         ],
         "music": 39,
-        "entrances": []
+        "entrances": [],
+        "index": 46
     },
     {
         "name": "Grass Land 6 - 7",
@@ -2821,7 +2869,8 @@
                 216,
                 104
             ]
-        ]
+        ],
+        "index": 47
     },
     {
         "name": "Grass Land 6 - 8",
@@ -2848,8 +2897,9 @@
             72,
             120
         ],
-        "music": 2053,
-        "entrances": []
+        "music": 5,
+        "entrances": [],
+        "index": 48
     },
     {
         "name": "Grass Land Boss - 0",
@@ -2878,8 +2928,9 @@
             144,
             144
         ],
-        "music": 2818,
-        "entrances": []
+        "music": 2,
+        "entrances": [],
+        "index": 49
     },
     {
         "name": "Ripple Field 1 - 0",
@@ -2946,7 +2997,8 @@
             104
         ],
         "music": 15,
-        "entrances": []
+        "entrances": [],
+        "index": 50
     },
     {
         "name": "Ripple Field 1 - 1",
@@ -3038,7 +3090,8 @@
                 2232,
                 264
             ]
-        ]
+        ],
+        "index": 51
     },
     {
         "name": "Ripple Field 1 - 2",
@@ -3079,7 +3132,8 @@
                 56,
                 152
             ]
-        ]
+        ],
+        "index": 52
     },
     {
         "name": "Ripple Field 1 - 3",
@@ -3148,7 +3202,8 @@
             232
         ],
         "music": 15,
-        "entrances": []
+        "entrances": [],
+        "index": 53
     },
     {
         "name": "Ripple Field 1 - 4",
@@ -3189,7 +3244,8 @@
             152
         ],
         "music": 8,
-        "entrances": []
+        "entrances": [],
+        "index": 54
     },
     {
         "name": "Ripple Field 1 - 5",
@@ -3236,7 +3292,8 @@
                 200,
                 184
             ]
-        ]
+        ],
+        "index": 55
     },
     {
         "name": "Ripple Field 1 - 6",
@@ -3282,7 +3339,8 @@
                 200,
                 184
             ]
-        ]
+        ],
+        "index": 56
     },
     {
         "name": "Ripple Field 1 - 7",
@@ -3322,7 +3380,8 @@
                 200,
                 184
             ]
-        ]
+        ],
+        "index": 57
     },
     {
         "name": "Ripple Field 1 - 8",
@@ -3349,8 +3408,9 @@
             72,
             120
         ],
-        "music": 2053,
-        "entrances": []
+        "music": 5,
+        "entrances": [],
+        "index": 58
     },
     {
         "name": "Ripple Field 2 - 0",
@@ -3423,7 +3483,8 @@
             152
         ],
         "music": 10,
-        "entrances": []
+        "entrances": [],
+        "index": 59
     },
     {
         "name": "Ripple Field 2 - 1",
@@ -3459,7 +3520,8 @@
             104
         ],
         "music": 39,
-        "entrances": []
+        "entrances": [],
+        "index": 60
     },
     {
         "name": "Ripple Field 2 - 2",
@@ -3543,7 +3605,8 @@
                 1048,
                 280
             ]
-        ]
+        ],
+        "index": 61
     },
     {
         "name": "Ripple Field 2 - 3",
@@ -3632,7 +3695,8 @@
             248
         ],
         "music": 10,
-        "entrances": []
+        "entrances": [],
+        "index": 62
     },
     {
         "name": "Ripple Field 2 - 4",
@@ -3672,7 +3736,8 @@
                 72,
                 152
             ]
-        ]
+        ],
+        "index": 63
     },
     {
         "name": "Ripple Field 2 - 5",
@@ -3708,7 +3773,8 @@
             264
         ],
         "music": 38,
-        "entrances": []
+        "entrances": [],
+        "index": 64
     },
     {
         "name": "Ripple Field 2 - 6",
@@ -3754,7 +3820,8 @@
                 56,
                 152
             ]
-        ]
+        ],
+        "index": 65
     },
     {
         "name": "Ripple Field 2 - 7",
@@ -3781,8 +3848,9 @@
             72,
             120
         ],
-        "music": 2053,
-        "entrances": []
+        "music": 5,
+        "entrances": [],
+        "index": 66
     },
     {
         "name": "Ripple Field 3 - 0",
@@ -3849,7 +3917,8 @@
             136
         ],
         "music": 18,
-        "entrances": []
+        "entrances": [],
+        "index": 67
     },
     {
         "name": "Ripple Field 3 - 1",
@@ -3944,7 +4013,8 @@
             104
         ],
         "music": 18,
-        "entrances": []
+        "entrances": [],
+        "index": 68
     },
     {
         "name": "Ripple Field 3 - 2",
@@ -4021,7 +4091,8 @@
             216
         ],
         "music": 18,
-        "entrances": []
+        "entrances": [],
+        "index": 69
     },
     {
         "name": "Ripple Field 3 - 3",
@@ -4057,7 +4128,8 @@
             104
         ],
         "music": 39,
-        "entrances": []
+        "entrances": [],
+        "index": 70
     },
     {
         "name": "Ripple Field 3 - 4",
@@ -4094,7 +4166,8 @@
             152
         ],
         "music": 8,
-        "entrances": []
+        "entrances": [],
+        "index": 71
     },
     {
         "name": "Ripple Field 3 - 5",
@@ -4128,8 +4201,9 @@
             40,
             152
         ],
-        "music": 3615,
-        "entrances": []
+        "music": 31,
+        "entrances": [],
+        "index": 72
     },
     {
         "name": "Ripple Field 3 - 6",
@@ -4156,8 +4230,9 @@
             72,
             120
         ],
-        "music": 2053,
-        "entrances": []
+        "music": 5,
+        "entrances": [],
+        "index": 73
     },
     {
         "name": "Ripple Field 3 - 7-1",
@@ -4192,7 +4267,8 @@
             328
         ],
         "music": 18,
-        "entrances": []
+        "entrances": [],
+        "index": 74
     },
     {
         "name": "Ripple Field 3 - 7-2",
@@ -4232,7 +4308,8 @@
                 232,
                 88
             ]
-        ]
+        ],
+        "index": 74
     },
     {
         "name": "Ripple Field 4 - 0",
@@ -4308,7 +4385,8 @@
             136
         ],
         "music": 15,
-        "entrances": []
+        "entrances": [],
+        "index": 75
     },
     {
         "name": "Ripple Field 4 - 1",
@@ -4344,13 +4422,14 @@
             104,
             134
         ],
-        "music": 3076,
+        "music": 4,
         "entrances": [
             [
                 104,
                 136
             ]
-        ]
+        ],
+        "index": 76
     },
     {
         "name": "Ripple Field 4 - 2-1",
@@ -4398,7 +4477,8 @@
                 72,
                 88
             ]
-        ]
+        ],
+        "index": 77
     },
     {
         "name": "Ripple Field 4 - 2-2",
@@ -4433,13 +4513,16 @@
                 16
             ]
         ],
-        "locations": [],
+        "locations": [
+            "Ripple Field 4 - Enemy 6 (Bukiset (Burning))"
+        ],
         "spawn": [
             72,
             248
         ],
         "music": 15,
-        "entrances": []
+        "entrances": [],
+        "index": 77
     },
     {
         "name": "Ripple Field 4 - 3",
@@ -4485,7 +4568,8 @@
                 72,
                 152
             ]
-        ]
+        ],
+        "index": 78
     },
     {
         "name": "Ripple Field 4 - 4",
@@ -4512,8 +4596,9 @@
             72,
             120
         ],
-        "music": 2053,
-        "entrances": []
+        "music": 5,
+        "entrances": [],
+        "index": 79
     },
     {
         "name": "Ripple Field 4 - 5-1",
@@ -4552,7 +4637,8 @@
                 104,
                 88
             ]
-        ]
+        ],
+        "index": 80
     },
     {
         "name": "Ripple Field 4 - 5-2",
@@ -4591,7 +4677,8 @@
                 232,
                 88
             ]
-        ]
+        ],
+        "index": 80
     },
     {
         "name": "Ripple Field 4 - 5-3",
@@ -4630,7 +4717,8 @@
                 184,
                 184
             ]
-        ]
+        ],
+        "index": 80
     },
     {
         "name": "Ripple Field 4 - 6",
@@ -4726,7 +4814,8 @@
                 488,
                 120
             ]
-        ]
+        ],
+        "index": 81
     },
     {
         "name": "Ripple Field 4 - 7-1",
@@ -4784,7 +4873,8 @@
             440
         ],
         "music": 15,
-        "entrances": []
+        "entrances": [],
+        "index": 82
     },
     {
         "name": "Ripple Field 4 - 7-2",
@@ -4832,7 +4922,8 @@
                 296,
                 440
             ]
-        ]
+        ],
+        "index": 82
     },
     {
         "name": "Ripple Field 4 - 8",
@@ -4929,7 +5020,8 @@
                 376,
                 1144
             ]
-        ]
+        ],
+        "index": 83
     },
     {
         "name": "Ripple Field 4 - 9",
@@ -4988,7 +5080,8 @@
                 168,
                 152
             ]
-        ]
+        ],
+        "index": 84
     },
     {
         "name": "Ripple Field 4 - 10",
@@ -5044,7 +5137,8 @@
                 120,
                 152
             ]
-        ]
+        ],
+        "index": 85
     },
     {
         "name": "Ripple Field 4 - 11",
@@ -5123,7 +5217,8 @@
                 56,
                 88
             ]
-        ]
+        ],
+        "index": 86
     },
     {
         "name": "Ripple Field 4 - 12",
@@ -5187,7 +5282,8 @@
                 88,
                 216
             ]
-        ]
+        ],
+        "index": 87
     },
     {
         "name": "Ripple Field 4 - 13",
@@ -5255,7 +5351,8 @@
                 88,
                 136
             ]
-        ]
+        ],
+        "index": 88
     },
     {
         "name": "Ripple Field 5 - 0",
@@ -5297,7 +5394,8 @@
             88
         ],
         "music": 16,
-        "entrances": []
+        "entrances": [],
+        "index": 89
     },
     {
         "name": "Ripple Field 5 - 1",
@@ -5348,7 +5446,8 @@
             1064
         ],
         "music": 16,
-        "entrances": []
+        "entrances": [],
+        "index": 90
     },
     {
         "name": "Ripple Field 5 - 2",
@@ -5416,7 +5515,8 @@
                 88,
                 344
             ]
-        ]
+        ],
+        "index": 91
     },
     {
         "name": "Ripple Field 5 - 3",
@@ -5534,7 +5634,8 @@
                 88,
                 200
             ]
-        ]
+        ],
+        "index": 92
     },
     {
         "name": "Ripple Field 5 - 4",
@@ -5573,7 +5674,8 @@
                 56,
                 72
             ]
-        ]
+        ],
+        "index": 93
     },
     {
         "name": "Ripple Field 5 - 5",
@@ -5625,7 +5727,8 @@
             152
         ],
         "music": 16,
-        "entrances": []
+        "entrances": [],
+        "index": 94
     },
     {
         "name": "Ripple Field 5 - 6",
@@ -5696,7 +5799,8 @@
                 184,
                 344
             ]
-        ]
+        ],
+        "index": 95
     },
     {
         "name": "Ripple Field 5 - 7",
@@ -5787,7 +5891,8 @@
                 712,
                 504
             ]
-        ]
+        ],
+        "index": 96
     },
     {
         "name": "Ripple Field 5 - 8",
@@ -5827,7 +5932,8 @@
                 152,
                 152
             ]
-        ]
+        ],
+        "index": 97
     },
     {
         "name": "Ripple Field 5 - 9",
@@ -5873,7 +5979,8 @@
                 56,
                 152
             ]
-        ]
+        ],
+        "index": 98
     },
     {
         "name": "Ripple Field 5 - 10",
@@ -5923,7 +6030,8 @@
                 152,
                 152
             ]
-        ]
+        ],
+        "index": 99
     },
     {
         "name": "Ripple Field 5 - 11",
@@ -5950,8 +6058,9 @@
             72,
             120
         ],
-        "music": 2053,
-        "entrances": []
+        "music": 5,
+        "entrances": [],
+        "index": 100
     },
     {
         "name": "Ripple Field 6 - 0",
@@ -5994,7 +6103,8 @@
             264
         ],
         "music": 15,
-        "entrances": []
+        "entrances": [],
+        "index": 101
     },
     {
         "name": "Ripple Field 6 - 1",
@@ -6032,7 +6142,8 @@
             152
         ],
         "music": 38,
-        "entrances": []
+        "entrances": [],
+        "index": 102
     },
     {
         "name": "Ripple Field 6 - 2",
@@ -6112,7 +6223,8 @@
                 104,
                 152
             ]
-        ]
+        ],
+        "index": 103
     },
     {
         "name": "Ripple Field 6 - 3",
@@ -6159,7 +6271,8 @@
                 88,
                 88
             ]
-        ]
+        ],
+        "index": 104
     },
     {
         "name": "Ripple Field 6 - 4",
@@ -6199,7 +6312,8 @@
                 184,
                 88
             ]
-        ]
+        ],
+        "index": 105
     },
     {
         "name": "Ripple Field 6 - 5",
@@ -6282,7 +6396,8 @@
             168
         ],
         "music": 15,
-        "entrances": []
+        "entrances": [],
+        "index": 106
     },
     {
         "name": "Ripple Field 6 - 6",
@@ -6342,7 +6457,8 @@
                 680,
                 200
             ]
-        ]
+        ],
+        "index": 107
     },
     {
         "name": "Ripple Field 6 - 7",
@@ -6417,7 +6533,8 @@
             264
         ],
         "music": 15,
-        "entrances": []
+        "entrances": [],
+        "index": 108
     },
     {
         "name": "Ripple Field 6 - 8",
@@ -6504,7 +6621,8 @@
                 408,
                 872
             ]
-        ]
+        ],
+        "index": 109
     },
     {
         "name": "Ripple Field 6 - 9",
@@ -6543,7 +6661,8 @@
                 72,
                 152
             ]
-        ]
+        ],
+        "index": 110
     },
     {
         "name": "Ripple Field 6 - 10",
@@ -6589,7 +6708,8 @@
                 56,
                 152
             ]
-        ]
+        ],
+        "index": 111
     },
     {
         "name": "Ripple Field 6 - 11",
@@ -6616,8 +6736,9 @@
             72,
             120
         ],
-        "music": 2053,
-        "entrances": []
+        "music": 5,
+        "entrances": [],
+        "index": 112
     },
     {
         "name": "Ripple Field Boss - 0",
@@ -6646,8 +6767,9 @@
             328,
             136
         ],
-        "music": 3074,
-        "entrances": []
+        "music": 2,
+        "entrances": [],
+        "index": 113
     },
     {
         "name": "Sand Canyon 1 - 0",
@@ -6700,7 +6822,8 @@
             104
         ],
         "music": 13,
-        "entrances": []
+        "entrances": [],
+        "index": 114
     },
     {
         "name": "Sand Canyon 1 - 1",
@@ -6736,7 +6859,8 @@
             344
         ],
         "music": 38,
-        "entrances": []
+        "entrances": [],
+        "index": 115
     },
     {
         "name": "Sand Canyon 1 - 2",
@@ -6812,7 +6936,8 @@
                 104,
                 408
             ]
-        ]
+        ],
+        "index": 116
     },
     {
         "name": "Sand Canyon 1 - 3",
@@ -6874,7 +6999,8 @@
                 56,
                 120
             ]
-        ]
+        ],
+        "index": 117
     },
     {
         "name": "Sand Canyon 1 - 4",
@@ -6941,7 +7067,8 @@
             280
         ],
         "music": 13,
-        "entrances": []
+        "entrances": [],
+        "index": 118
     },
     {
         "name": "Sand Canyon 1 - 5",
@@ -6993,7 +7120,8 @@
                 536,
                 152
             ]
-        ]
+        ],
+        "index": 119
     },
     {
         "name": "Sand Canyon 1 - 6",
@@ -7061,7 +7189,8 @@
                 104,
                 152
             ]
-        ]
+        ],
+        "index": 120
     },
     {
         "name": "Sand Canyon 1 - 7",
@@ -7107,7 +7236,8 @@
                 56,
                 152
             ]
-        ]
+        ],
+        "index": 121
     },
     {
         "name": "Sand Canyon 1 - 8",
@@ -7134,8 +7264,9 @@
             72,
             120
         ],
-        "music": 2053,
-        "entrances": []
+        "music": 5,
+        "entrances": [],
+        "index": 122
     },
     {
         "name": "Sand Canyon 2 - 0",
@@ -7222,7 +7353,8 @@
                 2872,
                 136
             ]
-        ]
+        ],
+        "index": 123
     },
     {
         "name": "Sand Canyon 2 - 1",
@@ -7263,7 +7395,8 @@
                 184,
                 104
             ]
-        ]
+        ],
+        "index": 124
     },
     {
         "name": "Sand Canyon 2 - 2",
@@ -7316,7 +7449,8 @@
             952
         ],
         "music": 21,
-        "entrances": []
+        "entrances": [],
+        "index": 125
     },
     {
         "name": "Sand Canyon 2 - 3",
@@ -7410,7 +7544,8 @@
                 1112,
                 88
             ]
-        ]
+        ],
+        "index": 126
     },
     {
         "name": "Sand Canyon 2 - 4-1",
@@ -7461,7 +7596,8 @@
                 184,
                 184
             ]
-        ]
+        ],
+        "index": 127
     },
     {
         "name": "Sand Canyon 2 - 4-2",
@@ -7533,7 +7669,8 @@
                 248,
                 184
             ]
-        ]
+        ],
+        "index": 127
     },
     {
         "name": "Sand Canyon 2 - 5-1",
@@ -7594,6 +7731,9 @@
             ]
         ],
         "locations": [
+            "Sand Canyon 2 - Enemy 9 (Bukiset (Ice))",
+            "Sand Canyon 2 - Enemy 10 (Bukiset (Needle))",
+            "Sand Canyon 2 - Enemy 11 (Bukiset (Clean))",
             "Sand Canyon 2 - Star 20",
             "Sand Canyon 2 - Star 21",
             "Sand Canyon 2 - Star 22",
@@ -7612,7 +7752,8 @@
                 904,
                 376
             ]
-        ]
+        ],
+        "index": 128
     },
     {
         "name": "Sand Canyon 2 - 5-2",
@@ -7683,7 +7824,8 @@
                 1016,
                 296
             ]
-        ]
+        ],
+        "index": 128
     },
     {
         "name": "Sand Canyon 2 - 5-3",
@@ -7754,7 +7896,8 @@
                 1144,
                 248
             ]
-        ]
+        ],
+        "index": 128
     },
     {
         "name": "Sand Canyon 2 - 5-4",
@@ -7815,6 +7958,9 @@
             ]
         ],
         "locations": [
+            "Sand Canyon 2 - Enemy 12 (Bukiset (Parasol))",
+            "Sand Canyon 2 - Enemy 13 (Bukiset (Spark))",
+            "Sand Canyon 2 - Enemy 14 (Bukiset (Cutter))",
             "Sand Canyon 2 - Star 27",
             "Sand Canyon 2 - Star 28",
             "Sand Canyon 2 - Star 29",
@@ -7833,7 +7979,8 @@
                 1256,
                 376
             ]
-        ]
+        ],
+        "index": 128
     },
     {
         "name": "Sand Canyon 2 - 6",
@@ -7877,7 +8024,8 @@
             216
         ],
         "music": 21,
-        "entrances": []
+        "entrances": [],
+        "index": 129
     },
     {
         "name": "Sand Canyon 2 - 7",
@@ -7920,7 +8068,8 @@
             216
         ],
         "music": 21,
-        "entrances": []
+        "entrances": [],
+        "index": 130
     },
     {
         "name": "Sand Canyon 2 - 8",
@@ -7964,7 +8113,8 @@
             136
         ],
         "music": 21,
-        "entrances": []
+        "entrances": [],
+        "index": 131
     },
     {
         "name": "Sand Canyon 2 - 9",
@@ -8058,7 +8208,8 @@
                 88,
                 184
             ]
-        ]
+        ],
+        "index": 132
     },
     {
         "name": "Sand Canyon 2 - 10",
@@ -8104,7 +8255,8 @@
                 56,
                 152
             ]
-        ]
+        ],
+        "index": 133
     },
     {
         "name": "Sand Canyon 2 - 11",
@@ -8131,8 +8283,9 @@
             72,
             120
         ],
-        "music": 2053,
-        "entrances": []
+        "music": 5,
+        "entrances": [],
+        "index": 134
     },
     {
         "name": "Sand Canyon 3 - 0",
@@ -8226,7 +8379,8 @@
                 88,
                 920
             ]
-        ]
+        ],
+        "index": 135
     },
     {
         "name": "Sand Canyon 3 - 1-1",
@@ -8265,7 +8419,8 @@
                 104,
                 152
             ]
-        ]
+        ],
+        "index": 136
     },
     {
         "name": "Sand Canyon 3 - 1-2",
@@ -8304,7 +8459,8 @@
                 200,
                 152
             ]
-        ]
+        ],
+        "index": 136
     },
     {
         "name": "Sand Canyon 3 - 1-3",
@@ -8343,7 +8499,8 @@
                 296,
                 152
             ]
-        ]
+        ],
+        "index": 136
     },
     {
         "name": "Sand Canyon 3 - 2",
@@ -8404,7 +8561,8 @@
             72
         ],
         "music": 16,
-        "entrances": []
+        "entrances": [],
+        "index": 137
     },
     {
         "name": "Sand Canyon 3 - 3",
@@ -8451,7 +8609,8 @@
             232
         ],
         "music": 16,
-        "entrances": []
+        "entrances": [],
+        "index": 138
     },
     {
         "name": "Sand Canyon 3 - 4",
@@ -8512,7 +8671,8 @@
             424
         ],
         "music": 16,
-        "entrances": []
+        "entrances": [],
+        "index": 139
     },
     {
         "name": "Sand Canyon 3 - 5",
@@ -8549,7 +8709,8 @@
             152
         ],
         "music": 8,
-        "entrances": []
+        "entrances": [],
+        "index": 140
     },
     {
         "name": "Sand Canyon 3 - 6",
@@ -8614,7 +8775,8 @@
             120
         ],
         "music": 16,
-        "entrances": []
+        "entrances": [],
+        "index": 141
     },
     {
         "name": "Sand Canyon 3 - 7",
@@ -8641,8 +8803,9 @@
             72,
             120
         ],
-        "music": 2053,
-        "entrances": []
+        "music": 5,
+        "entrances": [],
+        "index": 142
     },
     {
         "name": "Sand Canyon 3 - 8",
@@ -8676,8 +8839,9 @@
             40,
             152
         ],
-        "music": 3615,
-        "entrances": []
+        "music": 31,
+        "entrances": [],
+        "index": 143
     },
     {
         "name": "Sand Canyon 4 - 0",
@@ -8760,7 +8924,8 @@
                 1544,
                 136
             ]
-        ]
+        ],
+        "index": 144
     },
     {
         "name": "Sand Canyon 4 - 1",
@@ -8803,7 +8968,8 @@
                 216,
                 88
             ]
-        ]
+        ],
+        "index": 145
     },
     {
         "name": "Sand Canyon 4 - 2",
@@ -8878,7 +9044,8 @@
                 104,
                 88
             ]
-        ]
+        ],
+        "index": 146
     },
     {
         "name": "Sand Canyon 4 - 3",
@@ -8980,7 +9147,8 @@
                 88,
                 216
             ]
-        ]
+        ],
+        "index": 147
     },
     {
         "name": "Sand Canyon 4 - 4",
@@ -9052,7 +9220,8 @@
                 776,
                 248
             ]
-        ]
+        ],
+        "index": 148
     },
     {
         "name": "Sand Canyon 4 - 5",
@@ -9088,8 +9257,9 @@
             104,
             216
         ],
-        "music": 3076,
-        "entrances": []
+        "music": 4,
+        "entrances": [],
+        "index": 149
     },
     {
         "name": "Sand Canyon 4 - 6-1",
@@ -9137,7 +9307,8 @@
                 88,
                 104
             ]
-        ]
+        ],
+        "index": 150
     },
     {
         "name": "Sand Canyon 4 - 6-2",
@@ -9182,7 +9353,8 @@
             232
         ],
         "music": 18,
-        "entrances": []
+        "entrances": [],
+        "index": 150
     },
     {
         "name": "Sand Canyon 4 - 6-3",
@@ -9230,7 +9402,8 @@
                 88,
                 360
             ]
-        ]
+        ],
+        "index": 150
     },
     {
         "name": "Sand Canyon 4 - 7",
@@ -9339,7 +9512,8 @@
                 56,
                 152
             ]
-        ]
+        ],
+        "index": 151
     },
     {
         "name": "Sand Canyon 4 - 8",
@@ -9380,7 +9554,8 @@
             152
         ],
         "music": 8,
-        "entrances": []
+        "entrances": [],
+        "index": 152
     },
     {
         "name": "Sand Canyon 4 - 9",
@@ -9407,8 +9582,9 @@
             72,
             120
         ],
-        "music": 2053,
-        "entrances": []
+        "music": 5,
+        "entrances": [],
+        "index": 153
     },
     {
         "name": "Sand Canyon 5 - 0",
@@ -9505,7 +9681,8 @@
                 1320,
                 264
             ]
-        ]
+        ],
+        "index": 154
     },
     {
         "name": "Sand Canyon 5 - 1",
@@ -9573,7 +9750,8 @@
                 120,
                 152
             ]
-        ]
+        ],
+        "index": 155
     },
     {
         "name": "Sand Canyon 5 - 2",
@@ -9612,7 +9790,8 @@
                 72,
                 120
             ]
-        ]
+        ],
+        "index": 156
     },
     {
         "name": "Sand Canyon 5 - 3",
@@ -9721,7 +9900,8 @@
             56
         ],
         "music": 13,
-        "entrances": []
+        "entrances": [],
+        "index": 157
     },
     {
         "name": "Sand Canyon 5 - 4",
@@ -9798,7 +9978,8 @@
                 88,
                 88
             ]
-        ]
+        ],
+        "index": 158
     },
     {
         "name": "Sand Canyon 5 - 5",
@@ -9837,7 +10018,8 @@
                 88,
                 120
             ]
-        ]
+        ],
+        "index": 159
     },
     {
         "name": "Sand Canyon 5 - 6",
@@ -9888,7 +10070,8 @@
             760
         ],
         "music": 13,
-        "entrances": []
+        "entrances": [],
+        "index": 160
     },
     {
         "name": "Sand Canyon 5 - 7",
@@ -9934,7 +10117,8 @@
                 56,
                 152
             ]
-        ]
+        ],
+        "index": 161
     },
     {
         "name": "Sand Canyon 5 - 8",
@@ -9961,8 +10145,9 @@
             72,
             120
         ],
-        "music": 2053,
-        "entrances": []
+        "music": 5,
+        "entrances": [],
+        "index": 162
     },
     {
         "name": "Sand Canyon 5 - 9",
@@ -10063,7 +10248,8 @@
                 216,
                 1128
             ]
-        ]
+        ],
+        "index": 163
     },
     {
         "name": "Sand Canyon 6 - 0",
@@ -10120,7 +10306,8 @@
             248
         ],
         "music": 14,
-        "entrances": []
+        "entrances": [],
+        "index": 164
     },
     {
         "name": "Sand Canyon 6 - 1",
@@ -10163,7 +10350,8 @@
                 376,
                 216
             ]
-        ]
+        ],
+        "index": 165
     },
     {
         "name": "Sand Canyon 6 - 2",
@@ -10193,7 +10381,8 @@
             136
         ],
         "music": 14,
-        "entrances": []
+        "entrances": [],
+        "index": 166
     },
     {
         "name": "Sand Canyon 6 - 3",
@@ -10289,7 +10478,8 @@
                 88,
                 264
             ]
-        ]
+        ],
+        "index": 167
     },
     {
         "name": "Sand Canyon 6 - 4",
@@ -10385,7 +10575,8 @@
                 136,
                 152
             ]
-        ]
+        ],
+        "index": 168
     },
     {
         "name": "Sand Canyon 6 - 5",
@@ -10481,7 +10672,8 @@
                 264,
                 88
             ]
-        ]
+        ],
+        "index": 169
     },
     {
         "name": "Sand Canyon 6 - 6",
@@ -10577,7 +10769,8 @@
                 392,
                 152
             ]
-        ]
+        ],
+        "index": 170
     },
     {
         "name": "Sand Canyon 6 - 7",
@@ -10673,7 +10866,8 @@
                 440,
                 264
             ]
-        ]
+        ],
+        "index": 171
     },
     {
         "name": "Sand Canyon 6 - 8",
@@ -10769,7 +10963,8 @@
                 152,
                 392
             ]
-        ]
+        ],
+        "index": 172
     },
     {
         "name": "Sand Canyon 6 - 9",
@@ -10865,7 +11060,8 @@
                 264,
                 440
             ]
-        ]
+        ],
+        "index": 173
     },
     {
         "name": "Sand Canyon 6 - 10",
@@ -10961,7 +11157,8 @@
                 376,
                 392
             ]
-        ]
+        ],
+        "index": 174
     },
     {
         "name": "Sand Canyon 6 - 11",
@@ -11001,7 +11198,8 @@
                 600,
                 104
             ]
-        ]
+        ],
+        "index": 175
     },
     {
         "name": "Sand Canyon 6 - 12",
@@ -11057,7 +11255,8 @@
                 88,
                 136
             ]
-        ]
+        ],
+        "index": 176
     },
     {
         "name": "Sand Canyon 6 - 13",
@@ -11087,7 +11286,8 @@
             104
         ],
         "music": 14,
-        "entrances": []
+        "entrances": [],
+        "index": 177
     },
     {
         "name": "Sand Canyon 6 - 14",
@@ -11134,7 +11334,8 @@
                 104,
                 152
             ]
-        ]
+        ],
+        "index": 178
     },
     {
         "name": "Sand Canyon 6 - 15",
@@ -11174,7 +11375,8 @@
                 200,
                 152
             ]
-        ]
+        ],
+        "index": 179
     },
     {
         "name": "Sand Canyon 6 - 16",
@@ -11217,7 +11419,8 @@
                 184,
                 712
             ]
-        ]
+        ],
+        "index": 180
     },
     {
         "name": "Sand Canyon 6 - 17",
@@ -11260,7 +11463,8 @@
                 184,
                 312
             ]
-        ]
+        ],
+        "index": 181
     },
     {
         "name": "Sand Canyon 6 - 18",
@@ -11300,7 +11504,8 @@
                 248,
                 152
             ]
-        ]
+        ],
+        "index": 182
     },
     {
         "name": "Sand Canyon 6 - 19",
@@ -11347,7 +11552,8 @@
                 104,
                 152
             ]
-        ]
+        ],
+        "index": 183
     },
     {
         "name": "Sand Canyon 6 - 20",
@@ -11382,7 +11588,8 @@
             152
         ],
         "music": 14,
-        "entrances": []
+        "entrances": [],
+        "index": 184
     },
     {
         "name": "Sand Canyon 6 - 21",
@@ -11425,7 +11632,8 @@
                 168,
                 216
             ]
-        ]
+        ],
+        "index": 185
     },
     {
         "name": "Sand Canyon 6 - 22",
@@ -11489,7 +11697,8 @@
                 248,
                 136
             ]
-        ]
+        ],
+        "index": 186
     },
     {
         "name": "Sand Canyon 6 - 23",
@@ -11529,7 +11738,8 @@
                 56,
                 152
             ]
-        ]
+        ],
+        "index": 187
     },
     {
         "name": "Sand Canyon 6 - 24",
@@ -11580,7 +11790,8 @@
                 184,
                 328
             ]
-        ]
+        ],
+        "index": 188
     },
     {
         "name": "Sand Canyon 6 - 25",
@@ -11626,7 +11837,8 @@
             328
         ],
         "music": 14,
-        "entrances": []
+        "entrances": [],
+        "index": 189
     },
     {
         "name": "Sand Canyon 6 - 26",
@@ -11672,7 +11884,8 @@
             328
         ],
         "music": 14,
-        "entrances": []
+        "entrances": [],
+        "index": 190
     },
     {
         "name": "Sand Canyon 6 - 27",
@@ -11718,7 +11931,8 @@
             328
         ],
         "music": 14,
-        "entrances": []
+        "entrances": [],
+        "index": 191
     },
     {
         "name": "Sand Canyon 6 - 28",
@@ -11764,7 +11978,8 @@
             328
         ],
         "music": 14,
-        "entrances": []
+        "entrances": [],
+        "index": 192
     },
     {
         "name": "Sand Canyon 6 - 29",
@@ -11808,7 +12023,8 @@
                 248,
                 344
             ]
-        ]
+        ],
+        "index": 193
     },
     {
         "name": "Sand Canyon 6 - 30",
@@ -11838,7 +12054,8 @@
             136
         ],
         "music": 14,
-        "entrances": []
+        "entrances": [],
+        "index": 194
     },
     {
         "name": "Sand Canyon 6 - 31",
@@ -11884,7 +12101,8 @@
             328
         ],
         "music": 14,
-        "entrances": []
+        "entrances": [],
+        "index": 195
     },
     {
         "name": "Sand Canyon 6 - 32",
@@ -11960,7 +12178,8 @@
                 120,
                 328
             ]
-        ]
+        ],
+        "index": 196
     },
     {
         "name": "Sand Canyon 6 - 33",
@@ -12036,7 +12255,8 @@
                 120,
                 328
             ]
-        ]
+        ],
+        "index": 197
     },
     {
         "name": "Sand Canyon 6 - 34",
@@ -12112,7 +12332,8 @@
                 120,
                 328
             ]
-        ]
+        ],
+        "index": 198
     },
     {
         "name": "Sand Canyon 6 - 35",
@@ -12188,7 +12409,8 @@
                 120,
                 328
             ]
-        ]
+        ],
+        "index": 199
     },
     {
         "name": "Sand Canyon 6 - 36",
@@ -12243,7 +12465,8 @@
                 168,
                 648
             ]
-        ]
+        ],
+        "index": 200
     },
     {
         "name": "Sand Canyon 6 - 37",
@@ -12287,7 +12510,8 @@
                 248,
                 344
             ]
-        ]
+        ],
+        "index": 201
     },
     {
         "name": "Sand Canyon 6 - 38",
@@ -12363,7 +12587,8 @@
                 168,
                 376
             ]
-        ]
+        ],
+        "index": 202
     },
     {
         "name": "Sand Canyon 6 - 39",
@@ -12418,7 +12643,8 @@
                 120,
                 328
             ]
-        ]
+        ],
+        "index": 203
     },
     {
         "name": "Sand Canyon 6 - 40",
@@ -12473,7 +12699,8 @@
                 120,
                 328
             ]
-        ]
+        ],
+        "index": 204
     },
     {
         "name": "Sand Canyon 6 - 41",
@@ -12528,7 +12755,8 @@
                 120,
                 328
             ]
-        ]
+        ],
+        "index": 205
     },
     {
         "name": "Sand Canyon 6 - 42",
@@ -12584,7 +12812,8 @@
                 120,
                 328
             ]
-        ]
+        ],
+        "index": 206
     },
     {
         "name": "Sand Canyon 6 - 43",
@@ -12630,7 +12859,8 @@
                 72,
                 152
             ]
-        ]
+        ],
+        "index": 207
     },
     {
         "name": "Sand Canyon 6 - 44",
@@ -12657,8 +12887,9 @@
             72,
             120
         ],
-        "music": 2053,
-        "entrances": []
+        "music": 5,
+        "entrances": [],
+        "index": 208
     },
     {
         "name": "Sand Canyon Boss - 0",
@@ -12687,8 +12918,9 @@
             144,
             168
         ],
-        "music": 3330,
-        "entrances": []
+        "music": 2,
+        "entrances": [],
+        "index": 209
     },
     {
         "name": "Cloudy Park 1 - 0",
@@ -12747,7 +12979,8 @@
             152
         ],
         "music": 17,
-        "entrances": []
+        "entrances": [],
+        "index": 210
     },
     {
         "name": "Cloudy Park 1 - 1",
@@ -12781,7 +13014,8 @@
             152
         ],
         "music": 39,
-        "entrances": []
+        "entrances": [],
+        "index": 211
     },
     {
         "name": "Cloudy Park 1 - 2",
@@ -12839,7 +13073,8 @@
                 88,
                 424
             ]
-        ]
+        ],
+        "index": 212
     },
     {
         "name": "Cloudy Park 1 - 3",
@@ -12873,7 +13108,8 @@
             104
         ],
         "music": 39,
-        "entrances": []
+        "entrances": [],
+        "index": 213
     },
     {
         "name": "Cloudy Park 1 - 4",
@@ -12933,7 +13169,8 @@
             264
         ],
         "music": 17,
-        "entrances": []
+        "entrances": [],
+        "index": 214
     },
     {
         "name": "Cloudy Park 1 - 5",
@@ -12969,7 +13206,8 @@
             216
         ],
         "music": 39,
-        "entrances": []
+        "entrances": [],
+        "index": 215
     },
     {
         "name": "Cloudy Park 1 - 6",
@@ -13032,7 +13270,8 @@
                 2344,
                 232
             ]
-        ]
+        ],
+        "index": 216
     },
     {
         "name": "Cloudy Park 1 - 7",
@@ -13071,7 +13310,8 @@
                 56,
                 152
             ]
-        ]
+        ],
+        "index": 217
     },
     {
         "name": "Cloudy Park 1 - 8",
@@ -13135,7 +13375,8 @@
             104
         ],
         "music": 17,
-        "entrances": []
+        "entrances": [],
+        "index": 218
     },
     {
         "name": "Cloudy Park 1 - 9",
@@ -13169,7 +13410,8 @@
             152
         ],
         "music": 39,
-        "entrances": []
+        "entrances": [],
+        "index": 219
     },
     {
         "name": "Cloudy Park 1 - 10",
@@ -13227,7 +13469,8 @@
                 56,
                 264
             ]
-        ]
+        ],
+        "index": 220
     },
     {
         "name": "Cloudy Park 1 - 11",
@@ -13334,7 +13577,8 @@
                 88,
                 104
             ]
-        ]
+        ],
+        "index": 221
     },
     {
         "name": "Cloudy Park 1 - 12",
@@ -13380,7 +13624,8 @@
                 56,
                 152
             ]
-        ]
+        ],
+        "index": 222
     },
     {
         "name": "Cloudy Park 1 - 13",
@@ -13407,8 +13652,9 @@
             72,
             120
         ],
-        "music": 2053,
-        "entrances": []
+        "music": 5,
+        "entrances": [],
+        "index": 223
     },
     {
         "name": "Cloudy Park 2 - 0",
@@ -13471,7 +13717,8 @@
             152
         ],
         "music": 19,
-        "entrances": []
+        "entrances": [],
+        "index": 224
     },
     {
         "name": "Cloudy Park 2 - 1",
@@ -13535,7 +13782,8 @@
             152
         ],
         "music": 19,
-        "entrances": []
+        "entrances": [],
+        "index": 225
     },
     {
         "name": "Cloudy Park 2 - 2",
@@ -13589,7 +13837,8 @@
                 88,
                 88
             ]
-        ]
+        ],
+        "index": 226
     },
     {
         "name": "Cloudy Park 2 - 3",
@@ -13669,7 +13918,8 @@
                 72,
                 136
             ]
-        ]
+        ],
+        "index": 227
     },
     {
         "name": "Cloudy Park 2 - 4",
@@ -13745,7 +13995,8 @@
                 72,
                 136
             ]
-        ]
+        ],
+        "index": 228
     },
     {
         "name": "Cloudy Park 2 - 5",
@@ -13805,7 +14056,8 @@
             104
         ],
         "music": 19,
-        "entrances": []
+        "entrances": [],
+        "index": 229
     },
     {
         "name": "Cloudy Park 2 - 6",
@@ -13843,7 +14095,8 @@
             88
         ],
         "music": 38,
-        "entrances": []
+        "entrances": [],
+        "index": 230
     },
     {
         "name": "Cloudy Park 2 - 7",
@@ -13878,7 +14131,8 @@
             88
         ],
         "music": 19,
-        "entrances": []
+        "entrances": [],
+        "index": 231
     },
     {
         "name": "Cloudy Park 2 - 8",
@@ -13919,7 +14173,8 @@
             88
         ],
         "music": 8,
-        "entrances": []
+        "entrances": [],
+        "index": 232
     },
     {
         "name": "Cloudy Park 2 - 9",
@@ -13946,8 +14201,9 @@
             72,
             120
         ],
-        "music": 2053,
-        "entrances": []
+        "music": 5,
+        "entrances": [],
+        "index": 233
     },
     {
         "name": "Cloudy Park 3 - 0",
@@ -14013,7 +14269,8 @@
             136
         ],
         "music": 15,
-        "entrances": []
+        "entrances": [],
+        "index": 234
     },
     {
         "name": "Cloudy Park 3 - 1",
@@ -14070,7 +14327,8 @@
             1064
         ],
         "music": 15,
-        "entrances": []
+        "entrances": [],
+        "index": 235
     },
     {
         "name": "Cloudy Park 3 - 2",
@@ -14151,7 +14409,8 @@
                 408,
                 232
             ]
-        ]
+        ],
+        "index": 236
     },
     {
         "name": "Cloudy Park 3 - 3",
@@ -14194,7 +14453,8 @@
                 104,
                 152
             ]
-        ]
+        ],
+        "index": 237
     },
     {
         "name": "Cloudy Park 3 - 4",
@@ -14272,7 +14532,8 @@
                 88,
                 152
             ]
-        ]
+        ],
+        "index": 238
     },
     {
         "name": "Cloudy Park 3 - 5",
@@ -14306,13 +14567,14 @@
             48,
             152
         ],
-        "music": 3615,
+        "music": 31,
         "entrances": [
             [
                 56,
                 152
             ]
-        ]
+        ],
+        "index": 239
     },
     {
         "name": "Cloudy Park 3 - 6",
@@ -14349,7 +14611,8 @@
             152
         ],
         "music": 8,
-        "entrances": []
+        "entrances": [],
+        "index": 240
     },
     {
         "name": "Cloudy Park 3 - 7",
@@ -14376,8 +14639,9 @@
             72,
             120
         ],
-        "music": 2053,
-        "entrances": []
+        "music": 5,
+        "entrances": [],
+        "index": 241
     },
     {
         "name": "Cloudy Park 4 - 0",
@@ -14424,7 +14688,8 @@
             152
         ],
         "music": 21,
-        "entrances": []
+        "entrances": [],
+        "index": 242
     },
     {
         "name": "Cloudy Park 4 - 1",
@@ -14460,7 +14725,8 @@
             152
         ],
         "music": 38,
-        "entrances": []
+        "entrances": [],
+        "index": 243
     },
     {
         "name": "Cloudy Park 4 - 2",
@@ -14537,7 +14803,8 @@
             152
         ],
         "music": 21,
-        "entrances": []
+        "entrances": [],
+        "index": 244
     },
     {
         "name": "Cloudy Park 4 - 3",
@@ -14645,7 +14912,8 @@
             152
         ],
         "music": 21,
-        "entrances": []
+        "entrances": [],
+        "index": 245
     },
     {
         "name": "Cloudy Park 4 - 4",
@@ -14712,7 +14980,8 @@
             120
         ],
         "music": 21,
-        "entrances": []
+        "entrances": [],
+        "index": 246
     },
     {
         "name": "Cloudy Park 4 - 5",
@@ -14770,7 +15039,8 @@
             136
         ],
         "music": 21,
-        "entrances": []
+        "entrances": [],
+        "index": 247
     },
     {
         "name": "Cloudy Park 4 - 6",
@@ -14830,7 +15100,8 @@
             680
         ],
         "music": 21,
-        "entrances": []
+        "entrances": [],
+        "index": 248
     },
     {
         "name": "Cloudy Park 4 - 7",
@@ -14866,8 +15137,9 @@
             72,
             152
         ],
-        "music": 3076,
-        "entrances": []
+        "music": 4,
+        "entrances": [],
+        "index": 249
     },
     {
         "name": "Cloudy Park 4 - 8",
@@ -14909,7 +15181,8 @@
                 152,
                 120
             ]
-        ]
+        ],
+        "index": 250
     },
     {
         "name": "Cloudy Park 4 - 9",
@@ -14955,7 +15228,8 @@
                 72,
                 152
             ]
-        ]
+        ],
+        "index": 251
     },
     {
         "name": "Cloudy Park 4 - 10",
@@ -14982,8 +15256,9 @@
             72,
             120
         ],
-        "music": 2053,
-        "entrances": []
+        "music": 5,
+        "entrances": [],
+        "index": 252
     },
     {
         "name": "Cloudy Park 5 - 0",
@@ -15046,7 +15321,8 @@
             104
         ],
         "music": 17,
-        "entrances": []
+        "entrances": [],
+        "index": 253
     },
     {
         "name": "Cloudy Park 5 - 1",
@@ -15119,7 +15395,8 @@
             616
         ],
         "music": 17,
-        "entrances": []
+        "entrances": [],
+        "index": 254
     },
     {
         "name": "Cloudy Park 5 - 2",
@@ -15155,7 +15432,8 @@
             152
         ],
         "music": 40,
-        "entrances": []
+        "entrances": [],
+        "index": 255
     },
     {
         "name": "Cloudy Park 5 - 3",
@@ -15208,7 +15486,8 @@
             88
         ],
         "music": 17,
-        "entrances": []
+        "entrances": [],
+        "index": 256
     },
     {
         "name": "Cloudy Park 5 - 4",
@@ -15247,7 +15526,8 @@
             120
         ],
         "music": 17,
-        "entrances": []
+        "entrances": [],
+        "index": 257
     },
     {
         "name": "Cloudy Park 5 - 5",
@@ -15292,7 +15572,8 @@
             744
         ],
         "music": 17,
-        "entrances": []
+        "entrances": [],
+        "index": 258
     },
     {
         "name": "Cloudy Park 5 - 6",
@@ -15343,7 +15624,8 @@
             296
         ],
         "music": 17,
-        "entrances": []
+        "entrances": [],
+        "index": 259
     },
     {
         "name": "Cloudy Park 5 - 7",
@@ -15384,7 +15666,8 @@
             136
         ],
         "music": 8,
-        "entrances": []
+        "entrances": [],
+        "index": 260
     },
     {
         "name": "Cloudy Park 5 - 8",
@@ -15411,8 +15694,9 @@
             72,
             120
         ],
-        "music": 2053,
-        "entrances": []
+        "music": 5,
+        "entrances": [],
+        "index": 261
     },
     {
         "name": "Cloudy Park 6 - 0",
@@ -15454,7 +15738,8 @@
                 1032,
                 152
             ]
-        ]
+        ],
+        "index": 262
     },
     {
         "name": "Cloudy Park 6 - 1",
@@ -15493,7 +15778,8 @@
             72
         ],
         "music": 11,
-        "entrances": []
+        "entrances": [],
+        "index": 263
     },
     {
         "name": "Cloudy Park 6 - 2",
@@ -15553,7 +15839,8 @@
                 88,
                 152
             ]
-        ]
+        ],
+        "index": 264
     },
     {
         "name": "Cloudy Park 6 - 3",
@@ -15641,7 +15928,8 @@
                 264,
                 152
             ]
-        ]
+        ],
+        "index": 265
     },
     {
         "name": "Cloudy Park 6 - 4-1",
@@ -15696,7 +15984,8 @@
                 72,
                 72
             ]
-        ]
+        ],
+        "index": 266
     },
     {
         "name": "Cloudy Park 6 - 4-2",
@@ -15741,6 +16030,7 @@
             ]
         ],
         "locations": [
+            "Cloudy Park 6 - Enemy 2 (Tick)",
             "Cloudy Park 6 - Star 6"
         ],
         "spawn": [
@@ -15753,7 +16043,8 @@
                 264,
                 152
             ]
-        ]
+        ],
+        "index": 266
     },
     {
         "name": "Cloudy Park 6 - 4-3",
@@ -15798,6 +16089,7 @@
             ]
         ],
         "locations": [
+            "Cloudy Park 6 - Enemy 3 (Como)",
             "Cloudy Park 6 - Star 7"
         ],
         "spawn": [
@@ -15810,7 +16102,8 @@
                 136,
                 152
             ]
-        ]
+        ],
+        "index": 266
     },
     {
         "name": "Cloudy Park 6 - 4-4",
@@ -15867,7 +16160,8 @@
                 328,
                 152
             ]
-        ]
+        ],
+        "index": 266
     },
     {
         "name": "Cloudy Park 6 - 4-5",
@@ -15930,7 +16224,8 @@
                 200,
                 152
             ]
-        ]
+        ],
+        "index": 266
     },
     {
         "name": "Cloudy Park 6 - 5",
@@ -15999,7 +16294,8 @@
                 88,
                 152
             ]
-        ]
+        ],
+        "index": 267
     },
     {
         "name": "Cloudy Park 6 - 6",
@@ -16038,7 +16334,8 @@
             152
         ],
         "music": 11,
-        "entrances": []
+        "entrances": [],
+        "index": 268
     },
     {
         "name": "Cloudy Park 6 - 7",
@@ -16110,7 +16407,8 @@
                 936,
                 136
             ]
-        ]
+        ],
+        "index": 269
     },
     {
         "name": "Cloudy Park 6 - 8",
@@ -16213,7 +16511,8 @@
                 200,
                 72
             ]
-        ]
+        ],
+        "index": 270
     },
     {
         "name": "Cloudy Park 6 - 9",
@@ -16248,7 +16547,8 @@
             120
         ],
         "music": 11,
-        "entrances": []
+        "entrances": [],
+        "index": 271
     },
     {
         "name": "Cloudy Park 6 - 10-1",
@@ -16283,7 +16583,8 @@
                 72,
                 152
             ]
-        ]
+        ],
+        "index": 272
     },
     {
         "name": "Cloudy Park 6 - 10-2",
@@ -16322,7 +16623,8 @@
                 136,
                 152
             ]
-        ]
+        ],
+        "index": 272
     },
     {
         "name": "Cloudy Park 6 - 10-3",
@@ -16361,7 +16663,8 @@
                 200,
                 152
             ]
-        ]
+        ],
+        "index": 272
     },
     {
         "name": "Cloudy Park 6 - 10-4",
@@ -16400,7 +16703,8 @@
                 264,
                 152
             ]
-        ]
+        ],
+        "index": 272
     },
     {
         "name": "Cloudy Park 6 - 10-5",
@@ -16443,7 +16747,8 @@
                 328,
                 152
             ]
-        ]
+        ],
+        "index": 272
     },
     {
         "name": "Cloudy Park 6 - 11",
@@ -16527,7 +16832,8 @@
                 136,
                 152
             ]
-        ]
+        ],
+        "index": 273
     },
     {
         "name": "Cloudy Park 6 - 12",
@@ -16584,7 +16890,8 @@
                 88,
                 152
             ]
-        ]
+        ],
+        "index": 274
     },
     {
         "name": "Cloudy Park 6 - 13",
@@ -16624,7 +16931,8 @@
                 184,
                 216
             ]
-        ]
+        ],
+        "index": 275
     },
     {
         "name": "Cloudy Park 6 - 14",
@@ -16659,7 +16967,8 @@
                 184,
                 216
             ]
-        ]
+        ],
+        "index": 276
     },
     {
         "name": "Cloudy Park 6 - 15",
@@ -16700,7 +17009,8 @@
             152
         ],
         "music": 8,
-        "entrances": []
+        "entrances": [],
+        "index": 277
     },
     {
         "name": "Cloudy Park 6 - 16",
@@ -16727,8 +17037,9 @@
             72,
             120
         ],
-        "music": 2053,
-        "entrances": []
+        "music": 5,
+        "entrances": [],
+        "index": 278
     },
     {
         "name": "Cloudy Park Boss - 0",
@@ -16757,8 +17068,9 @@
             72,
             144
         ],
-        "music": 3330,
-        "entrances": []
+        "music": 2,
+        "entrances": [],
+        "index": 279
     },
     {
         "name": "Iceberg 1 - 0",
@@ -16809,7 +17121,8 @@
             424
         ],
         "music": 18,
-        "entrances": []
+        "entrances": [],
+        "index": 280
     },
     {
         "name": "Iceberg 1 - 1",
@@ -16878,7 +17191,8 @@
             1384
         ],
         "music": 18,
-        "entrances": []
+        "entrances": [],
+        "index": 281
     },
     {
         "name": "Iceberg 1 - 2",
@@ -16946,7 +17260,8 @@
                 808,
                 152
             ]
-        ]
+        ],
+        "index": 282
     },
     {
         "name": "Iceberg 1 - 3",
@@ -16987,7 +17302,8 @@
                 184,
                 152
             ]
-        ]
+        ],
+        "index": 283
     },
     {
         "name": "Iceberg 1 - 4",
@@ -17043,7 +17359,8 @@
                 72,
                 744
             ]
-        ]
+        ],
+        "index": 284
     },
     {
         "name": "Iceberg 1 - 5",
@@ -17103,7 +17420,8 @@
                 120,
                 168
             ]
-        ]
+        ],
+        "index": 285
     },
     {
         "name": "Iceberg 1 - 6",
@@ -17149,7 +17467,8 @@
                 56,
                 152
             ]
-        ]
+        ],
+        "index": 286
     },
     {
         "name": "Iceberg 1 - 7",
@@ -17176,8 +17495,9 @@
             72,
             120
         ],
-        "music": 2053,
-        "entrances": []
+        "music": 5,
+        "entrances": [],
+        "index": 287
     },
     {
         "name": "Iceberg 2 - 0",
@@ -17226,7 +17546,8 @@
             120
         ],
         "music": 20,
-        "entrances": []
+        "entrances": [],
+        "index": 288
     },
     {
         "name": "Iceberg 2 - 1",
@@ -17286,7 +17607,8 @@
                 88,
                 152
             ]
-        ]
+        ],
+        "index": 289
     },
     {
         "name": "Iceberg 2 - 2",
@@ -17402,7 +17724,8 @@
                 88,
                 72
             ]
-        ]
+        ],
+        "index": 290
     },
     {
         "name": "Iceberg 2 - 3",
@@ -17448,7 +17771,8 @@
                 200,
                 184
             ]
-        ]
+        ],
+        "index": 291
     },
     {
         "name": "Iceberg 2 - 4",
@@ -17495,7 +17819,8 @@
                 200,
                 184
             ]
-        ]
+        ],
+        "index": 292
     },
     {
         "name": "Iceberg 2 - 5",
@@ -17543,7 +17868,8 @@
                 200,
                 184
             ]
-        ]
+        ],
+        "index": 293
     },
     {
         "name": "Iceberg 2 - 6",
@@ -17607,7 +17933,8 @@
                 88,
                 152
             ]
-        ]
+        ],
+        "index": 294
     },
     {
         "name": "Iceberg 2 - 7",
@@ -17680,7 +18007,8 @@
                 88,
                 152
             ]
-        ]
+        ],
+        "index": 295
     },
     {
         "name": "Iceberg 2 - 8",
@@ -17726,7 +18054,8 @@
                 72,
                 152
             ]
-        ]
+        ],
+        "index": 296
     },
     {
         "name": "Iceberg 2 - 9",
@@ -17767,7 +18096,8 @@
                 88,
                 152
             ]
-        ]
+        ],
+        "index": 297
     },
     {
         "name": "Iceberg 2 - 10",
@@ -17794,8 +18124,9 @@
             72,
             120
         ],
-        "music": 2053,
-        "entrances": []
+        "music": 5,
+        "entrances": [],
+        "index": 298
     },
     {
         "name": "Iceberg 3 - 0",
@@ -17871,7 +18202,8 @@
                 1592,
                 104
             ]
-        ]
+        ],
+        "index": 299
     },
     {
         "name": "Iceberg 3 - 1",
@@ -17914,7 +18246,8 @@
                 200,
                 232
             ]
-        ]
+        ],
+        "index": 300
     },
     {
         "name": "Iceberg 3 - 2",
@@ -17989,7 +18322,8 @@
             120
         ],
         "music": 14,
-        "entrances": []
+        "entrances": [],
+        "index": 301
     },
     {
         "name": "Iceberg 3 - 3",
@@ -18064,7 +18398,8 @@
                 1032,
                 216
             ]
-        ]
+        ],
+        "index": 302
     },
     {
         "name": "Iceberg 3 - 4",
@@ -18105,7 +18440,8 @@
                 184,
                 136
             ]
-        ]
+        ],
+        "index": 303
     },
     {
         "name": "Iceberg 3 - 5",
@@ -18139,8 +18475,9 @@
             40,
             152
         ],
-        "music": 3615,
-        "entrances": []
+        "music": 31,
+        "entrances": [],
+        "index": 304
     },
     {
         "name": "Iceberg 3 - 6",
@@ -18213,7 +18550,8 @@
                 72,
                 120
             ]
-        ]
+        ],
+        "index": 305
     },
     {
         "name": "Iceberg 3 - 7",
@@ -18250,7 +18588,8 @@
             152
         ],
         "music": 8,
-        "entrances": []
+        "entrances": [],
+        "index": 306
     },
     {
         "name": "Iceberg 3 - 8",
@@ -18277,8 +18616,9 @@
             72,
             120
         ],
-        "music": 2053,
-        "entrances": []
+        "music": 5,
+        "entrances": [],
+        "index": 307
     },
     {
         "name": "Iceberg 4 - 0",
@@ -18335,7 +18675,8 @@
             152
         ],
         "music": 19,
-        "entrances": []
+        "entrances": [],
+        "index": 308
     },
     {
         "name": "Iceberg 4 - 1",
@@ -18384,7 +18725,8 @@
             104
         ],
         "music": 19,
-        "entrances": []
+        "entrances": [],
+        "index": 309
     },
     {
         "name": "Iceberg 4 - 2",
@@ -18450,7 +18792,8 @@
                 280,
                 632
             ]
-        ]
+        ],
+        "index": 310
     },
     {
         "name": "Iceberg 4 - 3",
@@ -18490,7 +18833,8 @@
                 88,
                 136
             ]
-        ]
+        ],
+        "index": 311
     },
     {
         "name": "Iceberg 4 - 4",
@@ -18529,7 +18873,8 @@
             104
         ],
         "music": 19,
-        "entrances": []
+        "entrances": [],
+        "index": 312
     },
     {
         "name": "Iceberg 4 - 5",
@@ -18576,7 +18921,8 @@
             840
         ],
         "music": 19,
-        "entrances": []
+        "entrances": [],
+        "index": 313
     },
     {
         "name": "Iceberg 4 - 6",
@@ -18611,7 +18957,8 @@
             120
         ],
         "music": 19,
-        "entrances": []
+        "entrances": [],
+        "index": 314
     },
     {
         "name": "Iceberg 4 - 7",
@@ -18688,7 +19035,8 @@
                 648,
                 104
             ]
-        ]
+        ],
+        "index": 315
     },
     {
         "name": "Iceberg 4 - 8",
@@ -18723,7 +19071,8 @@
             104
         ],
         "music": 19,
-        "entrances": []
+        "entrances": [],
+        "index": 316
     },
     {
         "name": "Iceberg 4 - 9",
@@ -18759,7 +19108,7 @@
             200,
             32
         ],
-        "music": 3076,
+        "music": 4,
         "entrances": [
             [
                 88,
@@ -18769,7 +19118,8 @@
                 200,
                 40
             ]
-        ]
+        ],
+        "index": 317
     },
     {
         "name": "Iceberg 4 - 10-1",
@@ -18806,7 +19156,8 @@
             88
         ],
         "music": 19,
-        "entrances": []
+        "entrances": [],
+        "index": 318
     },
     {
         "name": "Iceberg 4 - 10-2",
@@ -18846,7 +19197,8 @@
                 312,
                 88
             ]
-        ]
+        ],
+        "index": 318
     },
     {
         "name": "Iceberg 4 - 11",
@@ -18890,7 +19242,8 @@
                 136,
                 136
             ]
-        ]
+        ],
+        "index": 319
     },
     {
         "name": "Iceberg 4 - 12",
@@ -18933,7 +19286,8 @@
             120
         ],
         "music": 19,
-        "entrances": []
+        "entrances": [],
+        "index": 320
     },
     {
         "name": "Iceberg 4 - 13-1",
@@ -18976,7 +19330,8 @@
                 520,
                 72
             ]
-        ]
+        ],
+        "index": 321
     },
     {
         "name": "Iceberg 4 - 13-2",
@@ -19043,7 +19398,8 @@
                 280,
                 168
             ]
-        ]
+        ],
+        "index": 321
     },
     {
         "name": "Iceberg 4 - 14-1",
@@ -19087,7 +19443,9 @@
                 16
             ]
         ],
-        "locations": [],
+        "locations": [
+            "Iceberg 4 - Enemy 11 (Broom Hatter)"
+        ],
         "spawn": [
             152,
             136
@@ -19098,7 +19456,8 @@
                 88,
                 136
             ]
-        ]
+        ],
+        "index": 322
     },
     {
         "name": "Iceberg 4 - 14-2",
@@ -19142,7 +19501,9 @@
                 16
             ]
         ],
-        "locations": [],
+        "locations": [
+            "Iceberg 4 - Enemy 12 (Sasuke)"
+        ],
         "spawn": [
             152,
             136
@@ -19157,7 +19518,8 @@
                 344,
                 136
             ]
-        ]
+        ],
+        "index": 322
     },
     {
         "name": "Iceberg 4 - 15-1",
@@ -19197,7 +19559,8 @@
                 216,
                 120
             ]
-        ]
+        ],
+        "index": 323
     },
     {
         "name": "Iceberg 4 - 15-2",
@@ -19237,7 +19600,8 @@
                 88,
                 360
             ]
-        ]
+        ],
+        "index": 323
     },
     {
         "name": "Iceberg 4 - 15-3",
@@ -19277,7 +19641,8 @@
                 344,
                 360
             ]
-        ]
+        ],
+        "index": 323
     },
     {
         "name": "Iceberg 4 - 16",
@@ -19316,7 +19681,8 @@
                 168,
                 152
             ]
-        ]
+        ],
+        "index": 324
     },
     {
         "name": "Iceberg 4 - 17",
@@ -19355,7 +19721,8 @@
                 120,
                 152
             ]
-        ]
+        ],
+        "index": 325
     },
     {
         "name": "Iceberg 4 - 18",
@@ -19407,7 +19774,8 @@
             456
         ],
         "music": 19,
-        "entrances": []
+        "entrances": [],
+        "index": 326
     },
     {
         "name": "Iceberg 4 - 19",
@@ -19448,7 +19816,8 @@
             152
         ],
         "music": 8,
-        "entrances": []
+        "entrances": [],
+        "index": 327
     },
     {
         "name": "Iceberg 4 - 20",
@@ -19475,8 +19844,9 @@
             72,
             120
         ],
-        "music": 2053,
-        "entrances": []
+        "music": 5,
+        "entrances": [],
+        "index": 328
     },
     {
         "name": "Iceberg 5 - 0",
@@ -19557,7 +19927,8 @@
             120
         ],
         "music": 16,
-        "entrances": []
+        "entrances": [],
+        "index": 329
     },
     {
         "name": "Iceberg 5 - 1",
@@ -19592,7 +19963,8 @@
             104
         ],
         "music": 16,
-        "entrances": []
+        "entrances": [],
+        "index": 330
     },
     {
         "name": "Iceberg 5 - 2",
@@ -19631,7 +20003,8 @@
             104
         ],
         "music": 16,
-        "entrances": []
+        "entrances": [],
+        "index": 331
     },
     {
         "name": "Iceberg 5 - 3",
@@ -19676,7 +20049,8 @@
             120
         ],
         "music": 16,
-        "entrances": []
+        "entrances": [],
+        "index": 332
     },
     {
         "name": "Iceberg 5 - 4",
@@ -19725,7 +20099,8 @@
             88
         ],
         "music": 16,
-        "entrances": []
+        "entrances": [],
+        "index": 333
     },
     {
         "name": "Iceberg 5 - 5",
@@ -19778,7 +20153,8 @@
             104
         ],
         "music": 16,
-        "entrances": []
+        "entrances": [],
+        "index": 334
     },
     {
         "name": "Iceberg 5 - 6",
@@ -19813,7 +20189,8 @@
             200
         ],
         "music": 16,
-        "entrances": []
+        "entrances": [],
+        "index": 335
     },
     {
         "name": "Iceberg 5 - 7",
@@ -19852,7 +20229,8 @@
             120
         ],
         "music": 16,
-        "entrances": []
+        "entrances": [],
+        "index": 336
     },
     {
         "name": "Iceberg 5 - 8",
@@ -19887,7 +20265,8 @@
             152
         ],
         "music": 16,
-        "entrances": []
+        "entrances": [],
+        "index": 337
     },
     {
         "name": "Iceberg 5 - 9",
@@ -19938,7 +20317,8 @@
             152
         ],
         "music": 16,
-        "entrances": []
+        "entrances": [],
+        "index": 338
     },
     {
         "name": "Iceberg 5 - 10",
@@ -19973,7 +20353,8 @@
             248
         ],
         "music": 16,
-        "entrances": []
+        "entrances": [],
+        "index": 339
     },
     {
         "name": "Iceberg 5 - 11",
@@ -20027,7 +20408,8 @@
             120
         ],
         "music": 16,
-        "entrances": []
+        "entrances": [],
+        "index": 340
     },
     {
         "name": "Iceberg 5 - 12",
@@ -20076,7 +20458,8 @@
             120
         ],
         "music": 16,
-        "entrances": []
+        "entrances": [],
+        "index": 341
     },
     {
         "name": "Iceberg 5 - 13",
@@ -20115,7 +20498,8 @@
             104
         ],
         "music": 16,
-        "entrances": []
+        "entrances": [],
+        "index": 342
     },
     {
         "name": "Iceberg 5 - 14",
@@ -20166,7 +20550,8 @@
             152
         ],
         "music": 16,
-        "entrances": []
+        "entrances": [],
+        "index": 343
     },
     {
         "name": "Iceberg 5 - 15",
@@ -20205,7 +20590,8 @@
             216
         ],
         "music": 16,
-        "entrances": []
+        "entrances": [],
+        "index": 344
     },
     {
         "name": "Iceberg 5 - 16",
@@ -20240,7 +20626,8 @@
             152
         ],
         "music": 16,
-        "entrances": []
+        "entrances": [],
+        "index": 345
     },
     {
         "name": "Iceberg 5 - 17",
@@ -20275,7 +20662,8 @@
             120
         ],
         "music": 16,
-        "entrances": []
+        "entrances": [],
+        "index": 346
     },
     {
         "name": "Iceberg 5 - 18",
@@ -20314,7 +20702,8 @@
             152
         ],
         "music": 16,
-        "entrances": []
+        "entrances": [],
+        "index": 347
     },
     {
         "name": "Iceberg 5 - 19",
@@ -20353,7 +20742,8 @@
             264
         ],
         "music": 16,
-        "entrances": []
+        "entrances": [],
+        "index": 348
     },
     {
         "name": "Iceberg 5 - 20",
@@ -20392,7 +20782,8 @@
             200
         ],
         "music": 16,
-        "entrances": []
+        "entrances": [],
+        "index": 349
     },
     {
         "name": "Iceberg 5 - 21",
@@ -20443,7 +20834,8 @@
             152
         ],
         "music": 16,
-        "entrances": []
+        "entrances": [],
+        "index": 350
     },
     {
         "name": "Iceberg 5 - 22",
@@ -20491,7 +20883,8 @@
             72
         ],
         "music": 16,
-        "entrances": []
+        "entrances": [],
+        "index": 351
     },
     {
         "name": "Iceberg 5 - 23",
@@ -20530,7 +20923,8 @@
             104
         ],
         "music": 16,
-        "entrances": []
+        "entrances": [],
+        "index": 352
     },
     {
         "name": "Iceberg 5 - 24",
@@ -20569,7 +20963,8 @@
             152
         ],
         "music": 16,
-        "entrances": []
+        "entrances": [],
+        "index": 353
     },
     {
         "name": "Iceberg 5 - 25",
@@ -20608,7 +21003,8 @@
             200
         ],
         "music": 16,
-        "entrances": []
+        "entrances": [],
+        "index": 354
     },
     {
         "name": "Iceberg 5 - 26",
@@ -20647,7 +21043,8 @@
             136
         ],
         "music": 16,
-        "entrances": []
+        "entrances": [],
+        "index": 355
     },
     {
         "name": "Iceberg 5 - 27",
@@ -20692,7 +21089,8 @@
             152
         ],
         "music": 16,
-        "entrances": []
+        "entrances": [],
+        "index": 356
     },
     {
         "name": "Iceberg 5 - 28",
@@ -20731,7 +21129,8 @@
             152
         ],
         "music": 16,
-        "entrances": []
+        "entrances": [],
+        "index": 357
     },
     {
         "name": "Iceberg 5 - 29",
@@ -20782,7 +21181,8 @@
             1384
         ],
         "music": 16,
-        "entrances": []
+        "entrances": [],
+        "index": 358
     },
     {
         "name": "Iceberg 5 - 30",
@@ -20818,7 +21218,8 @@
             152
         ],
         "music": 40,
-        "entrances": []
+        "entrances": [],
+        "index": 359
     },
     {
         "name": "Iceberg 5 - 31",
@@ -20854,7 +21255,8 @@
             88
         ],
         "music": 40,
-        "entrances": []
+        "entrances": [],
+        "index": 360
     },
     {
         "name": "Iceberg 5 - 32",
@@ -20890,7 +21292,8 @@
             120
         ],
         "music": 40,
-        "entrances": []
+        "entrances": [],
+        "index": 361
     },
     {
         "name": "Iceberg 5 - 33",
@@ -20926,7 +21329,8 @@
             152
         ],
         "music": 40,
-        "entrances": []
+        "entrances": [],
+        "index": 362
     },
     {
         "name": "Iceberg 5 - 34",
@@ -20975,7 +21379,8 @@
             152
         ],
         "music": 16,
-        "entrances": []
+        "entrances": [],
+        "index": 363
     },
     {
         "name": "Iceberg 5 - 35",
@@ -21014,7 +21419,8 @@
             328
         ],
         "music": 16,
-        "entrances": []
+        "entrances": [],
+        "index": 364
     },
     {
         "name": "Iceberg 5 - 36",
@@ -21060,7 +21466,8 @@
                 72,
                 152
             ]
-        ]
+        ],
+        "index": 365
     },
     {
         "name": "Iceberg 5 - 37",
@@ -21087,8 +21494,9 @@
             72,
             120
         ],
-        "music": 2053,
-        "entrances": []
+        "music": 5,
+        "entrances": [],
+        "index": 366
     },
     {
         "name": "Iceberg 6 - 0",
@@ -21142,8 +21550,9 @@
             200,
             1000
         ],
-        "music": 3084,
-        "entrances": []
+        "music": 12,
+        "entrances": [],
+        "index": 367
     },
     {
         "name": "Iceberg 6 - 1",
@@ -21206,7 +21615,8 @@
                 136,
                 184
             ]
-        ]
+        ],
+        "index": 368
     },
     {
         "name": "Iceberg 6 - 2",
@@ -21261,7 +21671,8 @@
                 152,
                 184
             ]
-        ]
+        ],
+        "index": 369
     },
     {
         "name": "Iceberg 6 - 3",
@@ -21324,7 +21735,8 @@
                 136,
                 184
             ]
-        ]
+        ],
+        "index": 370
     },
     {
         "name": "Iceberg 6 - 4",
@@ -21379,7 +21791,8 @@
                 152,
                 184
             ]
-        ]
+        ],
+        "index": 371
     },
     {
         "name": "Iceberg 6 - 5",
@@ -21470,7 +21883,8 @@
                 136,
                 184
             ]
-        ]
+        ],
+        "index": 372
     },
     {
         "name": "Iceberg 6 - 6",
@@ -21518,7 +21932,8 @@
                 152,
                 184
             ]
-        ]
+        ],
+        "index": 373
     },
     {
         "name": "Iceberg 6 - 7",
@@ -21557,7 +21972,8 @@
             168
         ],
         "music": 12,
-        "entrances": []
+        "entrances": [],
+        "index": 374
     },
     {
         "name": "Iceberg 6 - 8",
@@ -21604,7 +22020,8 @@
             136
         ],
         "music": 12,
-        "entrances": []
+        "entrances": [],
+        "index": 375
     },
     {
         "name": "Iceberg 6 - 9",
@@ -21640,8 +22057,9 @@
             152,
             168
         ],
-        "music": 3084,
-        "entrances": []
+        "music": 12,
+        "entrances": [],
+        "index": 376
     },
     {
         "name": "Iceberg 6 - 10",
@@ -21680,7 +22098,8 @@
             136
         ],
         "music": 12,
-        "entrances": []
+        "entrances": [],
+        "index": 377
     },
     {
         "name": "Iceberg 6 - 11",
@@ -21716,8 +22135,9 @@
             152,
             168
         ],
-        "music": 3084,
-        "entrances": []
+        "music": 12,
+        "entrances": [],
+        "index": 378
     },
     {
         "name": "Iceberg 6 - 12",
@@ -21756,7 +22176,8 @@
             136
         ],
         "music": 12,
-        "entrances": []
+        "entrances": [],
+        "index": 379
     },
     {
         "name": "Iceberg 6 - 13",
@@ -21792,8 +22213,9 @@
             136,
             168
         ],
-        "music": 3084,
-        "entrances": []
+        "music": 12,
+        "entrances": [],
+        "index": 380
     },
     {
         "name": "Iceberg 6 - 14",
@@ -21832,7 +22254,8 @@
             136
         ],
         "music": 12,
-        "entrances": []
+        "entrances": [],
+        "index": 381
     },
     {
         "name": "Iceberg 6 - 15",
@@ -21871,7 +22294,8 @@
             168
         ],
         "music": 12,
-        "entrances": []
+        "entrances": [],
+        "index": 382
     },
     {
         "name": "Iceberg 6 - 16",
@@ -21910,7 +22334,8 @@
             136
         ],
         "music": 12,
-        "entrances": []
+        "entrances": [],
+        "index": 383
     },
     {
         "name": "Iceberg 6 - 17",
@@ -21946,8 +22371,9 @@
             136,
             168
         ],
-        "music": 3084,
-        "entrances": []
+        "music": 12,
+        "entrances": [],
+        "index": 384
     },
     {
         "name": "Iceberg 6 - 18",
@@ -21986,7 +22412,8 @@
             136
         ],
         "music": 12,
-        "entrances": []
+        "entrances": [],
+        "index": 385
     },
     {
         "name": "Iceberg 6 - 19",
@@ -22022,8 +22449,9 @@
             136,
             168
         ],
-        "music": 3084,
-        "entrances": []
+        "music": 12,
+        "entrances": [],
+        "index": 386
     },
     {
         "name": "Iceberg 6 - 20",
@@ -22062,7 +22490,8 @@
             136
         ],
         "music": 12,
-        "entrances": []
+        "entrances": [],
+        "index": 387
     },
     {
         "name": "Iceberg 6 - 21",
@@ -22098,8 +22527,9 @@
             136,
             168
         ],
-        "music": 3084,
-        "entrances": []
+        "music": 12,
+        "entrances": [],
+        "index": 388
     },
     {
         "name": "Iceberg 6 - 22",
@@ -22138,7 +22568,8 @@
             136
         ],
         "music": 12,
-        "entrances": []
+        "entrances": [],
+        "index": 389
     },
     {
         "name": "Iceberg 6 - 23",
@@ -22179,7 +22610,8 @@
             152
         ],
         "music": 8,
-        "entrances": []
+        "entrances": [],
+        "index": 390
     },
     {
         "name": "Iceberg 6 - 24",
@@ -22206,8 +22638,9 @@
             72,
             120
         ],
-        "music": 2053,
-        "entrances": []
+        "music": 5,
+        "entrances": [],
+        "index": 391
     },
     {
         "name": "Iceberg Boss - 0",
@@ -22236,7 +22669,8 @@
             56,
             152
         ],
-        "music": 2823,
-        "entrances": []
+        "music": 7,
+        "entrances": [],
+        "index": 392
     }
 ]

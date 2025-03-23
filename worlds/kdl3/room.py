@@ -1,4 +1,5 @@
 import struct
+from random import Random
 from typing import Optional, Dict, TYPE_CHECKING, List, Union, Tuple
 from BaseClasses import Region, ItemClassification, MultiWorld, Entrance
 from worlds.Files import APTokenTypes
@@ -33,24 +34,7 @@ final_iceberg_rooms = {
 class KDL3Door(Entrance):
     world: Optional["KDL3World"] = None
     parent_region: "KDL3Room"
-
-    def can_connect_to(self, other: "KDL3Door", dead_end: bool, state: "ERPlacementState") -> bool:
-        from . import KDL3World
-        world = getattr(self, "world", None)
-        if not world:
-            world = state.world
-            self.world = world
-
-        assert isinstance(world, KDL3World)
-
-        if other.connected_region.name in final_iceberg_rooms:
-            if any(x for x in self.parent_region.enemies if
-                   world.copy_abilities[x] == final_iceberg_rooms[other.connected_region.name]):
-                return super().can_connect_to(other, dead_end, state)
-            else:
-                return False
-        else:
-            return super().can_connect_to(other, dead_end, state)
+    connected_region: "KDL3Room"
 
 
 class KDL3Room(Region):
@@ -68,6 +52,7 @@ class KDL3Room(Region):
     entrance_coords: List[List[int]]
     spawn: List[int]
     entrance_pointer: int
+    default_spawn: bool
 
     def __init__(self, name: str, player: int, multiworld: MultiWorld, hint: Optional[str], level: int,
                  stage: int, room: int, pointer: int, music: int,
@@ -75,7 +60,8 @@ class KDL3Room(Region):
                  animal_pointers: List[int], enemies: List[str],
                  entity_load: List[List[int]],
                  consumables: List[Dict[str, Union[int, str]]], consumable_pointer: int,
-                 entrances: List[List[int]], spawn: List[int], entrance_pointer: int) -> None:
+                 entrances: List[List[int]], spawn: List[int], entrance_pointer: int,
+                 index: int) -> None:
         super().__init__(name, player, multiworld, hint)
         self.level = level
         self.stage = stage
@@ -91,14 +77,17 @@ class KDL3Room(Region):
         self.entrance_coords = entrances
         self.spawn = spawn
         self.entrance_pointer = entrance_pointer
+        self.index = index
+        self.default_spawn = False
 
-    def patch(self, patch: "KDL3ProcedurePatch", consumables: bool, local_items: bool) -> None:
+
+    def patch(self, patch: "KDL3ProcedurePatch", consumables: bool, local_items: bool, doors: bool, random: Random) -> None:
         patch.write_token(APTokenTypes.WRITE, self.pointer + 2, self.music.to_bytes(1, "little"))
-        animals = [x.item.name for x in self.locations if "Animal" in x.name and x.item]
+        animals = [x for x in self.locations if "Animal" in x.name and x.item]
         if len(animals) > 0:
-            for current_animal, address in zip(animals, self.animal_pointers):
-                patch.write_token(APTokenTypes.WRITE, self.pointer + address + 7,
-                                  animal_map[current_animal].to_bytes(1, "little"))
+            for current_animal in animals:
+                patch.write_token(APTokenTypes.WRITE, self.pointer + self.animal_pointers[current_animal.name] + 7,
+                                  animal_map[current_animal.item.name].to_bytes(1, "little"))
         if local_items:
             for location in self.get_locations():
                 if location.item is None or location.item.player != self.player:
@@ -175,3 +164,18 @@ class KDL3Room(Region):
                 assert isinstance(consumable["pointer"], int)
                 patch.write_token(APTokenTypes.WRITE, self.pointer + consumable["pointer"] + 7,
                                   vtype.to_bytes(1, "little"))
+
+        if doors:
+            door_ptr = self.entrance_pointer + self.pointer
+            for exit_name in self.default_exits:
+                exit_region = next((exit for exit in self.get_exits() if exit.name == exit_name), None)
+                if not exit_region:
+                    door_ptr += 10
+                    continue  # one singular case, we filter out an unreachable entrance
+                assert isinstance(exit_region, KDL3Door)
+                target_coords = exit_region.connected_region.spawn if not exit_region.connected_region.default_spawn \
+                    else random.choice(exit_region.connected_region.entrance_coords)
+                patch.write_token(APTokenTypes.WRITE, door_ptr, exit_region.connected_region.index.to_bytes(2, "little"))
+                patch.write_token(APTokenTypes.WRITE, door_ptr + 6, target_coords[0].to_bytes(2, "little"))
+                patch.write_token(APTokenTypes.WRITE, door_ptr + 8, target_coords[1].to_bytes(2, "little"))
+                door_ptr += 10

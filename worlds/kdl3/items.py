@@ -88,6 +88,7 @@ event_item_table = {
     "Wall": ItemData(None, True),
     "Donbe": ItemData(None, True),
     "Mikarin": ItemData(None, True),
+    "Shell": ItemData(None, True),
 }
 
 total_filler_weights = {
@@ -102,7 +103,8 @@ item_table = {
     **animal_friend_table,
     **animal_friend_spawn_table,
     **misc_item_table,
-    **trap_item_table
+    **trap_item_table,
+    **event_item_table
 }
 
 item_names = {
