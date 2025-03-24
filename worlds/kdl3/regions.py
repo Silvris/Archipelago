@@ -544,7 +544,7 @@ def shuffle_doors(world: "KDL3World"):
         for j in range(6):
             group = groups[world.player_levels[i][j] & 0xFF]
             randomize_entrances(world, False, group_match, False, group[0], group[1])
-    #visualize_regions(world.multiworld.get_region("Menu", world.player), "kdl3_doors.puml", show_locations=False)
+    visualize_regions(world.multiworld.get_region("Menu", world.player), "kdl3_doors.puml", show_locations=False)
     #raise NotImplementedError
 
 

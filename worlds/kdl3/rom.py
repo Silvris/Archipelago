@@ -122,6 +122,8 @@ consumable_size = 698
 
 stage_palettes = [0x60964, 0x60B64, 0x60D64, 0x60F64, 0x61164]
 
+door_enable = 0x3A1BF
+
 music_choices = [
     2,  # Boss 1
     3,  # Boss 2 (Unused)
@@ -507,38 +509,39 @@ def patch_rom(world: "KDL3World", patch: KDL3ProcedurePatch) -> None:
                                   struct.pack("H", ability_remap[world.copy_abilities[enemy]]))
         # following only needs done on non-door rando
         # incredibly lucky this follows the same order (including 5E == star block)
-        patch.write_token(APTokenTypes.WRITE, 0x2F77EA,
-                          (0x5E + (ability_remap[world.copy_abilities["Sparky"]] << 1)).to_bytes(1, "little"))
-        patch.write_token(APTokenTypes.WRITE, 0x2F7811,
-                          (0x5E + (ability_remap[world.copy_abilities["Sparky"]] << 1)).to_bytes(1, "little"))
-        patch.write_token(APTokenTypes.WRITE, 0x2F9BC4,
-                          (0x5E + (ability_remap[world.copy_abilities["Blocky"]] << 1)).to_bytes(1, "little"))
-        patch.write_token(APTokenTypes.WRITE, 0x2F9BEB,
-                          (0x5E + (ability_remap[world.copy_abilities["Blocky"]] << 1)).to_bytes(1, "little"))
-        patch.write_token(APTokenTypes.WRITE, 0x2FAC06,
-                          (0x5E + (ability_remap[world.copy_abilities["Jumper Shoot"]] << 1)).to_bytes(1, "little"))
-        patch.write_token(APTokenTypes.WRITE, 0x2FAC2D,
-                          (0x5E + (ability_remap[world.copy_abilities["Jumper Shoot"]] << 1)).to_bytes(1, "little"))
-        patch.write_token(APTokenTypes.WRITE, 0x2F9E7B,
-                          (0x5E + (ability_remap[world.copy_abilities["Yuki"]] << 1)).to_bytes(1, "little"))
-        patch.write_token(APTokenTypes.WRITE, 0x2F9EA2,
-                          (0x5E + (ability_remap[world.copy_abilities["Yuki"]] << 1)).to_bytes(1, "little"))
-        patch.write_token(APTokenTypes.WRITE, 0x2FA951,
-                          (0x5E + (ability_remap[world.copy_abilities["Sir Kibble"]] << 1)).to_bytes(1, "little"))
-        patch.write_token(APTokenTypes.WRITE, 0x2FA978,
-                          (0x5E + (ability_remap[world.copy_abilities["Sir Kibble"]] << 1)).to_bytes(1, "little"))
-        patch.write_token(APTokenTypes.WRITE, 0x2FA132,
-                          (0x5E + (ability_remap[world.copy_abilities["Haboki"]] << 1)).to_bytes(1, "little"))
-        patch.write_token(APTokenTypes.WRITE, 0x2FA159,
-                          (0x5E + (ability_remap[world.copy_abilities["Haboki"]] << 1)).to_bytes(1, "little"))
-        patch.write_token(APTokenTypes.WRITE, 0x2FA3E8,
-                          (0x5E + (ability_remap[world.copy_abilities["Boboo"]] << 1)).to_bytes(1, "little"))
-        patch.write_token(APTokenTypes.WRITE, 0x2FA40F,
-                          (0x5E + (ability_remap[world.copy_abilities["Boboo"]] << 1)).to_bytes(1, "little"))
-        patch.write_token(APTokenTypes.WRITE, 0x2F90E2,
-                          (0x5E + (ability_remap[world.copy_abilities["Captain Stitch"]] << 1)).to_bytes(1, "little"))
-        patch.write_token(APTokenTypes.WRITE, 0x2F9109,
-                          (0x5E + (ability_remap[world.copy_abilities["Captain Stitch"]] << 1)).to_bytes(1, "little"))
+        if not world.options.door_shuffle:
+            patch.write_token(APTokenTypes.WRITE, 0x2F77EA,
+                              (0x5E + (ability_remap[world.copy_abilities["Sparky"]] << 1)).to_bytes(1, "little"))
+            patch.write_token(APTokenTypes.WRITE, 0x2F7811,
+                              (0x5E + (ability_remap[world.copy_abilities["Sparky"]] << 1)).to_bytes(1, "little"))
+            patch.write_token(APTokenTypes.WRITE, 0x2F9BC4,
+                              (0x5E + (ability_remap[world.copy_abilities["Blocky"]] << 1)).to_bytes(1, "little"))
+            patch.write_token(APTokenTypes.WRITE, 0x2F9BEB,
+                              (0x5E + (ability_remap[world.copy_abilities["Blocky"]] << 1)).to_bytes(1, "little"))
+            patch.write_token(APTokenTypes.WRITE, 0x2FAC06,
+                              (0x5E + (ability_remap[world.copy_abilities["Jumper Shoot"]] << 1)).to_bytes(1, "little"))
+            patch.write_token(APTokenTypes.WRITE, 0x2FAC2D,
+                              (0x5E + (ability_remap[world.copy_abilities["Jumper Shoot"]] << 1)).to_bytes(1, "little"))
+            patch.write_token(APTokenTypes.WRITE, 0x2F9E7B,
+                              (0x5E + (ability_remap[world.copy_abilities["Yuki"]] << 1)).to_bytes(1, "little"))
+            patch.write_token(APTokenTypes.WRITE, 0x2F9EA2,
+                              (0x5E + (ability_remap[world.copy_abilities["Yuki"]] << 1)).to_bytes(1, "little"))
+            patch.write_token(APTokenTypes.WRITE, 0x2FA951,
+                              (0x5E + (ability_remap[world.copy_abilities["Sir Kibble"]] << 1)).to_bytes(1, "little"))
+            patch.write_token(APTokenTypes.WRITE, 0x2FA978,
+                              (0x5E + (ability_remap[world.copy_abilities["Sir Kibble"]] << 1)).to_bytes(1, "little"))
+            patch.write_token(APTokenTypes.WRITE, 0x2FA132,
+                              (0x5E + (ability_remap[world.copy_abilities["Haboki"]] << 1)).to_bytes(1, "little"))
+            patch.write_token(APTokenTypes.WRITE, 0x2FA159,
+                              (0x5E + (ability_remap[world.copy_abilities["Haboki"]] << 1)).to_bytes(1, "little"))
+            patch.write_token(APTokenTypes.WRITE, 0x2FA3E8,
+                              (0x5E + (ability_remap[world.copy_abilities["Boboo"]] << 1)).to_bytes(1, "little"))
+            patch.write_token(APTokenTypes.WRITE, 0x2FA40F,
+                              (0x5E + (ability_remap[world.copy_abilities["Boboo"]] << 1)).to_bytes(1, "little"))
+            patch.write_token(APTokenTypes.WRITE, 0x2F90E2,
+                              (0x5E + (ability_remap[world.copy_abilities["Captain Stitch"]] << 1)).to_bytes(1, "little"))
+            patch.write_token(APTokenTypes.WRITE, 0x2F9109,
+                              (0x5E + (ability_remap[world.copy_abilities["Captain Stitch"]] << 1)).to_bytes(1, "little"))
 
         if world.options.copy_ability_randomization == 2:
             for enemy in enemy_remap:
@@ -549,6 +552,11 @@ def patch_rom(world: "KDL3World", patch: KDL3ProcedurePatch) -> None:
     # write jumping goal
     patch.write_token(APTokenTypes.WRITE, 0x94F8, struct.pack("H", world.options.jumping_target))
     patch.write_token(APTokenTypes.WRITE, 0x944E, struct.pack("H", world.options.jumping_target))
+
+    if world.options.door_shuffle:
+        patch.write_token(APTokenTypes.WRITE, door_enable, int.to_bytes(1, 2, "little"))
+
+        
 
     from Utils import __version__
     patch_name = bytearray(

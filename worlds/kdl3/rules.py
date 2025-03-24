@@ -122,7 +122,7 @@ def set_rules(world: "KDL3World") -> None:
     set_rule(world.multiworld.get_location(location_name.grass_land_muchi, world.player),
              lambda state: can_reach_chuchu(state, world.player))
     set_rule(world.multiworld.get_location(location_name.grass_land_chao, world.player),
-             lambda state: state.has(location_name.grass_land_4_goku, world.player))
+             lambda state: state.has("Goku", world.player))
     set_rule(world.multiworld.get_location(location_name.grass_land_4_goku, world.player),
              lambda state: can_reach_stone(state, world.player))
     set_rule(world.multiworld.get_location(location_name.grass_land_mine, world.player),
@@ -136,7 +136,7 @@ def set_rules(world: "KDL3World") -> None:
     set_rule(world.multiworld.get_location(location_name.ripple_field_bakasa, world.player),
              lambda state: can_reach_kine(state, world.player) and can_reach_parasol(state, world.player))
     set_rule(world.multiworld.get_location(location_name.ripple_field_toad, world.player),
-             lambda state: state.has(location_name.ripple_field_toad, world.player))
+             lambda state: state.has("Little Toad", world.player))
     set_rule(world.multiworld.get_location(location_name.ripple_field_4_little_toad, world.player),
              lambda state: can_reach_needle(state, world.player))
     set_rule(world.multiworld.get_location(location_name.ripple_field_mama_pitch, world.player),

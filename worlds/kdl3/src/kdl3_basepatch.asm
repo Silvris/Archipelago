@@ -1,4 +1,4 @@
-fullsa1rom
+sa1rom
 
 !GAME_STATUS = $36D0
 
@@ -1299,6 +1299,22 @@ HookBossPurify:
     .Return:
     RTL
 
+DoorHandling:
+    print "Door Enable: ", hex(snestopc(realbase()))
+    LDA #$0000
+    CMP #$0000
+    BEQ .Vanilla
+    LDA #$0000
+    STA $B0
+    STA $B2
+    RTL
+    .Vanilla:
+    LDA $363F
+    STA $B0
+    LDA $3641
+    STA $B2
+    RTL
+
 org $07C000
     db "KDL3_BASEPATCH_ARCHI"
 
@@ -1337,3 +1353,8 @@ org $07E040
 
 org $07F000
 incbin "APPauseIcons.dat"
+
+org $C123F3
+HookDoorHandling:
+    JSL DoorHandling
+    NOP #7
