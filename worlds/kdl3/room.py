@@ -80,7 +80,6 @@ class KDL3Room(Region):
         self.index = index
         self.default_spawn = False
 
-
     def patch(self, patch: "KDL3ProcedurePatch", consumables: bool, local_items: bool, doors: bool, random: Random) -> None:
         patch.write_token(APTokenTypes.WRITE, self.pointer + 2, self.music.to_bytes(1, "little"))
         animals = [x for x in self.locations if "Animal" in x.name and x.item]
@@ -173,7 +172,7 @@ class KDL3Room(Region):
                     door_ptr += 10
                     continue  # one singular case, we filter out an unreachable entrance
                 assert isinstance(exit_region, KDL3Door)
-                target_coords = exit_region.connected_region.spawn if not exit_region.connected_region.default_spawn \
+                target_coords = exit_region.connected_region.spawn if not exit_region.connected_region.entrance_coords \
                     else random.choice(exit_region.connected_region.entrance_coords)
                 patch.write_token(APTokenTypes.WRITE, door_ptr, exit_region.connected_region.index.to_bytes(2, "little"))
                 patch.write_token(APTokenTypes.WRITE, door_ptr + 6, target_coords[0].to_bytes(2, "little"))

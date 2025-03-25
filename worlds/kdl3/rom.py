@@ -12,6 +12,8 @@ from worlds.Files import APProcedurePatch, APTokenMixin, APTokenTypes, APPatchEx
 from .aesthetics import get_palette_bytes, kirby_target_palettes, get_kirby_palette, gooey_target_palettes, \
     get_gooey_palette
 from .compression import hal_decompress
+from .names.location_name import level_names_inverse
+from .room import KDL3Room
 import bsdiff4
 
 if TYPE_CHECKING:
@@ -123,6 +125,7 @@ consumable_size = 698
 stage_palettes = [0x60964, 0x60B64, 0x60D64, 0x60F64, 0x61164]
 
 door_enable = 0x3A1BF
+door_enable_2 = 0x3A1E7
 
 music_choices = [
     2,  # Boss 1
@@ -554,7 +557,16 @@ def patch_rom(world: "KDL3World", patch: KDL3ProcedurePatch) -> None:
     patch.write_token(APTokenTypes.WRITE, 0x944E, struct.pack("H", world.options.jumping_target))
 
     if world.options.door_shuffle:
-        patch.write_token(APTokenTypes.WRITE, door_enable, int.to_bytes(1, 2, "little"))
+        patch.write_token(APTokenTypes.WRITE, door_enable + 1, int.to_bytes(1, 2, "little"))
+        patch.write_token(APTokenTypes.WRITE, door_enable_2 + 1, int.to_bytes(1, 2, "little"))
+        for level in range(1, 6):
+            level_region = world.get_region(level_names_inverse[level])
+            for connection in level_region.get_exits():
+                connected = connection.connected_region
+                if isinstance(connected, KDL3Room):
+                    patch.write_token(APTokenTypes.WRITE, 0x3F002E + (((connected.level - 1) * 7) +
+                                                                      (connected.stage - 1) * 2),
+                                      int.to_bytes((connected.index * 4) + 0x84, 2, "little"))
 
         
 

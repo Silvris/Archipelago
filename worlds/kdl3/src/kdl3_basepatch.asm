@@ -1304,6 +1304,11 @@ DoorHandling:
     LDA #$0000
     CMP #$0000
     BEQ .Vanilla
+    LDA $363F
+    CMP #$0005
+    BCS .Vanilla
+    LDA $3643
+    BEQ .Vanilla
     LDA #$0000
     STA $B0
     STA $B2
@@ -1313,6 +1318,30 @@ DoorHandling:
     STA $B0
     LDA $3641
     STA $B2
+    RTL
+
+DoorHandling2:
+    print "Door Enable 2: ", hex(snestopc(realbase()))
+    LDX #$0000
+    BEQ .VanillaLoad
+    LDX $B0
+    BNE .VanillaLoad
+    LDX $B2
+    BNE .VanillaLoad
+    LDX $B4
+    BEQ .VanillaLoad
+    ASL
+    ASL
+    CMP #$0000
+    BEQ .Vanilla
+    ADC #$0084
+    RTL
+    .VanillaLoad:
+    LDX #$0000
+    ASL
+    ASL
+    .Vanilla:
+    ADC [$BC], Y
     RTL
 
 org $07C000
@@ -1354,7 +1383,11 @@ org $07E040
 org $07F000
 incbin "APPauseIcons.dat"
 
-org $C123F3
+org $C213F3
 HookDoorHandling:
     JSL DoorHandling
-    NOP #7
+    NOP #6
+
+org $C21418
+HookDoorHandling2:
+    JSL DoorHandling2
