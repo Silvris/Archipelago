@@ -3,6 +3,8 @@ import logging
 import sys
 import typing
 import re
+import io
+import pkgutil
 from collections import deque
 
 assert "kivy" not in sys.modules, "kvui should be imported before kivy for frozen compatibility"
@@ -12,10 +14,7 @@ if sys.platform == "win32":
 
     # kivy 2.2.0 introduced DPI awareness on Windows, but it makes the UI enter an infinitely recursive re-layout
     # by setting the application to not DPI Aware, Windows handles scaling the entire window on its own, ignoring kivy's
-    try:
-        ctypes.windll.shcore.SetProcessDpiAwareness(0)
-    except FileNotFoundError:  # shcore may not be found on <= Windows 7
-        pass  # TODO: remove silent except when Python 3.8 is phased out.
+    ctypes.windll.shcore.SetProcessDpiAwareness(0)
 
 os.environ["KIVY_NO_CONSOLELOG"] = "1"
 os.environ["KIVY_NO_FILELOG"] = "1"
@@ -27,21 +26,24 @@ import Utils
 if Utils.is_frozen():
     os.environ["KIVY_DATA_DIR"] = Utils.local_path("data")
 
+import platformdirs
+os.environ["KIVY_HOME"] = os.path.join(platformdirs.user_config_dir("Archipelago", False), "kivy")
+os.makedirs(os.environ["KIVY_HOME"], exist_ok=True)
 
 from kivy.config import Config
 
 Config.set("input", "mouse", "mouse,disable_multitouch")
 Config.set("kivy", "exit_on_escape", "0")
 Config.set("graphics", "multisamples", "0")  # multisamples crash old intel drivers
-from kivy.uix.image import AsyncImage
 from kivymd.uix.divider import MDDivider
 from kivy.core.window import Window
 from kivy.core.clipboard import Clipboard
 from kivy.core.text.markup import MarkupLabel
+from kivy.core.image import ImageLoader, ImageLoaderBase, ImageData
 from kivy.base import ExceptionHandler, ExceptionManager
 from kivy.clock import Clock
 from kivy.factory import Factory
-from kivy.properties import BooleanProperty, ObjectProperty
+from kivy.properties import BooleanProperty, ObjectProperty, NumericProperty
 from kivy.metrics import dp
 from kivy.uix.widget import Widget
 from kivy.uix.layout import Layout
@@ -53,11 +55,15 @@ from kivy.uix.recycleboxlayout import RecycleBoxLayout
 from kivy.uix.recycleview.layout import LayoutSelectionBehavior
 from kivy.animation import Animation
 from kivy.uix.popup import Popup
+from kivy.uix.image import AsyncImage
 from kivymd.app import MDApp
 from kivymd.uix.gridlayout import MDGridLayout
 from kivymd.uix.floatlayout import MDFloatLayout
 from kivymd.uix.boxlayout import MDBoxLayout
 from kivymd.uix.tab.tab import MDTabsPrimary, MDTabsItem, MDTabsItemText, MDTabsCarousel
+from kivymd.uix.menu import MDDropdownMenu
+from kivymd.uix.menu.menu import MDDropdownTextItem
+from kivymd.uix.dropdownitem import MDDropDownItem, MDDropDownItemText
 from kivymd.uix.button import MDButton, MDButtonText, MDButtonIcon, MDIconButton
 from kivymd.uix.label import MDLabel, MDIcon
 from kivymd.uix.recycleview import MDRecycleView
@@ -68,7 +74,7 @@ from kivymd.uix.tooltip import MDTooltip, MDTooltipPlain
 
 fade_in_animation = Animation(opacity=0, duration=0) + Animation(opacity=1, duration=0.25)
 
-from NetUtils import JSONtoTextParser, JSONMessagePart, SlotType
+from NetUtils import JSONtoTextParser, JSONMessagePart, SlotType, HintStatus
 from Utils import async_start, get_input_text_from_response
 
 if typing.TYPE_CHECKING:
@@ -100,9 +106,11 @@ class ImageButton(MDIconButton):
                 image_args[kwarg.replace("image_", "")] = val
         super().__init__()
         self.image = AsyncImage(**image_args)
+
         def set_center(button, center):
             self.image.center_x = self.center_x
             self.image.center_y = self.center_y
+
         self.bind(center=set_center)
         self.add_widget(self.image)
 
@@ -152,6 +160,7 @@ class ToggleButton(MDButton, ToggleButtonBehavior):
                     child.theme_icon_color = "Custom"
                 child.text_color = self.theme_cls.primaryColor
                 child.icon_color = self.theme_cls.primaryColor
+
 
 # I was surprised to find this didn't already exist in kivy :(
 class HoverBehavior(object):
@@ -298,6 +307,9 @@ class ServerLabel(HovererableLabel, MDTooltip):
                             f"\nYou currently have {ctx.hint_points} points."
                 elif ctx.hint_cost == 0:
                     text += "\n!hint is free to use."
+                if ctx.stored_data and "_read_race_mode" in ctx.stored_data:
+                    text += "\nRace mode is enabled." \
+                        if ctx.stored_data["_read_race_mode"] else "\nRace mode is disabled."
             else:
                 text += f"\nYou are not authenticated yet."
 
@@ -361,11 +373,148 @@ class SelectableLabel(RecycleDataViewBehavior, TooltipLabel):
         self.selected = is_selected
 
 
+class MarkupDropdownTextItem(MDDropdownTextItem):
+    def __init__(self):
+        super().__init__()
+        for child in self.children:
+            if child.__class__ == MDLabel:
+                child.markup = True
+        print(self.text)
+    # Currently, this only lets us do markup on text that does not have any icons
+    # Create new TextItems as needed
+
+
+class MarkupDropdown(MDDropdownMenu):
+    def on_items(self, instance, value: list) -> None:
+        """
+        The method sets the class that will be used to create the menu item.
+        """
+
+        items = []
+        viewclass = "MarkupDropdownTextItem"
+
+        for data in value:
+            if "viewclass" not in data:
+                if (
+                    "leading_icon" not in data
+                    and "trailing_icon" not in data
+                    and "trailing_text" not in data
+                ):
+                    viewclass = "MarkupDropdownTextItem"
+                elif (
+                    "leading_icon" in data
+                    and "trailing_icon" not in data
+                    and "trailing_text" not in data
+                ):
+                    viewclass = "MDDropdownLeadingIconItem"
+                elif (
+                    "leading_icon" not in data
+                    and "trailing_icon" in data
+                    and "trailing_text" not in data
+                ):
+                    viewclass = "MDDropdownTrailingIconItem"
+                elif (
+                    "leading_icon" not in data
+                    and "trailing_icon" in data
+                    and "trailing_text" in data
+                ):
+                    viewclass = "MDDropdownTrailingIconTextItem"
+                elif (
+                    "leading_icon" in data
+                    and "trailing_icon" in data
+                    and "trailing_text" in data
+                ):
+                    viewclass = "MDDropdownLeadingTrailingIconTextItem"
+                elif (
+                    "leading_icon" in data
+                    and "trailing_icon" in data
+                    and "trailing_text" not in data
+                ):
+                    viewclass = "MDDropdownLeadingTrailingIconItem"
+                elif (
+                    "leading_icon" not in data
+                    and "trailing_icon" not in data
+                    and "trailing_text" in data
+                ):
+                    viewclass = "MDDropdownTrailingTextItem"
+                elif (
+                    "leading_icon" in data
+                    and "trailing_icon" not in data
+                    and "trailing_text" in data
+                ):
+                    viewclass = "MDDropdownLeadingIconTrailingTextItem"
+
+                data["viewclass"] = viewclass
+
+            if "height" not in data:
+                data["height"] = dp(48)
+
+            items.append(data)
+
+        self._items = items
+        # Update items in view
+        if hasattr(self, "menu"):
+            self.menu.data = self._items
+
+
+class AutocompleteHintInput(MDTextField):
+    min_chars = NumericProperty(3)
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+        self.dropdown = MarkupDropdown(caller=self, position="bottom", border_margin=dp(24), width=self.width)
+        self.dropdown.bind(on_select=lambda instance, x: setattr(self, 'text', x))
+        self.bind(on_text_validate=self.on_message)
+        self.bind(width=lambda instance, x: setattr(self.dropdown, "width", x))
+
+    def on_message(self, instance):
+        MDApp.get_running_app().commandprocessor("!hint "+instance.text)
+
+    def on_text(self, instance, value):
+        if len(value) >= self.min_chars:
+            self.dropdown.items.clear()
+            ctx: context_type = MDApp.get_running_app().ctx
+            if not ctx.game:
+                return
+            item_names = ctx.item_names._game_store[ctx.game].values()
+
+            def on_press(text):
+                split_text = MarkupLabel(text=text).markup
+                return self.dropdown.select("".join(text_frag for text_frag in split_text
+                                                    if not text_frag.startswith("[")))
+            lowered = value.lower()
+            for item_name in item_names:
+                try:
+                    index = item_name.lower().index(lowered)
+                except ValueError:
+                    pass  # substring not found
+                else:
+                    text = escape_markup(item_name)
+                    text = text[:index] + "[b]" + text[index:index+len(value)]+"[/b]"+text[index+len(value):]
+                    self.dropdown.items.append({
+                        "text": text,
+                        "on_release": lambda: on_press(text),
+                        "markup": True
+                    })
+            if not self.dropdown.parent:
+                self.dropdown.open()
+        else:
+            self.dropdown.dismiss()
+
+
+status_icons = {
+    HintStatus.HINT_NO_PRIORITY: "information",
+    HintStatus.HINT_PRIORITY: "exclamation-thick",
+    HintStatus.HINT_AVOID: "alert"
+}
+
 
 class HintLabel(RecycleDataViewBehavior, MDBoxLayout):
     selected = BooleanProperty(False)
     striped = BooleanProperty(False)
     index = None
+    dropdown: MDDropdownMenu
 
     def __init__(self):
         super(HintLabel, self).__init__()
@@ -374,9 +523,30 @@ class HintLabel(RecycleDataViewBehavior, MDBoxLayout):
         self.finding_text = ""
         self.location_text = ""
         self.entrance_text = ""
-        self.found_text = ""
-        for child in self.children:
-            child.bind(texture_size=self.set_height)
+        self.status_text = ""
+        self.hint = {}
+
+        ctx = MDApp.get_running_app().ctx
+        menu_items = []
+
+        for status in (HintStatus.HINT_NO_PRIORITY, HintStatus.HINT_PRIORITY, HintStatus.HINT_AVOID):
+            name = status_names[status]
+            status_button = MDDropDownItem(MDDropDownItemText(text=name), size_hint_y=None, height=dp(50))
+            status_button.status = status
+            menu_items.append({
+                "text": name,
+                "leading_icon": status_icons[status],
+                "on_release": lambda x=status: select(self, x)
+            })
+
+        self.dropdown = MDDropdownMenu(caller=self.ids["status"], items=menu_items)
+
+        def select(instance, data):
+            ctx.update_hint(self.hint["location"],
+                            self.hint["finding_player"],
+                            data)
+
+        self.dropdown.bind(on_release=self.dropdown.dismiss)
 
     def set_height(self, instance, value):
         self.height = max([child.texture_size[1] for child in self.children])
@@ -389,8 +559,8 @@ class HintLabel(RecycleDataViewBehavior, MDBoxLayout):
         self.finding_text = data["finding"]["text"]
         self.location_text = data["location"]["text"]
         self.entrance_text = data["entrance"]["text"]
-        self.found_text = data["found"]["text"]
-        self.height = self.minimum_height
+        self.status_text = data["status"]["text"]
+        self.hint = data["status"]["hint"]
         return super(HintLabel, self).refresh_view_attrs(rv, index, data)
 
     def on_touch_down(self, touch):
@@ -399,13 +569,21 @@ class HintLabel(RecycleDataViewBehavior, MDBoxLayout):
             return True
         if self.index:  # skip header
             if self.collide_point(*touch.pos):
-                if self.selected:
+                status_label = self.ids["status"]
+                if status_label.collide_point(*touch.pos):
+                    if self.hint["status"] == HintStatus.HINT_FOUND:
+                        return
+                    ctx = MDApp.get_running_app().ctx
+                    if ctx.slot_concerns_self(self.hint["receiving_player"]):  # If this player owns this hint
+                        # open a dropdown
+                        self.dropdown.open()
+                elif self.selected:
                     self.parent.clear_selection()
                 else:
                     text = "".join((self.receiving_text, "\'s ", self.item_text, " is at ", self.location_text, " in ",
                                     self.finding_text, "\'s World", (" at " + self.entrance_text)
                                     if self.entrance_text != "Vanilla"
-                                    else "", ". (", self.found_text.lower(), ")"))
+                                    else "", ". (", self.status_text.lower(), ")"))
                     temp = MarkupLabel(text).markup
                     text = "".join(
                         part for part in temp if not part.startswith(("[color", "[/color]", "[ref=", "[/ref]")))
@@ -419,18 +597,19 @@ class HintLabel(RecycleDataViewBehavior, MDBoxLayout):
             for child in self.children:
                 if child.collide_point(*touch.pos):
                     key = child.sort_key
-                    parent.hint_sorter = lambda element: remove_between_brackets.sub("", element[key]["text"]).lower()
+                    if key == "status":
+                        parent.hint_sorter = lambda element: status_sort_weights[element["status"]["hint"]["status"]]
+                    else:
+                        parent.hint_sorter = lambda element: (
+                            remove_between_brackets.sub("", element[key]["text"]).lower()
+                        )
                     if key == parent.sort_key:
                         # second click reverses order
                         parent.reversed = not parent.reversed
                     else:
                         parent.sort_key = key
                         parent.reversed = False
-                    break
-            else:
-                logging.warning("Did not find clicked header for sorting.")
-
-            MDApp.get_running_app().update_hints()
+                    MDApp.get_running_app().update_hints()
 
     def apply_selection(self, rv, index, is_selected):
         """ Respond to the selection of items in the view. """
@@ -628,10 +807,10 @@ class GameManager(MDApp):
                 self.tabs.carousel.add_widget(panel.content)
                 self.tabs.add_widget(panel)
 
-        hint_panel = MDTabsItem(MDTabsItemText(text="Hints"))
-        self.log_panels["Hints"] = hint_panel.content = HintLog(self.json_to_kivy_parser)
-        self.tabs.carousel.add_widget(hint_panel.content)
-        self.tabs.add_widget(hint_panel)
+        hint_panel = self.add_client_tab("Hints", HintLayout())
+        self.hint_log = HintLog(self.json_to_kivy_parser)
+        self.log_panels["Hints"] = hint_panel.content
+        hint_panel.content.add_widget(self.hint_log)
 
         self.main_area_container = MDGridLayout(size_hint_y=1, rows=1)
         self.main_area_container.add_widget(self.tabs)
@@ -664,10 +843,19 @@ class GameManager(MDApp):
 
         return self.container
 
+    def add_client_tab(self, title: str, content: Widget) -> Widget:
+        """Adds a new tab to the client window with a given title, and provides a given Widget as its content.
+         Returns the new tab widget, with the provided content being placed on the tab as content."""
+        new_tab = MDTabsItem(MDTabsItemText(text=title))
+        new_tab.content = content
+        self.tabs.add_widget(new_tab)
+        self.tabs.carousel.add_widget(new_tab.content)
+        return new_tab
+
     def update_texts(self, dt):
-        if hasattr(self.tabs.carousel.slides[0], "fix_heights"):
-            self.tabs.carousel.slides[0].fix_heights()  # TODO: remove this when Kivy fixes this upstream
-        # KIVYMDTODO: see if this bug exists in KivyMD
+        for slide in self.tabs.carousel.slides:
+            if hasattr(slide, "fix_heights"):
+                slide.fix_heights()  # TODO: remove this when Kivy fixes this upstream
         if self.ctx.server:
             self.title = self.base_title + " " + Utils.__version__ + \
                          f" | Connected to: {self.ctx.server_address} " \
@@ -749,8 +937,8 @@ class GameManager(MDApp):
             self.energy_link_label.text = f"EL: {Utils.format_SI_prefix(self.ctx.current_energy_link_value)}J"
 
     def update_hints(self):
-        hints = self.ctx.stored_data[f"_read_hints_{self.ctx.team}_{self.ctx.slot}"]
-        self.log_panels["Hints"].refresh_hints(hints)
+        hints = self.ctx.stored_data.get(f"_read_hints_{self.ctx.team}_{self.ctx.slot}", [])
+        self.hint_log.refresh_hints(hints)
 
     # default F1 keybind, opens a settings menu, that seems to break the layout engine once closed
     def open_settings(self, *largs):
@@ -806,6 +994,45 @@ class UILog(MDRecycleView):
                 element.height = element.texture_size[1]
 
 
+class HintLayout(MDBoxLayout):
+    orientation = "vertical"
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        boxlayout = MDBoxLayout(orientation="horizontal", size_hint_y=None, height=dp(55))
+        boxlayout.add_widget(MDLabel(text="New Hint:", size_hint_x=None, size_hint_y=None, height=dp(55)))
+        boxlayout.add_widget(AutocompleteHintInput())
+        self.add_widget(boxlayout)
+
+    def fix_heights(self):
+        for child in self.children:
+            fix_func = getattr(child, "fix_heights", None)
+            if fix_func:
+                fix_func()
+
+        
+status_names: typing.Dict[HintStatus, str] = {
+    HintStatus.HINT_FOUND: "Found",
+    HintStatus.HINT_UNSPECIFIED: "Unspecified",
+    HintStatus.HINT_NO_PRIORITY: "No Priority",
+    HintStatus.HINT_AVOID: "Avoid",
+    HintStatus.HINT_PRIORITY: "Priority",
+}
+status_colors: typing.Dict[HintStatus, str] = {
+    HintStatus.HINT_FOUND: "green",
+    HintStatus.HINT_UNSPECIFIED: "white",
+    HintStatus.HINT_NO_PRIORITY: "cyan",
+    HintStatus.HINT_AVOID: "salmon",
+    HintStatus.HINT_PRIORITY: "plum",
+}
+status_sort_weights: dict[HintStatus, int] = {
+    HintStatus.HINT_FOUND: 0,
+    HintStatus.HINT_UNSPECIFIED: 1,
+    HintStatus.HINT_NO_PRIORITY: 2,
+    HintStatus.HINT_AVOID: 3,
+    HintStatus.HINT_PRIORITY: 4,
+}
+
 class HintLog(MDRecycleView):
     header = {
         "receiving": {"text": "[u]Receiving Player[/u]"},
@@ -813,12 +1040,13 @@ class HintLog(MDRecycleView):
         "finding": {"text": "[u]Finding Player[/u]"},
         "location": {"text": "[u]Location[/u]"},
         "entrance": {"text": "[u]Entrance[/u]"},
-        "found": {"text": "[u]Status[/u]"},
+        "status": {"text": "[u]Status[/u]",
+                   "hint": {"receiving_player": -1, "location": -1, "finding_player": -1, "status": ""}},
         "striped": True,
     }
-
+    data: list[typing.Any]
     sort_key: str = ""
-    reversed: bool = False
+    reversed: bool = True
 
     def __init__(self, parser):
         super(HintLog, self).__init__()
@@ -826,8 +1054,18 @@ class HintLog(MDRecycleView):
         self.parser = parser
 
     def refresh_hints(self, hints):
+        if not hints:  # Fix the scrolling looking visually wrong in some edge cases
+            self.scroll_y = 1.0
         data = []
+        ctx = MDApp.get_running_app().ctx
         for hint in hints:
+            if not hint.get("status"): # Allows connecting to old servers
+                hint["status"] = HintStatus.HINT_FOUND if hint["found"] else HintStatus.HINT_UNSPECIFIED
+            hint_status_node = self.parser.handle_node({"type": "color",
+                                                        "color": status_colors.get(hint["status"], "red"),
+                                                        "text": status_names.get(hint["status"], "Unknown")})
+            if hint["status"] != HintStatus.HINT_FOUND and ctx.slot_concerns_self(hint["receiving_player"]):
+                hint_status_node = f"[u]{hint_status_node}[/u]"
             data.append({
                 "receiving": {"text": self.parser.handle_node({"type": "player_id", "text": hint["receiving_player"]})},
                 "item": {"text": self.parser.handle_node({
@@ -845,9 +1083,10 @@ class HintLog(MDRecycleView):
                 "entrance": {"text": self.parser.handle_node({"type": "color" if hint["entrance"] else "text",
                                                               "color": "blue", "text": hint["entrance"]
                                                               if hint["entrance"] else "Vanilla"})},
-                "found": {
-                    "text": self.parser.handle_node({"type": "color", "color": "green" if hint["found"] else "red",
-                                                     "text": "Found" if hint["found"] else "Not Found"})},
+                "status": {
+                    "text": hint_status_node,
+                    "hint": hint,
+                },
             })
 
         data.sort(key=self.hint_sorter, reverse=self.reversed)
@@ -858,13 +1097,48 @@ class HintLog(MDRecycleView):
 
     @staticmethod
     def hint_sorter(element: dict) -> str:
-        return ""
+        return element["status"]["hint"]["status"]  # By status by default
 
     def fix_heights(self):
         """Workaround fix for divergent texture and layout heights"""
         for element in self.children[0].children:
             max_height = max(child.texture_size[1] for child in element.children)
             element.height = max_height
+
+
+class ApAsyncImage(AsyncImage):
+    def is_uri(self, filename: str) -> bool:
+        if filename.startswith("ap:"):
+            return True
+        else:
+            return super().is_uri(filename)
+
+
+class ImageLoaderPkgutil(ImageLoaderBase):
+    def load(self, filename: str) -> typing.List[ImageData]:
+        # take off the "ap:" prefix
+        module, path = filename[3:].split("/", 1)
+        data = pkgutil.get_data(module, path)
+        return self._bytes_to_data(data)
+
+    @staticmethod
+    def _bytes_to_data(data: typing.Union[bytes, bytearray]) -> typing.List[ImageData]:
+        loader = next(loader for loader in ImageLoader.loaders if loader.can_load_memory())
+        return loader.load(loader, io.BytesIO(data))
+
+
+# grab the default loader method so we can override it but use it as a fallback
+_original_image_loader_load = ImageLoader.load
+
+
+def load_override(filename: str, default_load=_original_image_loader_load, **kwargs):
+    if filename.startswith("ap:"):
+        return ImageLoaderPkgutil(filename)
+    else:
+        return default_load(filename, **kwargs)
+
+
+ImageLoader.load = load_override
 
 
 class E(ExceptionHandler):
