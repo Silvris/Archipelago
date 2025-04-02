@@ -67,7 +67,7 @@ def get_seed_name(random_source) -> str:
     return f"{random_source.randint(0, pow(10, seeddigits) - 1)}".zfill(seeddigits)
 
 
-def main(args=None) -> Tuple[argparse.Namespace, int]:
+def main(args=None, log_channel=None) -> Tuple[argparse.Namespace, int]:
     # __name__ == "__main__" check so unittests that already imported worlds don't trip this.
     if __name__ == "__main__" and "worlds" in sys.modules:
         raise Exception("Worlds system should not be loaded before logging init.")
@@ -77,7 +77,8 @@ def main(args=None) -> Tuple[argparse.Namespace, int]:
 
     seed = get_seed(args.seed)
 
-    Utils.init_logging(f"Generate_{seed}", loglevel=args.log_level, add_timestamp=args.log_time)
+    Utils.init_logging(f"Generate_{seed}", loglevel=args.log_level, add_timestamp=args.log_time,
+                       log_channel=log_channel)
     random.seed(seed)
     seed_name = get_seed_name(random)
 

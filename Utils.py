@@ -495,7 +495,8 @@ loglevel_mapping = {'error': logging.ERROR, 'info': logging.INFO, 'warning': log
 
 def init_logging(name: str, loglevel: typing.Union[str, int] = logging.INFO,
                  write_mode: str = "w", log_format: str = "[%(name)s at %(asctime)s]: %(message)s",
-                 add_timestamp: bool = False, exception_logger: typing.Optional[str] = None):
+                 add_timestamp: bool = False, exception_logger: typing.Optional[str] = None,
+                 log_channel: typing.Optional[logging.StreamHandler] = None):
     import datetime
     loglevel: int = loglevel_mapping.get(loglevel, loglevel)
     log_folder = user_path("logs")
@@ -532,6 +533,8 @@ def init_logging(name: str, loglevel: typing.Union[str, int] = logging.INFO,
         if add_timestamp:
             stream_handler.setFormatter(formatter)
         root_logger.addHandler(stream_handler)
+    if log_channel:
+        root_logger.addHandler(log_channel)
 
     # Relay unhandled exceptions to logger.
     if not getattr(sys.excepthook, "_wrapped", False):  # skip if already modified

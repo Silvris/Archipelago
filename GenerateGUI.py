@@ -1,12 +1,17 @@
 import logging
+import os
 import os.path
+import traceback
+
 import Utils
 import typing
 import asyncio
-from Generate import main
+from concurrent.futures.thread import ThreadPoolExecutor
+from Generate import main as GenerateMain
 from Main import main as ERmain
 
 from kvui import ScrollBox
+from kivy.clock import Clock
 from kivy.metrics import dp
 from kivymd.app import MDApp
 from kivymd.uix.screen import MDScreen
@@ -101,36 +106,41 @@ class YamlSelectScreen(MDScreen):
         self.add_widget(self.layout)
 
 
-class TextInputStream:
-    buffer: typing.List[str]
-    field: MDTextField
+class TextInputHandler(logging.Handler):
+    buffer: list[str]
 
-    def write(self, data: str):
-        self.buffer.append(data)
+    def emit(self, data: logging.LogRecord):
+        self.buffer.append(data.message)
+        self.flush()
 
     def flush(self):
-        self.field.set_text(self.field, self.field.text + "\n".join(self.buffer))
-        self.buffer.clear()
+        pass
 
-    def __init__(self, field: MDTextField):
-        self.field = field
+    def __init__(self):
+        super().__init__()
         self.buffer = []
 
 
 class GenerateScreen(MDScreen):
     layout: MDRelativeLayout
     generate_log: MDTextField
-    channel: logging.StreamHandler
+    channel: TextInputHandler
+    generate_task: asyncio.Task
 
-    async def async_gen(self):
-        erargs, seed = main()
-        self.logger.addHandler(self.channel)
+    def async_gen(self):
+        erargs, seed = GenerateMain(log_channel=self.channel)
         multiworld = ERmain(erargs, seed)
+
+    def generate(self):
+        import threading
+        self.generate_log.text = ""
+        self.channel.buffer.clear()
+        threading.Thread(target=self.async_gen, name="GenerateMain").start()
         self.logger.removeHandler(self.channel)
 
-    def generate(self, _):
-        self.generate_log.text = ""
-        asyncio.run(self.async_gen())
+    def update_log(self, _):
+        self.generate_log.set_text(self.generate_log, self.generate_log.text + "\n".join(self.channel.buffer))
+        self.channel.buffer.clear()
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -143,12 +153,11 @@ class GenerateScreen(MDScreen):
         generate_button = MDButton(
             MDButtonIcon(icon="check-underline"),
             MDButtonText(text="Generate"),
-            on_release=self.generate,
+            on_release=lambda x: self.generate(),
 
         )
         generate_layout.add_widget(generate_button)
         generate_layout.add_widget(self.generate_log)
-
         self.layout.add_widget(generate_layout)
         self.appbar = MDTopAppBar(
             MDTopAppBarLeadingButtonContainer(
@@ -165,11 +174,11 @@ class GenerateScreen(MDScreen):
         self.layout.add_widget(self.appbar)
         self.add_widget(self.layout)
 
-        generate_log = TextInputStream(self.generate_log)
-        self.channel = logging.StreamHandler(generate_log)
+        self.channel = TextInputHandler()
         self.channel.setLevel(logging.INFO)
         self.logger = logging.getLogger()
 
+        Clock.schedule_interval(self.update_log, 0.5)
 
 class GenerateGUI(MDApp):
     layout: MDRelativeLayout
@@ -225,5 +234,8 @@ class GenerateGUI(MDApp):
         return navigation_layout
 
 
+async def main():
+    await GenerateGUI().async_run()
+
 if __name__ == "__main__":
-    GenerateGUI().run()
+    asyncio.run(main())
