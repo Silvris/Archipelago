@@ -1,7 +1,6 @@
 import logging
 import os
 import os.path
-import traceback
 
 import Utils
 import typing
@@ -19,6 +18,7 @@ from kivymd.uix.screenmanager import MDScreenManager
 from kivymd.uix.card import MDCard
 from kivymd.uix.button import MDButton, MDButtonText, MDButtonIcon, MDIconButton
 from kivymd.uix.filemanager import MDFileManager
+from kivymd.uix.boxlayout import MDBoxLayout
 from kivymd.uix.relativelayout import MDRelativeLayout
 from kivymd.uix.gridlayout import MDGridLayout
 from kivymd.uix.label import MDLabel
@@ -132,33 +132,37 @@ class GenerateScreen(MDScreen):
         multiworld = ERmain(erargs, seed)
 
     def generate(self):
-        import threading
         self.generate_log.text = ""
         self.channel.buffer.clear()
-        threading.Thread(target=self.async_gen, name="GenerateMain").start()
+        self.logger.addHandler(self.channel)
+        thread_pool = ThreadPoolExecutor(max_workers=1)
+        thread = thread_pool.submit(self.async_gen)
         self.logger.removeHandler(self.channel)
 
     def update_log(self, _):
-        self.generate_log.set_text(self.generate_log, self.generate_log.text + "\n".join(self.channel.buffer))
+        self.generate_log.set_text(self.generate_log, self.generate_log.text +
+                                   "\n".join(self.channel.buffer))
         self.channel.buffer.clear()
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.processes = []
         self.layout = MDRelativeLayout()
-        generate_layout = MDGridLayout(spacing=20, cols=1,
-                                       pos_hint={"center_x": 0.5, "center_y": 0.1}, size_hint=(0.5, 0.75))
-        self.generate_log = MDTextField(multiline=True, readonly=True, size_hint=(0.5, 0.9),
-                                        max_height=dp(200), mode="filled")
+        self.box = MDBoxLayout(orientation="vertical")
+        self.layout.add_widget(self.box)
+        self.generate_log = MDTextField(multiline=True, readonly=True, mode="filled")
         generate_button = MDButton(
             MDButtonIcon(icon="check-underline"),
             MDButtonText(text="Generate"),
             on_release=lambda x: self.generate(),
-
+            pos_hint={"center_x": 0.85, "center_y": 0.5}
         )
-        generate_layout.add_widget(generate_button)
-        generate_layout.add_widget(self.generate_log)
-        self.layout.add_widget(generate_layout)
+        scroll = ScrollBox(pos_hint={"center_x": 0.5, "center_y": 0.5})
+        scroll.do_scroll_x = False
+        scroll.layout.add_widget(self.generate_log)
+        scroll.layout.padding = [dp(10), dp(10)]
+
+        self.box.add_widget(generate_button)
+        self.box.add_widget(scroll)
         self.appbar = MDTopAppBar(
             MDTopAppBarLeadingButtonContainer(
                 MDActionTopAppBarButton(icon="menu", theme_text_color="Custom",
