@@ -79,12 +79,17 @@ sa1rom
 !ap_sub_games = $408000
 !received_items = $408002
 !received_planets = $408004
+!play_sfx = $408006
+!activate_candy = $408008
 
 
 org $008C29
     JSL WriteBWRAM
     NOP
     NOP
+
+org $00910C
+    JSL MainLoop
 
 org $00BD44
 hook_soft_reset:
@@ -108,6 +113,10 @@ org $01922E
     JML block_tgco_access
     tgco_access_return:
     NOP #2
+
+org $01FA1F
+    JSL great_cave_requirement
+    NOP
 
 org $02A34B
     JML hook_copy_ability
@@ -750,14 +759,18 @@ set_starting_stage:
     LDA #$0001
     PHA
     PHA
+    .GoalNumeric:
     print "Goal Numeric Requirement: ", hex(snestopc(realbase()))
     CPY #$0006
     BCC .SkipPull
     LDA !completed_sub_games
+    .GoalSpecific:
     print "Goal Specific Requirements: ", hex(snestopc(realbase()))
     AND #$007F
     CMP #$007F
     BNE .SkipPull
+    LDA #$0041
+    JSL $00D003
     PLA
     ORA #$0080
     BRA .Skip
@@ -789,7 +802,7 @@ soft_reset:
 
 TreasureRequirements:
     print "Treasures: ", hex(snestopc(realbase()))
-    dd $250000, $500000, $750000, $999999
+    dd $2625A0, $4C4B40, $7270E0, $989676
 
 block_tgco_access:
     LDA $32EA
@@ -856,6 +869,262 @@ set_star_complete:
     STA $401A6B
     .Return:
     JML hook_set_star_return
+
+invincibility_candy:
+    LDX #$0002
+    STX $7575
+    LDA #$FFFF
+    STA $7573
+    LDA #$0078
+    STA $7571
+    LDA #$000A
+    STA $35EF, X
+    LDA #$0438
+    STA $35F3, X
+    LDA #$0200
+    STA $74C5, X
+    TXY
+    LDA #$0000
+    LDX #$88C6
+    JSL $03D6B9
+    LDA #$AE11
+    JSL $05AC5F
+    LDA #$002C
+    JSL $00D12D
+    LDA #$0014
+    JSL $00D003
+    RTL
+
+MainLoop:
+    JSL $009258
+    PHX
+    LDA !play_sfx
+    BEQ .Candy
+    JSL $00D12D
+    LDA #$0000
+    STA !play_sfx
+    .Candy:
+    LDA !activate_candy
+    BEQ .Return
+    JSL invincibility_candy
+    LDA #$0000
+    STA !activate_candy
+    .Return:
+    PLX
+    RTL
+
+credits_goal_check:
+    JSL $00D003 ; start credits music
+    LDA #$0001
+    LDX #$0007
+    LDY #$0000
+    .CompletionLoop:
+    CPX #$0000
+    BEQ .CheckGoal
+    BIT !completed_sub_games
+    BEQ .NotComplete
+    INY
+    .NotComplete:
+    DEX
+    ASL
+    BRA .CompletionLoop
+    .CheckGoal:
+    TYA
+    CMP.l set_starting_stage_GoalNumeric+1
+    BCC .Return
+    LDA !completed_sub_games
+    AND.l set_starting_stage_GoalSpecific+1
+    CMP.l set_starting_stage_GoalSpecific+1
+    BNE .Return
+    LDA !received_sub_games
+    ORA #$0080
+    STA !received_sub_games
+    .Return:
+    RTL
+
+great_cave_requirement:
+    REP #$20
+    INC $00B1
+    LDY #$FFFE
+    PHB
+    .CheckRequirementHigh:
+    INY #2
+    .CheckRequirement:
+    INY #2
+    CPY #$000F
+    BPL .EarlyReturn ; we have enough to clear
+    LDA #$CA00
+    PHA
+    PLB
+    LDX #$0002
+    LDA !great_cave_gold, X
+    PLB
+    CMP TreasureRequirements, Y
+    BCC .GetDigitsHigh
+    BNE .CheckRequirementHigh ; branch if greater not equal
+    DEX #2
+    DEY #2
+    LDA #$CA00
+    PHA
+    PLB
+    LDA !great_cave_gold, X
+    PLB
+    CMP TreasureRequirements, Y
+    BCC .GetDigits ; if not minus at this point, has to be greater or equal
+    BRA .CheckRequirement
+    .EarlyReturn:
+    PLB
+    RTL
+    .GetDigits:
+    INY #2
+    .GetDigitsHigh:
+    TYX
+    LDA TreasureRequirements, X
+    TAY
+    DEX #2
+    LDA TreasureRequirements, X
+    TAX
+    LDA #$4040
+    PHA
+    PLB
+    PLB
+    TXA
+    CPY #$0098
+    BCC .Start
+    BNE .SetCap
+    CMP #$967F
+    BCC .Start
+    .SetCap:
+    LDA #$967F
+    LDY #$98
+    .Start
+    STA $9001
+    LDX #$FFFF
+    .Millions:
+    INX
+    LDA $9001
+    SEC
+    SBC #$4240
+    STA $9001
+    TYA
+    SBC #$000F
+    TAY
+    BPL .Millions
+    SEP #$20
+    TXA
+    STA $9000
+    REP #$20
+    LDA $9001
+    CLC
+    ADC #$4240
+    STA $9001
+    TYA
+    ADC #$000F
+    TAY
+    LDA $9001
+    LDX #$FFFF
+    .HundredThousands:
+    INX
+    SEC
+    SBC #$86A0
+    BCS .HTContinue
+    DEY
+    .HTContinue:
+    DEY
+    BPL .HundredThousands
+    STX $9001
+    CLC
+    ADC #$86A0
+    BCC .AddOne
+    INY
+    .AddOne:
+    INY
+    LDX #$FFFF
+    .TenThousands:
+    INX
+    SEC
+    SBC #$2710
+    BCS .TenThousands
+    DEY
+    BPL .TenThousands
+    STX $9002
+    ADC #$2710
+    LDX #$FFFF
+    SEC
+    .Thousands:
+    INX
+    SBC #$03E8
+    BCS .Thousands
+    STX $9003
+    ADC #$03E8
+    LDX #$FFFF
+    SEC
+    .Hundreds:
+    INX
+    SBC #$0064
+    BCS .Hundreds
+    STX $9004
+    ADC #$0064
+    LDX #$FFFF
+    SEC
+    .Tens:
+    INX
+    SBC #$000A
+    BCS .Tens
+    STX $9005
+    ADC #$000A
+    STA $9006
+    .FindFirstNonZero:
+    LDY #$FFFF
+    .NonZeroLoop:
+    INY
+    CPY #$0006
+    BEQ .Continue
+    SEP #$20
+    LDA $9000, Y
+    REP #$20
+    BEQ .NonZeroLoop
+    .Continue:
+    STY $9007
+    .Apply:
+    LDY #$001F
+    LDX #$0000
+    LDA #$0040
+    PHA
+    PHA
+    PHA
+    PHA
+    PHA
+    PHA
+    PHA
+    SEP #$20
+    .ApplyLoop:
+    PLB
+    LDA $9000, X
+    CPX $9007
+    BPL .Add
+    LDA #$FF
+    BRA .Set
+    .Add:
+    CLC
+    ADC #$B6
+    .Set:
+    PLB
+    STA ($14), Y
+    LDA $171B, Y
+    STA $173B, Y
+    INY
+    INX
+    CPX #$0007
+    BMI .ApplyLoop
+    REP #$20
+    PLB
+    RTL
+
+
+org $CEE9C4
+hook_credits:
+    JSL credits_goal_check
 
 org $CF2933
 remove_dyna_block:
