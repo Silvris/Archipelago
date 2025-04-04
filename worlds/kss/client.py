@@ -43,6 +43,8 @@ KSS_SENT_DELUXE_ESSENCE = SRAM_1_START + 0x7B1D  # 3 bytes
 KSS_RECEIVED_SUBGAMES = SRAM_1_START + 0x8000
 KSS_RECEIVED_ITEMS = SRAM_1_START + 0x8002
 KSS_RECEIVED_PLANETS = SRAM_1_START + 0x8004
+KSS_PLAY_SFX = SRAM_1_START + 0x8006
+KSS_ACTIVATE_CANDY = SRAM_1_START + 0x8008
 
 KSS_ROMNAME = SRAM_1_START + 0x8100
 KSS_DEATH_LINK_ADDR = SRAM_1_START + 0x9000
@@ -88,13 +90,16 @@ class KSSSNIClient(SNIClient):
                 # 1-Up
                 lives = int.from_bytes(await snes_read(ctx, KSS_KIRBY_LIVES, 2), "little")
                 snes_buffered_write(ctx, KSS_KIRBY_LIVES, int.to_bytes(lives + 1, 2, "little"))
+                snes_buffered_write(ctx, KSS_PLAY_SFX, int.to_bytes(0x2C, 2, "little"))
             elif item.item & 0xF == 2:
                 # Maxim
                 snes_buffered_write(ctx, KSS_KIRBY_HP, int.to_bytes(0x46, 2, "little"))
                 snes_buffered_write(ctx, KSS_KIRBY_HP + 2, int.to_bytes(0x46, 2, "little"))
+                snes_buffered_write(ctx, KSS_PLAY_SFX, int.to_bytes(0x2C, 2, "little"))
             elif item.item & 0xF == 3:
-                pass # Invincibility, not implemented
-                # it needs to hit IRAM, so have to setup in the rom
+                # Invincibility
+                snes_buffered_write(ctx, KSS_ACTIVATE_CANDY, int.to_bytes(1, 2, "little"))
+                snes_buffered_write(ctx, KSS_PLAY_SFX, int.to_bytes(0x2C, 2, "little"))
             else:
                 pass
 
