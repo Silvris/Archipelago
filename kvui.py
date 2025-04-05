@@ -87,6 +87,15 @@ else:
 remove_between_brackets = re.compile(r"\[.*?]")
 
 
+class ThemedApp(MDApp):
+    def set_colors(self):
+        text_colors = KivyJSONtoTextParser.TextColors()
+        self.theme_cls.theme_style = getattr(text_colors, "theme_style", "Dark")
+        self.theme_cls.primary_palette = getattr(text_colors, "primary_palette", "Green")
+        self.theme_cls.dynamic_scheme_name = getattr(text_colors, "dynamic_scheme_name", "TONAL_SPOT")
+        self.theme_cls.dynamic_scheme_contrast = 0.0
+
+
 class ImageIcon(MDButtonIcon, AsyncImage):
     def __init__(self, *args, **kwargs):
         super().__init__(args, kwargs)
@@ -119,15 +128,10 @@ class ImageButton(MDIconButton):
 
 
 class ScrollBox(MDScrollView):
-    layout: MDBoxLayout
+    layout: ObjectProperty(None)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.layout = MDBoxLayout(size_hint_y=None)
-        self.layout.bind(minimum_height=self.layout.setter("height"))
-        self.add_widget(self.layout)
-        self.bar_width = dp(12)
-        self.scroll_type = ["bars"]
 
 
 # thanks kivymd
@@ -360,7 +364,7 @@ class SelectableLabel(RecycleDataViewBehavior, TooltipLabel):
             else:
                 # Not a fan of the following few lines, but they work.
                 temp = MarkupLabel(text=self.text).markup
-                text = "".join(part for part in temp if not part.startswith(("[color", "[/color]", "[ref=", "[/ref]")))
+                text = "".join(part for part in temp if not part.startswith("["))
                 cmdinput = MDApp.get_running_app().textinput
                 if not cmdinput.text:
                     input_text = get_input_text_from_response(text, MDApp.get_running_app().last_autofillable_command)
@@ -712,7 +716,7 @@ class ClientTabs(MDTabsPrimary):
         self.on_size(self, self.size)
 
 
-class GameManager(MDApp):
+class GameManager(ThemedApp):
     logging_pairs = [
         ("Client", "Archipelago"),
     ]
@@ -761,8 +765,7 @@ class GameManager(MDApp):
         Clock.schedule_once(on_start)
 
     def build(self) -> Layout:
-        self.theme_cls.theme_style = self.json_to_kivy_parser.theme_style
-        self.theme_cls.primary_palette = self.json_to_kivy_parser.primary_palette
+        self.set_colors()
         self.container = ContainerLayout()
 
         self.grid = MainLayout()
@@ -1046,7 +1049,7 @@ class HintLog(MDRecycleView):
                    "hint": {"receiving_player": -1, "location": -1, "finding_player": -1, "status": ""}},
         "striped": True,
     }
-    data: typing.List[typing.Any]
+    data: list[typing.Any]
     sort_key: str = ""
     reversed: bool = True
 
@@ -1163,8 +1166,6 @@ class KivyJSONtoTextParser(JSONtoTextParser):
         for name, code in color_codes.items():
             color_codes[name] = getattr(colors, name, code)
         self.color_codes = color_codes
-        self.theme_style = colors.theme_style
-        self.primary_palette = colors.primary_palette
         super().__init__(*args, **kwargs)
 
     def __call__(self, *args, **kwargs):
