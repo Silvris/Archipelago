@@ -31,91 +31,91 @@ weapon_item_table = {
     "Great Sword Rarity 9": ItemData(315201, False),
     "Great Sword Rarity 10": ItemData(315202, False),
 
-    "Long Sword Rarity 8": ItemData(315204, False),
-    "Long Sword Rarity 9": ItemData(315205, False),
-    "Long Sword Rarity 10": ItemData(315206, False),
+    "Long Sword Rarity 8": ItemData(315203, False),
+    "Long Sword Rarity 9": ItemData(315204, False),
+    "Long Sword Rarity 10": ItemData(315205, False),
 
-    "Sword and Shield Rarity 8": ItemData(315208, False),
-    "Sword and Shield Rarity 9": ItemData(315209, False),
-    "Sword and Shield Rarity 10": ItemData(315210, False),
+    "Sword and Shield Rarity 8": ItemData(315206, False),
+    "Sword and Shield Rarity 9": ItemData(315207, False),
+    "Sword and Shield Rarity 10": ItemData(315208, False),
 
-    "Dual Blades Rarity 8": ItemData(315212, False),
-    "Dual Blades Rarity 9": ItemData(315213, False),
-    "Dual Blades Rarity 10": ItemData(315214, False),
+    "Dual Blades Rarity 8": ItemData(315209, False),
+    "Dual Blades Rarity 9": ItemData(315210, False),
+    "Dual Blades Rarity 10": ItemData(315211, False),
 
-    "Hammer Rarity 8": ItemData(315216, False),
-    "Hammer Rarity 9": ItemData(315217, False),
-    "Hammer Rarity 10": ItemData(315218, False),
+    "Hammer Rarity 8": ItemData(315212, False),
+    "Hammer Rarity 9": ItemData(315213, False),
+    "Hammer Rarity 10": ItemData(315214, False),
 
-    "Hunting Horn Rarity 8": ItemData(315220, False),
-    "Hunting Horn Rarity 9": ItemData(315221, False),
-    "Hunting Horn Rarity 10": ItemData(315222, False),
+    "Hunting Horn Rarity 8": ItemData(315215, False),
+    "Hunting Horn Rarity 9": ItemData(315216, False),
+    "Hunting Horn Rarity 10": ItemData(315217, False),
 
-    "Lance Rarity 8": ItemData(315224, False),
-    "Lance Rarity 9": ItemData(315225, False),
-    "Lance Rarity 10": ItemData(315226, False),
+    "Lance Rarity 8": ItemData(315218, False),
+    "Lance Rarity 9": ItemData(315219, False),
+    "Lance Rarity 10": ItemData(315220, False),
 
-    "Gunlance Rarity 8": ItemData(315228, False),
-    "Gunlance Rarity 9": ItemData(315229, False),
-    "Gunlance Rarity 10": ItemData(315230, False),
+    "Gunlance Rarity 8": ItemData(315221, False),
+    "Gunlance Rarity 9": ItemData(315222, False),
+    "Gunlance Rarity 10": ItemData(315223, False),
 
-    "Switch Axe Rarity 8": ItemData(315232, False),
-    "Switch Axe Rarity 9": ItemData(315233, False),
-    "Switch Axe Rarity 10": ItemData(315234, False),
+    "Switch Axe Rarity 8": ItemData(315224, False),
+    "Switch Axe Rarity 9": ItemData(315225, False),
+    "Switch Axe Rarity 10": ItemData(315226, False),
 
-    "Charge Blade Rarity 8": ItemData(315236, False),
-    "Charge Blade Rarity 9": ItemData(315237, False),
-    "Charge Blade Rarity 10": ItemData(315238, False),
+    "Charge Blade Rarity 8": ItemData(315227, False),
+    "Charge Blade Rarity 9": ItemData(315228, False),
+    "Charge Blade Rarity 10": ItemData(315229, False),
 
-    "Insect Glaive Rarity 8": ItemData(315240, False),
-    "Insect Glaive Rarity 9": ItemData(315241, False),
-    "Insect Glaive Rarity 10": ItemData(315242, False),
+    "Insect Glaive Rarity 8": ItemData(315230, False),
+    "Insect Glaive Rarity 9": ItemData(315231, False),
+    "Insect Glaive Rarity 10": ItemData(315232, False),
 
-    "Light Bowgun Rarity 8": ItemData(315244, False),
-    "Light Bowgun Rarity 9": ItemData(315245, False),
-    "Light Bowgun Rarity 10": ItemData(315246, False),
+    "Light Bowgun Rarity 8": ItemData(315233, False),
+    "Light Bowgun Rarity 9": ItemData(315234, False),
+    "Light Bowgun Rarity 10": ItemData(315235, False),
 
-    "Heavy Bowgun Rarity 8": ItemData(315248, False),
-    "Heavy Bowgun Rarity 9": ItemData(315249, False),
-    "Heavy Bowgun Rarity 10": ItemData(315250, False),
+    "Heavy Bowgun Rarity 8": ItemData(315236, False),
+    "Heavy Bowgun Rarity 9": ItemData(315237, False),
+    "Heavy Bowgun Rarity 10": ItemData(315238, False),
 
-    "Bow Rarity 8": ItemData(315252, False),
-    "Bow Rarity 9": ItemData(315253, False),
-    "Bow Rarity 10": ItemData(315254, False),
+    "Bow Rarity 8": ItemData(315239, False),
+    "Bow Rarity 9": ItemData(315240, False),
+    "Bow Rarity 10": ItemData(315241, False),
 
     # Consolidated Rarity Upgrades
-    "Weapon Rarity 8": ItemData(315256, False),
-    "Weapon Rarity 9": ItemData(315257, False),
-    "Weapon Rarity 10": ItemData(315258, False),
+    "Weapon Rarity 8": ItemData(315242, False),
+    "Weapon Rarity 9": ItemData(315243, False),
+    "Weapon Rarity 10": ItemData(315244, False),
 
     # Progressive Rarity Upgrades
-    "Progressive Great Sword": ItemData(315260, False),
-    "Progressive Long Sword": ItemData(315261, False),
-    "Progressive Sword and Shield": ItemData(315262, False),
-    "Progressive Dual Blades": ItemData(315263, False),
-    "Progressive Hammer": ItemData(315264, False),
-    "Progressive Hunting Horn": ItemData(315265, False),
-    "Progressive Lance": ItemData(315266, False),
-    "Progressive Gunlance": ItemData(315267, False),
-    "Progressive Switch Axe": ItemData(315268, False),
-    "Progressive Charge Blade": ItemData(315269, False),
-    "Progressive Insect Glaive": ItemData(315270, False),
-    "Progressive Light Bowgun": ItemData(315271, False),
-    "Progressive Heavy Bowgun": ItemData(315272, False),
-    "Progressive Bow": ItemData(315273, False),
+    "Progressive Great Sword": ItemData(315245, False),
+    "Progressive Long Sword": ItemData(315246, False),
+    "Progressive Sword and Shield": ItemData(315247, False),
+    "Progressive Dual Blades": ItemData(315248, False),
+    "Progressive Hammer": ItemData(315249, False),
+    "Progressive Hunting Horn": ItemData(315250, False),
+    "Progressive Lance": ItemData(315251, False),
+    "Progressive Gunlance": ItemData(315252, False),
+    "Progressive Switch Axe": ItemData(315253, False),
+    "Progressive Charge Blade": ItemData(315254, False),
+    "Progressive Insect Glaive": ItemData(315255, False),
+    "Progressive Light Bowgun": ItemData(315256, False),
+    "Progressive Heavy Bowgun": ItemData(315257, False),
+    "Progressive Bow": ItemData(315258, False),
 
     # Progressive Consolidated
-    "Progressive Weapon": ItemData(315274, False),
+    "Progressive Weapon": ItemData(315259, False),
 }
 
 armor_item_table = {
     # Armor
-    "Armor Rarity 8": ItemData(315275, False),
-    "Armor Rarity 9": ItemData(315276, False),
-    "Armor Rarity 10": ItemData(315277, False),
+    "Armor Rarity 8": ItemData(315260, False),
+    "Armor Rarity 9": ItemData(315261, False),
+    "Armor Rarity 10": ItemData(315262, False),
 
     #Progressive Armor
-    "Progressive Armor Rarity": ItemData(315278, False)
+    "Progressive Armor Rarity": ItemData(315263, False)
 }
 
 filler_item_table = {
