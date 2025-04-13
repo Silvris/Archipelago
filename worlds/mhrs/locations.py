@@ -1,4 +1,4 @@
-from .Quests import MR1Quests, MR2Quests, MR3Quests, MR4Quests, MR5Quests, MR6Quests
+from .quests import MR1Quests, MR2Quests, MR3Quests, MR4Quests, MR5Quests, MR6Quests
 import typing
 from BaseClasses import Location
 

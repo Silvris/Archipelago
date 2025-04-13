@@ -4,14 +4,14 @@ from typing import Dict, Any, Optional
 from worlds.AutoWorld import World, WebWorld
 from worlds.generic.Rules import set_rule
 from BaseClasses import Item, ItemClassification, Tutorial
-from .Options import MHRSOptions
-from .Items import lookup_name_to_id as items_lookup
-from .Items import filler_item_table, filler_weights, useful_item_table, follower_table,\
+from .options import MHRSOptions
+from .items import lookup_name_to_id as items_lookup
+from .items import filler_item_table, filler_weights, useful_item_table, follower_table,\
     progression_item_table, MHRSItem, item_table, item_name_groups
-from .Locations import mhr_quests, MHRSQuest, get_quest_table, get_mr_quest_num, urgent_quests
-from .Quests import FinalQuests, UrgentQuests
-from .QuestGen import generate_quests
-from .Regions import create_regions
+from .locations import mhr_quests, MHRSQuest, get_quest_table, get_mr_quest_num, urgent_quests
+from .quests import FinalQuests, UrgentQuests
+from .quest_gen import generate_quests
+from .regions import create_regions
 
 
 class MHRSWebWorld(WebWorld):

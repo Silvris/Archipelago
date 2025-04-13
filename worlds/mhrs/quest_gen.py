@@ -7,7 +7,7 @@ from random import Random
 from typing import TYPE_CHECKING
 
 from worlds.Files import APContainer
-from .Locations import get_quest_table
+from .locations import get_quest_table
 
 if TYPE_CHECKING:
     from . import MHRSWorld

@@ -1,7 +1,7 @@
 import typing
 
 from BaseClasses import Region
-from .Locations import MHRSQuest, mhr_quests
+from .locations import MHRSQuest, mhr_quests
 
 if typing.TYPE_CHECKING:
     from . import MHRSWorld
