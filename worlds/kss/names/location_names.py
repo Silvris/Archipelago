@@ -152,3 +152,15 @@ arena_18 = "The Arena - 18 Straight Wins"
 arena_19 = "The Arena - 19 Straight Wins"
 arena_complete = "The Arena - 20 Straight Wins"
 
+# Begin Maxim Tomatoes
+sb_gg_maxim = "Green Greens - Maxim Tomato"
+sb_bc_maxim = "Bubbly Clouds - Maxim Tomato"
+
+# Begin 1-Ups
+sb_gg_1up = "Green Greens - 1-Up"
+sb_fl_1up = "Float Islands - 1-Up"
+sb_bc_1up = "Bubbly Clouds - 1-Up"
+sb_bc_1up_moon = "Bubbly Clouds - 1-Up (Secret)"
+
+# Begin Candy
+sb_fl_candy = "Float Islands - Invincibility Candy"

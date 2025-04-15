@@ -1,3 +1,4 @@
+from typing import NamedTuple
 from BaseClasses import Location
 from .names import location_names, item_names
 from .items import BASE_ID
@@ -7,12 +8,24 @@ class KSSLocation(Location):
     game = "Kirby Super Star"
 
 
+class LocationData(NamedTuple):
+    code: int | None
+    maxim: bool = False
+    one_up: bool = False
+    candy: bool = False
+    essence: bool = False
+
+
 green_greens_locations = {
     location_names.sb_whispy: BASE_ID + 0,
+    location_names.sb_gg_maxim: BASE_ID + 0x100,
+    location_names.sb_gg_1up: BASE_ID + 0x200
 }
 
 float_islands_locations = {
     location_names.sb_lololo: BASE_ID + 1,
+    location_names.sb_fl_1up: BASE_ID + 0x201,
+    location_names.sb_fl_candy: BASE_ID + 0x400,
 }
 
 bubbly_clouds_locations = {

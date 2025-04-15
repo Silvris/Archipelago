@@ -13,6 +13,7 @@ from .locations import (green_greens_locations, float_islands_locations, bubbly_
 if TYPE_CHECKING:
     from . import KSSWorld
 
+
 class KSSRegion(Region):
     game = "Kirby Super Star"
 
