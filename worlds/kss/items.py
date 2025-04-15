@@ -137,8 +137,8 @@ planets: Dict[str, ItemData] = {
 }
 
 dyna_items: Dict[str, ItemData] = {
-    item_names.dyna_blade_ex1: ItemData(BASE_ID + 0x800, ItemClassification.useful),
-    item_names.dyna_blade_ex2: ItemData(BASE_ID + 0x801, ItemClassification.useful),
+    item_names.dyna_blade_ex1: ItemData(BASE_ID + 0x800, ItemClassification.progression),
+    item_names.dyna_blade_ex2: ItemData(BASE_ID + 0x801, ItemClassification.progression),
 }
 
 misc_items: Dict[str, ItemData] = {

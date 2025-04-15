@@ -5,7 +5,7 @@ import base64
 import threading
 import math
 from typing import Dict, List, ClassVar, Any
-from BaseClasses import Tutorial, MultiWorld, CollectionState, Item
+from BaseClasses import Tutorial, MultiWorld, CollectionState, Item, ItemClassification
 from worlds.AutoWorld import World, WebWorld
 from Options import OptionError
 from .items import (lookup_item_to_id, item_table, item_groups, KSSItem, filler_item_weights, copy_abilities,
@@ -108,10 +108,11 @@ class KSSWorld(World):
                     self.options.the_great_cave_offensive_gold_thresholds["Old Tower"]
                 self.options.the_great_cave_offensive_gold_thresholds.value["Old Tower"] = temp
 
-    def create_item(self, name):
+    def create_item(self, name, force_classification: ItemClassification | None = None):
         if name not in item_table:
             raise Exception(f"{name} is not a valid item name for Kirby Super Star.")
         data = item_table[name]
+        classification = force_classification if force_classification else data.classification
         return KSSItem(name, data.classification, data.code, self.player)
 
     def get_filler_item_name(self) -> str:
@@ -129,7 +130,10 @@ class KSSWorld(World):
         treasure_value = 0
 
         if "Dyna Blade" in self.options.included_subgames:
-            itempool.extend([self.create_item(name) for name in dyna_items])
+            force = None
+            if not self.options.essences and "Maxim Tomato" not in self.options.consumables:
+                force = ItemClassification.useful
+            itempool.extend([self.create_item(name, force) for name in dyna_items])
         if "The Great Cave Offensive" in self.options.included_subgames:
             max_gold = (math.floor((9999990 - self.options.the_great_cave_offensive_required_gold.value) *
                                   (self.options.the_great_cave_offensive_excess_gold.value / 100))
