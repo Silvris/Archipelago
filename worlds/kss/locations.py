@@ -304,10 +304,16 @@ romk_chapter_1_locations = {
 
 romk_chapter_2_locations = {
     location_names.romk_chapter_2: LocationData(BASE_ID + 80),
+    location_names.romk_c2_maxim_1: LocationData(BASE_ID + 0x12B, "maxim"),
+    location_names.romk_c2_maxim_2: LocationData(BASE_ID + 0x12C, "maxim"),
+    location_names.romk_c2_parasol: LocationData(BASE_ID + 0x839, "essence"),
+    location_names.romk_c2_bomb: LocationData(BASE_ID + 0x83A, "essence"),
+    location_names.romk_c2_wing: LocationData(BASE_ID + 0x83B, "essence"),
 }
 
 romk_chapter_3_locations = {
     location_names.romk_chapter_3: LocationData(BASE_ID + 81),
+    
 }
 
 romk_chapter_4_locations = {
