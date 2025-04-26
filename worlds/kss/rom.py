@@ -14,11 +14,14 @@ if TYPE_CHECKING:
 KSS_UHASH = "cb76ea8ac989e71210c89102d91c6c57"
 KSS_VCHASH = "5e0be1a462ffaca1351d446b96b25b74"
 
-starting_stage = 0xAFC8C
-goal_numeric = 0xAFC91
-goal_specific = 0xAFC99
-treasure_values = 0xAFCD1
-mww_mode = 0xAFD4F
+starting_stage = 0xAFCA3
+goal_numeric = 0xAFCA8
+goal_specific = 0xAFCB0
+treasure_values = 0xAFCEF
+mww_mode = 0xAFD6D
+maxims = 0xAFFB6
+one_ups = 0xAFFCB
+candies = 0xAFFE6
 
 slot_data = 0x3FD00
 
@@ -67,6 +70,24 @@ def patch_rom(world: "KSSWorld", patch: KSSProcedurePatch):
     patch.write_byte(mww_mode + 1, world.options.milky_way_wishes_mode.value)
 
     patch.write_byte(slot_data, world.options.death_link.value)
+
+    filter = 0
+    if "Maxim Tomato" in world.options.consumables:
+        patch.write_bytes(maxims + 1, int.to_bytes(1, 2, "little"))
+        filter |= 0x100
+
+    if "1-Up" in world.options.consumables:
+        patch.write_bytes(one_ups + 1, int.to_bytes(1, 2, "little"))
+        filter |= 0x200
+
+    if "Invincibility Candy" in world.options.consumables:
+        patch.write_bytes(candies + 1, int.to_bytes(1, 2, "little"))
+        filter |= 0x400
+
+    if world.options.essences:
+        filter |= 0x800
+
+    patch.write_bytes(slot_data + 1, filter.to_bytes(2, "little"))
 
     patch_name = bytearray(
         f'KSS{Utils.__version__.replace(".", "")[0:3]}_{world.player}_{world.multiworld.seed:11}\0', 'utf8')[:21]

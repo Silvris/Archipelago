@@ -107,7 +107,7 @@ org $00FFC0
     db "KSS__BASEPATCH_ARCHI"
 
 org $00FFD8
-    db $06
+    db $07
 
 org $01922E
     JML block_tgco_access
@@ -122,6 +122,9 @@ org $02A34B
     JML hook_copy_ability
     NOP
 
+org $059818
+    JML hook_maxim_tomato
+
 org $07DEB2
     NOP #3 ; Grants the initial treasure of TGCO for some reason, probably for the tutorial?
 
@@ -134,6 +137,108 @@ org $07DF95
 
 org $07E01F
     NOP #12 ; Milky Way Wishes initialization
+
+org $C7F98E
+EssenceLookup:
+    dw $000, $300, $600, $900, $C00, $F00, $1200, $1500, $1800, $1B00, $1E00, $2100, $2400, $2700, $2A00, $2D00
+    dw $3000, $3300, $3600, $3900, $3C00, $3F00, $4200, $4500, $4800, $4B00, $4E00, $5100, $5400, $5700, $5A00, $5D00
+    dw $6000, $6300, $6600, $6900, $6C00, $6F00, $7200, $7500, $7800, $7B00, $7E00, $8100, $8400, $8700, $8A00, $8D00
+    dw $9000, $9300, $9600, $9900, $9C00, $9F00, $A200, $A500, $A800, $AB00, $AE00, $B100, $B400, $B700, $BA00, $BD00
+
+SetEntityFlagX:
+    PHA
+    PHY
+    PHX
+    TXA
+    JSR SetEntityFlag
+    PLX
+    PLY
+    PLA
+    RTL
+
+SetEntityFlagY:
+    PHA
+    PHY
+    PHX
+    TYA
+    JSR SetEntityFlag
+    PLX
+    PLY
+    PLA
+    RTL
+
+SetEntityFlag:
+    ; Everything is saved, don't worry about restoring values
+    TAX
+    LDA $738E
+    BEQ .Return
+    LDA #$00FF
+    STZ $14
+    STA $16
+    LDA #$000C
+    CLC
+    ADC $32EC
+    TAY
+    LDA [$14], Y
+    LDY #$00C7
+    STY $16
+    LDY.w #EssenceLookup
+    STY $14
+    CLC
+    ADC $32F0
+    SEC
+    SBC #$0022
+    TAY
+    LDA [$14], Y
+    STA $14
+    LDA $32F4
+    ASL
+    CLC
+    ADC $14
+    PHA
+    ; Now we need to get our offset and mask
+    LDA $7936, X
+    DEC
+    TAX
+    LDY #$0000
+    .Loop:
+    CPX #$0008
+    BMI .Continue
+    INY
+    TXA
+    SEC
+    SBC #$0008
+    TAX
+    BRA .Loop
+    .Continue:
+    LDA #$0001
+    .Mask:
+    CPX #$0000
+    BEQ .Set
+    ASL
+    DEX
+    BRA .Mask
+    .Set:
+    STY $14
+    TAX
+    PLA
+    CLC
+    ADC $14
+    TAY
+    TXA
+    PHB
+    PHA
+    LDA #$4141
+    PHA
+    PLB
+    PLB
+    PLA
+    ORA $0000, Y
+    STA $0000, Y
+    PLB
+    .Return
+    RTS
+
 
 org $CA8532
     JML set_dyna_switch
@@ -166,6 +271,9 @@ org $CAB86E
 
 org $CAB8AA
     LDA #$0005
+
+org $CABCD6
+    JML subgame_requirement_visual
 
 org $CAF830
 remap_table:
@@ -645,6 +753,12 @@ WriteBWRAM:
     LDY #$2001
     LDA #$EFFE
     MVN $40, $40
+    LDA #$0000
+    STA $410000
+    LDX #$0000
+    LDY #$0001
+    LDA #$FFFE
+    MVN $41, $41
     LDX #$FD00 ; seed info 0x3D000
     LDY #$9000 ; target location
     LDA #$0300
@@ -689,6 +803,7 @@ block_ability_essence:
     PHY
     PHX
     PHA
+    JSL SetEntityFlagY
     LDY #$0000
     SEC
     SBC #$0001
@@ -945,6 +1060,9 @@ credits_goal_check:
 great_cave_requirement:
     REP #$20
     INC $00B1
+    LDA $32EA
+    CMP #$0003
+    BNE .NoPull
     LDY #$FFFE
     PHB
     .CheckRequirementHigh:
@@ -974,6 +1092,7 @@ great_cave_requirement:
     BRA .CheckRequirement
     .EarlyReturn:
     PLB
+    .NoPull:
     RTL
     .GetDigits:
     INY #2
@@ -1121,6 +1240,92 @@ great_cave_requirement:
     PLB
     RTL
 
+subgame_requirement_visual:
+    MVN $7E, $7E
+    .SetVisuals:
+    ; insane how the timing for this works out
+    LDA #$7ECA
+    PHA
+    PLB
+    LDX set_starting_stage_GoalSpecific+1
+    PLB
+    LDY #$0000
+    .VisualLoop:
+    TXA
+    BIT #$0001
+    BEQ .VisualSkip
+    LDA #$1E1D
+    STA $7494, Y
+    INY
+    INY
+    BRA .VisualContinue
+    .VisualSkip:
+    INY
+    INY
+    .VisualContinue:
+    TXA
+    LSR
+    BEQ .Return
+    TAX
+    BRA .VisualLoop
+    .Return:
+    LDA #$7ECA
+    PHA
+    PLB
+    LDA set_starting_stage_GoalNumeric+1
+    PLB
+    CLC
+    ADC #$02CF
+    STA $73B8
+    LDA #$1E1D
+    STA $73B6
+    PLB
+    JML $CABCDA
+
+hook_maxim_tomato:
+    CMP #$0000
+    BEQ .Maxim
+    JML $05981E
+    .Maxim:
+    print "Maxims: ", hex(snestopc(realbase()))
+    LDA #$0000
+    BNE .Continue
+    LDA $28
+    JML $059832
+    .Continue:
+    LDY $39
+    JSL SetEntityFlagY
+    JML $059840
+
+hook_one_up:
+    print "OneUp: ", hex(snestopc(realbase()))
+    LDA #$0000
+    BNE .Continue
+    INC $737A
+    BRA .Return
+    .Continue:
+    JSL SetEntityFlagY
+    .Return
+    ; cursed stack magic
+    PLA
+    PLB
+    PHA
+    LDA #$0000
+    PHA
+    PLB
+    PLB
+    JML $CF79C6
+
+hook_invincibility_candy:
+    print "Candy: ", hex(snestopc(realbase()))
+    LDA #$0000
+    BNE .Continue
+    STX $7575
+    LDA #$FFFF
+    JML $CF6E9A
+    .Continue:
+    JSL SetEntityFlagY
+    JML $CF6EDC
 
 org $CEE9C4
 hook_credits:
@@ -1142,6 +1347,16 @@ hook_set_treasure_value:
 org $CF44BD
 hook_set_treasure:
     JSL set_treasure
+
+org $CF6C7A
+one_up:
+    JSL hook_one_up
+    NOP #2
+
+org $CF6E94
+consumable_candy:
+    JML hook_invincibility_candy
+    NOP #2
 
 org $CF71EB
 check_deluxe_ability:

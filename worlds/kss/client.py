@@ -5,7 +5,7 @@ from NetUtils import ClientStatus, color, NetworkItem
 from worlds.AutoSNIClient import SNIClient
 from typing import TYPE_CHECKING
 from .items import treasures, BASE_ID
-from .client_data import treasure_base_id, boss_flags, deluxe_essence_flags, planet_flags
+from .client_data import treasure_base_id, boss_flags, deluxe_essence_flags, planet_flags, consumable_table
 
 if TYPE_CHECKING:
     from SNIClient import SNIContext
@@ -48,12 +48,14 @@ KSS_ACTIVATE_CANDY = SRAM_1_START + 0x8008
 
 KSS_ROMNAME = SRAM_1_START + 0x8100
 KSS_DEATH_LINK_ADDR = SRAM_1_START + 0x9000
+KSS_CONSUMABLE_FILTER = SRAM_1_START + 0x9001
 
 
 class KSSSNIClient(SNIClient):
     game = "Kirby Super Star"
     patch_suffix = ".apkss"
     item_queue: typing.List[NetworkItem] = []
+    consumable_filter: int = 0
 
     async def deathlink_kill_player(self, ctx: "SNIContext") -> None:
         from SNIClient import DeathState, snes_buffered_write, snes_read, snes_flush_writes
@@ -78,6 +80,8 @@ class KSSSNIClient(SNIClient):
         death_link = await snes_read(ctx, KSS_DEATH_LINK_ADDR, 1)
         if death_link:
             await ctx.update_death_link(bool(death_link[0] & 0b1))
+
+        self.consumable_filter = int.from_bytes(await snes_read(ctx, KSS_CONSUMABLE_FILTER, 2), "little")
         return True
 
     async def pop_item(self, ctx: "SNIContext", game_state: int):
@@ -246,10 +250,20 @@ class KSSSNIClient(SNIClient):
             if location not in ctx.checked_locations:
                 new_checks.append(location)
 
+        if self.consumable_filter:
+            consumables = await snes_read(ctx, SRAM_1_START + 0x10000, 0xFFFF)
+            for consumable, data in consumable_table.items():
+                if consumable & self.consumable_filter:
+                    location = consumable + BASE_ID
+                    offset, mask = data
+                    if consumables[offset] & mask:
+                        if location not in ctx.checked_locations:
+                            new_checks.append(location)
+
+        await ctx.check_locations(new_checks)
         for new_check_id in new_checks:
             ctx.locations_checked.add(new_check_id)
             location = ctx.location_names.lookup_in_game(new_check_id)
             snes_logger.info(
                 f'New Check: {location} ({len(ctx.locations_checked)}/'
                 f'{len(ctx.missing_locations) + len(ctx.checked_locations)})')
-            await ctx.send_msgs([{"cmd": 'LocationChecks', "locations": [new_check_id]}])

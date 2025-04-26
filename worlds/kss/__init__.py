@@ -51,8 +51,8 @@ class KSSWebWorld(WebWorld):
 class KSSWorld(World):
     game = "Kirby Super Star"
     item_name_to_id = lookup_item_to_id
-    location_name_to_id = {location: location_table[location]
-                           for location in location_table if location_table[location]}
+    location_name_to_id = {location: data.code
+                           for location, data in location_table.items() if data.code}
     item_name_groups = item_groups
     web = KSSWebWorld()
     settings: ClassVar[KSSSettings]
