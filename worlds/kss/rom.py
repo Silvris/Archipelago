@@ -14,14 +14,14 @@ if TYPE_CHECKING:
 KSS_UHASH = "cb76ea8ac989e71210c89102d91c6c57"
 KSS_VCHASH = "5e0be1a462ffaca1351d446b96b25b74"
 
+maxims = 0x7AF9F
+one_ups = 0x7FABD
+candies = 0x7FAD8
 starting_stage = 0xAFCA3
 goal_numeric = 0xAFCA8
 goal_specific = 0xAFCB0
 treasure_values = 0xAFCEF
 mww_mode = 0xAFD6D
-maxims = 0xAFFB6
-one_ups = 0xAFFCB
-candies = 0xAFFE6
 
 slot_data = 0x3FD00
 

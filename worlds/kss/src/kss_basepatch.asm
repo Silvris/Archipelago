@@ -122,8 +122,9 @@ org $02A34B
     JML hook_copy_ability
     NOP
 
-org $059818
+org $059810
     JML hook_maxim_tomato
+    NOP
 
 org $07DEB2
     NOP #3 ; Grants the initial treasure of TGCO for some reason, probably for the tutorial?
@@ -239,6 +240,54 @@ SetEntityFlag:
     .Return
     RTS
 
+hook_maxim_tomato:
+    LDA $7573
+    BEQ .Maxim
+    JML $05981E
+    .Maxim:
+    print "Maxims: ", hex(snestopc(realbase()))
+    LDA #$0000
+    BNE .Continue
+    LDA $28
+    CMP $737A, Y
+    BEQ .Full
+    JML $059815
+    .Full:
+    JML $059843
+    .Continue:
+    LDY $39
+    JSL SetEntityFlagY
+    JML $059840
+
+hook_one_up:
+    print "OneUp: ", hex(snestopc(realbase()))
+    LDA #$0000
+    BNE .Continue
+    INC $737A
+    BRA .Return
+    .Continue:
+    JSL SetEntityFlagY
+    .Return
+    ; cursed stack magic
+    PLA
+    PLB
+    PHA
+    LDA #$0000
+    PHA
+    PLB
+    PLB
+    JML $CF79C6
+
+hook_invincibility_candy:
+    print "Candy: ", hex(snestopc(realbase()))
+    LDA #$0000
+    BNE .Continue
+    STX $7575
+    LDA #$FFFF
+    JML $CF6E9A
+    .Continue:
+    JSL SetEntityFlagY
+    JML $CF6EDC
 
 org $CA8532
     JML set_dyna_switch
@@ -1281,51 +1330,6 @@ subgame_requirement_visual:
     STA $73B6
     PLB
     JML $CABCDA
-
-hook_maxim_tomato:
-    CMP #$0000
-    BEQ .Maxim
-    JML $05981E
-    .Maxim:
-    print "Maxims: ", hex(snestopc(realbase()))
-    LDA #$0000
-    BNE .Continue
-    LDA $28
-    JML $059832
-    .Continue:
-    LDY $39
-    JSL SetEntityFlagY
-    JML $059840
-
-hook_one_up:
-    print "OneUp: ", hex(snestopc(realbase()))
-    LDA #$0000
-    BNE .Continue
-    INC $737A
-    BRA .Return
-    .Continue:
-    JSL SetEntityFlagY
-    .Return
-    ; cursed stack magic
-    PLA
-    PLB
-    PHA
-    LDA #$0000
-    PHA
-    PLB
-    PLB
-    JML $CF79C6
-
-hook_invincibility_candy:
-    print "Candy: ", hex(snestopc(realbase()))
-    LDA #$0000
-    BNE .Continue
-    STX $7575
-    LDA #$FFFF
-    JML $CF6E9A
-    .Continue:
-    JSL SetEntityFlagY
-    JML $CF6EDC
 
 org $CEE9C4
 hook_credits:
