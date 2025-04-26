@@ -126,7 +126,7 @@ class MilkyWayWishesMode(Choice):
 
 class Consumables(OptionSet):
     """
-    Adds the specified consumables to the location pool. Options are Maxim Tomatoes, 1-Ups,
+    Adds the specified consumables to the location pool. Options are Maxim Tomato, 1-Up,
     and Invincibility Candy.
     """
     display_name = "Consumable Checks"

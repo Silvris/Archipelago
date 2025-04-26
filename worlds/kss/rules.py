@@ -176,10 +176,10 @@ def set_revenge_rules(world: "KSSWorld"):
     set_rule(world.get_entrance("RoMK - Chapter 4 -> RoMK - Chapter 5"),
              lambda state: state.has_any([item_names.beam, item_names.yoyo, item_names.jet, item_names.bomb],
                                          world.player))
+    set_rule(world.get_location(location_names.romk_chapter_6),
+             lambda state: state.has_any([item_names.wing, item_names.suplex], world.player))
     set_rule(world.get_entrance("RoMK - Chapter 6 -> RoMK - Chapter 7"),
-             lambda state: state.has_any([item_names.wing,
-                                          item_names.suplex],
-                                         world.player))
+             lambda state: state.has_any([item_names.wing, item_names.suplex], world.player))
 
     if "Maxim Tomato" in world.options.consumables:
         set_rule(world.get_location(location_names.romk_c3_maxim_1),
