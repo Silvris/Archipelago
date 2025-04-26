@@ -319,6 +319,7 @@ romk_chapter_3_locations = {
     location_names.romk_c3_fighter: LocationData(BASE_ID + 0x83E, "essence"),
     location_names.romk_c3_cutter_2: LocationData(BASE_ID + 0x83F, "essence"),
     location_names.romk_c3_ice: LocationData(BASE_ID + 0x840, "essence"),
+    location_names.romk_c3_1up_2: LocationData(BASE_ID + 0x22F, "one_up"),
     location_names.romk_c3_maxim_1: LocationData(BASE_ID + 0x12D, "maxim"),
     location_names.romk_c3_mirror: LocationData(BASE_ID + 0x841, "essence"),
     location_names.romk_c3_parasol: LocationData(BASE_ID + 0x842, "essence"),

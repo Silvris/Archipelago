@@ -8,7 +8,8 @@ from .locations import (green_greens_locations, float_islands_locations, bubbly_
                         romk_chapter_3_locations, romk_chapter_4_locations, romk_chapter_5_locations,
                         romk_chapter_6_locations, romk_chapter_7_locations, floria_locations, aqualiss_locations,
                         skyhigh_locations, hotbeat_locations, cavios_locations, mecheye_locations, halfmoon_locations,
-                        copy_planet_locations, space_locations, the_arena_locations, KSSLocation, LocationData)
+                        copy_planet_locations, space_locations, the_arena_locations, KSSLocation, LocationData,
+                        bonus_1_locations, bonus_2_locations)
 
 if TYPE_CHECKING:
     from . import KSSWorld
@@ -101,6 +102,14 @@ def create_dyna_blade(world: "KSSWorld", menu: KSSRegion):
     world.get_location(location_names.db_complete).place_locked_item(world.create_item(item_names.dyna_blade_complete))
     world.multiworld.regions.extend([dyna_blade, peanut_plains, mallow_castle, cocoa_cave,
                                      candy_mountain, dyna_blade_nest])
+
+    if world.options.essences or "Maxim Tomato" in world.options.consumables:
+        extra1 = create_region("Dyna Blade Bonus 1", world)
+        extra2 = create_region("Dyna Blade Bonus 2", world)
+        for locations, region in zip((bonus_1_locations, bonus_2_locations), (extra1, extra2)):
+            add_locations(world, region, locations)
+            dyna_blade.connect(region)
+            world.multiworld.regions.append(region)
 
 
 def create_great_cave_offensive(world: "KSSWorld", menu: KSSRegion):
