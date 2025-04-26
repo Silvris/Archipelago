@@ -1,6 +1,6 @@
-from Options import PerGameCommonOptions, Range, Choice, OptionSet, OptionDict, DeathLinkMixin
+from Options import PerGameCommonOptions, Range, Choice, OptionSet, OptionDict, DeathLinkMixin, Toggle
 from dataclasses import dataclass
-from schema import Schema, And, Use, Optional
+from schema import Schema, And
 
 
 subgame_mapping = {
@@ -88,8 +88,9 @@ class TheGreatCaveOffensiveGoldThresholds(OptionDict):
     How much of the required gold is required before allowing access to
     Crystal/Old Tower/Garden areas in The Great Cave Offensive
     """
+    # TODO: swap to OptionCounter
     display_name = "The Great Cave Offensive Gold Thresholds"
-    valid_keys = ["Crystal", "Old Tower", "Garden"]
+    valid_keys = ("Crystal", "Old Tower", "Garden")
     schema = Schema({
         area: And(float, lambda i: 0 <= i <= 1, error="Value must be between 0 and 1")
         for area in ["Crystal", "Old Tower", "Garden"]
@@ -123,12 +124,32 @@ class MilkyWayWishesMode(Choice):
     default = 0
 
 
+class Consumables(OptionSet):
+    """
+    Adds the specified consumables to the location pool. Options are Maxim Tomatoes, 1-Ups,
+    and Invincibility Candy.
+    """
+    display_name = "Consumable Checks"
+    valid_keys = ("Maxim Tomato", "1-Up", "Invincibility Candy")
+
+    default = frozenset()
+
+
+class Essences(Toggle):
+    """
+    Adds Copy Essence pedestals to the location pool.
+    """
+    display_name = "Essence-sanity"
+
+
 @dataclass
 class KSSOptions(PerGameCommonOptions, DeathLinkMixin):
     required_subgame_completions: RequiredSubgameCompletions
     required_subgames: RequiredSubgames
     starting_subgame: StartingSubgame
     included_subgames: IncludedSubgames
+    consumables: Consumables
+    essences: Essences
     the_great_cave_offensive_required_gold: TheGreatCaveOffensiveRequiredGold
     the_great_cave_offensive_excess_gold: TheGreatCaveOffensiveExcessGold
     the_great_cave_offensive_gold_thresholds: TheGreatCaveOffensiveGoldThresholds
