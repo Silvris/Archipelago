@@ -313,24 +313,77 @@ romk_chapter_2_locations = {
 
 romk_chapter_3_locations = {
     location_names.romk_chapter_3: LocationData(BASE_ID + 81),
-    
+    location_names.romk_c3_1up_1: LocationData(BASE_ID + 0x21D, "one_up"),
+    location_names.romk_c3_cutter_1: LocationData(BASE_ID + 0x83C, "essence"),
+    location_names.romk_c3_sword: LocationData(BASE_ID + 0x83D, "essence"),
+    location_names.romk_c3_fighter: LocationData(BASE_ID + 0x83E, "essence"),
+    location_names.romk_c3_cutter_2: LocationData(BASE_ID + 0x83F, "essence"),
+    location_names.romk_c3_ice: LocationData(BASE_ID + 0x840, "essence"),
+    location_names.romk_c3_maxim_1: LocationData(BASE_ID + 0x12D, "maxim"),
+    location_names.romk_c3_mirror: LocationData(BASE_ID + 0x841, "essence"),
+    location_names.romk_c3_parasol: LocationData(BASE_ID + 0x842, "essence"),
+    location_names.romk_c3_ninja: LocationData(BASE_ID + 0x843, "essence"),
+    location_names.romk_c3_wheel: LocationData(BASE_ID + 0x844, "essence"),
 }
 
 romk_chapter_4_locations = {
     location_names.romk_chapter_4: LocationData(BASE_ID + 82),
+    location_names.romk_c4_candy_1: LocationData(BASE_ID + 0x403, "candy"),
+    location_names.romk_c4_maxim_1: LocationData(BASE_ID + 0x12E, "maxim"),
+    location_names.romk_c4_fire: LocationData(BASE_ID + 0x845, "essence"),
+    location_names.romk_c4_yoyo: LocationData(BASE_ID + 0x846, "essence"),
+    location_names.romk_c4_beam: LocationData(BASE_ID + 0x847, "essence"),
+    location_names.romk_c4_maxim_2: LocationData(BASE_ID + 0x12F, "maxim"),
 }
 
 romk_chapter_5_locations = {
     location_names.romk_chapter_5: LocationData(BASE_ID + 83),
+    location_names.romk_c5_maxim_1: LocationData(BASE_ID + 0x130, "maxim"),
+    location_names.romk_c5_maxim_2: LocationData(BASE_ID + 0x131, "maxim"),
+    location_names.romk_c5_sword: LocationData(BASE_ID + 0x848, "essence"),
+    location_names.romk_c5_wing: LocationData(BASE_ID + 0x849, "essence"),
+    location_names.romk_c5_ice: LocationData(BASE_ID + 0x84A, "essence"),
+    location_names.romk_c5_parasol: LocationData(BASE_ID + 0x84B, "essence"),
+    location_names.romk_c5_beam: LocationData(BASE_ID + 0x84C, "essence"),
+    location_names.romk_c5_hammer: LocationData(BASE_ID + 0x84D, "essence"),
+    location_names.romk_c5_plasma: LocationData(BASE_ID + 0x84E, "essence"),
+    location_names.romk_c5_cutter: LocationData(BASE_ID + 0x84F, "essence"),
+    location_names.romk_c5_mirror: LocationData(BASE_ID + 0x850, "essence"),
+    location_names.romk_c5_maxim_3: LocationData(BASE_ID + 0x132, "maxim"),
 }
 
 romk_chapter_6_locations = {
     location_names.romk_chapter_6: LocationData(BASE_ID + 84),
+    location_names.romk_c6_parasol: LocationData(BASE_ID + 0x851, "essence"),
+    location_names.romk_c6_jet: LocationData(BASE_ID + 0x852, "essence"),
+    location_names.romk_c6_wing_1: LocationData(BASE_ID + 0x853, "essence"),
+    location_names.romk_c6_candy: LocationData(BASE_ID + 0x404, "candy"),
+    location_names.romk_c6_maxim_1: LocationData(BASE_ID + 0x133, "maxim"),
+    location_names.romk_c6_wing_2: LocationData(BASE_ID + 0x854, "essence"),
+    location_names.romk_c6_suplex: LocationData(BASE_ID + 0x855, "essence"),
+    location_names.romk_c6_yoyo: LocationData(BASE_ID + 0x856, "essence"),
+    location_names.romk_c6_1up_1: LocationData(BASE_ID + 0x21E, "one_up"),
+    location_names.romk_c6_1up_2: LocationData(BASE_ID + 0x21F, "one_up"),
+    location_names.romk_c6_maxim_2: LocationData(BASE_ID + 0x134, "maxim"),
+    location_names.romk_c6_bomb: LocationData(BASE_ID + 0x857, "essence"),
+    location_names.romk_c6_maxim_3: LocationData(BASE_ID + 0x135, "maxim"),
 }
 
 romk_chapter_7_locations = {
     location_names.romk_chapter_7: LocationData(BASE_ID + 85),
     location_names.romk_complete: LocationData(None),
+    location_names.romk_c7_cutter_1: LocationData(BASE_ID + 0x858, "essence"),
+    location_names.romk_c7_parasol: LocationData(BASE_ID + 0x859, "essence"),
+    location_names.romk_c7_yoyo: LocationData(BASE_ID + 0x85A, "essence"),
+    location_names.romk_c7_stone: LocationData(BASE_ID + 0x85B, "essence"),
+    location_names.romk_c7_ninja_1: LocationData(BASE_ID + 0x85C, "essence"),
+    location_names.romk_c7_maxim_1: LocationData(BASE_ID + 0x136, "maxim"),
+    location_names.romk_c7_maxim_2: LocationData(BASE_ID + 0x137, "maxim"),
+    location_names.romk_c7_maxim_3: LocationData(BASE_ID + 0x138, "maxim"),
+    location_names.romk_c7_ninja_2: LocationData(BASE_ID + 0x85D, "essence"),
+    location_names.romk_c7_sleep: LocationData(BASE_ID + 0x85E, "essence"),
+    location_names.romk_c7_cutter_2: LocationData(BASE_ID + 0x85F, "essence"),
+    location_names.romk_c7_maxim_4: LocationData(BASE_ID + 0x139, "maxim"),
 }
 
 revenge_of_meta_knight_locations = {
@@ -348,6 +401,7 @@ floria_locations = {
     location_names.mww_cutter: LocationData(BASE_ID + 88),
     location_names.mww_fighter: LocationData(BASE_ID + 89),
     location_names.mww_ice: LocationData(BASE_ID + 90),
+    location_names.mww_fl_maxim: LocationData(BASE_ID + 0x13A, "maxim"),
 }
 
 aqualiss_locations = {
@@ -355,6 +409,14 @@ aqualiss_locations = {
     location_names.mww_beam: LocationData(BASE_ID + 92),
     location_names.mww_parasol: LocationData(BASE_ID + 93),
     location_names.mww_sword: LocationData(BASE_ID + 94),
+    location_names.mww_aq_1up_1: LocationData(BASE_ID + 0x220, "one_up"),
+    location_names.mww_aq_maxim_1: LocationData(BASE_ID + 0x13B, "maxim"),
+    location_names.mww_aq_1up_2: LocationData(BASE_ID + 0x221, "one_up"),
+    location_names.mww_aq_maxim_2: LocationData(BASE_ID + 0x13C, "maxim"),
+    location_names.mww_aq_maxim_3: LocationData(BASE_ID + 0x13D, "maxim"),
+    location_names.mww_aq_1up_3: LocationData(BASE_ID + 0x222, "one_up"),
+    location_names.mww_aq_maxim_4: LocationData(BASE_ID + 0x13E, "maxim"),
+
 }
 
 skyhigh_locations = {
@@ -362,12 +424,27 @@ skyhigh_locations = {
     location_names.mww_jet: LocationData(BASE_ID + 96),
     location_names.mww_wheel: LocationData(BASE_ID + 97),
     location_names.mww_wing: LocationData(BASE_ID + 98),
+    location_names.mww_sh_1up_1: LocationData(BASE_ID + 0x223, "one_up"),
+    location_names.mww_sh_maxim_1: LocationData(BASE_ID + 0x13F, "maxim"),
+    location_names.mww_sh_candy: LocationData(BASE_ID + 0x405, "candy"),
+    location_names.mww_sh_maxim_2: LocationData(BASE_ID + 0x140, "maxim"),
 }
 
 hotbeat_locations = {
     location_names.mww_hotbeat: LocationData(BASE_ID + 99),
     location_names.mww_fire: LocationData(BASE_ID + 100),
     location_names.mww_suplex: LocationData(BASE_ID + 101),
+    location_names.mww_hb_candy: LocationData(BASE_ID + 0x406, "candy"),
+    location_names.mww_hb_maxim_1: LocationData(BASE_ID + 0x141, "maxim"),
+    location_names.mww_hb_maxim_2: LocationData(BASE_ID + 0x142, "maxim"),
+    location_names.mww_hb_maxim_3: LocationData(BASE_ID + 0x143, "maxim"),
+    location_names.mww_hb_1up_1: LocationData(BASE_ID + 0x224, "one_up"),
+    location_names.mww_hb_1up_2: LocationData(BASE_ID + 0x225, "one_up"),
+    location_names.mww_hb_maxim_4: LocationData(BASE_ID + 0x144, "maxim"),
+    location_names.mww_hb_maxim_5: LocationData(BASE_ID + 0x145, "maxim"),
+    location_names.mww_hb_1up_3: LocationData(BASE_ID + 0x226, "one_up"),
+    location_names.mww_hb_maxim_6: LocationData(BASE_ID + 0x146, "maxim"),
+    location_names.mww_hb_maxim_7: LocationData(BASE_ID + 0x147, "maxim"),
 }
 
 cavios_locations = {
@@ -375,18 +452,40 @@ cavios_locations = {
     location_names.mww_bomb: LocationData(BASE_ID + 103),
     location_names.mww_hammer: LocationData(BASE_ID + 104),
     location_names.mww_stone: LocationData(BASE_ID + 105),
+    location_names.mww_cv_maxim_1: LocationData(BASE_ID + 0x148, "maxim"),
+    location_names.mww_cv_maxim_2: LocationData(BASE_ID + 0x149, "maxim"),
+    location_names.mww_cv_maxim_3: LocationData(BASE_ID + 0x14A, "maxim"),
+    location_names.mww_cv_1up_1: LocationData(BASE_ID + 0x227, "one_up"),
+    location_names.mww_cv_maxim_4: LocationData(BASE_ID + 0x14B, "maxim"),
+    location_names.mww_cv_maxim_5: LocationData(BASE_ID + 0x14C, "maxim"),
+    location_names.mww_cv_1up_2: LocationData(BASE_ID + 0x228, "one_up"),
+    location_names.mww_cv_candy: LocationData(BASE_ID + 0x407, "candy"),
 }
 
 mecheye_locations = {
     location_names.mww_mecheye: LocationData(BASE_ID + 106),
     location_names.mww_plasma: LocationData(BASE_ID + 107),
     location_names.mww_yoyo: LocationData(BASE_ID + 108),
+    location_names.mww_me_1up_1: LocationData(BASE_ID + 0x229, "one_up"),
+    location_names.mww_me_candy: LocationData(BASE_ID + 0x408, "candy"),
+    location_names.mww_me_1up_2: LocationData(BASE_ID + 0x22A, "one_up"),
+    location_names.mww_me_maxim_1: LocationData(BASE_ID + 0x14D, "maxim"),
+    location_names.mww_me_maxim_2: LocationData(BASE_ID + 0x14E, "maxim"),
+    location_names.mww_me_1up_3: LocationData(BASE_ID + 0x22B, "one_up"),
+    location_names.mww_me_1up_4: LocationData(BASE_ID + 0x22C, "one_up"),
+    location_names.mww_me_1up_5: LocationData(BASE_ID + 0x22D, "one_up"),
+    location_names.mww_me_maxim_3: LocationData(BASE_ID + 0x14F, "maxim"),
 }
 
 halfmoon_locations = {
     location_names.mww_halfmoon: LocationData(BASE_ID + 109),
     location_names.mww_mirror: LocationData(BASE_ID + 110),
     location_names.mww_ninja: LocationData(BASE_ID + 111),
+    location_names.mww_hm_maxim_1: LocationData(BASE_ID + 0x150, "maxim"),
+    location_names.mww_hm_maxim_2: LocationData(BASE_ID + 0x151, "maxim"),
+    location_names.mww_hm_1up_1: LocationData(BASE_ID + 0x22E, "one_up"),
+    location_names.mww_hm_maxim_3: LocationData(BASE_ID + 0x152, "maxim"),
+    location_names.mww_hm_maxim_4: LocationData(BASE_ID + 0x153, "maxim"),
 }
 
 copy_planet_locations = {
