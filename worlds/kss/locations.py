@@ -131,6 +131,8 @@ dyna_blade_locations = {
     **cocoa_cave_locations,
     **candy_mountain_locations,
     **dyna_blade_nest_locations,
+    **bonus_1_locations,
+    **bonus_2_locations,
 }
 
 gourmet_race_locations = {
