@@ -80,8 +80,8 @@ class KSSSNIClient(SNIClient):
         death_link = await snes_read(ctx, KSS_DEATH_LINK_ADDR, 1)
         if death_link:
             await ctx.update_death_link(bool(death_link[0] & 0b1))
-
-        self.consumable_filter = int.from_bytes(await snes_read(ctx, KSS_CONSUMABLE_FILTER, 2), "little")
+        consumable_filter = await snes_read(ctx, KSS_CONSUMABLE_FILTER, 2)
+        self.consumable_filter = int.from_bytes(consumable_filter, "little")
         return True
 
     async def pop_item(self, ctx: "SNIContext", game_state: int):

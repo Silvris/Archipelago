@@ -218,6 +218,11 @@ db_b2_suplex = "Dyna Blade Bonus 2 - Suplex Essence"
 db_b2_copy = "Dyna Blade Bonus 2 - Copy Essence"
 db_b2_maxim = "Dyna Blade Bonus 2 - Maxim Tomato"
 
+db_db_sword = "Dyna Blade's Nest - Sword Essence"
+db_db_cutter = "Dyna Blade's Nest - Cutter Essence"
+db_db_fire = "Dyna Blade's Nest - Fire Essence"
+db_db_beam = "Dyna Blade's Nest - Beam Essence"
+
 gr_jet = "Gourmet Race 3 - Jet Essence"
 gr_parasol = "Gourmet Race 3 - Parasol Essence"
 gr_ninja = "Gourmet Race 3 - Ninja Essence"

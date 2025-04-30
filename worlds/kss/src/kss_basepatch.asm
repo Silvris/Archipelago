@@ -1138,6 +1138,7 @@ great_cave_requirement:
     PLB
     CMP TreasureRequirements, Y
     BCC .GetDigits ; if not minus at this point, has to be greater or equal
+    INY #2
     BRA .CheckRequirement
     .EarlyReturn:
     PLB
@@ -1166,30 +1167,30 @@ great_cave_requirement:
     LDA #$967F
     LDY #$98
     .Start
-    STA $9001
+    STA $A001
     LDX #$FFFF
     .Millions:
     INX
-    LDA $9001
+    LDA $A001
     SEC
     SBC #$4240
-    STA $9001
+    STA $A001
     TYA
     SBC #$000F
     TAY
     BPL .Millions
     SEP #$20
     TXA
-    STA $9000
+    STA $A000
     REP #$20
-    LDA $9001
+    LDA $A001
     CLC
     ADC #$4240
-    STA $9001
+    STA $A001
     TYA
     ADC #$000F
     TAY
-    LDA $9001
+    LDA $A001
     LDX #$FFFF
     .HundredThousands:
     INX
@@ -1200,7 +1201,7 @@ great_cave_requirement:
     .HTContinue:
     DEY
     BPL .HundredThousands
-    STX $9001
+    STX $A001
     CLC
     ADC #$86A0
     BCC .AddOne
@@ -1215,7 +1216,7 @@ great_cave_requirement:
     BCS .TenThousands
     DEY
     BPL .TenThousands
-    STX $9002
+    STX $A002
     ADC #$2710
     LDX #$FFFF
     SEC
@@ -1223,7 +1224,7 @@ great_cave_requirement:
     INX
     SBC #$03E8
     BCS .Thousands
-    STX $9003
+    STX $A003
     ADC #$03E8
     LDX #$FFFF
     SEC
@@ -1231,7 +1232,7 @@ great_cave_requirement:
     INX
     SBC #$0064
     BCS .Hundreds
-    STX $9004
+    STX $A004
     ADC #$0064
     LDX #$FFFF
     SEC
@@ -1239,9 +1240,9 @@ great_cave_requirement:
     INX
     SBC #$000A
     BCS .Tens
-    STX $9005
+    STX $A005
     ADC #$000A
-    STA $9006
+    STA $A006
     .FindFirstNonZero:
     LDY #$FFFF
     .NonZeroLoop:
@@ -1249,11 +1250,11 @@ great_cave_requirement:
     CPY #$0006
     BEQ .Continue
     SEP #$20
-    LDA $9000, Y
+    LDA $A000, Y
     REP #$20
     BEQ .NonZeroLoop
     .Continue:
-    STY $9007
+    STY $A007
     .Apply:
     LDY #$001F
     LDX #$0000
@@ -1268,8 +1269,8 @@ great_cave_requirement:
     SEP #$20
     .ApplyLoop:
     PLB
-    LDA $9000, X
-    CPX $9007
+    LDA $A000, X
+    CPX $A007
     BPL .Add
     LDA #$FF
     BRA .Set

@@ -123,6 +123,10 @@ bonus_2_locations = {
 dyna_blade_nest_locations = {
     location_names.db_stage_5: LocationData(BASE_ID + 8),
     location_names.db_complete: LocationData(None),
+    location_names.db_db_cutter: LocationData(BASE_ID + 0x860, "essence"),
+    location_names.db_db_beam: LocationData(BASE_ID + 0x861, "essence"),
+    location_names.db_db_fire: LocationData(BASE_ID + 0x862, "essence"),
+    location_names.db_db_sword: LocationData(BASE_ID + 0x863, "essence"),
 }
 
 dyna_blade_locations = {
