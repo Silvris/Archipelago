@@ -46,6 +46,8 @@ def set_dyna_blade_rules(world: "KSSWorld"):
                                                                                               item_names.hammer,
                                                                                               item_names.yoyo],
                                                                                              world.player))
+        set_rule(world.get_location(location_names.db_cm_1up_1),
+                 lambda state: state.has_any([item_names.hammer, item_names.stone], world.player))
         for location in (location_names.db_cm_1up_2, location_names.db_cm_1up_3,
                          location_names.db_cm_1up_4, location_names.db_cm_1up_5):
             set_rule(world.get_location(location), lambda state: state.has(item_names.fire, world.player))
