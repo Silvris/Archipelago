@@ -76,16 +76,16 @@ class KSSWorld(World):
             raise OptionError(f"Kirby Super Star ({self.player_name}): At least one of The Great Cave Offensive, "
                               f"Milky Way Wishes, or The Arena must be included")
 
-        if self.options.starting_subgame.current_option_name not in self.options.included_subgames:
-            logger.warning(f"Kirby Super Star ({self.player_name}): Starting subgame not included, choosing random.")
-            self.options.starting_subgame.value = self.random.choice([value[0] for value in subgame_mapping.items()
-                                                                      if value[1] in self.options.included_subgames])
-
         for game in sorted(self.options.required_subgames.value):
             if game not in self.options.included_subgames.value:
                 logger.warning(F"Kirby Super Star ({self.player_name}): Required subgame {game} not included, "
                                F"adding to included subgames")
                 self.options.included_subgames.value.add(game)
+
+        if self.options.starting_subgame.current_option_name not in self.options.included_subgames:
+            logger.warning(f"Kirby Super Star ({self.player_name}): Starting subgame not included, choosing random.")
+            self.options.starting_subgame.value = self.random.choice([value[0] for value in subgame_mapping.items()
+                                                                      if value[1] in self.options.included_subgames])
 
         if self.options.required_subgame_completions > len(self.options.included_subgames.value):
             logger.warning(f"Kirby Super Star ({self.player_name}): Required subgame count greater than "
