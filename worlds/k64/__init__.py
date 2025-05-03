@@ -22,6 +22,7 @@ import settings
 
 logger = logging.getLogger("Kirby 64: The Crystal Shards")
 
+
 class K64Settings(settings.Group):
     class RomFile(settings.UserFilePath):
         """File name of the K64 EN rom"""
@@ -56,7 +57,6 @@ class K64Settings(settings.Group):
                     cls._validate_stream_hashes(f)
                 except ValueError:
                     raise ValueError(f"File hash does not match for {path}")
-
 
     rom_file: RomFile = RomFile(RomFile.copy_to)
 
@@ -163,12 +163,12 @@ class K64World(World):
             "boss_requirements": self.boss_requirements
         }
 
-    def interpret_slot_data(self, slot_data: Dict[str, Any]):
+    @staticmethod
+    def interpret_slot_data(slot_data: Dict[str, Any]):
         local_levels = {int(key): value for key, value in slot_data["player_levels"].items()}
         return {"player_levels": local_levels}
 
     def generate_output(self, output_directory: str):
-        rom_path = ""
         try:
             rom_path = os.path.join(output_directory, f"{self.multiworld.get_out_file_name_base(self.player)}"
                                                       f"{K64ProcedurePatch.patch_file_ending}")
