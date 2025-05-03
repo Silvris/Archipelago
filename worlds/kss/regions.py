@@ -10,6 +10,7 @@ from .locations import (green_greens_locations, float_islands_locations, bubbly_
                         skyhigh_locations, hotbeat_locations, cavios_locations, mecheye_locations, halfmoon_locations,
                         copy_planet_locations, space_locations, the_arena_locations, KSSLocation, LocationData,
                         bonus_1_locations, bonus_2_locations)
+from .options import IncludedSubgames
 
 if TYPE_CHECKING:
     from . import KSSWorld
@@ -24,7 +25,10 @@ def create_region(name, world: "KSSWorld"):
 
 
 def add_locations(world: "KSSWorld", region: KSSRegion, locations: dict[str, LocationData]):
-    filter_list = [""]
+    if hasattr(world.multiworld, "generation_is_fake"):
+        filter_list = ["", "maxim", "one_up", "candy", "essence"]
+    else:
+        filter_list = [""]
     if "Maxim Tomato" in world.options.consumables:
         filter_list.append("maxim")
     if "1-Up" in world.options.consumables:
@@ -39,8 +43,8 @@ def add_locations(world: "KSSWorld", region: KSSRegion, locations: dict[str, Loc
     region.add_locations(filtered, KSSLocation)
 
 
-def create_trivial_regions(world: "KSSWorld", menu: KSSRegion):
-    if "Gourmet Race" in world.options.included_subgames:
+def create_trivial_regions(world: "KSSWorld", menu: KSSRegion, included_subgames: set[str]):
+    if "Gourmet Race" in included_subgames:
         gourmet_race = create_region("Gourmet Race", world)
         add_locations(world, gourmet_race, gourmet_race_locations)
         menu.connect(gourmet_race, None, lambda state: state.has(item_names.gourmet_race, world.player))
@@ -48,7 +52,7 @@ def create_trivial_regions(world: "KSSWorld", menu: KSSRegion):
             world.create_item(item_names.gourmet_race_complete))
         world.multiworld.regions.append(gourmet_race)
 
-    if "The Arena" in world.options.included_subgames:
+    if "The Arena" in included_subgames:
         arena = create_region("The Arena", world)
         add_locations(world, arena, the_arena_locations)
         menu.connect(arena, None, lambda state: state.has(item_names.the_arena, world.player))
@@ -103,7 +107,9 @@ def create_dyna_blade(world: "KSSWorld", menu: KSSRegion):
     world.multiworld.regions.extend([dyna_blade, peanut_plains, mallow_castle, cocoa_cave,
                                      candy_mountain, dyna_blade_nest])
 
-    if world.options.essences or "Maxim Tomato" in world.options.consumables:
+    if world.options.essences \
+            or "Maxim Tomato" in world.options.consumables \
+            or hasattr(world.multiworld, "generation_is_fake"):
         extra1 = create_region("Dyna Blade Bonus 1", world)
         extra2 = create_region("Dyna Blade Bonus 2", world)
         for locations, region in zip((bonus_1_locations, bonus_2_locations), (extra1, extra2)):
@@ -201,14 +207,18 @@ def create_milky_way_wishes(world: "KSSWorld", menu: KSSRegion):
 def create_regions(world: "KSSWorld"):
     menu = create_region("Menu", world)
     world.multiworld.regions.append(menu)
-    create_trivial_regions(world, menu)
-    if "Spring Breeze" in world.options.included_subgames:
+    if hasattr(world.multiworld, "generation_is_fake"):
+        included_subgames = IncludedSubgames.valid_keys
+    else:
+        included_subgames = world.options.included_subgames
+    create_trivial_regions(world, menu, included_subgames)
+    if "Spring Breeze" in included_subgames:
         create_spring_breeze(world, menu)
-    if "Dyna Blade" in world.options.included_subgames:
+    if "Dyna Blade" in included_subgames:
         create_dyna_blade(world, menu)
-    if "The Great Cave Offensive" in world.options.included_subgames:
+    if "The Great Cave Offensive" in included_subgames:
         create_great_cave_offensive(world, menu)
-    if "Revenge of Meta Knight" in world.options.included_subgames:
+    if "Revenge of Meta Knight" in included_subgames:
         create_revenge_meta_knight(world, menu)
-    if "Milky Way Wishes" in world.options.included_subgames:
+    if "Milky Way Wishes" in included_subgames:
         create_milky_way_wishes(world, menu)

@@ -4,7 +4,7 @@ import os
 import base64
 import threading
 import math
-from typing import Dict, List, ClassVar, Any
+from typing import Dict, List, ClassVar, Any, Mapping
 from BaseClasses import Tutorial, MultiWorld, CollectionState, Item, ItemClassification
 from worlds.AutoWorld import World, WebWorld
 from Options import OptionError
@@ -59,6 +59,7 @@ class KSSWorld(World):
     options_dataclass = KSSOptions
     options: KSSOptions
     treasure_value: List[int]
+    ut_can_gen_without_yaml: bool = True
 
     create_regions = create_regions
 
@@ -136,7 +137,7 @@ class KSSWorld(World):
             itempool.extend([self.create_item(name, force) for name in dyna_items])
         if "The Great Cave Offensive" in self.options.included_subgames:
             max_gold = (math.floor((9999990 - self.options.the_great_cave_offensive_required_gold.value) *
-                                  (self.options.the_great_cave_offensive_excess_gold.value / 100))
+                                   (self.options.the_great_cave_offensive_excess_gold.value / 100))
                         + self.options.the_great_cave_offensive_required_gold.value)
             for name, treasure in sorted(treasures.items(), key=(lambda treasure: treasure[1].value), reverse=True):
                 itempool.append(self.create_item(name))
@@ -180,6 +181,15 @@ class KSSWorld(World):
         self.multiworld.itempool += itempool
 
     set_rules = set_rules
+
+    def fill_slot_data(self) -> Mapping[str, Any]:
+        return {
+            "treasure_value": self.treasure_value
+        }
+
+    @staticmethod
+    def interpret_slot_data(slot_data: Dict[str, Any]) -> Dict[str, Any]:
+        return slot_data
 
     def generate_output(self, output_directory: str) -> None:
         try:

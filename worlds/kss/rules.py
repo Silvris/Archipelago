@@ -54,6 +54,11 @@ def set_dyna_blade_rules(world: "KSSWorld"):
 
 
 def set_great_cave_rules(world: "KSSWorld"):
+    if hasattr(world.multiworld, "re_gen_passthrough"):
+        re_gen_passthrough: dict = getattr(world.multiworld, "re_gen_passthrough")
+        if "Kirby Super Star" in re_gen_passthrough:
+            world.treasure_value = re_gen_passthrough["Kirby Super Star"]["treasure_value"]
+
     # Delay setting these rules until we know for sure
     if world.treasure_value:
         set_rule(world.get_entrance("Sub-Tree -> Crystal"), lambda state: state.has("Gold", world.player,
