@@ -1,4 +1,4 @@
-# Kirby's Dream Land 3
+# Kirby 64 - The Crystal Shards
 
 ## Where is the settings page?
 
@@ -6,33 +6,20 @@ The [player settings page for this game](../player-settings) contains all the op
 config file.
 
 ## What does randomization do to this game?
-Kirby will be unable to absorb Copy Abilities and meet up with his animal friends until they are sent to him. Items such
-as Heart Stars, 1-Ups, and Invincibility Candy will be shuffled into the pool for Kirby to receive.
+Kirby will be unable to absorb Copy Abilities, create Power Combos and meet up with his friends until they are sent to him. Items such
+as Crystal Shards, 1-Ups, and Invincibility Candy will be shuffled into the pool for Kirby to receive.
 
-## What is considered a location check in Kirby's Dream Land 3?
+## What is considered a location check in Kirby 64 - The Crystal Shards?
 - Completing a stage for the first time
-- Completing the given task of a stage and receiving a Heart Star
-- Purifying a boss after acquiring a certain number of Heart Stars
- (indicated by their portrait flashing in the level select)
-- If enabled, 1-Ups and Maxim Tomatoes
+- Collecting a Crystal Shard
+- Defeating a boss
 
 ## When the player receives an item, what happens?
-A sound effect will play, and Kirby will immediately receive the effects of that item, such as being able to receive Copy Abilities from enemies that 
-give said Copy Ability. Animal Friends will require leaving the room you are currently in before they will appear.
+Kirby will immediately receive the effects of that item, such as being able to receive Copy Abilities from enemies that 
+give said Copy Ability. Friends will require leaving the room you are currently in before they will appear.
 
-## What is the goal of Kirby's Dream Land 3?
-Under the Zero goal, players must collect enough Heart Stars to purify the five bosses and gain access to the Hyper Zone,
-where Zero can be found and defeated.
+## What is the goal of Kirby 64 - The Crystal Shards?
+Players must collect enough Crystal Shards to travel across the galaxy to save the inhabitants of Ripple Star and gain access to Dark Star,
+where Zero-Two can be found and defeated.
 
-Under the Boss Butch goal, players must collect enough Heart Stars to purify the five bosses
-and then complete the Boss Butch game mode accessible from the main menu.
-
-Under the MG5 goal, players must collect enough Heart Stars to purify the five bosses 
-and then perfect the Super MG5 game mode accessible from the main menu.
-
-Under the Jumping goal, players must collect enough Heart Stars to purify the five bosses
-and then reach a target score in the Jumping game mode accessible from the main menu.
-
-## Why is EmuHawk resizing itself while I'm playing?
-Kirby's Dream Land 3 changes the SNES's display resolution from 1x to 2x many times during gameplay (particularly in rooms with foreground effects).
-To counter-act this resizing, set SNES -> Options -> "Always use double-size frame buffer".
+If Fast Goal mode is enabled, Dark Star will be unlocked as soon as the required number of Crystal Shards and all 3 of Kirby's friends are received.
