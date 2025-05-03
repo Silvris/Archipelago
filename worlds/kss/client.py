@@ -106,7 +106,7 @@ class KSSSNIClient(SNIClient):
                 # 1-Up
                 lives = int.from_bytes(await snes_read(ctx, KSS_KIRBY_LIVES, 2), "little")
                 snes_buffered_write(ctx, KSS_KIRBY_LIVES, int.to_bytes(lives + 1, 2, "little"))
-                snes_buffered_write(ctx, KSS_PLAY_SFX, int.to_bytes(0x2C, 2, "little"))
+                snes_buffered_write(ctx, KSS_PLAY_SFX, int.to_bytes(0x3E, 2, "little"))
             else:
                 pass
 
@@ -186,9 +186,19 @@ class KSSSNIClient(SNIClient):
                 unlocked_subgames = int.from_bytes(await snes_read(ctx, KSS_RECEIVED_SUBGAMES, 2), "little")
                 unlocked_subgames |= (1 << (item.item & 0xFF))
                 snes_buffered_write(ctx, KSS_RECEIVED_SUBGAMES, unlocked_subgames.to_bytes(2, "little"))
+            elif item.item & 0x100 != 0:
+                snes_buffered_write(ctx, KSS_PLAY_SFX, int.to_bytes(0x44, 2, "little"))
+            elif item.item & 0x200 != 0:
+                snes_buffered_write(ctx, KSS_PLAY_SFX, int.to_bytes(0x86, 2, "little"))
+            elif item.item & 0x400 != 0:
+                snes_buffered_write(ctx, KSS_PLAY_SFX, int.to_bytes(0x42, 2, "little"))
+            elif item.item & 0x800 != 0:
+                snes_buffered_write(ctx, KSS_PLAY_SFX, int.to_bytes(0x4D, 2, "little"))
             elif item.item & 0x1000 != 0:
                 if item.item & 0xF != 4:
                     self.item_queue.append(item)
+                else:
+                    snes_buffered_write(ctx, KSS_PLAY_SFX, int.to_bytes(0x43, 2, "little"))
 
         await self.pop_item(ctx, game_state)
 
