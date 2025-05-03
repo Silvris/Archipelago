@@ -206,7 +206,7 @@ class K64Client(BizHawkClient):
         from kvui import TooltipLabel
 
         if not self.crystal_label:
-            self.crystal_label = TooltipLabel(text=f"")
+            self.crystal_label = TooltipLabel(text=f"", size_hint_x=None, width=125, halign="center", valign="center")
             ctx.ui.connect_layout.add_widget(self.crystal_label)
 
         current_crystals = sum(1 for item in ctx.items_received if item.item == 0x640020)
