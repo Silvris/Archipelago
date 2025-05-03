@@ -71,8 +71,8 @@ class KSSWorld(World):
 
     def generate_early(self) -> None:
         # lots here
-        if self.options.included_subgames.value.union(
-                {"The Great Cave Offensive", "Milky Way Wishes", "The Arena"}) == {}:
+        if not self.options.included_subgames.value.intersection(
+                {"The Great Cave Offensive", "Milky Way Wishes", "The Arena"}):
             raise OptionError(f"Kirby Super Star ({self.player_name}): At least one of The Great Cave Offensive, "
                               f"Milky Way Wishes, or The Arena must be included")
 
