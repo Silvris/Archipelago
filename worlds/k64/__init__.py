@@ -204,14 +204,6 @@ class K64World(World):
             return value
 
         crystals = state.prog_items[self.player][ItemName.crystal_shard]
-        if not hasattr(state, "k64_level_state"):
-            setattr(state, "k64_level_state", dict())
-        if self.player not in state.k64_level_state:
-            state.k64_level_state[self.player] = []
-        if not hasattr(state, "k64_stale"):
-            setattr(state, "k64_stale", dict())
-        if self.player not in state.k64_stale:
-            state.k64_stale[self.player] = True
         level_state = [crystals >= requirement for requirement in self.boss_requirements]
         if state.k64_level_state[self.player] != level_state:
             state.k64_stale[self.player] = True
@@ -224,14 +216,6 @@ class K64World(World):
             return value
 
         crystals = state.prog_items[self.player][ItemName.crystal_shard]
-        if not hasattr(state, "k64_level_state"):
-            setattr(state, "k64_level_state", dict())
-        if self.player not in state.k64_level_state:
-            state.k64_level_state[self.player] = []
-        if not hasattr(state, "k64_stale"):
-            setattr(state, "k64_stale", dict())
-        if self.player not in state.k64_stale:
-            state.k64_stale[self.player] = True
         level_state = [crystals >= requirement for requirement in self.boss_requirements]
         if state.k64_level_state[self.player] != level_state:
             state.k64_stale[self.player] = True

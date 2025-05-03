@@ -1,4 +1,7 @@
 from worlds.generic.Rules import set_rule, add_rule
+from worlds.AutoWorld import LogicMixin
+from BaseClasses import MultiWorld
+from copy import deepcopy
 from .names import LocationName, ItemName
 import typing
 
@@ -130,6 +133,22 @@ ice_levels = [
     "Ripple Star 1",
     "Ripple Star 3",
 ]
+
+
+class K64LogicMixin(LogicMixin):
+    game: str = "Kirby 64 - The Crystal Shards"
+    k64_stale: dict[int, bool]
+    k64_level_state: dict[int, list[bool]]
+
+    def init_mixin(self, multiworld: MultiWorld):
+        k64_players = multiworld.get_game_players(self.game)
+        self.k64_stale = {player: True for player in k64_players}
+        self.k64_level_state = {player: [False, False, False, False, False, False] for player in k64_players}
+
+    def copy_mixin(self, other: "K64LogicMixin"):
+        other.k64_stale = self.k64_stale.copy()
+        other.k64_level_state = deepcopy(self.k64_level_state)
+        return other
 
 
 def has_any_bomb(state: "CollectionState", player: int):
