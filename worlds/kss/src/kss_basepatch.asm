@@ -1116,7 +1116,6 @@ great_cave_requirement:
     PHB
     .CheckRequirementHigh:
     INY #2
-    .CheckRequirement:
     INY #2
     CPY #$000F
     BPL .EarlyReturn ; we have enough to clear
@@ -1139,7 +1138,7 @@ great_cave_requirement:
     CMP TreasureRequirements, Y
     BCC .GetDigits ; if not minus at this point, has to be greater or equal
     INY #2
-    BRA .CheckRequirement
+    BRA .CheckRequirementHigh
     .EarlyReturn:
     PLB
     .NoPull:
@@ -1165,7 +1164,7 @@ great_cave_requirement:
     BCC .Start
     .SetCap:
     LDA #$967F
-    LDY #$98
+    LDY #$0098
     .Start
     STA $A001
     LDX #$FFFF

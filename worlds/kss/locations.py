@@ -277,6 +277,7 @@ garden_locations = {
     location_names.tgco_ga_maxim_3: LocationData(BASE_ID + 0x123, "maxim"),
     location_names.tgco_ga_maxim_4: LocationData(BASE_ID + 0x124, "maxim"),
     location_names.tgco_ga_1up_1: LocationData(BASE_ID + 0x218, "one_up"),
+    location_names.tgco_ga_1up_6: LocationData(BASE_ID + 0x230, "one_up"),
     location_names.tgco_ga_wing_2: LocationData(BASE_ID + 0x831, "essence"),
     location_names.tgco_ga_plasma: LocationData(BASE_ID + 0x832, "essence"),
     location_names.tgco_ga_maxim_5: LocationData(BASE_ID + 0x125, "maxim"),
@@ -335,6 +336,7 @@ romk_chapter_3_locations = {
 
 romk_chapter_4_locations = {
     location_names.romk_chapter_4: LocationData(BASE_ID + 82),
+    location_names.romk_c4_sword: LocationData(BASE_ID + 0x864, "essence"),
     location_names.romk_c4_candy_1: LocationData(BASE_ID + 0x403, "candy"),
     location_names.romk_c4_maxim_1: LocationData(BASE_ID + 0x12E, "maxim"),
     location_names.romk_c4_fire: LocationData(BASE_ID + 0x845, "essence"),
@@ -447,9 +449,10 @@ hotbeat_locations = {
     location_names.mww_hb_maxim_3: LocationData(BASE_ID + 0x143, "maxim"),
     location_names.mww_hb_1up_1: LocationData(BASE_ID + 0x224, "one_up"),
     location_names.mww_hb_1up_2: LocationData(BASE_ID + 0x225, "one_up"),
+    location_names.mww_hb_1up_3: LocationData(BASE_ID + 0x231, "one_up"),
     location_names.mww_hb_maxim_4: LocationData(BASE_ID + 0x144, "maxim"),
     location_names.mww_hb_maxim_5: LocationData(BASE_ID + 0x145, "maxim"),
-    location_names.mww_hb_1up_3: LocationData(BASE_ID + 0x226, "one_up"),
+    location_names.mww_hb_1up_4: LocationData(BASE_ID + 0x226, "one_up"),
     location_names.mww_hb_maxim_6: LocationData(BASE_ID + 0x146, "maxim"),
     location_names.mww_hb_maxim_7: LocationData(BASE_ID + 0x147, "maxim"),
 }
