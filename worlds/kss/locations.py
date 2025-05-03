@@ -539,6 +539,11 @@ the_arena_locations = {
     location_names.arena_18: LocationData(BASE_ID + 130),
     location_names.arena_19: LocationData(BASE_ID + 131),
     location_names.arena_complete: LocationData(None),
+    location_names.arena_maxim_1: LocationData(BASE_ID + 0x154, "maxim"),
+    location_names.arena_maxim_2: LocationData(BASE_ID + 0x155, "maxim"),
+    location_names.arena_maxim_3: LocationData(BASE_ID + 0x156, "maxim"),
+    location_names.arena_maxim_4: LocationData(BASE_ID + 0x157, "maxim"),
+    location_names.arena_maxim_5: LocationData(BASE_ID + 0x158, "maxim"),
 }
 
 location_table = {
