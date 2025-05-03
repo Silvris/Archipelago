@@ -86,16 +86,11 @@ class KSSSNIClient(SNIClient):
 
     async def pop_item(self, ctx: "SNIContext", game_state: int):
         from SNIClient import snes_read, snes_buffered_write
-        if game_state != 3:
+        if game_state not in (0x3, 0xC):
             return
         if self.item_queue:
             item = self.item_queue.pop()
-            if item.item & 0xF == 1:
-                # 1-Up
-                lives = int.from_bytes(await snes_read(ctx, KSS_KIRBY_LIVES, 2), "little")
-                snes_buffered_write(ctx, KSS_KIRBY_LIVES, int.to_bytes(lives + 1, 2, "little"))
-                snes_buffered_write(ctx, KSS_PLAY_SFX, int.to_bytes(0x2C, 2, "little"))
-            elif item.item & 0xF == 2:
+            if item.item & 0xF == 2:
                 # Maxim
                 snes_buffered_write(ctx, KSS_KIRBY_HP, int.to_bytes(0x46, 2, "little"))
                 snes_buffered_write(ctx, KSS_KIRBY_HP + 2, int.to_bytes(0x46, 2, "little"))
@@ -103,6 +98,14 @@ class KSSSNIClient(SNIClient):
             elif item.item & 0xF == 3:
                 # Invincibility
                 snes_buffered_write(ctx, KSS_ACTIVATE_CANDY, int.to_bytes(1, 2, "little"))
+                snes_buffered_write(ctx, KSS_PLAY_SFX, int.to_bytes(0x2C, 2, "little"))
+            elif game_state != 3:
+                self.item_queue.insert(0, item)
+                return
+            elif item.item & 0xF == 1:
+                # 1-Up
+                lives = int.from_bytes(await snes_read(ctx, KSS_KIRBY_LIVES, 2), "little")
+                snes_buffered_write(ctx, KSS_KIRBY_LIVES, int.to_bytes(lives + 1, 2, "little"))
                 snes_buffered_write(ctx, KSS_PLAY_SFX, int.to_bytes(0x2C, 2, "little"))
             else:
                 pass
