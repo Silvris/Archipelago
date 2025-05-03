@@ -5,7 +5,7 @@ from .locations import K64Location, location_table
 from .items import K64Item
 from .names import LocationName, ItemName
 from .rules import (burn_levels, needle_levels, stone_levels,
-                    spark_levels, bomb_levels, ice_levels, cutter_levels)
+                    spark_levels, bomb_levels, ice_levels, cutter_levels, dedede_copy_levels, waddle_copy_levels)
 
 if typing.TYPE_CHECKING:
     from . import K64World
@@ -19,13 +19,18 @@ class K64Region(Region):
                                     "Needle Ability", "Bomb Ability", "Spark Ability", "Cutter Ability"],
                                     [burn_levels, stone_levels, ice_levels,
                                     needle_levels, bomb_levels, spark_levels, cutter_levels]):
+            regions: list[str] = regions.copy()
+            if ability in dedede_copy_levels and state.has(ItemName.king_dedede, self.player):
+                regions.extend(dedede_copy_levels[ability])
+            if ability in waddle_copy_levels and state.has(ItemName.waddle_dee, self.player):
+                regions.extend(waddle_copy_levels[ability])
             if any(state.can_reach(region, "Region", self.player) for region in regions):
                 state.prog_items[self.player][ability] = 1
             else:
                 del state.prog_items[self.player][ability]
 
     def can_reach(self, state: CollectionState) -> bool:
-        stale = getattr(state, "k64_stale", {self.player: False})[self.player]
+        stale = state.k64_stale[self.player]
         if stale:
             state.k64_stale[self.player] = False
             self.copy_ability_sweep(state)

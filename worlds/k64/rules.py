@@ -18,7 +18,6 @@ burn_levels = [
     "Rock Star 3",
     "Aqua Star 1",
     "Aqua Star 2",
-    "Aqua Star 3",
     "Neo Star 1",
     "Neo Star 3",
     "Neo Star 4",
@@ -36,12 +35,10 @@ needle_levels = [
     "Rock Star 2",
     "Aqua Star 1",
     "Neo Star 3",
-    "Neo Star 4",
     "Shiver Star 1",
     "Shiver Star 2",
     "Shiver Star 3",
     "Ripple Star 1",
-    "Ripple Star 2",
     "Ripple Star 3",
 ]
 
@@ -54,7 +51,6 @@ bomb_levels = [
     "Aqua Star 2",
     "Aqua Star 3",
     "Aqua Star 4",
-    "Neo Star 4",
     "Shiver Star 1",
     "Shiver Star 2",
     "Shiver Star 3",
@@ -65,17 +61,13 @@ bomb_levels = [
 
 spark_levels = [
     "Pop Star 2",
-    "Rock Star 1",
     "Rock Star 2",
     "Rock Star 4",
     "Aqua Star 1",
     "Aqua Star 2",
     "Aqua Star 4",
-    "Neo Star 2",
-    "Neo Star 4",
     "Shiver Star 2",
     "Shiver Star 3",
-    "Shiver Star 4",
     "Ripple Star 1",
     "Ripple Star 3",
 ]
@@ -87,14 +79,10 @@ cutter_levels = [
     "Rock Star 2",
     "Rock Star 3",
     "Aqua Star 1",
-    "Aqua Star 2",
     "Aqua Star 3",
     "Aqua Star 4",
     "Neo Star 1",
-    "Neo Star 2",
     "Neo Star 3",
-    "Neo Star 4",
-    "Shiver Star 1",
     "Shiver Star 2",
     "Shiver Star 3",
     "Shiver Star 4",
@@ -133,6 +121,39 @@ ice_levels = [
     "Ripple Star 1",
     "Ripple Star 3",
 ]
+
+waddle_copy_levels = {
+    "Spark Ability": [
+        "Rock Star 1",
+        "Neo Star 2"
+    ],
+    "Cutter Ability": [
+        "Aqua Star 2",
+        "Neo Star 2",
+        "Shiver Star 1"
+    ]
+}
+
+
+dedede_copy_levels = {
+    "Burning Ability": [
+        "Aqua Star 3"
+    ],
+    "Needle Ability": [
+        "Neo Star 4",
+        "Ripple Star 2",
+    ],
+    "Bomb Ability": [
+        "Neo Star 4",
+    ],
+    "Spark Ability": [
+        "Neo Star 4",
+        "Shiver Star 4",
+    ],
+    "Cutter Ability": [
+        "Neo Star 4",
+    ]
+}
 
 
 class K64LogicMixin(LogicMixin):
@@ -389,6 +410,7 @@ def set_rules(world: "K64World") -> None:
              lambda state: has_volcano(state, world.player, world.options.split_power_combos.value))
     for location in (LocationName.aqua_star_2, LocationName.aqua_star_2_s2, LocationName.aqua_star_2_s3):
         set_rule(world.get_location(location), lambda state: has_waddle_dee(state, world.player))
+
     set_rule(world.get_location(LocationName.aqua_star_3_s1),
              lambda state: has_shurikens(state, world.player, world.options.split_power_combos.value))
     set_rule(world.get_location(LocationName.aqua_star_3_s3),
