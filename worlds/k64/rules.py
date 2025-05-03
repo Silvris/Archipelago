@@ -410,10 +410,11 @@ def set_rules(world: "K64World") -> None:
              lambda state: has_volcano(state, world.player, world.options.split_power_combos.value))
     for location in (LocationName.aqua_star_2, LocationName.aqua_star_2_s2, LocationName.aqua_star_2_s3):
         set_rule(world.get_location(location), lambda state: has_waddle_dee(state, world.player))
-
+    for location in (LocationName.aqua_star_3, LocationName.aqua_star_3_s2, LocationName.aqua_star_3_s3):
+        set_rule(world.get_location(location), lambda state: has_king_dedede(state, world.player))
     set_rule(world.get_location(LocationName.aqua_star_3_s1),
              lambda state: has_shurikens(state, world.player, world.options.split_power_combos.value))
-    set_rule(world.get_location(LocationName.aqua_star_3_s3),
+    add_rule(world.get_location(LocationName.aqua_star_3_s3),
              lambda state: has_stone_friends(state, world.player, world.options.split_power_combos.value))
     # Level 4
     for location in (LocationName.neo_star_2, LocationName.neo_star_2_s2, LocationName.neo_star_2_s3):
