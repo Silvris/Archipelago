@@ -12,7 +12,7 @@ class ItemData(NamedTuple):
     useful: bool = False
 
 
-weapons = {
+weapons: dict[str, ItemData] = {
     "Rolling Cutter": ItemData(0x1, True),
     "Ice Slasher": ItemData(0x2, True),
     "Hyper Bomb": ItemData(0x3, True),
@@ -21,7 +21,7 @@ weapons = {
     "Super Arm": ItemData(0x6, True),
 }
 
-stage_access = {
+stage_access: dict[str, ItemData] = {
     "Cut Man Access Codes": ItemData(0x11, True),
     "Ice Man Access Codes": ItemData(0x12, True),
     "Bomb Man Access Codes": ItemData(0x13, True),
@@ -30,17 +30,17 @@ stage_access = {
     "Guts Man Access Codes": ItemData(0x16, True),
 }
 
-misc_items = {
+misc_items: dict[str, ItemData] = {
     "Magnet Beam": ItemData(0x7, True, True),
     "1-Up": ItemData(0x20, False),
     "Weapon Energy (L)": ItemData(0x21, False),
     "Health Energy (L)": ItemData(0x22, False),
 }
 
-all_items = {
+all_items: dict[str, ItemData] = {
     **weapons,
     **stage_access,
     **misc_items
 }
 
-item_lookup = {item: data.item_id for item, data in all_items.items()}
+item_lookup: dict[str, int] = {item: data.item_id for item, data in all_items.items() if data.item_id}
