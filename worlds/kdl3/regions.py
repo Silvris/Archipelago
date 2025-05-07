@@ -423,7 +423,8 @@ def shuffle_doors(world: "KDL3World"):
         randomized_entrances.extend(list(room.entrances))
 
     for entrance in randomized_entrances:
-        disconnect_entrance_for_randomization(entrance)  # have to place groups later
+        disconnect_entrance_for_randomization(entrance, one_way_target_name=entrance.connected_region.name)
+        # have to place groups later
 
     local_rooms = world.rooms.copy()
     world.random.shuffle(local_rooms)

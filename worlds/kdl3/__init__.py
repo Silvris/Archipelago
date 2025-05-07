@@ -242,6 +242,7 @@ class KDL3World(World):
                          for _ in range(trap_amount)])
         itempool.extend([self.create_item("Heart Star", True) for _ in range(non_required_heart_stars)])
         self.multiworld.itempool += itempool
+
         if self.options.open_world:
             for level in self.player_levels:
                 for stage in range(0, 6):
@@ -250,6 +251,14 @@ class KDL3World(World):
                         .place_locked_item(KDL3Item(
                             f"{location_name.level_names_inverse[level]} - Stage Completion",
                             ItemClassification.progression, None, self.player))
+
+        for level in range(1, 6):
+            self.multiworld.get_location(f"Level {level} Boss - Defeated", self.player) \
+                .place_locked_item(
+                KDL3Item(f"Level {level} Boss Defeated", ItemClassification.progression, None, self.player))
+            self.multiworld.get_location(f"Level {level} Boss - Purified", self.player) \
+                .place_locked_item(
+                KDL3Item(f"Level {level} Boss Purified", ItemClassification.progression, None, self.player))
 
     set_rules = set_rules
 
@@ -331,13 +340,6 @@ class KDL3World(World):
             # place remaining
             for enemy in enemies_to_set:
                 self.copy_abilities[enemy] = self.random.choice(valid_abilities)
-        for level in range(1, 6):
-            self.multiworld.get_location(f"Level {level} Boss - Defeated", self.player) \
-                .place_locked_item(
-                KDL3Item(f"Level {level} Boss Defeated", ItemClassification.progression, None, self.player))
-            self.multiworld.get_location(f"Level {level} Boss - Purified", self.player) \
-                .place_locked_item(
-                KDL3Item(f"Level {level} Boss Purified", ItemClassification.progression, None, self.player))
         if self.options.door_shuffle:
             shuffle_doors(self)
 

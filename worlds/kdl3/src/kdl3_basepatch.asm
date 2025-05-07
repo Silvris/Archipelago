@@ -1334,6 +1334,7 @@ DoorHandling2:
     ASL
     CMP #$0000
     BEQ .Vanilla
+    CLC
     ADC #$0084
     RTL
     .VanillaLoad:
@@ -1341,6 +1342,7 @@ DoorHandling2:
     ASL
     ASL
     .Vanilla:
+    CLC
     ADC [$BC], Y
     RTL
 
