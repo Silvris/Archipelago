@@ -6,6 +6,7 @@ import uuid
 from struct import unpack, pack
 from collections import defaultdict
 import random
+import asyncio
 
 from MultiServer import mark_raw
 from NetUtils import ClientStatus, color
@@ -13,7 +14,7 @@ from Utils import async_start
 from worlds.AutoSNIClient import SNIClient
 from .locations import boss_locations
 from .gifting import kdl3_gifting_options, kdl3_trap_gifts, kdl3_gifts, update_object, pop_object, initialize_giftboxes
-from .client_addrs import consumable_addrs, star_addrs
+from .client_addrs import consumable_addrs, star_addrs, trap_link_matches, trap_link_sends
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -62,7 +63,10 @@ KDL3_HEART_STAR_COUNT = SRAM_1_START + 0x8070
 KDL3_GOOEY_TRAP = SRAM_1_START + 0x8080
 KDL3_SLOWNESS_TRAP = SRAM_1_START + 0x8082
 KDL3_ABILITY_TRAP = SRAM_1_START + 0x8084
-KDL3_GIFTING_SEND = SRAM_1_START + 0x8086
+KDL3_FAST_TRAP = SRAM_1_START + 0x8086
+KDL3_ICE_TRAP = SRAM_1_START + 0x8088
+KDL3_PUSH_TRAP = SRAM_1_START + 0x808A
+KDL3_GIFTING_SEND = SRAM_1_START + 0x80A0
 KDL3_COMPLETED_STAGES = SRAM_1_START + 0x8200
 KDL3_CONSUMABLES = SRAM_1_START + 0xA000
 KDL3_STARS = SRAM_1_START + 0xB000
@@ -108,28 +112,53 @@ class KDL3SNIClient(SNIClient):
     giftbox_key: str = ""
     motherbox_key: str = ""
     client_random: random.Random = random.Random()
+    last_trap_link: float = -1
 
-    async def deathlink_kill_player(self, ctx: "SNIContext") -> None:
-        from SNIClient import DeathState, snes_buffered_write, snes_flush_writes, snes_read
+    @staticmethod
+    async def damage_kirby(ctx: "SNIContext", amount: int = 1):
+        from SNIClient import snes_buffered_write, snes_flush_writes, snes_read
         game_state = await snes_read(ctx, KDL3_GAME_STATE, 1)
         if game_state[0] == 0xFF:
             return  # despite how funny it is, don't try to kill Kirby in a menu
+
+        current_hp = int.from_bytes(await snes_read(ctx, KDL3_KIRBY_HP, 2), "little")
+        if current_hp == 0:
+            return  # don't kill Kirby while he's already dead
+
+        remaining_hp = max(0, current_hp - amount)
 
         current_stage = await snes_read(ctx, KDL3_CURRENT_LEVEL, 1)
         if current_stage[0] == 0x7:  # boss stage
             boss_hp = await snes_read(ctx, KDL3_BOSS_HP, 1)
             if boss_hp[0] == 0:
-                return  # receiving a deathlink after defeating a boss has softlock potential
+                remaining_hp = 1  # receiving a deathlink after defeating a boss has softlock potential
 
-        current_hp = await snes_read(ctx, KDL3_KIRBY_HP, 1)
-        if current_hp[0] == 0:
-            return  # don't kill Kirby while he's already dead
-        snes_buffered_write(ctx, KDL3_KIRBY_HP, bytes([0x00]))
+        snes_buffered_write(ctx, KDL3_KIRBY_HP, remaining_hp.to_bytes(2, "little"))
 
         await snes_flush_writes(ctx)
 
+    async def deathlink_kill_player(self, ctx: "SNIContext") -> None:
+        from SNIClient import DeathState
+        await self.damage_kirby(ctx, 10)
+
         ctx.death_state = DeathState.dead
         ctx.last_death_link = time.time()
+
+    async def send_trap_link(self, ctx: "SNIContext", item: int):
+        if ctx.slot < 0 or "TrapLink" not in ctx.tags or item not in trap_link_sends:
+            return
+
+        self.last_trap_link = time.time()
+
+        await ctx.send_msgs([{
+            "cmd": "Bounce",
+            "tags": ["TrapLink"],
+            "data": {
+                "time": self.last_trap_link,
+                "source": ctx.player_names[ctx.slot],
+                "trap_name": trap_link_sends[item]
+            },
+        }])
 
     async def validate_rom(self, ctx: "SNIContext") -> bool:
         from SNIClient import snes_read
@@ -148,6 +177,8 @@ class KDL3SNIClient(SNIClient):
 
         death_link = await snes_read(ctx, KDL3_DEATH_LINK_ADDR, 1)
         if death_link:
+            if death_link[0] & 0b100:
+                ctx.tags.update("TrapLink")
             await ctx.update_death_link(bool(death_link[0] & 0b1))
             ctx.items_handling |= (death_link[0] & 0b10)  # set local items if enabled
         return True
@@ -168,6 +199,23 @@ class KDL3SNIClient(SNIClient):
                     break
             else:
                 self.item_queue.append(item)  # no more slots, get it next go around
+
+    def on_package(self, ctx: SNIContext, cmd: str, args: dict[str, typing.Any]) -> None:
+        if cmd == "Bounced" and "TrapLink" in args["tags"]:
+            data: dict = args["data"]
+            trap_name: str = data["trap_name"]
+            if data["time"] < ctx.last_death_link + 1 or trap_name not in trap_link_matches:
+                return
+
+            snes_logger.info(f"Received {trap_name} from {data['source']}")
+            if not trap_link_matches[trap_name]:
+                # these require special handling
+                if trap_name in ("Instant Death Trap", ):
+                    asyncio.run(self.damage_kirby(ctx, 10))
+                elif trap_name in ("Damage Trap", "TNT Barrel Trap", ):
+                    asyncio.run(self.damage_kirby(ctx, 1))
+            else:
+                self.item_queue.extend(trap_link_matches[trap_name])
 
     async def pop_gift(self, ctx: "SNIContext") -> None:
         if self.giftbox_key in ctx.stored_data and ctx.stored_data[self.giftbox_key]:
@@ -347,6 +395,7 @@ class KDL3SNIClient(SNIClient):
                     # Positive
                     self.item_queue.append(item_idx | 0x40)
                 elif item.item & 0x000040 > 0:
+                    await self.send_trap_link(ctx, item.item)
                     self.item_queue.append(item_idx | 0x80)
 
             # handle gifts here

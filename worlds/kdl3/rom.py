@@ -124,8 +124,8 @@ consumable_size = 698
 
 stage_palettes = [0x60964, 0x60B64, 0x60D64, 0x60F64, 0x61164]
 
-door_enable = 0x3A1BF
-door_enable_2 = 0x3A1E7
+door_enable = 0x3A20A
+door_enable_2 = 0x3A232
 
 music_choices = [
     2,  # Boss 1
@@ -474,7 +474,8 @@ def patch_rom(world: "KDL3World", patch: KDL3ProcedurePatch) -> None:
                       struct.pack("H", world.required_heart_stars if world.options.goal_speed == 1 else 0xFFFF))
     patch.write_token(APTokenTypes.WRITE, 0x3D00C, world.options.goal_speed.value.to_bytes(2, "little"))
     patch.write_token(APTokenTypes.WRITE, 0x3D00E, world.options.open_world.value.to_bytes(2, "little"))
-    patch.write_token(APTokenTypes.WRITE, 0x3D010, ((world.options.remote_items.value << 1) +
+    patch.write_token(APTokenTypes.WRITE, 0x3D010, ((world.options.trap_link.value << 2) +
+                                                    (world.options.remote_items.value << 1) +
                                                     world.options.death_link.value).to_bytes(2, "little"))
     patch.write_token(APTokenTypes.WRITE, 0x3D012, world.options.goal.value.to_bytes(2, "little"))
     patch.write_token(APTokenTypes.WRITE, 0x3D014, world.options.stage_shuffle.value.to_bytes(2, "little"))

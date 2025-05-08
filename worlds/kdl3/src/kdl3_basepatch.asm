@@ -250,18 +250,37 @@ MainLoopHook:
     DEC $8080
     .Slowness:
     LDA $8082 ; slowness
-    BEQ .Eject ; are we under the effects of a slowness trap
+    BEQ .Fast ; are we under the effects of a slowness trap
     DEC $8082 ; dec by 1 each frame
+    BRA .Eject ; skip fast, prio slow
+    .Fast:
+    LDA $8086
+    BEQ .Eject
+    DEC $8086
     .Eject:
     PHX
     PHY
     LDA $54A9 ; copy ability
-    BEQ .PullVars ; branch if we do not have a copy ability
+    BEQ .Ice ; branch if we do not have a copy ability
     LDA $8084 ; eject ability
-    BEQ .PullVars ; branch if we haven't received eject
+    BEQ .Ice ; branch if we haven't received eject
     LDA #$2000 ; select button press
     STA $60C1 ; write to controller mirror
     DEC $8084
+    .Ice:
+    LDA $8088
+    BEQ .Push
+    DEC $8088
+    .Push:
+    LDA $808A
+    BEQ .PullVars
+    LDA $0800
+    LDX $15A2
+    BPL .Positive
+    EOR #$FFFF
+    .Positive
+    STA $1D22
+    DEC $808A
     .PullVars:
     PLY
     PLX
@@ -414,15 +433,19 @@ ParseItemQueue:
     .PlaySFXLong
     BRA .PlaySFX
     .ApplyNegative:
-    CPY #$0005
+    CPY #$000B
     BCS .PlayNone
     LDA $8080,Y
-    CPY #$0002
-    BNE .Increment
+    CPY #$0000
+    BEQ .Increment
+    CPY #$0004
+    BEQ .Increment
+    CPY #$000A
+    BEQ .Increment
     CLC
     LDA #$0384
     ADC $8080, Y
-    BVC .PlayNegative
+    BRA .PlayNegative
     LDA #$FFFF
     .PlayNegative:
     STA $8080,Y
@@ -814,12 +837,30 @@ GooeySpawn:
 SpeedTrap:
     PHX
     LDX $8082 ; do we have slowness
-    BEQ .Apply ; branch if we do not
+    BEQ .Fast ; branch if we do not
     LSR
+    BRA .Apply
+    .Fast:
+    LDX $8086 ; do we have a fast trap
+    BEQ .Apply ; branch if we do not
+    ASL ; you cannot apply more than this
+    ; kirby will be too fast
     .Apply:
     PLX
     STA $1F22, Y ; player max speed
     EOR #$FFFF
+    RTL
+
+IceTrap:
+    PHX
+    LDX $8088 ; do we have an ice trap
+    BEQ .Return ; skip if we do not
+    LDX #$0002
+    STX $B0
+    .Return:
+    PLX
+    LDA $54F9, Y
+    ASL
     RTL
 
 HeartStarVisual:
@@ -1121,7 +1162,7 @@ GiftGiving:
     LDX $901C
     BEQ .Return
     PLX
-    STA $8086
+    STA $80A0
     LDA #$0026
     JML $CABC99
     .Return:
@@ -1393,3 +1434,7 @@ HookDoorHandling:
 org $C21418
 HookDoorHandling2:
     JSL DoorHandling2
+
+org $C31AE8
+VelocityHook:
+    JSL IceTrap

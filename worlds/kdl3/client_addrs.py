@@ -1,3 +1,37 @@
+trap_link_matches: dict[str, list[int]] = {
+    # Nothing present in the list means we
+    # handle this trap in a manual manner
+    "OmoTrap": [0x80, 0x80, 0x80, 0x80, 0x80],
+    "Ice Trap": [0x84],
+    "Slow Trap": [0x81],
+    "Freeze Trap": [0x84],
+    "Frozen Trap": [0x84],
+    "Slowness Trap": [0x81],
+    "Spring Trap": [0x85],
+    "Buyon Trap": [0x80, 0x80, 0x80, 0x80, 0x80],
+    "Damage Trap": [],
+    "Instant Death Trap": [],
+    "Eject Ability": [0x82],
+    "Gooey Bag": [0x80],
+    "TNT Barrel Trap": [],
+    "Honey Trap": [0x81],
+    "Bomb": [],
+    "Bonk Trap": [0x85],
+    "Fast Trap": [0x83],
+    "Army Trap": [0x80, 0x80, 0x80, 0x80, 0x80],
+    "Sticky Floor Trap": [0x81],
+    "Push Trap": [0x85]
+}
+
+trap_link_sends: dict[int, str] = {
+    0x770040: "Gooey Bag",
+    0x770041: "Slowness",
+    0x770042: "Eject Ability",
+    0x770043: "Fast Trap",
+    0x770044: "Ice Trap",
+    0x770045: "Push Trap",
+}
+
 consumable_addrs = {
     0: 14,
     1: 15,

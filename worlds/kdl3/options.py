@@ -3,7 +3,7 @@ from dataclasses import dataclass
 from typing import List
 
 from Options import DeathLinkMixin, Choice, Toggle, OptionDict, Range, PlandoBosses, DefaultOnToggle, \
-    PerGameCommonOptions, Visibility, NamedRange, OptionGroup, PlandoConnections
+    PerGameCommonOptions, Visibility, NamedRange, OptionGroup, PlandoConnections, OptionCounter
 from .names import location_name
 
 
@@ -223,7 +223,7 @@ class FillerPercentage(Range):
 
 class TrapPercentage(Range):
     """
-    Percentage of filler items to be converted to trap items (Gooey Bags, Slowness, Eject Ability).
+    Percentage of filler items to be converted to trap items (Gooey Bags, Slowness, Eject Ability, etc).
     """
     display_name = "Trap Percentage"
     range_start = 0
@@ -231,34 +231,18 @@ class TrapPercentage(Range):
     default = 50
 
 
-class GooeyTrapPercentage(Range):
+class TrapWeights(OptionCounter):
     """
-    Chance that any given trap is a Gooey Bag (spawns Gooey when you receive it).
+    Relative weights for each individual trap item to appear when a trap item is created.
     """
-    display_name = "Gooey Trap Percentage"
-    range_start = 0
-    range_end = 100
-    default = 50
+    max = 100
+    min = 0
+    display_name = "Trap Weights"
+    valid_keys = frozenset({"Gooey Bag", "Eject Ability", "Slowness", "Fast Trap", "Ice Trap", "Push Trap"})
 
-
-class SlowTrapPercentage(Range):
-    """
-    Chance that any given trap is Slowness (halves your max speed for 15 seconds when you receive it).
-    """
-    display_name = "Slowness Trap Percentage"
-    range_start = 0
-    range_end = 100
-    default = 50
-
-
-class AbilityTrapPercentage(Range):
-    """
-    Chance that any given trap is an Eject Ability (ejects your ability when you receive it).
-    """
-    display_name = "Ability Trap Percentage"
-    range_start = 0
-    range_end = 100
-    default = 50
+    default = {
+        key: 50 for key in valid_keys
+    }
 
 
 class ConsumableChecks(Toggle):
@@ -424,17 +408,12 @@ class Gifting(Toggle):
     display_name = "Gifting"
 
 
-class TotalHeartStars(NamedRange):
+class TrapLink(Toggle):
     """
-    Deprecated. Use max_heart_stars instead. Supported for only one version.
+    When enabled, traps you receive will be shared across compatible games, and you
+    will receive equivalent traps when other TrapLink players receive trap items.
     """
-    default = -1
-    range_start = 5
-    range_end = 99
-    special_range_names = {
-        "default": -1
-    }
-    visibility = Visibility.none
+    display_name = "TrapLink"
 
 
 @dataclass
@@ -448,9 +427,7 @@ class KDL3Options(PerGameCommonOptions, DeathLinkMixin):
     heart_stars_required: HeartStarsRequired
     filler_percentage: FillerPercentage
     trap_percentage: TrapPercentage
-    gooey_trap_weight: GooeyTrapPercentage
-    slow_trap_weight: SlowTrapPercentage
-    ability_trap_weight: AbilityTrapPercentage
+    trap_weights: TrapWeights
     jumping_target: JumpingTarget
     stage_shuffle: LevelShuffle
     door_shuffle: DoorShuffle
@@ -464,6 +441,7 @@ class KDL3Options(PerGameCommonOptions, DeathLinkMixin):
     boss_requirement_random: BossRequirementRandom
     consumables: ConsumableChecks
     starsanity: StarChecks
+    trap_link: TrapLink
     gifting: Gifting
     kirby_flavor_preset: KirbyFlavorPreset
     kirby_flavor: KirbyFlavor
@@ -472,16 +450,13 @@ class KDL3Options(PerGameCommonOptions, DeathLinkMixin):
     music_shuffle: MusicShuffle
     virtual_console: VirtualConsoleChanges
 
-    total_heart_stars: TotalHeartStars  # remove in 2 versions
-
 
 kdl3_option_groups: List[OptionGroup] = [
     OptionGroup("Goal Options", [Goal, GoalSpeed, MaxHeartStars, HeartStarsRequired, JumpingTarget, ]),
     OptionGroup("World Options", [RemoteItems, StrictBosses, OpenWorld, OpenWorldBossRequirement, ConsumableChecks,
-                                  StarChecks, FillerPercentage, TrapPercentage, GooeyTrapPercentage,
-                                  SlowTrapPercentage, AbilityTrapPercentage, LevelShuffle, DoorShuffle, BossShuffle,
-                                  AnimalRandomization, CopyAbilityRandomization,  BossRequirementRandom,
-                                  Gifting, ]),
+                                  StarChecks, FillerPercentage, TrapPercentage, TrapWeights, LevelShuffle, DoorShuffle,
+                                  BossShuffle, AnimalRandomization, CopyAbilityRandomization,  BossRequirementRandom,
+                                  Gifting, TrapLink, ]),
     OptionGroup("Cosmetic Options", [GameLanguage, BossShuffleAllowBB, KirbyFlavorPreset, KirbyFlavor,
                                      GooeyFlavorPreset, GooeyFlavor, MusicShuffle, VirtualConsoleChanges, ]),
 ]

@@ -67,7 +67,10 @@ misc_item_table = {
 trap_item_table = {
     "Gooey Bag": ItemData(0x770040, False, False, True),
     "Slowness": ItemData(0x770041, False, False, True),
-    "Eject Ability": ItemData(0x770042, False, False, True)
+    "Eject Ability": ItemData(0x770042, False, False, True),
+    "Fast Trap": ItemData(0x770043, False, False, True),
+    "Ice Trap": ItemData(0x770044, False, False, True),
+    "Push Trap": ItemData(0x770045, False, False, True),
 }
 
 filler_item_weights = {

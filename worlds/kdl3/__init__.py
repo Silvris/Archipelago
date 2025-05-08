@@ -84,12 +84,6 @@ class KDL3World(World):
 
     create_regions = create_levels
 
-    def generate_early(self) -> None:
-        if self.options.total_heart_stars != -1:
-            logger.warning(f"Kirby's Dream Land 3 ({self.player_name}): Use of \"total_heart_stars\" is deprecated. "
-                           f"Please use \"max_heart_stars\" instead.")
-            self.options.max_heart_stars.value = self.options.total_heart_stars.value
-
     def create_item(self, name: str, force_non_progression: bool = False) -> KDL3Item:
         item = item_table[name]
         classification = ItemClassification.filler
@@ -108,10 +102,8 @@ class KDL3World(World):
                                    weights=list(filler_item_weights.values()))[0]
 
     def get_trap_item_name(self) -> str:
-        return self.random.choices(["Gooey Bag", "Slowness", "Eject Ability"],
-                                   weights=[self.options.gooey_trap_weight.value,
-                                            self.options.slow_trap_weight.value,
-                                            self.options.ability_trap_weight.value])[0]
+        return self.random.choices(list(self.options.trap_weights.keys()),
+                                   weights=list(self.options.trap_weights.values()))[0]
 
     def get_restrictive_copy_ability_placement(self, copy_ability: str, enemies_to_set: List[str],
                                                level: int, stage: int) -> Optional[str]:
@@ -357,8 +349,10 @@ class KDL3World(World):
         # UT support
         return {"player_levels": self.player_levels}
 
-    def interpret_slot_data(self, slot_data: Mapping[str, Any]):
-        # UT support
+    @staticmethod
+    def interpret_slot_data(slot_data: Mapping[str, Any]):
+        # Partial UT support
+        # Support for doors, animals, and copy abilities is probably not worth it
         player_levels = {int(key): value for key, value in slot_data["player_levels"].items()}
         return {"player_levels": player_levels}
 
