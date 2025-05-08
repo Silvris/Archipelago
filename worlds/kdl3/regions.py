@@ -253,20 +253,13 @@ def generate_rooms(world: "KDL3World", level_regions: Dict[int, Region]) -> None
                 first_rooms[0x770200 + room.level - 1] = room
             else:
                 first_rooms[0x770000 + ((room.level - 1) * 6) + room.stage - 1] = room
-        exits: Dict[str, Callable[[CollectionState], bool]] = dict()
-        names: Dict[str, str] = {}
-        for name, def_exit in room.default_exits.items():
+        for exit_name, def_exit in room.default_exits.items():
             target: str = def_exit["room"]
+            access_rule = None
             if def_exit["access_rule"]:
-                access_rule = tuple(def_exit["access_rule"])
-                exits[target] = lambda state, rule=access_rule: state.has_all(rule, world.player)
-            else:
-                exits[target] = lambda state: bool(1)
-            names[target] = name
-        room.add_exits(
-            names,
-            exits
-        )
+                required_items = tuple(def_exit["access_rule"])
+                access_rule = lambda state, rule=required_items: state.has_all(rule, world.player)
+            room.connect(rooms[target], exit_name, access_rule)
         if world.options.open_world:
             if any("Complete" in location.name for location in room.locations):
                 room.add_locations({f"{level_names[room.level]} {room.stage} - Stage Completion": None},

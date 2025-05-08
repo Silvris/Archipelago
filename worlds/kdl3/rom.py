@@ -564,7 +564,7 @@ def patch_rom(world: "KDL3World", patch: KDL3ProcedurePatch) -> None:
             for connection in level_region.get_exits():
                 connected = connection.connected_region
                 if isinstance(connected, KDL3Room):
-                    patch.write_token(APTokenTypes.WRITE, 0x3F002E + (((connected.level - 1) * 7) +
+                    patch.write_token(APTokenTypes.WRITE, 0x3F002E + (((connected.level - 1) * 14) +
                                                                       (connected.stage - 1) * 2),
                                       int.to_bytes((connected.index * 4) + 0x84, 2, "little"))
 
