@@ -178,7 +178,7 @@ class KDL3SNIClient(SNIClient):
         death_link = await snes_read(ctx, KDL3_DEATH_LINK_ADDR, 1)
         if death_link:
             if death_link[0] & 0b100:
-                ctx.tags.update("TrapLink")
+                ctx.tags.update({"TrapLink"})
             await ctx.update_death_link(bool(death_link[0] & 0b1))
             ctx.items_handling |= (death_link[0] & 0b10)  # set local items if enabled
         return True
@@ -200,11 +200,11 @@ class KDL3SNIClient(SNIClient):
             else:
                 self.item_queue.append(item)  # no more slots, get it next go around
 
-    def on_package(self, ctx: SNIContext, cmd: str, args: dict[str, typing.Any]) -> None:
-        if cmd == "Bounced" and "TrapLink" in args["tags"]:
+    def on_package(self, ctx: "SNIContext", cmd: str, args: dict[str, typing.Any]) -> None:
+        if cmd == "Bounced" and "tags" in args and "TrapLink" in args["tags"]:
             data: dict = args["data"]
             trap_name: str = data["trap_name"]
-            if data["time"] < ctx.last_death_link + 1 or trap_name not in trap_link_matches:
+            if data["time"] < self.last_trap_link + 1 or trap_name not in trap_link_matches:
                 return
 
             snes_logger.info(f"Received {trap_name} from {data['source']}")
