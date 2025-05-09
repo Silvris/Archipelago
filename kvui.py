@@ -729,15 +729,7 @@ class MessageBox(Popup):
 class MDNavigationItemBase(MDNavigationItem):
     text = StringProperty(None)
 
-class MDNavigationItemUnderline(Widget):
-    def __init__(self, **kwargs):
-        super().__init__(size_hint=(None, None), height=2, **kwargs)
-        with self.canvas.before:
-            Color(0, 0, 0, 0)
-            self.line = Line(width=2)
-
 class MDScreenManagerBase(MDScreenManager):
-    underline_bar: MDNavigationItemUnderline
     current_tab: MDNavigationItemBase
     local_screen_names: list[str]
 
@@ -763,14 +755,6 @@ class MDScreenManagerBase(MDScreenManager):
             self.transition.direction = "right"
         self.current = name
         self.current_tab = new_tab
-        self.update_underline()
-
-    def update_underline(self, *args) -> None:
-        tab = self.current_tab
-        if self.underline_bar is None or tab is None:
-            return
-        self.underline_bar.line.points = [tab.x, tab.y, tab.right, tab.y]
-        self.underline_bar.canvas.before.children[0].rgba = MDApp.get_running_app().theme_cls.primaryColor
 
 class CommandButton(MDButton, MDTooltip):
     def __init__(self, *args, manager: "GameManager", **kwargs):
@@ -877,7 +861,6 @@ class GameManager(ThemedApp):
         )
         self.log_panels["All"] = self.screens.current_tab.content
         self.screens.current_tab.active = True
-        self.screens.underline_bar = MDNavigationItemUnderline()
 
         for logger_name, display_name in self.logging_pairs:
             bridge_logger = logging.getLogger(logger_name)
@@ -891,7 +874,6 @@ class GameManager(ThemedApp):
 
         self.main_area_container = MDGridLayout(size_hint_y=1, cols=1)
         self.main_area_container.add_widget(self.tabs)
-        self.main_area_container.add_widget(self.screens.underline_bar)
         self.main_area_container.add_widget(self.screens)
 
         self.grid.add_widget(self.main_area_container)
