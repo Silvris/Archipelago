@@ -229,8 +229,7 @@ def generate_rooms(world: "KDL3World", level_regions: Dict[int, Region]) -> None
                         room_entry["stage"], room_entry["room"], room_entry["pointer"], room_entry["music"],
                         room_entry["default_exits"], room_entry["animal_pointers"], room_entry["enemies"],
                         room_entry["entity_load"], room_entry["consumables"], room_entry["consumables_pointer"],
-                        room_entry["entrances"], room_entry["spawn"], room_entry["entrance_pointer"],
-                        room_entry["index"])
+                        room_entry["entrances"], room_entry["spawn"], room_entry["index"])
         room.add_locations({location: world.location_name_to_id[location] if location in world.location_name_to_id else
         None for location in room_entry["locations"]
                             if (not any(x in location for x in ["1-Up", "Maxim"]) or

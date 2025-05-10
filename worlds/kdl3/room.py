@@ -60,8 +60,7 @@ class KDL3Room(Region):
                  animal_pointers: List[int], enemies: List[str],
                  entity_load: List[List[int]],
                  consumables: List[Dict[str, Union[int, str]]], consumable_pointer: int,
-                 entrances: List[List[int]], spawn: List[int], entrance_pointer: int,
-                 index: int) -> None:
+                 entrances: List[List[int]], spawn: List[int], index: int) -> None:
         super().__init__(name, player, multiworld, hint)
         self.level = level
         self.stage = stage
@@ -76,7 +75,6 @@ class KDL3Room(Region):
         self.consumable_pointer = consumable_pointer
         self.entrance_coords = entrances
         self.spawn = spawn
-        self.entrance_pointer = entrance_pointer
         self.index = index
         self.default_spawn = False
 
@@ -165,13 +163,12 @@ class KDL3Room(Region):
                                   vtype.to_bytes(1, "little"))
 
         if doors:
-            door_ptr = self.entrance_pointer + self.pointer
-            for exit_name in self.default_exits:
+            for exit_name, exit_info in self.default_exits.items():
                 exit_region = next((exit for exit in self.get_exits() if exit.name == exit_name), None)
                 if not exit_region:
-                    door_ptr += 10
                     continue  # one singular case, we filter out an unreachable entrance
                 assert isinstance(exit_region, KDL3Door)
+                door_ptr = exit_info["ptr"]
                 target_coords = exit_region.connected_region.spawn if not exit_region.connected_region.entrance_coords \
                     else random.choice(exit_region.connected_region.entrance_coords)
                 patch.write_token(APTokenTypes.WRITE, door_ptr, exit_region.connected_region.index.to_bytes(2, "little"))
