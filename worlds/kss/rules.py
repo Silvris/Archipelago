@@ -154,6 +154,10 @@ def set_great_cave_rules(world: "KSSWorld"):
         set_rule(world.get_location(location_names.tgco_st_1up_1), lambda state: state.has_any([item_names.bomb,
                                                                                                 item_names.beam],
                                                                                                world.player))
+        set_rule(world.get_location(location_names.tgco_st_1up_2), lambda state: state.has_any([item_names.wing,
+                                                                                                item_names.cutter,
+                                                                                                item_names.sword],
+                                                                                               world.player))
         set_rule(world.get_location(location_names.tgco_ot_1up_2),
                  lambda state: state.has_any([item_names.stone, item_names.hammer], world.player)
                  and state.has(item_names.fire, world.player))
