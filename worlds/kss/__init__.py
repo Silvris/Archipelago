@@ -12,7 +12,7 @@ from .items import (lookup_item_to_id, item_table, item_groups, KSSItem, filler_
                     sub_games, dyna_items, planets, treasures, sub_game_completion)
 from .locations import location_table, KSSLocation
 from .names import item_names
-from .options import KSSOptions, subgame_mapping
+from .options import KSSOptions, subgame_mapping, IncludedSubgames, Consumables
 from .regions import create_regions
 from .rom import KSS_UHASH, KSSProcedurePatch, patch_rom, KSS_VCHASH
 from .rules import set_rules
@@ -108,6 +108,12 @@ class KSSWorld(World):
                 self.options.the_great_cave_offensive_gold_thresholds.value["Garden"] =\
                     self.options.the_great_cave_offensive_gold_thresholds["Old Tower"]
                 self.options.the_great_cave_offensive_gold_thresholds.value["Old Tower"] = temp
+
+        # proper UT support
+        if hasattr(self.multiworld, "generation_is_fake"):
+            self.options.included_subgames = IncludedSubgames.valid_keys
+            self.options.consumables.value = Consumables.valid_keys
+            self.options.essences.value = True
 
     def create_item(self, name, force_classification: ItemClassification | None = None):
         if name not in item_table:

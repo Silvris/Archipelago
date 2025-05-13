@@ -25,10 +25,7 @@ def create_region(name, world: "KSSWorld"):
 
 
 def add_locations(world: "KSSWorld", region: KSSRegion, locations: dict[str, LocationData]):
-    if hasattr(world.multiworld, "generation_is_fake"):
-        filter_list = ["", "maxim", "one_up", "candy", "essence"]
-    else:
-        filter_list = [""]
+    filter_list = [""]
     if "Maxim Tomato" in world.options.consumables:
         filter_list.append("maxim")
     if "1-Up" in world.options.consumables:
@@ -107,9 +104,7 @@ def create_dyna_blade(world: "KSSWorld", menu: KSSRegion):
     world.multiworld.regions.extend([dyna_blade, peanut_plains, mallow_castle, cocoa_cave,
                                      candy_mountain, dyna_blade_nest])
 
-    if world.options.essences \
-            or "Maxim Tomato" in world.options.consumables \
-            or hasattr(world.multiworld, "generation_is_fake"):
+    if world.options.essences or "Maxim Tomato" in world.options.consumables:
         extra1 = create_region("Dyna Blade Bonus 1", world)
         extra2 = create_region("Dyna Blade Bonus 2", world)
         for locations, region in zip((bonus_1_locations, bonus_2_locations), (extra1, extra2)):
@@ -207,10 +202,7 @@ def create_milky_way_wishes(world: "KSSWorld", menu: KSSRegion):
 def create_regions(world: "KSSWorld"):
     menu = create_region("Menu", world)
     world.multiworld.regions.append(menu)
-    if hasattr(world.multiworld, "generation_is_fake"):
-        included_subgames = IncludedSubgames.valid_keys
-    else:
-        included_subgames = world.options.included_subgames
+    included_subgames = world.options.included_subgames.value
     create_trivial_regions(world, menu, included_subgames)
     if "Spring Breeze" in included_subgames:
         create_spring_breeze(world, menu)
