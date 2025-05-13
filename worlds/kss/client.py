@@ -145,7 +145,7 @@ class KSSSNIClient(SNIClient):
         treasure_data = 0
         treasure_value = 0
         for treasure in [item for item in ctx.items_received if item.item & 0x200]:
-            treasure_info = treasures[ctx.item_names[treasure.item]]
+            treasure_info = treasures[ctx.item_names.lookup_in_game(treasure.item)]
             treasure_value += treasure_info.value
             treasure_data |= (1 << ((treasure.item & 0xFF) - 1))
         if treasure_data != known_treasures:
