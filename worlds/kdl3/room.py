@@ -30,11 +30,126 @@ final_iceberg_rooms = {
     "Iceberg 6 - 22": "Needle Ability",
 }
 
+required_paths = {
+    "Grass Land 1 - 4": {
+        "Grass Land 1 - 3",
+    },
+    "Grass Land 2 - 5": {
+        "Grass Land 2 - 3"
+    },
+    "Grass Land 3 - 5": {
+        "Grass Land 3 - 3"
+    },
+    "Grass Land 4 - 8": {
+        "Grass Land 4 - 6-2"
+    },
+    "Grass Land 6 - 5": {
+        "Grass Land 6 - 1"
+    },
+    "Ripple Field 1 - 4": {
+        "Ripple Field 1 - 5",
+        "Ripple Field 1 - 6",
+        "Ripple Field 1 - 7",
+    },
+    "Ripple Field 2 - 6": {
+        "Ripple Field 2 - 4"
+    },
+    "Ripple Field 3 - 4": {
+        "Ripple Field 3 - 5"
+    },
+    "Ripple Field 4 - 3": {
+        "Ripple Field 4 - 2-1"
+    },
+    "Ripple Field 6 - 10": {
+        "Ripple Field 6 - 3",  # Questionable, needs testing. if fail add in 4 as well
+        # "Ripple Field 6 - 4",
+    },
+    "Sand Canyon 1 - 7": {
+        "Sand Canyon 1 - 0",
+    },
+    "Sand Canyon 2 - 10": {
+        "Sand Canyon 2 - 6",
+        # "Sand Canyon 2 - 7",  # unknown if needed currently
+        "Sand Canyon 2 - 8",
+    },
+    "Sand Canyon 3 - 5": {
+        "Sand Canyon 3 - 8",
+    },
+    "Sand Canyon 4 - 8": {
+        "Sand Canyon 4 - 6-2",  # Actual requirement
+    },
+    "Sand Canyon 6 - 43": {
+        "Sand Canyon 6 - 15",
+        "Sand Canyon 6 - 18",
+        "Sand Canyon 6 - 20",
+        "Sand Canyon 6 - 29",
+        "Sand Canyon 6 - 37",
+    },
+    "Cloudy Park 1 - 12": {
+        "Cloudy Park 1 - 8",
+    },
+    "Cloudy Park 2 - 8": {
+        "Cloudy Park 2 - 7",
+    },
+    "Cloudy Park 3 - 6": {
+        "Cloudy Park 3 - 5",
+    },
+    "Cloudy Park 4 - 9": {
+        "Cloudy Park 4 - 8",
+    },
+    "Cloudy Park 6 - 15": {
+        # "Cloudy Park 6 - 13",
+        "Cloudy Park 6 - 14",
+    },
+    "Iceberg 1 - 6": {
+        "Iceberg 1 - 2",
+    },
+    "Iceberg 2 - 8": {
+        "Iceberg 2 - 3",
+        "Iceberg 2 - 4",
+        "Iceberg 2 - 5",
+    },
+    "Iceberg 3 - 7": {
+        "Iceberg 3 - 5",
+    },
+    "Iceberg 4 - 19": {
+        "Iceberg 4 - 10-1",  # Actual Requirement
+    },
+    "Iceberg 6 - 23": {
+        "Iceberg 6 - 8",
+        "Iceberg 6 - 10",
+        "Iceberg 6 - 12",
+        "Iceberg 6 - 14",
+        "Iceberg 6 - 16",
+        "Iceberg 6 - 18",
+        "Iceberg 6 - 20",
+        "Iceberg 6 - 22",
+    },
+}
 
 class KDL3Door(Entrance):
     world: Optional["KDL3World"] = None
     parent_region: "KDL3Room"
     connected_region: "KDL3Room"
+
+    def can_connect_to(self, other: Entrance, dead_end: bool, er_state: "ERPlacementState") -> bool:
+        if other.name not in required_paths:
+            # we don't care about this one
+            return super().can_connect_to(other, dead_end, er_state)
+        if any(entrance.parent_region for entrance in other.connected_region.entrances):
+            # we already managed to find a valid connection, continue
+            return super().can_connect_to(other, dead_end, er_state)
+        required = sorted(required_paths[other.name])
+        # now we begin breadth first search
+        found_regions = []
+        parent_regions = [self.parent_region]
+        while parent_regions:
+            region = parent_regions.pop()
+            if region.name in found_regions or not isinstance(region, KDL3Room):
+                continue
+            found_regions.append(region.name)
+            parent_regions.extend([entrance.parent_region for entrance in region.entrances if entrance.parent_region])
+        return all(region in found_regions for region in required)
 
 
 class KDL3Room(Region):
