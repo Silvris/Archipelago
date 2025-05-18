@@ -157,11 +157,14 @@ class K64World(World):
         self.stage_shuffle_enabled = self.options.stage_shuffle.value > 0
 
     def fill_slot_data(self) -> Mapping[str, Any]:
-        return {
+        slot_data = self.options.as_dict("goal_speed", "split_power_combos", "kirby_flavor_preset", "kirby_flavor")
+        slot_data.update({
             "player_levels": self.player_levels,
             "required_crystals": self.required_crystals,
             "boss_requirements": self.boss_requirements
-        }
+        })
+
+        return slot_data
 
     @staticmethod
     def interpret_slot_data(slot_data: Dict[str, Any]):
