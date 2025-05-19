@@ -1,3 +1,5 @@
+import logging
+
 import orjson
 import os
 from pkgutil import get_data
@@ -10,7 +12,7 @@ from .locations import KDL3Location, stage_locations, heart_star_locations, boss
 from .items import copy_ability_access_table
 from .names import location_name
 from .options import BossShuffle
-from .room import KDL3Room, final_iceberg_rooms
+from .room import KDL3Room, final_iceberg_rooms, required_paths, required_set, KDL3Door
 
 if TYPE_CHECKING:
     from . import KDL3World
@@ -410,7 +412,7 @@ def shuffle_doors(world: "KDL3World"):
     level_regions = [world.multiworld.get_region(x, world.player) for x in ["Grass Land", "Ripple Field", "Sand Canyon",
                                                                             "Cloudy Park", "Iceberg"]]
 
-    from entrance_rando import disconnect_entrance_for_randomization, randomize_entrances
+    from entrance_rando import disconnect_entrance_for_randomization, randomize_entrances, EntranceRandomizationError
 
     randomized_entrances = []
 
@@ -536,10 +538,73 @@ def shuffle_doors(world: "KDL3World"):
         er_targets.extend(group[0])
         er_exits.extend(group[1])
 
+    def find_nearest_entrance(room: KDL3Room, world: "KDL3World"):
+        if any(entrance for entrance in room.entrances if not entrance.parent_region):
+            return world.random.choice([en for en in room.entrances if not en.parent_region])
+        elif not any(entrance for entrance in room.entrances if isinstance(entrance, KDL3Door)):
+            raise Exception("Catastrophic failure in KDL3 Door Shuffle")
+        else:
+            # just travel up first entrance with parent
+            entrances = [entrance for entrance in room.entrances if entrance.parent_region]
+            return find_nearest_entrance(entrances[0].parent_region, world)
+
+    for group, goal in zip(required_set, required_paths):
+        if group == 29:
+            continue # the way this level's special case has to be done, it can never actually hit this issue
+        goal_region = world.get_region(goal)
+        entrances, exits = groups[group]
+        # don't have to shuffle entrances, we only pop from them
+        found_regions = []
+        required_regions = required_set[group]
+        room = goal_region
+        while not all(region in found_regions for region in required_regions):
+            distance = world.random.randint(1, 4)
+            while distance:
+                # should be safe, since we break if a required gets hit
+                exit: KDL3Door = world.random.choice([ex for ex in exits if isinstance(ex, KDL3Door)
+                                                      and ex.parent_region.name not in found_regions])
+                exits.remove(exit)
+                entrance = find_nearest_entrance(room, world)
+                room = entrance.connected_region
+                room.entrances.remove(entrance)
+                entrances.remove(entrance)
+                exit.connected_region = room
+                distance -= 1
+                room = exit.parent_region
+                found_regions.append(room.name)
+                if room.name in required_regions:
+                    break
+            if not all(region in found_regions for region in required_regions):
+                # manually place the required
+                req_regions = sorted(required_regions.difference(found_regions))
+                world.random.shuffle(req_regions)
+                req = req_regions.pop()
+                req_reg = world.get_region(req)
+                exit: KDL3Door = world.random.choice([ex for ex in req_reg.get_exits() if not ex.connected_region])
+                exit.connected_region = room
+                exits.remove(exit)
+                entrance = find_nearest_entrance(room, world)
+                room.entrances.remove(entrance)
+                entrances.remove(entrance)
+                found_regions.append(req)
+                room = req_reg
+
     for i in range(1, 6):
         for j in range(6):
             group = groups[world.player_levels[i][j] & 0xFF]
-            randomize_entrances(world, False, group_match, False, group[0], group[1])
+            retries = 10
+            while retries > 0:
+                try:
+                    randomize_entrances(world, False, group_match, False, group[0], group[1])
+                    break
+                except EntranceRandomizationError:
+                    logging.error(f"{world.player_name} ER failed for group {group[0][0].randomization_group}."
+                                  f" {retries} retries remaining.")
+                    retries -= 1
+                    if not retries:
+                        raise
+
+
     visualize_regions(world.multiworld.get_region("Menu", world.player), "kdl3_doors.puml", show_locations=False)
     #raise NotImplementedError
 
