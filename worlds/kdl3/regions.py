@@ -538,7 +538,8 @@ def shuffle_doors(world: "KDL3World"):
         er_targets.extend(group[0])
         er_exits.extend(group[1])
 
-    def find_nearest_entrance(room: KDL3Room, world: "KDL3World"):
+    def find_nearest_entrance(room: KDL3Room, world: "KDL3World", traversed: list):
+        traversed.append(room.name)
         if any(entrance for entrance in room.entrances if not entrance.parent_region):
             return world.random.choice([en for en in room.entrances if not en.parent_region])
         elif not any(entrance for entrance in room.entrances if isinstance(entrance, KDL3Door)):
@@ -546,11 +547,9 @@ def shuffle_doors(world: "KDL3World"):
         else:
             # just travel up first entrance with parent
             entrances = [entrance for entrance in room.entrances if entrance.parent_region]
-            return find_nearest_entrance(entrances[0].parent_region, world)
+            return find_nearest_entrance(entrances[0].parent_region, world, traversed)
 
     for group, goal in zip(required_set, required_paths):
-        if group == 29:
-            continue # the way this level's special case has to be done, it can never actually hit this issue
         goal_region = world.get_region(goal)
         entrances, exits = groups[group]
         # don't have to shuffle entrances, we only pop from them
@@ -564,14 +563,15 @@ def shuffle_doors(world: "KDL3World"):
                 exit: KDL3Door = world.random.choice([ex for ex in exits if isinstance(ex, KDL3Door)
                                                       and ex.parent_region.name not in found_regions])
                 exits.remove(exit)
-                entrance = find_nearest_entrance(room, world)
+                entrance = find_nearest_entrance(room, world, found_regions)
                 room = entrance.connected_region
                 room.entrances.remove(entrance)
                 entrances.remove(entrance)
                 exit.connected_region = room
                 distance -= 1
-                room = exit.parent_region
+                room = find_nearest_entrance(exit.parent_region, world, found_regions).connected_region
                 found_regions.append(room.name)
+
                 if room.name in required_regions:
                     break
             if not all(region in found_regions for region in required_regions):
@@ -583,7 +583,7 @@ def shuffle_doors(world: "KDL3World"):
                 exit: KDL3Door = world.random.choice([ex for ex in req_reg.get_exits() if not ex.connected_region])
                 exit.connected_region = room
                 exits.remove(exit)
-                entrance = find_nearest_entrance(room, world)
+                entrance = find_nearest_entrance(room, world, found_regions)
                 room.entrances.remove(entrance)
                 entrances.remove(entrance)
                 found_regions.append(req)
