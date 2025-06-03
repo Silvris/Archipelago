@@ -572,7 +572,7 @@ def shuffle_doors(world: "KDL3World"):
                 room = find_nearest_entrance(exit.parent_region, world, found_regions).connected_region
                 found_regions.append(room.name)
 
-                if room.name in required_regions:
+                if room.name in required_regions or all(region in found_regions for region in required_regions):
                     break
             if not all(region in found_regions for region in required_regions):
                 # manually place the required
