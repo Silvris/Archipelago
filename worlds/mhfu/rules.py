@@ -1,6 +1,6 @@
 from .quests import get_quest_by_id, get_proper_name, get_star_name, goal_quests, hub_rank_max
 from .data.monsters import flying_wyverns, piscene_wyverns, bird_wyverns, monster_ids
-from typing import TYPE_CHECKING, List, Dict
+from typing import TYPE_CHECKING
 from worlds.generic.Rules import add_rule
 
 if TYPE_CHECKING:
@@ -12,26 +12,26 @@ def can_complete_quest(state: "CollectionState", qid: str, player: int):
     return state.can_reach(get_proper_name(get_quest_by_id(qid)), "Location", player)
 
 
-def can_complete_all_quests(state: "CollectionState", qids: List[str], player: int):
+def can_complete_all_quests(state: "CollectionState", qids: list[str], player: int):
     for qid in qids:
         if not can_complete_quest(state, qid, player):
             return False
     return True
 
 
-def can_hunt_monsters(state: "CollectionState", quest_monsters: Dict[str, List[int]],
-                      monsters: List[str], player: int, any_monster=False):
+def can_hunt_monsters(state: "CollectionState", quest_monsters: dict[str, dict[str, list[int]]],
+                      monsters: list[str], player: int, any_monster=False):
     # any means return true if any, else return true if all
     relevant_mons = [monster_ids[monster] for monster in monsters]
     if any_monster:
         for monster in relevant_mons:
-            monster_quests = [f"m{quest}" for quest in quest_monsters if monster in quest_monsters[quest]]
+            monster_quests = [f"m{quest}" for quest in quest_monsters if monster in quest_monsters[quest]["monsters"]]
             if any(can_complete_quest(state, quest, player) for quest in monster_quests):
                 return True
         return False
     else:
         for monster in relevant_mons:
-            monster_quests = [f"m{quest}" for quest in quest_monsters if monster in quest_monsters[quest]]
+            monster_quests = [f"m{quest}" for quest in quest_monsters if monster in quest_monsters[quest]["monsters"]]
             if not any(can_complete_quest(state, quest, player) for quest in monster_quests):
                 return False
         return True
@@ -67,7 +67,7 @@ def set_rules(world: "MHFUWorld"):
                  lambda state: can_complete_quest(state, "m10213", world.player))
         # needs access to Yian Kut-Ku, unlock req is 10 Kut-Ku killed
         add_rule(world.multiworld.get_location(get_proper_name(get_quest_by_id("m10304")), world.player),
-                 lambda state: can_hunt_monsters(state, world.quest_monsters, ["Yian Kut-Ku"], world.player))
+                 lambda state: can_hunt_monsters(state, world.quest_info, ["Yian Kut-Ku"], world.player))
         add_rule(world.multiworld.get_location(get_proper_name(get_quest_by_id("m10308")), world.player),
                  lambda state: can_complete_quest(state, "m10307", world.player))
         add_rule(world.multiworld.get_location(get_proper_name(get_quest_by_id("m10309")), world.player),
@@ -102,7 +102,7 @@ def set_rules(world: "MHFUWorld"):
                      lambda state: can_complete_all_quests(state, ["m11116", "m11117", "m11118"], world.player))
             for quest in ("m11211", "m11212"):
                 add_rule(world.multiworld.get_location(get_proper_name(get_quest_by_id(quest)), world.player),
-                         lambda state: can_hunt_monsters(state, world.quest_monsters,
+                         lambda state: can_hunt_monsters(state, world.quest_info,
                                                          [*list(piscene_wyverns.keys()), *list(flying_wyverns.keys()),
                                                           *list(bird_wyverns.keys())], world.player, True))
                 # needs access to any Bird/Flying/Piscine that aren't a drome
@@ -141,7 +141,7 @@ def set_rules(world: "MHFUWorld"):
 
             for quest in ("m02214", "m02215"):
                 add_rule(world.multiworld.get_location(get_proper_name(get_quest_by_id(quest)), world.player),
-                         lambda state: can_hunt_monsters(state, world.quest_monsters,
+                         lambda state: can_hunt_monsters(state, world.quest_info,
                                                          [*list(piscene_wyverns.keys()), *list(flying_wyverns.keys()),
                                                           *list(bird_wyverns.keys())], world.player, True))
             for quest in ("m02217", "m02218", "m02219", "m02220", "m02221", "m02222"):

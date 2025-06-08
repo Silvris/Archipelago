@@ -170,13 +170,20 @@ def create_ranks(world: "MHFUWorld"):
         region.add_locations({get_proper_name(quest): location_name_to_id[get_proper_name(quest)]
                               for quest in valid_quests}, MHFULocation)
         if world.options.quest_randomization:
-            world.quest_monsters.update({quest["qid"][1:]:
-                                         world.random.choices(monster_habitats[quest["stage"]],
-                                                              k=len(quest["monsters"]))
-                                         for quest in valid_quests})
+            for quest in valid_quests:
+                quest_info = {
+                    "monsters": [world.random.choices(monster_habitats[quest["stage"]],
+                                                      k=len(quest["monsters"]))
+                                 ],
+                    "mon_num": world.random.choice([1, 2])
+                }
+                quest_info["targets"] = world.random.choices(quest_info["monsters"], k=quest_info["mon_num"])
+
+                world.quest_info[quest["qid"][1:]] = quest_info
         else:
-            world.quest_monsters.update({quest["qid"][1:]: quest["monsters"]
-                                         for quest in valid_quests})
+            # only need monsters for the resulting quest info
+            world.quest_info.update({quest["qid"][1:]: {"monsters": quest["monsters"]}
+                                     for quest in valid_quests})
         world.multiworld.regions.append(region)
     for hub, rank, star in world.rank_requirements:
         region = world.multiworld.get_region(get_star_name(hub, rank, star), world.player)

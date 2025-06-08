@@ -62,22 +62,24 @@ class MHFUWorld(World):
 
     def __init__(self, multiworld: MultiWorld, player: int):
         super().__init__(multiworld, player)
-        self.location_num: Dict[(int, int, int), int] = {}
-        self.rank_requirements: Dict[(int, int, int), int] = {}
-        self.quest_monsters: Dict[str, List[int]] = {}
+        self.location_num: dict[(int, int, int), int] = {}
+        self.rank_requirements: dict[(int, int, int), int] = {}
+        self.quest_info: dict[str, dict[str, list[int]] | int | list[int]] = {}
         self.required_keys: int = 0
 
     def generate_early(self) -> None:
         # there's an impossible set of options, so we just need to block it
         if not self.options.guild_depth and not self.options.village_depth:
-            raise Exception("Must have at least one rank of quests to play through.")
+            raise Exception(f"{self.player_name}) Must have at least one rank of quests to play through.")
         goal_rank = goal_ranks[self.options.goal.value]
         if goal_rank[0] == 0 and goal_rank[1] > self.options.guild_depth:
             self.options.guild_depth.value = goal_rank[1]
-            logging.warning(f"Guild Depth too low for goal, increasing to {self.options.guild_depth.get_option_name(goal_rank[1])}")
+            logging.warning(f"({self.player_name}) Guild Depth too low for goal, increasing to "
+                            f"{self.options.guild_depth.get_option_name(goal_rank[1])}")
         elif goal_rank[0] == 1 and goal_rank[1] > self.options.village_depth:
             self.options.village_depth.value = goal_rank[1]
-            logging.warning(f"Village Depth too low for goal, increasing to {self.options.village_depth.get_option_name(goal_rank[1])}")
+            logging.warning(f"{self.player_name}) Village Depth too low for goal, increasing to "
+                            f"{self.options.village_depth.get_option_name(goal_rank[1])}")
 
     def create_item(self, name: str, force_non_progression=False) -> MHFUItem:
         item = item_table[name]
@@ -176,6 +178,6 @@ class MHFUWorld(World):
         for rank in self.rank_requirements:
             rank_requirements[f"{rank[0]},{rank[1]},{rank[2]}"] = self.rank_requirements[rank]
         options["rank_requirements"] = rank_requirements
-        options["quest_monsters"] = self.quest_monsters if self.options.quest_randomization else {}
+        options["quest_info"] = self.quest_info if self.options.quest_randomization else {}
         options["set_cutscene"] = not self.options.village_depth.value == 2
         return options

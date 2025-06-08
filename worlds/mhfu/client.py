@@ -65,7 +65,9 @@ MHFU_POINTERS = {
         "RESET_ACTION": 0x090AF355,  # byte
         "SET_ACTION": 0x090AF418,  # half
         "FAIL_QUEST": 0x09A01B1C,  # byte
-        "POISON_TIMER": 0x090AF508  # half
+        "POISON_TIMER": 0x090AF508,  # half
+        "QUEST_VISUAL_GOAL": 0x09B1DA48,
+        "QUEST_VISUAL_MON": 0x9B1DDAE8,
     }
 }
 
@@ -78,7 +80,10 @@ MHFU_BREAKPOINTS = {
     "QUEST_LOAD": (True, 0x08A57510, 1, True, True, True, False, False),
     "QUEST_COMPLETE": (True, 0x09999DC8, 63, False, True, False, True, True),
     "MONSTER_LOAD": (False, 0x08871C24, 1, True, True, False, False, False),
-    #"MONSTER_LOAD_RESPAWN": (False, 0x09B18F10, 1, True, True, False, False, False)
+    #"MONSTER_LOAD_RESPAWN": (False, 0x09B18F10, 1, True, True, False, False, False),
+    "QUEST_VISUAL_LOAD": (False, 0x09A8346C, 1, False, True, False, False, False),
+    "QUEST_VISUAL_TYPE": (False, 0x09A8319C, 1, True, True, False, False, False)
+
 }
 
 MHFU_BREAKPOINT_ARGS = {
@@ -86,6 +91,7 @@ MHFU_BREAKPOINT_ARGS = {
     # this lets us pull register info from the breakpoint
     "MONSTER_LOAD": ["{v0}"],
     #"MONSTER_LOAD_RESPAWN": ["{s2}"],
+    "QUEST_VISUAL_TYPE": ["{v0}"]
 }
 
 ACTIONS = {
@@ -151,11 +157,12 @@ async def handle_logs(ctx: MHFUContext, logs: typing.List):
                         # pull the mons
                         mons[idx] = await ctx.ppsspp_read_bytes(large_mon_info_ptr["value"] + quest_base + (idx * 60),
                                                                 60)
-                    print(mons)
+                    #print(mons)
                     # apply difficulty modifier
                     if mons and ctx.quest_randomization:
+                        quest_str = str("%.5i" % quest_id)
                         info_out = bytearray()
-                        quest_mons = ctx.quest_monsters[str("%.5i" % quest_id)]
+                        quest_mons = ctx.quest_info[quest_str]["monsters"]
                         for mon in mons:
                             mon_data = bytearray(base64.b64decode(mons[mon]["base64"]))
                             if ctx.quest_randomization:
@@ -164,17 +171,15 @@ async def handle_logs(ctx: MHFUContext, logs: typing.List):
                         await ctx.ppsspp_write_bytes(large_mon_info_ptr["value"] + quest_base, info_out)
                         # need to write new monster ids
                         await ctx.ppsspp_write_bytes(large_mon_id_ptr["value"] + quest_base,
-                                                         struct.pack("IIII", *quest_mons,
-                                                                     *[0xFFFFFFFF] * (4 - len(quest_mons))))
+                                                     struct.pack("IIII", *quest_mons,
+                                                                 *[0xFFFFFFFF] * (4 - len(quest_mons))))
                         # now pick one to be the quest target
-                        target_mon = random.choice(quest_mons)
-                        quest_mons.remove(target_mon)
+                        target_mons = ctx.quest_info[quest_str]["targets"].copy()
                         await ctx.ppsspp_write_bytes(quest_base + 0x70,
-                                                         struct.pack("HH", target_mon, 1))
-                        if quest_mons and random.random() > 0.5:
+                                                     struct.pack("HH", target_mons.pop(), 1))
+                        if target_mons:
                             # secondary goal
-                            target_mon = random.choice(quest_mons)
-                            quest_mons.remove(target_mon)
+                            target_mon = target_mons.pop()
                             await ctx.ppsspp_write_bytes(quest_base + 0x78,
                                                          struct.pack("HH", target_mon, 1))
                         else:
@@ -221,6 +226,19 @@ async def handle_logs(ctx: MHFUContext, logs: typing.List):
                         await ctx.send_msgs([{"cmd": 'LocationChecks', "locations": [new_check_id]}])
 
                 checked_quests = True
+
+            elif breakpoint == "QUEST_VISUAL_LOAD":
+                pass
+
+            elif breakpoint == "QUEST_VISUAL_TYPE":
+                breakpoint, qaddr = breakpoint.split("|")
+                quest_addr = int(qaddr, 16)
+                quest_id_addr = quest_addr + 0x18
+                quest_id = await ctx.ppsspp_read_unsigned(quest_id_addr, 4)
+                qtype = 0x4
+                if any(monster in elder_dragons for monster in ctx.quest_info[str("%.5i" % quest_id)]["targets"]):
+                    qtype = 0x1
+                await ctx.ppsspp_write_bytes(quest_addr, qtype.to_bytes(1, "little"))
 
             if MHFU_BREAKPOINTS[breakpoint][3]:
                 # this break point stops emulation, we need to restart it
@@ -337,8 +355,8 @@ class MHFUContext(CommonContext):
     unlocked_keys: int = 0
     required_keys: int = 0
     refresh: bool = False
-    rank_requirements: typing.Dict[(int, int, int), int] = {}
-    weapon_status: typing.Dict[int, typing.Set[int]] = {
+    rank_requirements: dict[(int, int, int), int] = {}
+    weapon_status: dict[int, set[int]] = {
         0: set(),  # Great Sword
         1: set(),  # Heavy Bowgun
         2: set(),  # Hammer
@@ -351,12 +369,12 @@ class MHFUContext(CommonContext):
         9: set(),  # Gunlance
         10: set(),  # Bow
     }
-    armor_status: typing.Set[int] = set()
+    armor_status: set[int] = set()
     quest_randomization: bool = False
-    quest_monsters: typing.Dict[str, typing.List[int]]
+    quest_info: dict[str, dict[str, list[int]] | int | list[int]] = {}
     quest_multiplier: float = 1.0
     cash_only: bool = False
-    item_queue: typing.List[NetworkItem] = []
+    item_queue: list[NetworkItem] = []
     set_cutscene: typing.Optional[bool] = None
 
     # intermitten
@@ -566,7 +584,7 @@ class MHFUContext(CommonContext):
         self.recv_index = len(items)
 
     def run_gui(self):
-        from kvui import GameManager, Label
+        from kvui import GameManager, MDLabel
 
         class MHFUManager(GameManager):
             logging_pairs = [
@@ -574,13 +592,13 @@ class MHFUContext(CommonContext):
                 ("PPSSPP", "PPSSPP"),
             ]
             base_title = "Archipelago Monster Hunter Freedom Unite Client"
-            keys: typing.Optional[Label] = None
+            keys: typing.Optional[MDLabel] = None
 
             def build(self):
                 b = super().build()
 
-                keys = Label(text="Key Quests: 0/0",
-                             size_hint_x=None, width=150)
+                keys = MDLabel(text="Key Quests: 0/0",
+                               size_hint_x=None, width=150)
                 self.keys = keys
 
                 self.connect_layout.add_widget(keys)
@@ -601,7 +619,7 @@ class MHFUContext(CommonContext):
             self.goal_quest = int(goal_quests[self.goal][1:])
             self.quest_multiplier = float(args["slot_data"]["quest_difficulty_multiplier"] / 100)
             self.quest_randomization = args["slot_data"]["quest_randomization"]
-            self.quest_monsters = args["slot_data"]["quest_monsters"]
+            self.quest_info = args["slot_data"]["quest_info"]
             self.cash_only = args["slot_data"]["cash_only_equipment"]
             self.required_keys = args["slot_data"]["required_keys"]
             for group, value in args["slot_data"]["rank_requirements"].items():
@@ -647,25 +665,6 @@ async def game_watcher(ctx):
 
 async def main(args):
     ctx = MHFUContext(args.connect, args.password)
-    """
-    chat_socket = MySocket()
-    chat_socket.connect(socket.gethostbyname(socket.getfqdn()), 27312)
-    packet = bytes((
-        *bytes([1]),
-        *struct.pack(
-            "IH",
-            getnode() & 0xFFFFFFFF,
-            getnode() >> 32
-        ),
-        *bytearray("Archipelago", 'utf-8') + bytes([0] * (128 - 11)),
-        *bytearray("ULUS10391", 'utf-8')
-        )
-    )
-    asyncio.create_task(keep_alive_and_parse(ctx))
-    chat_socket.send(packet)
-    chat_socket.send(bytes((*bytes([2]), *bytes("MHP2Q000", 'utf-8'))))
-    ctx.chat_socket = chat_socket
-    """
     ctx.server_task = asyncio.create_task(server_loop(ctx), name="ServerLoop")
     if gui_enabled:
         ctx.run_gui()
