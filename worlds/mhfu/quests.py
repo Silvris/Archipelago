@@ -172,12 +172,12 @@ def create_ranks(world: "MHFUWorld"):
         if world.options.quest_randomization:
             for quest in valid_quests:
                 quest_info = {
-                    "monsters": [world.random.choices(monster_habitats[quest["stage"]],
-                                                      k=len(quest["monsters"]))
-                                 ],
-                    "mon_num": world.random.choice([1, 2])
+                    "monsters": world.random.choices(monster_habitats[quest["stage"]],
+                                                     k=len(quest["monsters"])) if quest["monsters"] else [],
+                    "mon_num": world.random.choice(range(1, len(quest["monsters"]) + 1)) if quest["monsters"] else 0
                 }
-                quest_info["targets"] = world.random.choices(quest_info["monsters"], k=quest_info["mon_num"])
+                if quest_info["mon_num"]:
+                    quest_info["targets"] = world.random.choices(quest_info["monsters"], k=quest_info["mon_num"])
 
                 world.quest_info[quest["qid"][1:]] = quest_info
         else:
