@@ -236,7 +236,7 @@ async def handle_logs(ctx: MHFUContext, logs: typing.List):
                 quest_id_addr = quest_addr + 0x18
                 quest_id = (await ctx.ppsspp_read_unsigned(quest_id_addr, 16))["value"]
                 quest_str = str("%.5i" % quest_id)
-                if ctx.quest_info[quest_str]["targets"]:
+                if "targets" in ctx.quest_info[quest_str]:
                     qtype = 0x4
                     if any(monster in elder_dragons.values() for monster in ctx.quest_info[quest_str]["targets"]):
                         qtype = 0x1
