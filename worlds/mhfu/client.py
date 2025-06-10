@@ -91,7 +91,7 @@ MHFU_BREAKPOINT_ARGS = {
     # this lets us pull register info from the breakpoint
     "MONSTER_LOAD": ["{v0}"],
     #"MONSTER_LOAD_RESPAWN": ["{s2}"],
-    "QUEST_VISUAL_TYPE": ["{v0}"]
+    "QUEST_VISUAL_TYPE": ["{v0},{v0+0x18:p}"]
 }
 
 ACTIONS = {
@@ -132,6 +132,13 @@ WEAPON_GROUPS = {
     3: [3, 9],
     4: [1, 5, 10]
 }
+
+
+def split_log_mem(data: str) -> tuple[int, int]:
+    # PPSSPP uses the format %x[%x] for memory logging
+    # logging both pointer and memory
+    pointer, data = data.split("[")
+    return int(pointer, 16), int(data[:-1], 16)
 
 
 async def handle_logs(ctx: MHFUContext, logs: typing.List):
@@ -231,11 +238,11 @@ async def handle_logs(ctx: MHFUContext, logs: typing.List):
                 pass
 
             elif "QUEST_VISUAL_TYPE" in breakpoint:
-                breakpoint, qaddr = breakpoint.split("|")
+                breakpoint, args = breakpoint.split("|")
+                qaddr, quest_id_str = args.split(",")
                 quest_addr = int(qaddr, 16)
-                quest_id_addr = quest_addr + 0x18
-                quest_id = (await ctx.ppsspp_read_unsigned(quest_id_addr, 16))["value"]
-                quest_str = str("%.5i" % quest_id)
+                quest_id_addr, quest_mix = split_log_mem(quest_id_str)
+                quest_str = str("%.5i" % (quest_mix & 0xFFFF))
                 if "targets" in ctx.quest_info[quest_str]:
                     qtype = 0x4
                     if any(monster in elder_dragons.values() for monster in ctx.quest_info[quest_str]["targets"]):
