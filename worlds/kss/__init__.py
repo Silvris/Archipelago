@@ -111,7 +111,7 @@ class KSSWorld(World):
 
         # proper UT support
         if hasattr(self.multiworld, "generation_is_fake"):
-            self.options.included_subgames = IncludedSubgames.valid_keys
+            self.options.included_subgames.valid_keys = IncludedSubgames.valid_keys
             self.options.consumables.value = Consumables.valid_keys
             self.options.essences.value = True
 

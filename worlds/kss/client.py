@@ -264,7 +264,9 @@ class KSSSNIClient(SNIClient):
                 new_checks.append(location)
 
         if self.consumable_filter:
-            consumables = await snes_read(ctx, SRAM_1_START + 0x10000, 0xFFFF)
+            consumables = bytearray()
+            for i in range(0, 0x10000, 0x1000):
+                consumables.extend(await snes_read(ctx, SRAM_1_START + 0x10000 + i, 0x1000))
             for consumable, data in consumable_table.items():
                 if consumable & self.consumable_filter:
                     location = consumable + BASE_ID
