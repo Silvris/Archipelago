@@ -399,7 +399,8 @@ class Context:
 
     def broadcast_text_team(self, text: str, additional_arguments: dict = {}):
         self.logger.info("Notice (team): %s" % text)
-        self.broadcast_team([{**{"cmd": "PrintJSON", "data": [{ "text": text }]}, **additional_arguments}])
+        self.broadcast_team(additional_arguments.get("team"),
+                            [{**{"cmd": "PrintJSON", "data": [{ "text": text }]}, **additional_arguments}])
 
     def broadcast(self, endpoints: typing.Iterable[Client], msgs: typing.List[dict]):
         msgs = self.dumper(msgs)
@@ -1386,11 +1387,16 @@ class ClientMessageProcessor(CommonCommandProcessor):
         self.ctx = ctx
         self.client = client
 
-    def __call__(self, raw: str) -> typing.Optional[bool]:
+    def __call__(self, raw: str, team: int | None = None) -> typing.Optional[bool]:
         if not raw.startswith("!admin"):
-            self.ctx.broadcast_text_all(self.ctx.get_aliased_name(self.client.team, self.client.slot) +
-                                        ('' if self.ctx.teams == 1 else f" (Team #{self.client.team + 1})") + ': ' + raw,
-                                        {"type": "Chat", "team": self.client.team, "slot": self.client.slot, "message": raw})
+            message = self.ctx.get_aliased_name(self.client.team, self.client.slot) + \
+                      ('' if self.ctx.teams == 1 else f" (Team #{self.client.team + 1})") + ': ' + raw
+
+            args = {"type": "Chat", "team": self.client.team, "slot": self.client.slot, "message": raw}
+            if team is not None:
+                self.ctx.broadcast_text_team(message, args)
+            else:
+                self.ctx.broadcast_text_all(message, args)
         return super(ClientMessageProcessor, self).__call__(raw)
 
     def output(self, text: str):
@@ -2043,7 +2049,7 @@ async def process_client_cmd(ctx: Context, client: Client, args: dict):
                                               "original_cmd": cmd}])
                 return
 
-            client.messageprocessor(args["text"])
+            client.messageprocessor(args["text"], args.get("team", None))
 
         elif cmd == "Bounce":
             games = set(args.get("games", []))

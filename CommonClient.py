@@ -56,8 +56,11 @@ class ClientCommandProcessor(CommandProcessor):
 
     In addition all docstrings for command methods will be displayed to the user on launch and when using "/help"
     """
+    team_only: bool
+
     def __init__(self, ctx: CommonContext):
         self.ctx = ctx
+        self.team_only = True
 
     def output(self, text: str):
         """Helper function to abstract logging to the CommonClient UI"""
@@ -175,11 +178,20 @@ class ClientCommandProcessor(CommandProcessor):
             self.output("Unreadied.")
         async_start(self.ctx.send_msgs([{"cmd": "StatusUpdate", "status": state}]), name="send StatusUpdate")
 
+    def _cmd_team(self):
+        """Send default messages to team only."""
+        self.team_only = True
+
+    def _cmd_all(self):
+        """Send default messages to all players."""
+        self.team_only = False
+
     def default(self, raw: str):
         """The default message parser to be used when parsing any messages that do not match a command"""
         raw = self.ctx.on_user_say(raw)
         if raw:
-            async_start(self.ctx.send_msgs([{"cmd": "Say", "text": raw}]), name="send Say")
+            async_start(self.ctx.send_msgs([{"cmd": "Say", "text": raw,
+                                             **({"team": self.ctx.team} if self.team_only else {})}]), name="send Say")
 
 
 class CommonContext:
