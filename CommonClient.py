@@ -181,10 +181,12 @@ class ClientCommandProcessor(CommandProcessor):
     def _cmd_team(self):
         """Send default messages to team only."""
         self.team_only = True
+        self.output("Sending messages to team.")
 
     def _cmd_all(self):
         """Send default messages to all players."""
         self.team_only = False
+        self.output("Sending messages to all players.")
 
     def default(self, raw: str):
         """The default message parser to be used when parsing any messages that do not match a command"""
