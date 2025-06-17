@@ -463,8 +463,12 @@ class Context:
         self.generator_version = Version(*decoded_obj["version"])
         clients_ver = decoded_obj["minimum_versions"].get("clients", {})
         self.minimum_client_versions = {}
+        if self.generator_version < Version(0, 6, 2):
+            min_version = Version(0, 1, 6)
+        else:
+            min_version = min_client_version
         for player, version in clients_ver.items():
-            self.minimum_client_versions[player] = max(Version(*version), min_client_version)
+            self.minimum_client_versions[player] = max(Version(*version), min_version)
 
         if use_embedded_server_options:
             server_options = decoded_obj.get("server_options", {})
