@@ -41,12 +41,12 @@ def set_rules(world: "MHFUWorld"):
     for hub, rank, star in world.rank_requirements:
         if (hub, rank, star + 1) in world.rank_requirements:
             add_rule(world.multiworld.get_entrance(f"To {get_star_name(hub, rank, star + 1)}", world.player),
-                     lambda state, req=world.rank_requirements[hub, rank, star + 1]:
+                     lambda state, req=world.rank_requirements[hub, rank, star]:
                      state.has("Key Quest", world.player, req))
         elif star + 1 == hub_rank_max[hub, rank] and (hub, rank + 1, 0) in world.rank_requirements \
                 and (hub, rank) != (0, 3):
             add_rule(world.multiworld.get_entrance(f"To {get_star_name(hub, rank + 1, 0)}", world.player),
-                     lambda state, req=world.rank_requirements[hub, rank + 1, 0]:
+                     lambda state, req=world.rank_requirements[hub, rank, star]:
                      state.has("Key Quest", world.player, req))
 
     # set goal requirement

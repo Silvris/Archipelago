@@ -181,17 +181,23 @@ async def handle_logs(ctx: MHFUContext, logs: typing.List):
                                                      struct.pack("IIII", *quest_mons,
                                                                  *[0xFFFFFFFF] * (4 - len(quest_mons))))
                         # now pick one to be the quest target
+                        await ctx.ppsspp_write_bytes(quest_base + 0x4C, struct.pack("I", 1))
                         target_mons = ctx.quest_info[quest_str]["targets"].copy()
+                        first = target_mons.pop()
+                        await ctx.ppsspp_write_bytes(quest_base + 0x6C, struct.pack("I", 1))
                         await ctx.ppsspp_write_bytes(quest_base + 0x70,
-                                                     struct.pack("HH", target_mons.pop(), 1))
+                                                     struct.pack("HH", first, 1))
                         if target_mons:
                             # secondary goal
                             target_mon = target_mons.pop()
+                            await ctx.ppsspp_write_bytes(quest_base + 0x74,
+                                                         struct.pack("I", 1))
+
                             await ctx.ppsspp_write_bytes(quest_base + 0x78,
                                                          struct.pack("HH", target_mon, 1))
                         else:
                             # need to null these 3
-                            await ctx.ppsspp_write_bytes(quest_base + 0x78, struct.pack("HH", 0, 0))
+                            await ctx.ppsspp_write_bytes(quest_base + 0x74, struct.pack("IHH", 0, 0, 0))
                 # this gets pinged twice during quest load, we edit the first and fall through the second
                 ctx.randomize_quest = not ctx.randomize_quest
             elif "MONSTER_LOAD" in breakpoint:
@@ -536,7 +542,7 @@ class MHFUContext(CommonContext):
 
             if item.item == 24700083:
                 # Zenny Bag
-                current_zenny = (await self.ppsspp_read_unsigned(MHFU_POINTERS[self.lang]["ZENNY"]))["value"]
+                current_zenny = (await self.ppsspp_read_unsigned(MHFU_POINTERS[self.lang]["ZENNY"], 16))["value"]
                 await self.ppsspp_write_unsigned(MHFU_POINTERS[self.lang]["ZENNY"], current_zenny + 50000, 16)
             else:
                 self.item_queue.append(item)
