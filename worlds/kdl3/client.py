@@ -6,11 +6,12 @@ import uuid
 from struct import unpack, pack
 from collections import defaultdict
 import random
+from enum import Enum
 
 from MultiServer import mark_raw
 from NetUtils import ClientStatus, color
 from Utils import async_start
-from worlds.AutoSNIClient import SNIClient
+from worlds.AutoSNIClient import SNIClient, SnesReader, Read, SnesData
 from .locations import boss_locations
 from .gifting import kdl3_gifting_options, kdl3_trap_gifts, kdl3_gifts, update_object, pop_object, initialize_giftboxes
 from .client_addrs import consumable_addrs, star_addrs
@@ -22,51 +23,90 @@ if TYPE_CHECKING:
 snes_logger = logging.getLogger("SNES")
 
 # FXPAK Pro protocol memory mapping used by SNI
-ROM_START = 0x000000
-SRAM_1_START = 0xE00000
+# ROM_START = 0x000000 # no longer used, only BWRAM reads are consistent on SA-1
+BWRAM_START = 0xE00000
 
-# KDL3
-KDL3_HALKEN = SRAM_1_START + 0x80F0
-KDL3_NINTEN = SRAM_1_START + 0x8FF0
-KDL3_ROMNAME = SRAM_1_START + 0x8100
-KDL3_DEATH_LINK_ADDR = SRAM_1_START + 0x9010
-KDL3_GOAL_ADDR = SRAM_1_START + 0x9012
-KDL3_CONSUMABLE_FLAG = SRAM_1_START + 0x9018
-KDL3_STARS_FLAG = SRAM_1_START + 0x901A
-KDL3_GIFTING_FLAG = SRAM_1_START + 0x901C
-KDL3_LEVEL_ADDR = SRAM_1_START + 0x9020
-KDL3_IS_DEMO = SRAM_1_START + 0x5AD5
-KDL3_GAME_SAVE = SRAM_1_START + 0x3617
-KDL3_CURRENT_WORLD = SRAM_1_START + 0x363F
-KDL3_CURRENT_LEVEL = SRAM_1_START + 0x3641
-KDL3_GAME_STATE = SRAM_1_START + 0x36D0
-KDL3_LIFE_COUNT = SRAM_1_START + 0x39CF
-KDL3_KIRBY_HP = SRAM_1_START + 0x39D1
-KDL3_BOSS_HP = SRAM_1_START + 0x39D5
-KDL3_STAR_COUNT = SRAM_1_START + 0x39D7
-KDL3_LIFE_VISUAL = SRAM_1_START + 0x39E3
-KDL3_HEART_STARS = SRAM_1_START + 0x53A7
-KDL3_WORLD_UNLOCK = SRAM_1_START + 0x53CB
-KDL3_LEVEL_UNLOCK = SRAM_1_START + 0x53CD
-KDL3_BOSS_STATUS = SRAM_1_START + 0x53D5
-KDL3_INVINCIBILITY_TIMER = SRAM_1_START + 0x54B1
-KDL3_MG5_STATUS = SRAM_1_START + 0x5EE4
-KDL3_BOSS_BUTCH_STATUS = SRAM_1_START + 0x5EEA
-KDL3_JUMPING_STATUS = SRAM_1_START + 0x5EF0
-KDL3_CURRENT_BGM = SRAM_1_START + 0x733E
-KDL3_SOUND_FX = SRAM_1_START + 0x7F62
-KDL3_ANIMAL_FRIENDS = SRAM_1_START + 0x8000
-KDL3_ABILITY_ARRAY = SRAM_1_START + 0x8020
-KDL3_RECV_COUNT = SRAM_1_START + 0x8050
-KDL3_HEART_STAR_COUNT = SRAM_1_START + 0x8070
-KDL3_GOOEY_TRAP = SRAM_1_START + 0x8080
-KDL3_SLOWNESS_TRAP = SRAM_1_START + 0x8082
-KDL3_ABILITY_TRAP = SRAM_1_START + 0x8084
-KDL3_GIFTING_SEND = SRAM_1_START + 0x8086
-KDL3_COMPLETED_STAGES = SRAM_1_START + 0x8200
-KDL3_CONSUMABLES = SRAM_1_START + 0xA000
-KDL3_STARS = SRAM_1_START + 0xB000
-KDL3_ITEM_QUEUE = SRAM_1_START + 0xC000
+# Commented addresses are no longer used by the client directly, but preserved for documentation
+KDL3_ROMNAME = BWRAM_START + 0x8100
+KDL3_HALKEN = BWRAM_START + 0x80F0
+KDL3_NINTEN = BWRAM_START + 0x8FF0
+KDL3_DEATH_LINK_ADDR = BWRAM_START + 0x9010
+KDL3_GOAL_ADDR = BWRAM_START + 0x9012
+KDL3_CONSUMABLE_FLAG = BWRAM_START + 0x9018
+KDL3_STARS_FLAG = BWRAM_START + 0x901A
+KDL3_GIFTING_FLAG = BWRAM_START + 0x901C
+KDL3_LEVEL_ADDR = BWRAM_START + 0x9020
+KDL3_IS_DEMO = BWRAM_START + 0x5AD5
+KDL3_GAME_SAVE = BWRAM_START + 0x3617
+KDL3_CURRENT_WORLD = BWRAM_START + 0x363F
+KDL3_CURRENT_LEVEL = BWRAM_START + 0x3641
+KDL3_GAME_STATE = BWRAM_START + 0x36D0
+KDL3_LIFE_COUNT = BWRAM_START + 0x39CF
+KDL3_KIRBY_HP = BWRAM_START + 0x39D1
+KDL3_BOSS_HP = BWRAM_START + 0x39D5
+# KDL3_STAR_COUNT = BWRAM_START + 0x39D7
+# KDL3_LIFE_VISUAL = BWRAM_START + 0x39E3
+KDL3_HEART_STARS = BWRAM_START + 0x53A7
+KDL3_WORLD_UNLOCK = BWRAM_START + 0x53CB
+# KDL3_LEVEL_UNLOCK = BWRAM_START + 0x53CD
+KDL3_BOSS_STATUS = BWRAM_START + 0x53D5
+# KDL3_INVINCIBILITY_TIMER = BWRAM_START + 0x54B1
+KDL3_MG5_STATUS = BWRAM_START + 0x5EE4
+KDL3_BOSS_BUTCH_STATUS = BWRAM_START + 0x5EEA
+KDL3_JUMPING_STATUS = BWRAM_START + 0x5EF0
+KDL3_CURRENT_BGM = BWRAM_START + 0x733E
+KDL3_SOUND_FX = BWRAM_START + 0x7F62
+# KDL3_ANIMAL_FRIENDS = BWRAM_START + 0x8000
+# KDL3_ABILITY_ARRAY = BWRAM_START + 0x8020
+KDL3_RECV_COUNT = BWRAM_START + 0x8050
+# KDL3_HEART_STAR_COUNT = BWRAM_START + 0x8070
+# KDL3_GOOEY_TRAP = BWRAM_START + 0x8080
+# KDL3_SLOWNESS_TRAP = BWRAM_START + 0x8082
+# KDL3_ABILITY_TRAP = BWRAM_START + 0x8084
+KDL3_GIFTING_SEND = BWRAM_START + 0x8086
+KDL3_COMPLETED_STAGES = BWRAM_START + 0x8200
+KDL3_CONSUMABLES = BWRAM_START + 0xA000
+KDL3_STARS = BWRAM_START + 0xB000
+KDL3_ITEM_QUEUE = BWRAM_START + 0xC000
+
+
+class ConnectMemory(Enum):
+    rom_name = Read(KDL3_ROMNAME, 0x15)
+
+
+class KDL3Memory(Enum):
+    rom_name = ConnectMemory.rom_name
+    halken = Read(KDL3_HALKEN, 6)
+    ninten = Read(KDL3_NINTEN, 6)
+    death_link = Read(KDL3_DEATH_LINK_ADDR, 2)
+    goal_type = Read(KDL3_GOAL_ADDR, 2)
+    consumable_flag = Read(KDL3_CONSUMABLE_FLAG, 2)
+    star_flag = Read(KDL3_STARS_FLAG, 2)
+    gifting_flag = Read(KDL3_GIFTING_FLAG, 2)
+    levels = Read(KDL3_LEVEL_ADDR, 14 * 5)
+    demo = Read(KDL3_IS_DEMO, 1)
+    current_save = Read(KDL3_GAME_SAVE, 2)
+    current_world = Read(KDL3_CURRENT_WORLD, 2)
+    current_level = Read(KDL3_CURRENT_LEVEL, 2)
+    game_state = Read(KDL3_GAME_STATE, 1)
+    lives = Read(KDL3_LIFE_COUNT, 2)
+    kirby_hp = Read(KDL3_KIRBY_HP, 2)
+    gooey_hp = Read(KDL3_KIRBY_HP + 2, 2)
+    boss_hp = Read(KDL3_BOSS_HP, 2)
+    heart_stars = Read(KDL3_HEART_STARS, 35)
+    max_world = Read(KDL3_WORLD_UNLOCK, 2)
+    boss_status = Read(KDL3_BOSS_STATUS, 2)
+    mg5 = Read(KDL3_MG5_STATUS, 2)
+    boss_butch = Read(KDL3_BOSS_BUTCH_STATUS, 2)
+    jumping = Read(KDL3_JUMPING_STATUS, 2)
+    current_bgm = Read(KDL3_CURRENT_BGM, 2)
+    recv_count = Read(KDL3_RECV_COUNT, 2)
+    send_gift = Read(KDL3_GIFTING_SEND, 2)
+    completed_stages = Read(KDL3_COMPLETED_STAGES, 60)
+    consumables = Read(KDL3_CONSUMABLES, 1920)
+    stars = Read(KDL3_STARS, 1920)
+    item_queue = Read(KDL3_ITEM_QUEUE, 16)
+
 
 deathlink_messages = defaultdict(lambda: " was defeated.", {
     0x0200: " was bonked by apples from Whispy Woods.",
@@ -99,6 +139,12 @@ def cmd_gift(self: "SNIClientCommandProcessor") -> None:
 class KDL3SNIClient(SNIClient):
     game = "Kirby's Dream Land 3"
     patch_suffix = ".apkdl3"
+
+    snes_reader = SnesReader(KDL3Memory)
+    """ for everything except `validate_rom` """
+    connect_reader = SnesReader(ConnectMemory)
+    """ for `validate_rom` """
+
     levels: typing.Dict[int, typing.List[int]] = {}
     consumables: typing.Optional[bool] = None
     stars: typing.Optional[bool] = None
