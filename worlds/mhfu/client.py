@@ -223,7 +223,7 @@ async def handle_logs(ctx: MHFUContext, logs: typing.List):
                         if quest_completion[flag] & (1 << mask):
                             if base_id + id not in ctx.checked_locations:
                                 new_checks.append(id + base_id)
-                            if id == ctx.goal_quest and not ctx.finished_game:
+                            if quest["qid"] == ctx.goal_quest and not ctx.finished_game:
                                 await ctx.send_msgs([{"cmd": "StatusUpdate", "status": ClientStatus.CLIENT_GOAL}])
                                 ctx.finished_game = True
                         elif base_id + id in ctx.checked_locations:
@@ -233,7 +233,7 @@ async def handle_logs(ctx: MHFUContext, logs: typing.List):
                 if new_checks:
                     for new_check_id in new_checks:
                         ctx.locations_checked.add(new_check_id)
-                        location = ctx.location_names[new_check_id]
+                        location = ctx.location_names.lookup_in_game(new_check_id)
                         ppsspp_logger.info(
                             f'New Check: {location} ({len(ctx.locations_checked)}/{len(ctx.missing_locations) + len(ctx.checked_locations)})')
                         await ctx.send_msgs([{"cmd": 'LocationChecks', "locations": [new_check_id]}])
@@ -366,7 +366,7 @@ class MHFUContext(CommonContext):
     recv_index = -1
     death_link = False
     goal: int = 0
-    goal_quest: int = 3233  # This is Ukanlos, pick the furthest out to potentially avoid collision
+    goal_quest: str = "m03233"  # This is Ukanlos, pick the furthest out to potentially avoid collision
     unlocked_keys: int = 0
     required_keys: int = 0
     refresh: bool = False
@@ -631,7 +631,7 @@ class MHFUContext(CommonContext):
             # pick up our slot data
             self.death_link = args["slot_data"]["death_link"]
             self.goal = args["slot_data"]["goal"]
-            self.goal_quest = int(goal_quests[self.goal][1:])
+            self.goal_quest = goal_quests[self.goal]
             self.quest_multiplier = float(args["slot_data"]["quest_difficulty_multiplier"] / 100)
             self.quest_randomization = args["slot_data"]["quest_randomization"]
             self.quest_info = args["slot_data"]["quest_info"]
