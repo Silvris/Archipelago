@@ -16,7 +16,7 @@ import struct
 from NetUtils import NetworkItem, ClientStatus
 from .quests import quest_data, base_id, goal_quests
 from .items import item_name_to_id, item_id_to_name, item_name_groups
-from .data.monsters import elder_dragons
+from .data.monsters import elder_dragons, monster_lookup
 from .data.equipment import blademaster, gunner, blademaster_upgrades, gunner_upgrades, \
     helms, chests, arms, waists, legs
 
@@ -66,8 +66,8 @@ MHFU_POINTERS = {
         "SET_ACTION": 0x090AF418,  # half
         "FAIL_QUEST": 0x09A01B1C,  # byte
         "POISON_TIMER": 0x090AF508,  # half
-        "QUEST_VISUAL_GOAL": 0x09B1DA48,
-        "QUEST_VISUAL_MON": 0x9B1DDAE8,
+        # "QUEST_VISUAL_GOAL": 0x09B1DA48,
+        # "QUEST_VISUAL_MON": 0x9B1DDAE8,
     }
 }
 
@@ -89,9 +89,10 @@ MHFU_BREAKPOINTS = {
 MHFU_BREAKPOINT_ARGS = {
     # do this so we can just pass the former directly, while parse this one
     # this lets us pull register info from the breakpoint
-    "MONSTER_LOAD": ["{v0}"],
+    "MONSTER_LOAD": ["{v0+0x2E4:p}"],
     #"MONSTER_LOAD_RESPAWN": ["{s2}"],
-    "QUEST_VISUAL_TYPE": ["{v0},{v0+0x18:p}"]
+    "QUEST_VISUAL_TYPE": ["{v0},{v0+0x18:p}"],
+    "QUEST_VISUAL_LOAD": ["{v0-0x448},{v0-0xa8},{s4+0x20:p}"]
 }
 
 ACTIONS = {
@@ -202,11 +203,10 @@ async def handle_logs(ctx: MHFUContext, logs: typing.List):
                 ctx.randomize_quest = not ctx.randomize_quest
             elif "MONSTER_LOAD" in breakpoint:
                 breakpoint, mon_addr = breakpoint.split("|")
-                mon_address = int(mon_addr, 16)
-                health = (await ctx.ppsspp_read_unsigned(mon_address + 0x2E4, 16))["value"]
+                mon_address, health = split_log_mem(mon_addr)
                 health = min(max(int(health * ctx.quest_multiplier), 1), 0xFFFF)
-                await ctx.ppsspp_write_unsigned(mon_address + 0x2E4, health, 16)
-                await ctx.ppsspp_write_unsigned(mon_address + 0x41E, health, 16)
+                await ctx.ppsspp_write_unsigned(mon_address, health, 16)
+                await ctx.ppsspp_write_unsigned(mon_address + 0x13A, health, 16)
 
             elif breakpoint == "QUEST_COMPLETE":
                 # ~400 of this type get sent on every quest completion
@@ -240,8 +240,34 @@ async def handle_logs(ctx: MHFUContext, logs: typing.List):
 
                 checked_quests = True
 
-            elif breakpoint == "QUEST_VISUAL_LOAD":
-                pass
+            elif "QUEST_VISUAL_LOAD" in breakpoint:
+                breakpoint, args = breakpoint.split("|")
+                goal, mons, qid = args.split(",")
+                _, quest = split_log_mem(qid)
+                quest_id = quest & 0xFFFF
+                quest_info = ctx.quest_info[f"{quest_id:05}"]
+                if "targets" in quest_info:
+                    # now we can construct the strings
+                    targets = [mon for mon in quest_info["targets"]]
+                    targets.reverse()
+                    target = targets.pop()
+                    is_slay = target in elder_dragons.values()
+                    goal_str = f"{'Slay' if is_slay else 'Hunt'} " \
+                               f"{'the' if is_slay else ('an' if monster_lookup[target].lower()[0] in ('a', 'e', 'i', 'o', 'u') else 'a')}" \
+                               f" {monster_lookup[target]} "
+                    if targets:
+                        target = targets.pop()
+                        is_slay_2 = target in elder_dragons.values()
+                        if is_slay != is_slay_2:
+                            goal_str += f"and \n{'Slay' if is_slay_2 else 'Hunt'} "
+                        else:
+                            goal_str += "and \n"
+                        goal_str += f"{'the' if is_slay_2 else ('an' if monster_lookup[target].lower()[0] in ('a', 'e', 'i', 'o', 'u') else 'a')}"
+                        goal_str += f" {monster_lookup[target]}"
+                    await ctx.ppsspp_write_bytes(int(goal, 16), goal_str.encode("ascii") + b"\x00")
+                # now monsters
+                mons_str = f"\n".join([monster_lookup[mon] for mon in quest_info["monsters"]])
+                await ctx.ppsspp_write_bytes(int(mons, 16), mons_str.encode("ascii") + b"\x00")
 
             elif "QUEST_VISUAL_TYPE" in breakpoint:
                 breakpoint, args = breakpoint.split("|")

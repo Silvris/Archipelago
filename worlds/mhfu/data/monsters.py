@@ -61,6 +61,8 @@ monster_ids = {
     "Furious Rajang": 89
 }
 
+monster_lookup = {idx: monster for monster, idx in monster_ids.items()}
+
 elder_dragons = {
     "Fatalis": 2,
     "Lao-Shan Lung": 7,
