@@ -176,6 +176,12 @@ def create_ranks(world: "MHFUWorld"):
                                                      k=len(quest["monsters"])) if quest["monsters"] else [],
                     "mon_num": world.random.choice(range(1, len(quest["monsters"]) + 1)) if quest["monsters"] else 0
                 }
+                if quest["qid"] == "m10501":
+                    # Special case: this quest crashes if the first monster isn't a Rathalos
+                    if 11 in quest_info["monsters"] or 49 in quest_info["monsters"]:
+                        quest_info["monsters"].sort(key=lambda x: x in (11, 49), reverse=True)
+                    else:
+                        quest_info["monsters"][0] = world.random.choice([11, 49])
                 if quest_info["mon_num"]:
                     quest_info["targets"] = world.random.choices(quest_info["monsters"], k=quest_info["mon_num"])
 

@@ -78,9 +78,9 @@ MHFU_BREAKPOINTS = {
     # memory being this is a memory breakpoint, else it's CPU
     # CPU breakpoints don't use read/write/change
     "QUEST_LOAD": (True, 0x08A57510, 1, True, True, True, False, False),
-    "QUEST_COMPLETE": (True, 0x09999DC8, 63, False, True, False, True, True),
+    # "QUEST_COMPLETE": (True, 0x09999DC8, 63, False, True, False, True, True),
     "MONSTER_LOAD": (False, 0x08871C24, 1, True, True, False, False, False),
-    #"MONSTER_LOAD_RESPAWN": (False, 0x09B18F10, 1, True, True, False, False, False),
+    # "MONSTER_LOAD_RESPAWN": (False, 0x09B18F10, 1, True, True, False, False, False),
     "QUEST_VISUAL_LOAD": (False, 0x09A8346C, 1, False, True, False, False, False),
     "QUEST_VISUAL_TYPE": (False, 0x09A8319C, 1, True, True, False, False, False)
 
@@ -207,38 +207,6 @@ async def handle_logs(ctx: MHFUContext, logs: typing.List):
                 health = min(max(int(health * ctx.quest_multiplier), 1), 0xFFFF)
                 await ctx.ppsspp_write_unsigned(mon_address, health, 16)
                 await ctx.ppsspp_write_unsigned(mon_address + 0x13A, health, 16)
-
-            elif breakpoint == "QUEST_COMPLETE":
-                # ~400 of this type get sent on every quest completion
-                # madness, we have to clear some of them
-                if checked_quests:
-                    continue
-                new_checks = []
-                completion_bytes = await ctx.ppsspp_read_bytes(MHFU_POINTERS[ctx.lang]["QUEST_COMPLETE"], 63)
-                quest_completion = bytearray(base64.b64decode(completion_bytes["base64"]))
-                for id, quest in enumerate(quest_data):
-                    flag = int(quest["flag"])
-                    mask = int(quest["mask"])
-                    if flag >= 0 and mask >= 0:
-                        if quest_completion[flag] & (1 << mask):
-                            if base_id + id not in ctx.checked_locations:
-                                new_checks.append(id + base_id)
-                            if quest["qid"] == ctx.goal_quest and not ctx.finished_game:
-                                await ctx.send_msgs([{"cmd": "StatusUpdate", "status": ClientStatus.CLIENT_GOAL}])
-                                ctx.finished_game = True
-                        elif base_id + id in ctx.checked_locations:
-                            quest_completion[flag] |= (1 << mask)
-                await ctx.ppsspp_write_bytes(MHFU_POINTERS[ctx.lang]["QUEST_COMPLETE"], bytes(quest_completion))
-
-                if new_checks:
-                    for new_check_id in new_checks:
-                        ctx.locations_checked.add(new_check_id)
-                        location = ctx.location_names.lookup_in_game(new_check_id)
-                        ppsspp_logger.info(
-                            f'New Check: {location} ({len(ctx.locations_checked)}/{len(ctx.missing_locations) + len(ctx.checked_locations)})')
-                        await ctx.send_msgs([{"cmd": 'LocationChecks', "locations": [new_check_id]}])
-
-                checked_quests = True
 
             elif "QUEST_VISUAL_LOAD" in breakpoint:
                 breakpoint, args = breakpoint.split("|")
@@ -690,6 +658,34 @@ async def game_watcher(ctx):
                 await ctx.get_key_binary()
                 await ctx.set_equipment_status()
                 ctx.refresh = False
+
+            new_checks = []
+            quest_changed = False
+            completion_bytes = await ctx.ppsspp_read_bytes(MHFU_POINTERS[ctx.lang]["QUEST_COMPLETE"], 63)
+            quest_completion = bytearray(base64.b64decode(completion_bytes["base64"]))
+            for id, quest in enumerate(quest_data):
+                flag = int(quest["flag"])
+                mask = int(quest["mask"])
+                if flag >= 0 and mask >= 0:
+                    if quest_completion[flag] & (1 << mask):
+                        if base_id + id not in ctx.checked_locations and base_id + id not in ctx.locations_checked:
+                            new_checks.append(id + base_id)
+                        if quest["qid"] == ctx.goal_quest and not ctx.finished_game:
+                            await ctx.send_msgs([{"cmd": "StatusUpdate", "status": ClientStatus.CLIENT_GOAL}])
+                            ctx.finished_game = True
+                    elif base_id + id in ctx.checked_locations:
+                        quest_changed = True
+                        quest_completion[flag] |= (1 << mask)
+            if quest_changed:
+                await ctx.ppsspp_write_bytes(MHFU_POINTERS[ctx.lang]["QUEST_COMPLETE"], bytes(quest_completion))
+
+            if new_checks:
+                for new_check_id in new_checks:
+                    ctx.locations_checked.add(new_check_id)
+                    location = ctx.location_names.lookup_in_game(new_check_id)
+                    ppsspp_logger.info(
+                        f'New Check: {location} ({len(ctx.locations_checked)}/{len(ctx.missing_locations) + len(ctx.checked_locations)})')
+                    await ctx.send_msgs([{"cmd": 'LocationChecks', "locations": [new_check_id]}])
 
             current_overlay = await ctx.ppsspp_read_string(MHFU_POINTERS[ctx.lang]["CURRENT_OVL"])
             if current_overlay["value"] in ("game_task.ovl", "lobby_task.ovl"):
