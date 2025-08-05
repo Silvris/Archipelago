@@ -19,6 +19,7 @@ from .items import item_name_to_id, item_id_to_name, item_name_groups
 from .data.monsters import elder_dragons, monster_lookup
 from .data.equipment import blademaster, gunner, blademaster_upgrades, gunner_upgrades, \
     helms, chests, arms, waists, legs
+from .data.item_gifts import item_gifts, decoration_gifts
 
 ppsspp_logger = logging.getLogger("PPSSPP")
 PPSSPP_REPORTING = "https://report.ppsspp.org/match/list"
@@ -533,11 +534,69 @@ class MHFUContext(CommonContext):
     async def pop_item(self):
         if self.item_queue:
             item = self.item_queue.pop()
-
             if item.item == 24700083:
                 # Zenny Bag
                 current_zenny = (await self.ppsspp_read_unsigned(MHFU_POINTERS[self.lang]["ZENNY"], 16))["value"]
                 await self.ppsspp_write_unsigned(MHFU_POINTERS[self.lang]["ZENNY"], current_zenny + 50000, 16)
+            elif item.item in (24700079, 24700080):
+                # Equipment
+                e_type = random.choice([5, 6]) if item.item == 24700079 else random.choice(range(5))
+                e_rarity_group = {1}  # always allow rare 1 items, so the items are at least useful without much
+                if e_type >= 5:
+                    # weapon
+                    w_type = random.choice(list(self.weapon_status.keys()))
+                    # now fill e_rarity with the correct value
+                    e_rarity_group.update(self.weapon_status[w_type])
+                    weapons = blademaster if e_type == 5 else gunner
+                    e_id, e_rarity = random.choice([(idx, value[1]) for idx, value in weapons.items()
+                                                    if value[1] in e_rarity_group])
+                else:
+                    e_rarity_group.update(self.armor_status)
+                    armors = {
+                        0: legs,
+                        1: helms,
+                        2: chests,
+                        3: arms,
+                        4: waists
+                    }
+                    e_id, e_rarity = random.choice([(idx, value) for idx, value in armors[e_type].items()
+                                                    if value in e_rarity_group])
+                # now read
+                equipment_data = bytearray(base64.b64decode(
+                    (await self.ppsspp_read_bytes(MHFU_POINTERS[self.lang]["EQUIP_CHEST"], 12000))["base64"]))
+                # each entry is a 12 byte struct, for some reason
+                for i in range(1000):
+                    enabled = equipment_data[i * 12]
+                    if not enabled:
+                        # this is a free slot we can apply our new equipment
+                        equipment_data[(i*12):i*12 + 12] = struct.pack("BBHII", 1, e_type, e_id, 0, 0)
+                        break
+                else:
+                    ppsspp_logger.warning("Unable to grant equipment, as equipment chest is full. Item may be lost"
+                                          "if not received before disconnecting.")
+                    self.item_queue.append(item)
+                    return
+                await self.ppsspp_write_bytes(MHFU_POINTERS[self.lang]["EQUIP_CHEST"], bytes(equipment_data))
+            elif item.item in (24700081, 24700082):
+                # item box
+                i_groups = decoration_gifts if item.item == 27400081 else item_gifts
+                group_name, group_info = random.choice(list(i_groups.items()))
+                # get item box
+                item_data = bytearray(base64.b64decode(
+                    (await self.ppsspp_read_bytes(MHFU_POINTERS[self.lang]["ITEM_CHEST"], 4000))["base64"]))
+                items = {i: list(struct.unpack("HH", item_data[i*4: (i*4) + 4])) for i in range(1000)}
+                for item_id, item_num in group_info.items():
+                    idx = next((item for item in items if items[item][0] == item_id), None)
+                    if not idx:
+                        # find the next 0 idx
+                        idx = next((item for item in items if items[item][0] == 0), None)
+                        if not idx:
+                            continue  # this will lose the item, but we may be able to grant others
+                    items[idx][0] = item_id
+                    items[idx][1] += item_num
+                    item_data[idx*4: (idx*4) + 4] = struct.pack("HH", item_id, item_num)
+                await self.ppsspp_write_bytes(MHFU_POINTERS[self.lang]["ITEM_CHEST"], item_data)
+                ppsspp_logger.info(f"Received {group_name}.")
             else:
                 self.item_queue.append(item)
 
