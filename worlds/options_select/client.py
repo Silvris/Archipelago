@@ -650,9 +650,9 @@ class OptionsCreator(ThemedApp):
 
         self.game_label.bind(texture_size=set_height)
 
-        from kivy.modules.console import create_console
-        from kivy.core.window import Window
-        create_console(Window, self.container)
+        #from kivy.modules.console import create_console
+        #from kivy.core.window import Window
+        #create_console(Window, self.container)
 
         return self.container
 
