@@ -27,6 +27,7 @@ from urllib.parse import urlparse
 from worlds.AutoWorld import AutoWorldRegister, World
 from Options import (Option, Toggle, TextChoice, Choice, FreeText, NamedRange, Range, OptionSet, OptionList, Removed,
                      OptionCounter, Visibility, VerifyKeys, PlandoTexts, PlandoConnections, ItemLinks)
+from .core import FunctionalToggle, AdjustScrollBox
 
 try:
     from Utils import save_filename
@@ -73,7 +74,7 @@ class TrailingPressedIconButton(ButtonBehavior, RotateBehavior, MDListItemTraili
     pass
 
 
-class WorldButton(ToggleButton):
+class WorldButton(FunctionalToggle):
     world_cls: typing.Type[World]
 
 
@@ -517,7 +518,7 @@ class OptionsCreator(ThemedApp):
                         child.disabled = value
 
             default_random = option.default == "random"
-            random_toggle = ToggleButton(MDButtonText(text="Random?"), size_hint_x=None, width=dp(100),
+            random_toggle = FunctionalToggle(MDButtonText(text="Random?"), size_hint_x=None, width=dp(100),
                                          state="down" if default_random else "normal")
             random_toggle.bind(state=randomize_option)
             label_box.add_widget(random_toggle)

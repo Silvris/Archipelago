@@ -4,7 +4,29 @@ import logging
 import subprocess
 import typing
 import Utils
-from kvui import TooltipLabel
+from kvui import ToggleButton, ToolTip, MDScrollView, MDBoxLayout, ObjectProperty, NumericProperty, dp
+
+
+class FunctionalToggle(ToggleButton):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._update_bg(self, self.state)
+
+    def _update_bg(self, _, state: str):
+        super()._update_bg(_, state)
+        if state == "normal":
+            self.md_bg_color = self.theme_cls.surfaceContainerLowColor
+
+
+class AdjustScrollBox(MDScrollView):
+    layout: MDBoxLayout = ObjectProperty(None)
+    box_height: int = NumericProperty(dp(100))
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+
+ToolTip.markup = True
 
 
 def _mp_save_filename(res: "multiprocessing.Queue[typing.Optional[str]]", *args: typing.Any) -> None:

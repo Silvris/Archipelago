@@ -1,3 +1,17 @@
+<AdjustScrollBox>:
+    layout: layout
+    box_height: dp(100)
+    bar_width: "12dp"
+    scroll_wheel_distance: 40
+    do_scroll_x: False
+    scroll_type: ['bars', 'content']
+    MDBoxLayout:
+        id: layout
+        orientation: "vertical"
+        spacing: 10
+        size_hint_y: None
+        height: max(self.minimum_height, root.box_height)
+
 <VisualRange>:
     id: this
     spacing: 15
@@ -98,7 +112,7 @@
                 height: "20dp"
                 on_press: root.validate_add(input)
 
-        ScrollBox:
+        AdjustScrollBox:
             id: scrollbox
             size_hint_y: None
             adapt_minimum: False
@@ -117,7 +131,7 @@ ContainerLayout:
         padding: 3, 5, 0, 3
         spacing: "2dp"
 
-        ScrollBox:
+        AdjustScrollBox:
             id: scrollbox
             size_hint_x: None
             width: "150dp"
