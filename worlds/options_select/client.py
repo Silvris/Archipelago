@@ -54,8 +54,7 @@ def filter_tooltip(tooltip):
 
 def option_can_be_randomized(option: typing.Type[Option]):
     # most options can be randomized, so we should just check for those that cannot
-    if any(issubclass(option, option_type) for option_type in (VerifyKeys, Removed, PlandoTexts,
-                                                               PlandoConnections, ItemLinks)):
+    if not option.supports_weighting:
         return False
     elif issubclass(option, FreeText) and not issubclass(option, TextChoice):
         return False
@@ -209,7 +208,7 @@ class VisualListSetCounter(MDDialog):
     def add_set_item(self, key: str, value: int | None = None):
         text = MDListItemSupportingText(text=key, id="value")
         if issubclass(self.option, OptionCounter):
-            value_txt = CounterItemValue(text=str(value) if value else "0")
+            value_txt = CounterItemValue(text=str(value) if value else "1")
             item = MDListItem(text,
                               value_txt,
                               MDIconButton(icon="minus", on_release=self.remove_item), focus_behavior=False)
@@ -319,8 +318,8 @@ class OptionsCreator(ThemedApp):
                          box.range.slider.value != option.special_range_names[self.options[name]]):
                 # we should validate the touch here,
                 # but this is much cheaper
-                self.options[name] = box.slider.value
-                box.tag.text = str(box.slider.value)
+                self.options[name] = box.range.slider.value
+                box.tag.text = str(box.range.slider.value)
                 set_button_text(box.choice, "Custom")
 
         def set_button_text(button: MDButton, text: str):
@@ -346,7 +345,7 @@ class OptionsCreator(ThemedApp):
             }
             for choice in option.special_range_names
         ]
-        box.range.slider.dropdown = MDDropdownMenu(caller=box.range.slider, items=items)
+        box.range.slider.dropdown = MDDropdownMenu(caller=box.choice, items=items)
         box.choice.bind(on_release=open)
         self.options[name] = option.default
         return box
@@ -471,7 +470,7 @@ class OptionsCreator(ThemedApp):
         return main_button
 
     def create_option(self, option: typing.Type[Option], name: str, world: typing.Type[World]) -> Widget:
-        option_base = MDBoxLayout(orientation="vertical", size_hint_y=None, padding=[0, 0, dp(5), 0])
+        option_base = MDBoxLayout(orientation="vertical", size_hint_y=None, padding=[0, 0, dp(5), dp(5)])
 
         tooltip = filter_tooltip(option.__doc__)
         option_label = TooltipLabel(text=f"[ref=0|{tooltip}]"
@@ -611,7 +610,8 @@ class OptionsCreator(ThemedApp):
     def build(self):
         self.set_colors()
         self.options = {}
-        self.container = Builder.load_string(pkgutil.get_data(__name__, "optionscreator.kv").decode("utf-8"))
+        self.container = Builder.load_string(pkgutil.get_data(__name__, "creator.kv").decode("utf-8"))
+        self.root = self.container
         self.main_layout = self.container.ids.main
         self.scrollbox = self.container.ids.scrollbox
 
