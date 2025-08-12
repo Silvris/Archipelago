@@ -616,10 +616,13 @@ class OptionsCreator(ThemedApp):
         self.scrollbox = self.container.ids.scrollbox
 
         def world_button_action(world_button: WorldButton):
-            old_button = next((button for button in self.scrollbox.layout.children
-                               if button.world_cls.game == self.current_game), None)
-            if old_button:
-                old_button.state = "normal"
+            if self.current_game != world_button.world_cls.game:
+                old_button = next((button for button in self.scrollbox.layout.children
+                                   if button.world_cls.game == self.current_game), None)
+                if old_button:
+                    old_button.state = "normal"
+            else:
+                world_button.state = "down"
             self.create_options_panel(world_button)
 
         for world, cls in sorted(AutoWorldRegister.world_types.items(), key=lambda x: x[0]):
