@@ -144,7 +144,6 @@ def split_log_mem(data: str) -> tuple[int, int]:
 
 
 async def handle_logs(ctx: MHFUContext, logs: typing.List):
-    checked_quests = False
     for log in logs:
         if log["channel"] in ("MEMMAP", "JIT"):
             # we hit a breakpoint

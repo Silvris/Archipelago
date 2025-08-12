@@ -98,6 +98,7 @@ rank_sort = defaultdict(lambda: 99, {
     (0, 3, 2): 20,
 })
 
+
 class MHFULocation(Location):
     game: str = "Monster Hunter Freedom Unite"
 
