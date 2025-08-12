@@ -1,3 +1,5 @@
+import pkgutil
+
 from kvui import (ThemedApp, ScrollBox, MainLayout, ContainerLayout, dp, Widget, MDBoxLayout, TooltipLabel, MDLabel,
                   ToggleButton, MarkupDropdown, ResizableTextField)
 from kivy.animation import Animation
@@ -72,9 +74,14 @@ class TrailingPressedIconButton(ButtonBehavior, RotateBehavior, MDListItemTraili
     pass
 
 
+class WorldButton(ToggleButton):
+    world_cls: typing.Type[World]
+
+
 class VisualRange(MDBoxLayout):
     option: typing.Type[Range]
     name: str
+    # tag: MDLabel = ObjectProperty(None)
     slider: MDSlider = ObjectProperty(None)
 
     def __init__(self, *args, option: typing.Type[Range], name: str, **kwargs):
@@ -295,23 +302,25 @@ class OptionsCreator(ThemedApp):
                        pos_hint={"center_x": 0.5}, size_hint_x=0.5).open()
 
     def create_range(self, option: typing.Type[Range], name: str):
-        def update_text(slider, touch):
-            self.options[name] = int(slider.value)
+        def update_text(box: VisualRange):
+            self.options[name] = box.slider.value
+            box.tag.text = str(box.slider.value)
             return
 
         box = VisualRange(option=option, name=name)
-        box.slider.bind(on_touch_move=update_text)
+        box.slider.bind(on_touch_move=lambda _, _1: update_text(box))
         self.options[name] = option.default
         return box
 
     def create_named_range(self, option: typing.Type[NamedRange], name: str):
-        def set_to_custom(slider, touch):
-            if (not self.options[name] == slider.value) and (not self.options[name] in option.special_range_names or
-                                                             slider.value != option.special_range_names[
-                                                                 self.options[name]]):
+        def set_to_custom(box: VisualNamedRange):
+            if (not self.options[name] == box.range.slider.value) \
+                    and (not self.options[name] in option.special_range_names or
+                         box.range.slider.value != option.special_range_names[self.options[name]]):
                 # we should validate the touch here,
                 # but this is much cheaper
-                self.options[name] = slider.value
+                self.options[name] = box.slider.value
+                box.tag.text = str(box.slider.value)
                 set_button_text(box.choice, "Custom")
 
         def set_button_text(button: MDButton, text: str):
@@ -329,7 +338,7 @@ class OptionsCreator(ThemedApp):
             box.range.slider.dropdown.open()
 
         box = VisualNamedRange(option=option, name=name, range=self.create_range(option, name))
-        box.range.slider.bind(on_touch_move=set_to_custom)
+        box.range.slider.bind(on_touch_move=lambda _, _2: set_to_custom(box))
         items = [
             {
                 "text": choice.title(),
@@ -457,7 +466,7 @@ class OptionsCreator(ThemedApp):
         dialog.open()
 
     def create_option_set_list_counter(self, option: typing.Type[OptionList] | typing.Type[OptionSet] |
-                                       typing.Type[OptionCounter], name: str, world: typing.Type[World]):
+                                                     typing.Type[OptionCounter], name: str, world: typing.Type[World]):
         main_button = MDButton(MDButtonText(text="Edit"), on_release=lambda x: self.create_popup(option, name, world))
         return main_button
 
@@ -517,7 +526,7 @@ class OptionsCreator(ThemedApp):
 
         return option_base
 
-    def create_options_panel(self, world_button):
+    def create_options_panel(self, world_button: WorldButton):
         self.option_layout.clear_widgets()
         self.options.clear()
         cls: typing.Type[World] = world_button.world_cls
@@ -530,11 +539,22 @@ class OptionsCreator(ThemedApp):
             self.current_game = "None"
             if validate_url(cls.web.options_page):
                 webbrowser.open(cls.web.options_page)
+                MDSnackbar(MDSnackbarText(text="Launching in default browser..."), y=dp(24), pos_hint={"center_x": 0.5},
+                           size_hint_x=0.5).open()
+                world_button.state = "normal"
             else:
                 # attach onto archipelago.gg and see if we pass
                 new_url = "https://archipelago.gg/" + cls.web.options_page
                 if validate_url(new_url):
                     webbrowser.open(new_url)
+                    MDSnackbar(MDSnackbarText(text="Launching in default browser..."), y=dp(24),
+                               pos_hint={"center_x": 0.5},
+                               size_hint_x=0.5).open()
+                else:
+                    MDSnackbar(MDSnackbarText(text="Invalid options page, please report to world developer."), y=dp(24),
+                               pos_hint={"center_x": 0.5},
+                               size_hint_x=0.5).open()
+                world_button.state = "normal"
                 # else just fall through
         else:
             expansion_box = ScrollBox()
@@ -582,12 +602,6 @@ class OptionsCreator(ThemedApp):
         if isinstance(chevron, MDListItem):
             chevron = next((child for child in chevron.ids.trailing_container.children
                             if isinstance(child, TrailingPressedIconButton)), None)
-        Animation(
-            padding=[0, dp(12), 0, dp(12)]
-            if not panel.is_open
-            else [0, 0, 0, 0],
-            d=0.2,
-        ).start(panel)
         panel.open() if not panel.is_open else panel.close()
         if chevron:
             panel.set_chevron_down(
@@ -597,9 +611,17 @@ class OptionsCreator(ThemedApp):
     def build(self):
         self.set_colors()
         self.options = {}
-        self.container = Builder.load_file(Utils.local_path("data/optionscreator.kv"))
+        self.container = Builder.load_string(pkgutil.get_data(__name__, "optionscreator.kv").decode("utf-8"))
         self.main_layout = self.container.ids.main
         self.scrollbox = self.container.ids.scrollbox
+
+        def world_button_action(world_button: WorldButton):
+            old_button = next((button for button in self.scrollbox.layout.children
+                               if button.world_cls.game == self.current_game), None)
+            if old_button:
+                old_button.state = "normal"
+            self.create_options_panel(world_button)
+
         for world, cls in sorted(AutoWorldRegister.world_types.items(), key=lambda x: x[0]):
             if world == "Archipelago":
                 continue
@@ -609,9 +631,9 @@ class OptionsCreator(ThemedApp):
             world_text.bind(width=lambda *x, text=world_text: text.setter('text_size')(text, (text.width, None)),
                             texture_size=lambda *x, text=world_text: text.setter("height")(text,
                                                                                            world_text.texture_size[1]))
-            world_button = MDButton(world_text, size_hint_x=None, width=dp(150), theme_width="Custom",
-                                    radius=(dp(5), dp(5), dp(5), dp(5)))
-            world_button.bind(on_release=self.create_options_panel)
+            world_button = WorldButton(world_text, size_hint_x=None, width=dp(150), theme_width="Custom",
+                                       radius=(dp(5), dp(5), dp(5), dp(5)))
+            world_button.bind(on_release=world_button_action)
             world_button.world_cls = cls
             self.scrollbox.layout.add_widget(world_button)
         self.main_panel = self.container.ids.player_layout
