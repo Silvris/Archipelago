@@ -80,7 +80,7 @@ class WorldButton(ToggleButton):
 class VisualRange(MDBoxLayout):
     option: typing.Type[Range]
     name: str
-    # tag: MDLabel = ObjectProperty(None)
+    tag: MDLabel = ObjectProperty(None)
     slider: MDSlider = ObjectProperty(None)
 
     def __init__(self, *args, option: typing.Type[Range], name: str, **kwargs):
@@ -302,8 +302,8 @@ class OptionsCreator(ThemedApp):
 
     def create_range(self, option: typing.Type[Range], name: str):
         def update_text(box: VisualRange):
-            self.options[name] = box.slider.value
-            box.tag.text = str(box.slider.value)
+            self.options[name] = int(box.slider.value)
+            box.tag.text = str(int(box.slider.value))
             return
 
         box = VisualRange(option=option, name=name)
@@ -318,16 +318,17 @@ class OptionsCreator(ThemedApp):
                          box.range.slider.value != option.special_range_names[self.options[name]]):
                 # we should validate the touch here,
                 # but this is much cheaper
-                self.options[name] = box.range.slider.value
-                box.tag.text = str(box.range.slider.value)
+                self.options[name] = int(box.range.slider.value)
+                box.range.tag.text = str(int(box.range.slider.value))
                 set_button_text(box.choice, "Custom")
 
         def set_button_text(button: MDButton, text: str):
             button.text.text = text
 
-        def set_value(text):
+        def set_value(text: str, box: VisualNamedRange):
             box.range.slider.value = min(max(option.special_range_names[text.lower()], option.range_start),
                                          option.range_end)
+            box.range.tag.text = str(int(box.range.slider.value))
             set_button_text(box.choice, text)
             self.options[name] = text.lower()
             box.range.slider.dropdown.dismiss()
@@ -341,7 +342,7 @@ class OptionsCreator(ThemedApp):
         items = [
             {
                 "text": choice.title(),
-                "on_release": lambda text=choice.title(): set_value(text)
+                "on_release": lambda text=choice.title(): set_value(text, box)
             }
             for choice in option.special_range_names
         ]
