@@ -6,6 +6,7 @@ import os
 from collections import defaultdict
 from BaseClasses import Location, Region
 from .data.monster_habitats import monster_habitats
+from .options import VillageQuestDepth, GuildQuestDepth
 
 if typing.TYPE_CHECKING:
     from . import MHFUWorld
@@ -123,11 +124,25 @@ quest_data: typing.List[typing.Dict[str, str]] = \
 
 base_id = 24700000
 
-location_name_to_id = {get_proper_name(info): base_id + id for id, info in enumerate(quest_data)}
+# filter out treasure and training
+location_name_to_id = {get_proper_name(info): base_id + id for id, info in enumerate(quest_data)
+                       if (info["hub"], info["rank"]) != ("0", "4")}
+
+# now handle manually
+next_id = max(location_name_to_id.values()) + 1
+for i, treasure in enumerate([quest for quest in quest_data if quest["hub"] == "0" and quest["rank"] == "4"]):
+    quest_name = get_proper_name(treasure)
+    location_name_to_id[f"{quest_name} - Silver Crown"] = next_id + (i * 2)
+    location_name_to_id[f"{quest_name} - Gold Crown"] = next_id + (i * 2) + 1
 
 
-def get_quest_by_id(idx: str) -> typing.Dict[str, str] | None:
+def get_quest_by_id(idx: str) -> dict[str, str] | None:
     return next((quest for quest in quest_data if quest["qid"] == idx), None)
+
+
+def get_area_quests(ranks: typing.Iterable[tuple[int, int, int]], areas: tuple[int]) -> list[dict[str, typing.Any]]:
+    return [quest for quest in quest_data if (int(quest["hub"]), int(quest["rank"]), int(quest["star"]) in ranks and
+                                              int(quest["stage"]) in areas)]
 
 
 def create_ranks(world: "MHFUWorld"):
@@ -141,9 +156,6 @@ def create_ranks(world: "MHFUWorld"):
             world.rank_requirements[0, 0, i] = 0
         for i in range(hub_rank_max[0, 1]):
             world.rank_requirements[0, 1, i] = 0
-        # check treasure quests
-        if world.options.treasure_quests:
-            world.rank_requirements[0, 4, 0] = 0
         if world.options.guild_depth.value > 1:
             # write high rank
             for i in range(hub_rank_max[0, 2]):
@@ -152,15 +164,18 @@ def create_ranks(world: "MHFUWorld"):
                 # write g rank
                 for i in range(hub_rank_max[0, 3]):
                     world.rank_requirements[0, 3, i] = 0
+    # check treasure quests
+    if world.options.treasure_quests:
+        world.rank_requirements[0, 4, 0] = 0
     if world.options.village_depth:
         # if any village depth, we write low rank
         for i in range(hub_rank_max[1, 0]):
             world.rank_requirements[1, 0, i] = 0
-        if world.options.village_depth == world.options.village_depth.option_high_rank:
+        if world.options.village_depth == VillageQuestDepth.option_high_rank:
             for i in range(hub_rank_max[1, 1]):
                 world.rank_requirements[1, 1, i] = 0
     if world.options.training_quests:
-        for i in range(3 if world.options.guild_depth.value == 3 else 2):
+        for i in range(3 if world.options.guild_depth.value == GuildQuestDepth.option_g_rank else 2):
             world.rank_requirements[2, i, 0] = 0
     for hub, rank, star in world.rank_requirements:
         valid_quests = [quest for quest in quest_data if int(quest["hub"]) == hub
@@ -168,8 +183,30 @@ def create_ranks(world: "MHFUWorld"):
         world.location_num[hub, rank, star] = len(valid_quests)
         region = Region(get_star_name(hub, rank, star),
                         world.player, world.multiworld)
-        region.add_locations({get_proper_name(quest): location_name_to_id[get_proper_name(quest)]
-                              for quest in valid_quests}, MHFULocation)
+        if (hub, rank, star) == (0, 4, 0):
+            # treasure quests are a little weird
+            # 1 is default, 5 are LR Village, 1 is G
+            if not world.options.village_depth:
+                valid_quests = [quest for quest in valid_quests if quest["qid"] in ("m04001", "m04007")]
+            if world.options.guild_depth.value != GuildQuestDepth.option_g_rank:
+                valid_quests = [quest for quest in valid_quests if quest["qid"] != "m04007"]
+            world.location_num[hub, rank, star] = len(valid_quests) * 2
+            region.add_locations({f"{get_proper_name(quest)} - {qtype}":
+                                  location_name_to_id[f"{get_proper_name(quest)} - {qtype}"]
+                                  for quest in valid_quests for qtype in ("Silver Crown", "Gold Crown")}, MHFULocation)
+        elif (hub, rank, star) == (2, 1, 0):
+            # Solo/Group Training has some special casing
+            # namely, guild required
+            if not world.options.guild_depth:
+                valid_quests = [quest for quest in valid_quests if quest["qid"] not in ("m22002", "m22003", "m22004",
+                                                                                        "m22005", "m22006")]
+            elif world.options.guild_depth == GuildQuestDepth.option_low_rank:
+                valid_quests = [quest for quest in valid_quests if quest["qid"] not in ("m22005", "m22006")]
+            region.add_locations({get_proper_name(quest): location_name_to_id[get_proper_name(quest)]
+                                  for quest in valid_quests}, MHFULocation)
+        else:
+            region.add_locations({get_proper_name(quest): location_name_to_id[get_proper_name(quest)]
+                                  for quest in valid_quests}, MHFULocation)
         if world.options.quest_randomization:
             for quest in valid_quests:
                 quest_info = {
