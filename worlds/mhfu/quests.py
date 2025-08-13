@@ -202,6 +202,8 @@ def create_ranks(world: "MHFUWorld"):
                                                                                         "m22005", "m22006")]
             elif world.options.guild_depth == GuildQuestDepth.option_low_rank:
                 valid_quests = [quest for quest in valid_quests if quest["qid"] not in ("m22005", "m22006")]
+            elif world.options.guild_depth == GuildQuestDepth.option_high_rank:
+                valid_quests = [quest for quest in valid_quests if quest["qid"] != "m22006"]
             region.add_locations({get_proper_name(quest): location_name_to_id[get_proper_name(quest)]
                                   for quest in valid_quests}, MHFULocation)
         else:
