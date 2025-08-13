@@ -1,4 +1,4 @@
-from worlds.Files import APDeltaPatch
+from worlds.Files import APProcedurePatch
 import typing
 import settings
 import Utils
@@ -35,12 +35,12 @@ class RomData:
             self.file = bytearray(stream.read())
 
 
-class PokemonBlack2DeltaPatch(APDeltaPatch):
+class PokemonBlack2DeltaPatch(APProcedurePatch):
     game = "Pokemon Black 2"
     patch_file_ending = ".apblack2"
 
 
-class PokemonWhite2DeltaPatch(APDeltaPatch):
+class PokemonWhite2DeltaPatch(APProcedurePatch):
     game = "Pokemon White 2"
     patch_file_ending = ".apwhite2"
 
