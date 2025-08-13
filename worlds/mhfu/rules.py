@@ -31,15 +31,11 @@ def can_reach_area(state: "CollectionState", areas: tuple[int],
 
 
 def can_hunt_any_monster(state: "CollectionState", quest_monsters: dict[str, dict[str, list[int]]],
-                      monsters: list[str], player: int, quest_id: str,
-                      any_monster: bool = False, hub: list[int] | None = None):
-    if not hub:
-        hub = [0, 1]
+                         monsters: list[str], player: int, quest_id: str):
     relevant_mons = [monster_ids[monster] for monster in monsters]
     for monster in relevant_mons:
         monster_quests = [f"m{quest}" for quest in quest_monsters if monster in quest_monsters[quest]["monsters"]
                           and f"m{quest}" != quest_id
-                          and int(get_quest_by_id(f"m{quest}")["hub"]) in hub
                           and get_quest_by_id(f"m{quest}")["rank"] != "4"]
         if any(can_complete_quest(state, quest, player) for quest in monster_quests):
             return True
@@ -47,17 +43,12 @@ def can_hunt_any_monster(state: "CollectionState", quest_monsters: dict[str, dic
 
 
 def can_hunt_all_monsters(state: "CollectionState", quest_monsters: dict[str, dict[str, list[int]]],
-                      monsters: list[str], player: int, quest_id: str,
-                       hub: list[int] | None = None):
-    # any means return true if any, else return true if all
-    if not hub:
-        hub = [0, 1]
+                          monsters: list[str], player: int, quest_id: str):
     relevant_mons = [monster_ids[monster] for monster in monsters]
     for monster in relevant_mons:
         monster_quests = [f"m{quest}" for quest in quest_monsters if monster in quest_monsters[quest]["monsters"]
-                            and f"m{quest}" != quest_id
-                            and int(get_quest_by_id(f"m{quest}")["hub"]) in hub
-                            and get_quest_by_id(f"m{quest}")["rank"] != "4"]
+                          and f"m{quest}" != quest_id
+                          and get_quest_by_id(f"m{quest}")["rank"] != "4"]
         if not any(can_complete_quest(state, quest, player) for quest in monster_quests):
             return False
     return True
@@ -130,7 +121,7 @@ def set_rules(world: "MHFUWorld"):
                          lambda state: can_hunt_any_monster(state, world.quest_info,
                                                             [*list(piscene_wyverns.keys()),
                                                              *list(flying_wyverns.keys()),
-                                                             *list(bird_wyverns.keys())], world.player, quest, True))
+                                                             *list(bird_wyverns.keys())], world.player, quest))
                 # needs access to any Bird/Flying/Piscine that aren't a drome
             add_rule(world.get_location(get_proper_name(get_quest_by_id("m11213"))),
                      lambda state: can_complete_all_quests(state, ["m11211", "m11212"], world.player))
@@ -180,7 +171,7 @@ def set_rules(world: "MHFUWorld"):
                          lambda state: can_hunt_any_monster(state, world.quest_info,
                                                             [*list(piscene_wyverns.keys()),
                                                              *list(flying_wyverns.keys()),
-                                                             *list(bird_wyverns.keys())], world.player, quest, True))
+                                                             *list(bird_wyverns.keys())], world.player, quest))
             for quest in ("m02217", "m02218", "m02219", "m02220", "m02221", "m02222"):
                 add_rule(world.get_location(get_proper_name(get_quest_by_id(quest))),
                          lambda state: can_complete_all_quests(state, ["m02214", "m02215", "m02124", "m02228",
@@ -230,7 +221,8 @@ def set_rules(world: "MHFUWorld"):
             add_rule(world.get_location(get_proper_name(get_quest_by_id("m21010"))),
                      lambda state: can_complete_quest(state, "m10402", world.player))
             add_rule(world.get_location(get_proper_name(get_quest_by_id("m21011"))),
-                     lambda state: can_hunt_all_monsters(state, world.quest_info, ["Cephadrome"], world.player, "m21011")
+                     lambda state: can_hunt_all_monsters(state, world.quest_info, ["Cephadrome"],
+                                                         world.player, "m21011")
                      and can_complete_all_quests(state, ["m21001", "m21002"], world.player))
             add_rule(world.get_location(get_proper_name(get_quest_by_id("m21012"))),
                      lambda state: can_hunt_all_monsters(state, world.quest_info, ["Plesioth"], world.player, "m21012")
