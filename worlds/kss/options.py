@@ -96,6 +96,8 @@ class TheGreatCaveOffensiveGoldThresholds(OptionCounter):
         area: And(int, lambda i: 0 <= i <= 100, error="Value must be between 0 and 100")
         for area in ["Crystal", "Old Tower", "Garden"]
     })
+    min = 0
+    max = 100
     default = {
         "Crystal": 25,
         "Old Tower": 50,
@@ -200,14 +202,14 @@ class KirbyFlavor(OptionDict):
     """
     display_name = "Custom Kirby Flavor"
     default = {
-      "1": "B01810",
-      "2": "F0E0E8",
-      "3": "C8A0A8",
-      "4": "A87070",
-      "5": "E02018",
-      "6": "F0A0B8",
-      "7": "D07880",
-      "8": "A85048",
+        "1": "F8F8F8",
+        "2": "F0E0E8",
+        "3": "E8D0D0",
+        "4": "F0A0B8",
+        "5": "C8A0A8",
+        "6": "A85048",
+        "7": "E02018",
+        "8": "E85048",
     }
     visibility = Visibility.template | Visibility.spoiler  # likely never supported on guis
 
