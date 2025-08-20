@@ -181,7 +181,8 @@ class KSSWorld(World):
 
         required_gold = min(self.options.the_great_cave_offensive_required_gold.value, treasure_value)
 
-        self.treasure_value = [*[math.floor(required_gold * self.options.the_great_cave_offensive_gold_thresholds[region])
+        self.treasure_value = [*[math.floor(required_gold *
+                                            (self.options.the_great_cave_offensive_gold_thresholds[region] / 100))
                                 for region in ["Crystal", "Old Tower", "Garden"]],
                                self.options.the_great_cave_offensive_required_gold.value]
         self.multiworld.itempool += itempool

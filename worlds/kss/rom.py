@@ -6,7 +6,8 @@ import settings
 from worlds.Files import APProcedurePatch, APTokenMixin, APTokenTypes
 from typing import Iterable, TYPE_CHECKING, Optional
 from struct import pack
-from .options import subgame_mapping
+from .options import subgame_mapping, KirbyFlavorPreset
+from .aesthetics import get_palette, get_palette_bytes, palette_factors, palette_addresses
 
 if TYPE_CHECKING:
     from . import KSSWorld
@@ -88,6 +89,18 @@ def patch_rom(world: "KSSWorld", patch: KSSProcedurePatch):
         filter |= 0x800
 
     patch.write_bytes(slot_data + 1, filter.to_bytes(2, "little"))
+
+    # Kirby palette
+    if world.options.kirby_flavor_preset.value:
+        if isinstance(world.options.kirby_flavor_preset.value, int):
+            flavors = {key: world.options.kirby_flavor_preset.value for key in palette_addresses.keys()}
+        else:
+            flavors = {key: KirbyFlavorPreset.options[val]
+                       for key, val in world.options.kirby_flavor_preset.value.items()}
+
+        for ability, flavor in flavors.items():
+            for palette in palette_addresses[ability]:
+                patch.write_bytes(palette, get_palette_bytes(get_palette(world, flavor), palette_factors[palette]))
 
     patch_name = bytearray(
         f'KSS{Utils.__version__.replace(".", "")[0:3]}_{world.player}_{world.multiworld.seed:11}\0', 'utf8')[:21]
