@@ -284,7 +284,7 @@ garden_locations = {
     location_names.tgco_ga_wheel: LocationData(BASE_ID + 0x833, "essence"),
     location_names.tgco_ga_sleep: LocationData(BASE_ID + 0x834, "essence"),
     location_names.tgco_ga_parasol_1: LocationData(BASE_ID + 0x835, "essence"),
-    location_names.tgco_ga_1up_2: LocationData(BASE_ID + 0x219, "essence"),
+    location_names.tgco_ga_1up_2: LocationData(BASE_ID + 0x219, "one_up"),
     location_names.tgco_ga_maxim_6: LocationData(BASE_ID + 0x126, "maxim"),
     location_names.tgco_ga_maxim_7: LocationData(BASE_ID + 0x127, "maxim"),
     location_names.tgco_ga_1up_3: LocationData(BASE_ID + 0x21A, "one_up"),
