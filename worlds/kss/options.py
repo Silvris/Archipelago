@@ -2,6 +2,7 @@ from Options import (PerGameCommonOptions, Range, Choice, OptionSet, OptionDict,
                      OptionCounter, Visibility)
 from dataclasses import dataclass
 from schema import Schema, And, Use, Optional, Or
+import random
 from .aesthetics import palette_addresses
 
 
@@ -152,8 +153,8 @@ class KirbyFlavorPreset(Choice, OptionDict):
     display_name = "Kirby Flavor"
     valid_keys = sorted(palette_addresses.keys())
     schema = Schema(Or(str, int, {
-        Optional(And(str, Use(str.title), lambda s: s in palette_addresses)): And(str, Use(str.lower),
-                                                                                  lambda s: s in KirbyFlavorPreset.options)
+        Optional(And(str, Use(str.title), lambda s: s in palette_addresses)):
+            And(str, Use(str.lower), lambda s: s in KirbyFlavorPreset.options)
     }))
     default = 0
     option_default = 0
@@ -177,8 +178,24 @@ class KirbyFlavorPreset(Choice, OptionDict):
         self.value: int | dict = value
 
     @classmethod
+    def parse_weighted_option(cls, value: dict[str, int]):
+        for key in value.keys():
+            if key.lower() not in cls.options and key.lower() != "random":
+                raise KeyError(
+                    f'Could not find option "{key}" for "{cls.__name__}", '
+                    f'known options are {", ".join(f"{option}" for option in cls.name_lookup.values())}')
+        return random.choices(list(value.keys()), weights=list(value.values()), k=1)[0]
+
+    @classmethod
     def from_any(cls, value):
         if isinstance(value, dict):
+            if any(key not in cls.valid_keys for key in value.keys()):
+                # We have to assume that this is a weighted option
+                val = cls.parse_weighted_option(value)
+                return super().from_any(val)
+            for key in value.keys():
+                if value[key].lower() == "random":
+                    value[key] = random.choice(list([key for key, val in cls.options.items() if val >= 0]))
             return cls(value)
         else:
             return super().from_any(value)
@@ -187,10 +204,9 @@ class KirbyFlavorPreset(Choice, OptionDict):
         if not isinstance(self.value, int):
             super().verify_keys()
 
-    @classmethod
-    def get_option_name(cls, value):
+    def get_option_name(self, value):
         if isinstance(value, int):
-            return cls.name_lookup[value].replace("_", " ").title()
+            return self.name_lookup[value].replace("_", " ").title()
         else:
             return super().get_option_name(value)
 
