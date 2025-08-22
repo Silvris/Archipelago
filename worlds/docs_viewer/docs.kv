@@ -1,5 +1,60 @@
+<WorldButton>:
+    theme_width: "Custom"
+    width: "145dp"
+    theme_height: "Custom"
+    height: max(dp(40), button_text.height)
+    MDButtonText:
+        id: button_text
+        text: self.parent.name
+        adaptive_size: False
+        adaptive_height: True
+
+<DocumentVisual>:
+    id: main
+    style: "filled"
+    padding: "4dp"
+    size_hint: 1, None
+    height: "75dp"
+    focus_behavior: False
+    button: button
+
+    MDRelativeLayout:
+        MDLabel:
+            text: main.name
+            pos_hint:{"center_x": 0.35, "center_y": 0.75 if main.description else 0.65}
+            halign: "center"
+            font_style: "Title"
+            role: "medium"
+            theme_text_color: "Custom"
+            text_color: app.theme_cls.onSurfaceColor
+
+        MDLabel:
+            text: main.description
+            pos_hint: {"center_x": 0.35, "center_y": 0.35}
+            halign: "center"
+            role: "small"
+            theme_text_color: "Custom"
+            text_color: app.theme_cls.onSurfaceColor
+
+        MDLabel:
+            text: main.authors
+
+        MDButton:
+            id: button
+            MDButtonText:
+                text: "Open"
+
+<DocumentSelect>:
+    scroll: scroll
+    ScrollBox:
+        id: scroll
+
 ContainerLayout:
     md_bg_color: app.theme_cls.backgroundColor
+    main: main
+    visual: visual
+    scrollbox: scrollbox
+    screen_manager: screen_manager
 
     MainLayout:
         id: main
@@ -18,3 +73,11 @@ ContainerLayout:
 
         MainLayout:
             id: visual
+
+            MDScreenManager:
+                id: screen_manager
+                size_hint: None, None
+                width: self.parent.width
+                height: self.parent.height
+                x: self.parent.x
+                y: self.parent.y
