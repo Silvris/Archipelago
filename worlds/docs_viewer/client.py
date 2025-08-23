@@ -1,6 +1,7 @@
 import pkgutil
 import zipfile
 import os
+from collections import Counter
 from io import BytesIO
 from typing import Type
 
@@ -30,15 +31,24 @@ class DocumentVisual(MDCard):
     name: str = StringProperty("")
     description: str = StringProperty("")
     authors: str = StringProperty("")
+    language: str = StringProperty("")
     relative_path: str = StringProperty("")
     button: MDButton = ObjectProperty(None)
+    multilang: bool = False
 
-    def __init__(self, name, description, authors, relative_path, *args, **kwargs):
+    def __init__(self, name, description, authors, language, relative_path, multilang,  *args, **kwargs):
+        self.multilang = multilang
         super().__init__(*args, **kwargs)
         self.name = name
         self.description = description
         self.authors = authors
+        self.language = language
         self.relative_path = relative_path
+        self.button.bind(on_release=self.open_doc)
+
+
+    def open_doc(self, button: MDButton):
+        pass
 
 
 class DocumentView(MDScreen):
@@ -77,14 +87,18 @@ class DocumentSelect(MDScreen):
             for lang in web.game_info_languages:
                 rel_path = self.check_exists(world, f"{lang}_{world.game}")
                 if rel_path:
-                    self.scroll.layout.add_widget(DocumentVisual(f"{world.game} Info ({lang.upper()})",
+                    self.scroll.layout.add_widget(DocumentVisual(f"{world.game} Info",
                                                                  f"Game info for {world.game} "
-                                                                 f"for language {lang.upper()}.","", rel_path))
+                                                                 f"for language {lang.upper()}.","",
+                                                                 lang.upper(), rel_path, True))
+            lang_count = Counter([tutorial.tutorial_name for tutorial in web.tutorials])
             for tutorial in web.tutorials:
                 path = self.check_exists(world, tutorial.file_name)
                 if path:
                     self.scroll.layout.add_widget(DocumentVisual(tutorial.tutorial_name, tutorial.description,
-                                                                 ", ".join(tutorial.authors), path))
+                                                                 ", ".join(tutorial.authors), tutorial.language, path,
+                                                                 lang_count[tutorial.tutorial_name] > 1))
+
         else:
             self.scroll.layout.add_widget(MDLabel("No documents could be found for this game."))
 
