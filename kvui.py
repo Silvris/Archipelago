@@ -40,7 +40,7 @@ from kivy.core.clipboard import Clipboard
 from kivy.core.text.markup import MarkupLabel
 from kivy.core.image import ImageLoader, ImageLoaderBase, ImageData
 from kivy.base import ExceptionHandler, ExceptionManager
-from kivy.clock import Clock
+from kivy.clock import Clock, ClockEvent
 from kivy.factory import Factory
 from kivy.properties import BooleanProperty, ObjectProperty, NumericProperty, StringProperty
 from kivy.metrics import dp, sp
@@ -63,7 +63,7 @@ from kivymd.uix.boxlayout import MDBoxLayout
 from kivymd.uix.navigationbar import MDNavigationBar, MDNavigationItem
 from kivymd.uix.screen import MDScreen
 from kivymd.uix.screenmanager import MDScreenManager
-
+from kivymd.uix.behaviors import HoverBehavior
 from kivymd.uix.menu import MDDropdownMenu
 from kivymd.uix.menu.menu import MDDropdownTextItem
 from kivymd.uix.dropdownitem import MDDropDownItem, MDDropDownItemText
@@ -89,6 +89,8 @@ else:
 
 remove_between_brackets = re.compile(r"\[.*?]")
 
+#TODO: remove after a couple of versions (or stable KivyMD)
+ResizableTextField = MDTextField
 
 class ThemedApp(MDApp):
     def set_colors(self):
@@ -168,74 +170,6 @@ class ToggleButton(MDButton, ToggleButtonBehavior):
                 child.text_color = self.theme_cls.primaryColor
                 child.icon_color = self.theme_cls.primaryColor
 
-
-# thanks kivymd
-class ResizableTextField(MDTextField):
-    """
-    Resizable MDTextField that manually overrides the builtin sizing.
-
-    Note that in order to use this, the sizing must be specified from within a .kv rule.
-    """
-    def __init__(self, *args, **kwargs):
-        # cursed rules override
-        rules = Builder.match(self)
-        textfield = next((rule for rule in rules if rule.name == f"<MDTextField>"), None)
-        if textfield:
-            subclasses = rules[rules.index(textfield) + 1:]
-            for subclass in subclasses:
-                height_rule = subclass.properties.get("height", None)
-                if height_rule:
-                    height_rule.ignore_prev = True
-        super().__init__(*args, **kwargs)
-
-
-def on_release(self: MDButton, *args):
-    super(MDButton, self).on_release(args)
-    self.on_leave()
-
-
-MDButton.on_release = on_release
-
-
-# I was surprised to find this didn't already exist in kivy :(
-class HoverBehavior(object):
-    """originally from https://stackoverflow.com/a/605348110"""
-    hovered = BooleanProperty(False)
-    border_point = ObjectProperty(None)
-
-    def __init__(self, **kwargs):
-        self.register_event_type("on_enter")
-        self.register_event_type("on_leave")
-        Window.bind(mouse_pos=self.on_mouse_pos)
-        Window.bind(on_cursor_leave=self.on_cursor_leave)
-        super(HoverBehavior, self).__init__(**kwargs)
-
-    def on_mouse_pos(self, window, pos):
-        if not self.get_root_window():
-            return  # Abort if not displayed
-
-        # to_widget translates window pos to within widget pos
-        inside = self.collide_point(*self.to_widget(*pos))
-        if self.hovered == inside:
-            return  # We have already done what was needed
-        self.border_point = pos
-        self.hovered = inside
-
-        if inside:
-            self.dispatch("on_enter")
-        else:
-            self.dispatch("on_leave")
-
-    def on_cursor_leave(self, *args):
-        # if the mouse left the window, it is obviously no longer inside the hover label.
-        self.hovered = BooleanProperty(False)
-        self.border_point = ObjectProperty(None)
-        self.dispatch("on_leave")
-
-
-Factory.register("HoverBehavior", HoverBehavior)
-
-
 class ToolTip(MDTooltipPlain):
     pass
 
@@ -244,7 +178,7 @@ class ServerToolTip(ToolTip):
     pass
 
 
-class HovererableLabel(HoverBehavior, MDLabel):
+class HovererableLabel(MDLabel, HoverBehavior):
     pass
 
 
@@ -259,22 +193,21 @@ class TooltipLabel(HovererableLabel, MDTooltip):
         shift_x = center_x - x
         if shift_x > 0:
             self.shift_left = shift_x
+            self.shift_right = 0
         else:
-            self.shift_right = shift_x
+            self.shift_left = 0
+            self.shift_right = -shift_x
 
         if self._tooltip:
             # update
             self._tooltip.text = text
         else:
-            self._tooltip = ToolTip(text=text, pos_hint={})
+            self._tooltip = ToolTip(text=text)
             self.display_tooltip()
 
-    def on_mouse_pos(self, window, pos):
-        if not self.get_root_window():
-            return  # Abort if not displayed
-        super().on_mouse_pos(window, pos)
-        if self.refs and self.hovered:
-
+    def on_mouse_update(self, window, pos):
+        super().on_mouse_update(window, pos)
+        if self.refs and self.hover_visible:
             tx, ty = self.to_widget(*pos, relative=True)
             # Why TF is Y flipped *within* the texture?
             ty = self.texture_size[1] - ty
@@ -288,6 +221,7 @@ class TooltipLabel(HovererableLabel, MDTooltip):
                         break
             if not hit:
                 self.remove_tooltip()
+                self._tooltip = None
 
     def on_enter(self):
         pass
@@ -310,7 +244,10 @@ class ServerLabel(HoverBehavior, MDTooltip, MDBoxLayout):
 
     def on_enter(self):
         self._tooltip.text = self.get_text()
-        self.display_tooltip()
+        if self._tooltip.parent:
+            self.remove_tooltip()
+
+        Clock.schedule_once(self.display_tooltip, 0.5)
 
     def on_leave(self):
         self.animation_tooltip_dismiss()
@@ -495,11 +432,11 @@ class MarkupDropdown(MDDropdownMenu):
             self.menu.data = self._items
 
 
-class AutocompleteHintInput(ResizableTextField):
+class AutocompleteHintInput(MDTextField):
     min_chars = NumericProperty(3)
 
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
 
         self.dropdown = MarkupDropdown(caller=self, position="bottom", border_margin=dp(2), width=self.width)
         self.bind(on_text_validate=self.on_message)
@@ -656,7 +593,7 @@ class HintLabel(RecycleDataViewBehavior, MDBoxLayout):
             self.selected = is_selected
 
 
-class ConnectBarTextInput(ResizableTextField):
+class ConnectBarTextInput(MDTextField):
     def insert_text(self, substring, from_undo=False):
         s = substring.replace("\n", "").replace("\r", "")
         return super(ConnectBarTextInput, self).insert_text(s, from_undo=from_undo)
@@ -666,11 +603,11 @@ def is_command_input(string: str) -> bool:
     return len(string) > 0 and string[0] in "/!"
 
 
-class CommandPromptTextInput(ResizableTextField):
+class CommandPromptTextInput(MDTextField):
     MAXIMUM_HISTORY_MESSAGES = 50
 
-    def __init__(self, **kwargs) -> None:
-        super().__init__(**kwargs)
+    def __init__(self, *args, **kwargs) -> None:
+        super().__init__(*args, **kwargs)
         self._command_history_index = -1
         self._command_history: typing.Deque[str] = deque(maxlen=CommandPromptTextInput.MAXIMUM_HISTORY_MESSAGES)
 
@@ -812,11 +749,14 @@ class CommandButton(MDButton, MDTooltip):
     def on_enter(self):
         self._tooltip.text = self.manager.commandprocessor.get_help_text()
         self._tooltip.font_size = dp(20 - (len(self._tooltip.text) // 400))  # mostly guessing on the numbers here
-        self.display_tooltip()
+        if self._tooltip.parent:
+            self.remove_tooltip()
+            print("Tooltip has parent")
 
-    def on_leave(self):
+        Clock.schedule_once(self.display_tooltip, 0.5)
+
+    def on_leave(self) -> None:
         self.animation_tooltip_dismiss()
-
 
 class GameManager(ThemedApp):
     logging_pairs = [
@@ -887,7 +827,6 @@ class GameManager(ThemedApp):
             if not self.ctx.server:
                 self.connect_button_action(sender)
 
-        self.server_connect_bar.height = dp(30)
         self.server_connect_bar.bind(on_text_validate=connect_bar_validate)
         self.connect_layout.add_widget(self.server_connect_bar)
         self.server_connect_button = MDButton(MDButtonText(text="Connect"), style="filled", size=(dp(100), dp(70)),
