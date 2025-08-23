@@ -33,10 +33,11 @@ class DocumentVisual(MDCard):
     relative_path: str = StringProperty("")
     button: MDButton = ObjectProperty(None)
 
-    def __init__(self, name, description, relative_path, *args, **kwargs):
+    def __init__(self, name, description, authors, relative_path, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.name = name
         self.description = description
+        self.authors = authors
         self.relative_path = relative_path
 
 
@@ -78,11 +79,12 @@ class DocumentSelect(MDScreen):
                 if rel_path:
                     self.scroll.layout.add_widget(DocumentVisual(f"{world.game} Info ({lang.upper()})",
                                                                  f"Game info for {world.game} "
-                                                                 f"for language {lang.upper()}.", rel_path))
+                                                                 f"for language {lang.upper()}.","", rel_path))
             for tutorial in web.tutorials:
                 path = self.check_exists(world, tutorial.file_name)
                 if path:
-                    self.scroll.layout.add_widget(DocumentVisual(tutorial.tutorial_name, tutorial.description, path))
+                    self.scroll.layout.add_widget(DocumentVisual(tutorial.tutorial_name, tutorial.description,
+                                                                 ", ".join(tutorial.authors), path))
         else:
             self.scroll.layout.add_widget(MDLabel("No documents could be found for this game."))
 
