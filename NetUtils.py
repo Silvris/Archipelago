@@ -358,13 +358,16 @@ def add_json_hint_status(parts: list, hint_status: HintStatus, text: typing.Opti
 
 class Hint(typing.NamedTuple):
     receiving_player: int
-    finding_player: int
-    location: int
-    item: int
-    found: bool
-    entrance: str = ""
+    finding_player: int | None
+    location: int | None
+    item: int | None
+    found: bool | None
+    info: dict[str, str] | str # verb-noun pair
     item_flags: int = 0
     status: HintStatus = HintStatus.HINT_UNSPECIFIED
+
+    def __reduce__(self):
+        pass
 
     def re_check(self, ctx, team) -> Hint:
         if self.found and self.status == HintStatus.HINT_FOUND:
@@ -382,7 +385,7 @@ class Hint(typing.NamedTuple):
         return self
 
     def __hash__(self):
-        return hash((self.receiving_player, self.finding_player, self.location, self.item, self.entrance))
+        return hash((self.receiving_player, self.finding_player, self.location, self.item, self.info.get("at", None)))
 
     def as_network_message(self) -> dict:
         parts = []
@@ -394,11 +397,14 @@ class Hint(typing.NamedTuple):
         add_json_location(parts, self.location, self.finding_player)
         add_json_text(parts, " in ")
         add_json_text(parts, self.finding_player, type="player_id")
+        add_json_text(parts, "'s World")
         if self.entrance:
             add_json_text(parts, "'s World at ")
             add_json_text(parts, self.entrance, type="entrance_name")
         else:
-            add_json_text(parts, "'s World")
+            for verb, noun in self.info.items():
+                add_json_text(parts, f" {verb} ")
+                add_json_text(parts, noun, type="entrance_name")
         add_json_text(parts, ". ")
         add_json_hint_status(parts, self.status)
 
