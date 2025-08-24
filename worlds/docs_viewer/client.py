@@ -8,7 +8,9 @@ from typing import Type
 from kvui import (ThemedApp, ScrollBox, MainLayout, ContainerLayout, ApAsyncImage, MDScreenManager, MDScreen)
 from kivy.lang.builder import Builder
 from kivy.properties import StringProperty, ObjectProperty
-from kivymd.uix.button import MDButton, MDButtonText
+from kivy.uix.widget import Widget
+from kivymd.app import MDApp
+from kivymd.uix.button import MDButton, MDButtonText, MDIconButton
 from kivymd.uix.card import MDCard
 from kivymd.uix.label import MDLabel
 from kivy.core.window import Window
@@ -48,11 +50,30 @@ class DocumentVisual(MDCard):
 
 
     def open_doc(self, button: MDButton):
-        pass
+        MDApp.get_running_app().display_doc(self)
 
 
 class DocumentView(MDScreen):
     name = "DocumentView"
+    scroll: ScrollBox = ObjectProperty(None)
+    back: MDIconButton = ObjectProperty(None)
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.scroll.layout.spacing = 10
+        self.scroll.layout.padding = (5, 10)
+
+    def load_document(self, document: str):
+        self.scroll.layout.clear_widgets()
+
+        doc_strs = document.split("\n")
+
+        for string in doc_strs:
+            if string:
+                self.scroll.layout.add_widget(MDLabel(text=string))
+            else:
+                self.scroll.layout.add_widget(Widget())
+
 
 
 class DocumentSelect(MDScreen):
@@ -70,11 +91,11 @@ class DocumentSelect(MDScreen):
             zf = zipfile.ZipFile(BytesIO(open(world.zip_path, 'rb').read()))
             docs = zipfile.Path(zf, f"{os.path.basename(world.zip_path).split('.')[0]}/docs/{path}")
             if docs.exists():
-                return docs.name
+                return str(docs.at).split("/", maxsplit=1)[1]
             return None
         else:
-            rel_path = f"/docs/{path}"
-            if os.path.exists(f"{os.path.dirname(world.__file__)}{rel_path}"):
+            rel_path = f"docs/{path}"
+            if os.path.exists(f"{os.path.dirname(world.__file__)}/{rel_path}"):
                 return rel_path
             return None
 
@@ -112,6 +133,7 @@ class DocsViewer(ThemedApp):
     screen_manager: MDScreenManager
     doc_select: DocumentSelect
     doc_view: DocumentView
+    game: str
 
     def add_world_button(self, world: Type[World], path: str):
         button = WorldButton(world.game, path)
@@ -120,7 +142,14 @@ class DocsViewer(ThemedApp):
 
     def show_world_docs(self, world: Type[World]):
         self.screen_manager.current = self.doc_select.name
+        self.game = world.game
         self.doc_select.populate(world)
+
+    def display_doc(self, visual: DocumentVisual):
+        world = AutoWorldRegister.world_types[self.game]
+        self.screen_manager.current = self.doc_view.name
+        self.doc_view.load_document(pkgutil.get_data(world.__module__, visual.relative_path).decode("utf-8"))
+
 
     def build(self):
         self.set_colors()

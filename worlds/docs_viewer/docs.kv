@@ -59,6 +59,16 @@
     ScrollBox:
         id: scroll
 
+<DocumentView>:
+    scroll: scroll
+    back: back
+    ScrollBox:
+        id: scroll
+
+    MDIconButton:
+        id: back
+        icon: "arrow-left"
+
 ContainerLayout:
     md_bg_color: app.theme_cls.backgroundColor
     main: main
@@ -83,11 +93,7 @@ ContainerLayout:
 
         MainLayout:
             id: visual
+            cols: 1
 
             MDScreenManager:
                 id: screen_manager
-                size_hint: None, None
-                width: self.parent.width
-                height: self.parent.height
-                x: self.parent.x
-                y: self.parent.y
