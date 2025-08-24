@@ -124,6 +124,19 @@ filler_weights = {
     "Zenny Bag": 4
 }
 
+trap_items = {
+    "Farcaster": ItemData(247000510, False, trap=True),
+    "Paratoad": ItemData(247000511, False, trap=True),
+    "Sleeptoad": ItemData(247000512, False, trap=True),
+    "Poisontoad": ItemData(247000513, False, trap=True),
+    "Blango Artillery": ItemData(247000514, False, trap=True),
+    "Puppet Spider": ItemData(247000515, False, trap=True),
+    "Blastoad": ItemData(247000516, False, trap=True),
+    "Gustcrab": ItemData(247000517, False, trap=True),
+    "Wailnard": ItemData(247000518, False, trap=True),
+    "Pincercrab": ItemData(247000519, False, trap=True),
+}
+
 item_table = {
     **weapon_item_table,
     **armor_item_table,

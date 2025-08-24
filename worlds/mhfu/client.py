@@ -100,9 +100,13 @@ ACTIONS = {
     -1: 0x0300,  # Kill Player
     10: 0x0072,  # Farcaster
     11: 0x0215,  # Sleep
-    12: 0x0216,  # Paralysis
-    13: 0x021B,  # Snowman
-    14: 0x0019,  # Use Item
+    13: 0x0216,  # Paralysis
+    14: 0x021B,  # Snowman
+    15: 0x0019,  # Use Item
+    16: 0x0202,  # Knockback
+    17: 0x0204,  # Blowback
+    18: 0x0219,  # Roar
+    19: 0x0205,  # Trip
 }
 
 KEY_OFFSETS = {
@@ -599,6 +603,9 @@ class MHFUContext(CommonContext):
             else:
                 self.item_queue.append(item)
 
+    def pop_trap(self):
+        pass
+
     def receive_items(self, items: typing.List[NetworkItem]):
         # we might need to come up with a data storage solution for weapon/armor gifts, but for now, grant always
         for item in items:
@@ -754,6 +761,9 @@ async def game_watcher(ctx):
                     await ctx.ppsspp_write_unsigned(MHFU_POINTERS[ctx.lang]["NARGA_HYPNOC_CUTSCENE"], cutscenes | 0x60)
                     ctx.set_cutscene = None
                 await ctx.pop_item()
+                if current_overlay["value"] == "game_task.ovl":
+                    # we're on a hunt
+                    await ctx.pop_trap()
         except Exception as ex:
             Utils.messagebox("Error", str(ex), True)
 
