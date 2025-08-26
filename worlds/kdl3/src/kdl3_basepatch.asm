@@ -545,9 +545,44 @@ ConsumableSet:
     PHY
     AND #$00FF
     PHA
-    LDX $53CF
-    LDY $53D3
+    LDA.l DoorHandling+1
+    BEQ .DirectLoad
+    LDA $3643
+    BNE .ByIndex
+    LDA $363F
+    ASL
+    TAX
+    LDA $FF0020, X
+    STA $00
+    LDA #$00FF
+    STA $02
+    LDA $3641
+    ASL
+    TAY
+    LDA [$00], Y
+    BRA .ReadRemap
+    .ByIndex:
+    ASL
+    ASL
+    CLC
+    ADC #$0084
+    .ReadRemap:
+    ORA #$B000
+    STA $00
+    LDA #$00C4
+    STA $02
+    LDY #$0002
+    LDA [$00], Y
+    TAY
+    LDA [$00]
+    TAX
     LDA #$0000
+    BRA .Next
+    .DirectLoad:
+    LDX $363F
+    LDY $3641
+    LDA #$0000
+    .Next:
     DEY
     .LoopLevel:
     CPX #$0000
@@ -1234,12 +1269,59 @@ StarsSet:
     PHX
     PHY
     LDX $901A
-    BEQ .ApplyStar
+    BNE .ContinueBlock
+.ApplyStar:
+    LDA $39D7
+    INC
+    ORA #$8000
+    STA $39D7
+    PLY
+    PLX
+    PLA
+    XBA
     AND #$00FF
-    PHA
-    LDX $53CF
-    LDY $53D3
+    RTL
+.ContinueBlock:
+    AND #$00FF
+    PHA    
+    LDA.l DoorHandling+1
+    BEQ .DirectLoad
+    LDA $3643
+    BNE .ByIndex
+    LDA $363F
+    ASL
+    TAX
+    LDA $FF0020, X
+    STA $00
+    LDA #$00FF
+    STA $02
+    LDA $3641
+    ASL
+    TAY
+    LDA [$00], Y
+    BRA .ReadRemap
+    .ByIndex:
+    ASL
+    ASL
+    CLC
+    ADC #$0084
+    .ReadRemap:
+    ORA #$B000
+    STA $00
+    LDA #$00C4
+    STA $02
+    LDY #$0002
+    LDA [$00], Y
+    TAY
+    LDA [$00]
+    TAX
     LDA #$0000
+    BRA .Next
+    .DirectLoad:
+    LDX $363F
+    LDY $3641
+    LDA #$0000
+    .Next:
     DEY
     .LoopLevel:
     CPX #$0000
@@ -1290,12 +1372,6 @@ StarsSet:
     XBA
     AND #$00FF
     RTL
-    .ApplyStar:
-    LDA $39D7
-    INC
-    ORA #$8000
-    STA $39D7
-    BRA .Return
 
 ApplyLocalCheck:
 ; args: A-address of check following $08B000
@@ -1362,8 +1438,11 @@ DoorHandling:
     RTL
 
 DoorHandling2:
-    print "Door Enable 2: ", hex(snestopc(realbase()))
-    LDX #$0000
+    PHA
+    LDA.l DoorHandling+1
+    TAX
+    PLA
+    CPX #$0000
     BEQ .VanillaLoad
     LDX $B0
     BNE .VanillaLoad

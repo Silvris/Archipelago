@@ -274,6 +274,7 @@ class KDL3Room(Region):
         self.entrance_coords = entrances
         self.spawn = spawn
         self.index = index
+        self.original = (self.level - 1, self.stage - 1)  # set on init, don't adjust further
         self.default_spawn = False
 
     def patch(self, patch: "KDL3ProcedurePatch", consumables: bool, local_items: bool, doors: bool, random: Random) -> None:

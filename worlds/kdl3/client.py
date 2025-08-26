@@ -131,7 +131,8 @@ class KDL3SNIClient(SNIClient):
         if current_stage[0] == 0x7:  # boss stage
             boss_hp = await snes_read(ctx, KDL3_BOSS_HP, 1)
             if boss_hp[0] == 0:
-                remaining_hp = 1  # receiving a deathlink after defeating a boss has softlock potential
+                remaining_hp = max(1, remaining_hp)
+                # receiving a deathlink after defeating a boss has softlock potential
 
         snes_buffered_write(ctx, KDL3_KIRBY_HP, remaining_hp.to_bytes(2, "little"))
 

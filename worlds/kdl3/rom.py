@@ -123,8 +123,7 @@ consumable_size = 698
 
 stage_palettes = [0x60964, 0x60B64, 0x60D64, 0x60F64, 0x61164]
 
-door_enable = 0x3A20A
-door_enable_2 = 0x3A232
+door_enable = 0x3A294
 
 music_choices = [
     2,  # Boss 1
@@ -557,7 +556,6 @@ def patch_rom(world: "KDL3World", patch: KDL3ProcedurePatch) -> None:
 
     if world.options.door_shuffle:
         patch.write_token(APTokenTypes.WRITE, door_enable + 1, int.to_bytes(1, 2, "little"))
-        patch.write_token(APTokenTypes.WRITE, door_enable_2 + 1, int.to_bytes(1, 2, "little"))
         for level in range(1, 6):
             level_region = world.get_region(level_names_inverse[level])
             for connection in level_region.get_exits():
@@ -567,7 +565,13 @@ def patch_rom(world: "KDL3World", patch: KDL3ProcedurePatch) -> None:
                                                                       (connected.stage - 1) * 2),
                                       int.to_bytes((connected.index * 4) + 0x84, 2, "little"))
 
-        
+    for level in range(1, 6):
+        level_region = world.get_region(level_names_inverse[level])
+        for connection in level_region.get_exits():
+            connected = connection.connected_region
+            if isinstance(connected, KDL3Room):
+                patch.write_token(APTokenTypes.WRITE, 0x4B084 + (connected.index * 4),
+                                  struct.pack("HH", *connected.original))
 
     from Utils import __version__
     patch_name = bytearray(
