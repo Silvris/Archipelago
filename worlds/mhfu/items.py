@@ -124,24 +124,25 @@ filler_weights = {
     "Zenny Bag": 4
 }
 
-trap_items = {
-    "Farcaster": ItemData(247000510, False, trap=True),
-    "Paratoad": ItemData(247000511, False, trap=True),
-    "Sleeptoad": ItemData(247000512, False, trap=True),
-    "Poisontoad": ItemData(247000513, False, trap=True),
-    "Blango Artillery": ItemData(247000514, False, trap=True),
-    "Puppet Spider": ItemData(247000515, False, trap=True),
-    "Blastoad": ItemData(247000516, False, trap=True),
-    "Gustcrab": ItemData(247000517, False, trap=True),
-    "Wailnard": ItemData(247000518, False, trap=True),
-    "Pincercrab": ItemData(247000519, False, trap=True),
+trap_item_table = {
+    "Farcaster": ItemData(24700510, False, trap=True),
+    "Paratoad": ItemData(24700511, False, trap=True),
+    "Sleeptoad": ItemData(24700512, False, trap=True),
+    "Poisontoad": ItemData(24700513, False, trap=True),
+    "Blango Artillery": ItemData(24700514, False, trap=True),
+    "Puppet Spider": ItemData(24700515, False, trap=True),
+    "Blastoad": ItemData(24700516, False, trap=True),
+    "Gustcrab": ItemData(24700517, False, trap=True),
+    "Wailnard": ItemData(24700518, False, trap=True),
+    "Pincercrab": ItemData(24700519, False, trap=True),
 }
 
 item_table = {
     **weapon_item_table,
     **armor_item_table,
     **progression_item_table,
-    **filler_item_table
+    **filler_item_table,
+    **trap_item_table
 }
 
 item_name_groups = {

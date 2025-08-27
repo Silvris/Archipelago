@@ -374,6 +374,7 @@ class MHFUContext(CommonContext):
     debugger: typing.Optional[client.WebSocketClientProtocol] = None
     watcher_task = None
     want_slot_data = True
+    server_seed_name: str | None = None
 
     # game info
     recv_index = -1
@@ -556,7 +557,7 @@ class MHFUContext(CommonContext):
             if item.item == 24700083:
                 # Zenny Bag
                 current_zenny = (await self.ppsspp_read_unsigned(MHFU_POINTERS[self.lang]["ZENNY"], 16))["value"]
-                await self.ppsspp_write_unsigned(MHFU_POINTERS[self.lang]["ZENNY"], current_zenny + 50000, 16)
+                await self.ppsspp_write_unsigned(MHFU_POINTERS[self.lang]["ZENNY"], current_zenny + 50000, 32)
             elif item.item in (24700079, 24700080):
                 # Equipment
                 e_type = random.choice([5, 6]) if item.item == 24700079 else random.choice(range(5))
@@ -619,12 +620,20 @@ class MHFUContext(CommonContext):
             else:
                 self.item_queue.append(item)
 
-    def pop_trap(self):
-        pass
+    async def pop_trap(self):
+        if self.trap_queue:
+            trap = self.trap_queue.pop()
+            if trap == 13:
+                # Poison
+                await self.ppsspp_write_unsigned(MHFU_POINTERS[self.lang]["POISON_TIMER"], 60, 16)
+            else:
+                # Set Action
+                await self.ppsspp_write_unsigned(MHFU_POINTERS[self.lang]["RESET_ACTION"], 1)
+                res = await self.ppsspp_write_unsigned(MHFU_POINTERS[self.lang]["SET_ACTION"], ACTIONS[trap], 16)
+                print(res)
 
     def receive_items(self, items: list[NetworkItem]):
         # we might need to come up with a data storage solution for weapon/armor gifts, but for now, grant always
-        self.recv_index = (await self.ppsspp_read_unsigned(MHFU_POINTERS[self.lang]["AP_SAVE"] + 4, 32))["value"]
         i = 0
         for i, item in enumerate(items):
             if item.item == 24700077:
@@ -641,6 +650,7 @@ class MHFUContext(CommonContext):
                     self.trap_queue.append(item.item - 24700500)
             elif item_id_to_name[item.item] in item_name_groups["Weapons"]:
                 # there's like 50 of these gimme a break
+                self.refresh = True
                 local_id = item.item - base_id
                 weapon_group = local_id // 11
                 if weapon_group < 11:
@@ -678,16 +688,17 @@ class MHFUContext(CommonContext):
                     self.armor_status.add(current_max + 1)
                 else:
                     self.armor_status.add(local_id)
+                self.refresh = True
         else:
             if i > self.recv_index:
                 self.recv_index = i
-                self.ppsspp_write_unsigned(MHFU_POINTERS[self.lang]["AP_SAVE"] + 4, i, 32)
-        self.refresh = True
+                asyncio.create_task(self.ppsspp_write_unsigned(MHFU_POINTERS[self.lang]["AP_SAVE"] + 4, i, 32))
 
     def run_gui(self):
         from kvui import GameManager, MDLabel
 
         class MHFUManager(GameManager):
+            ctx: MHFUContext
             logging_pairs = [
                 ("Client", "Archipelago"),
                 ("PPSSPP", "PPSSPP"),
@@ -704,6 +715,12 @@ class MHFUContext(CommonContext):
 
                 self.connect_layout.add_widget(keys)
                 return b
+
+            def on_stop(self):
+                if self.ctx:
+                    if self.ctx.debugger:
+                        self.ctx.debugger.close()
+                super().on_stop()
 
             def update_keys(self, current, target):
                 if self.keys:
@@ -731,6 +748,8 @@ class MHFUContext(CommonContext):
             self.unlocked_keys = 0
             self.refresh = True
             self.set_cutscene = args["slot_data"]["set_cutscene"]
+        elif cmd == "RoomInfo":
+            self.server_seed_name = args.get("seed_name", None)
         elif cmd == "ReceivedItems":
             self.receive_items(args["items"])
 
@@ -753,13 +772,17 @@ async def game_watcher(ctx):
                 ap_info = (await ctx.ppsspp_read_unsigned(MHFU_POINTERS[ctx.lang]["AP_SAVE"], 32))["value"]
 
                 if ap_info != 0:
-                    if ap_info != crc32(ctx.seed_name):
-                        ppsspp_logger.error("This hunter is registered to another multiworld!"
+                    if ap_info != crc32(ctx.server_seed_name.encode("utf-8")):
+                        ppsspp_logger.error("This hunter is registered to another multiworld!\n"
                                             "Please make sure you loaded the correct save.")
-                        ctx.disconnect(False)
+                        await ctx.disconnect(False)
+                        continue
                 else:
                     # generate a new id and save on save file
-                    await ctx.ppsspp_write_unsigned(MHFU_POINTERS[ctx.lang]["AP_SAVE"], crc32(ctx.seed_name), 32)
+                    await ctx.ppsspp_write_unsigned(MHFU_POINTERS[ctx.lang]["AP_SAVE"],
+                                                    crc32(ctx.server_seed_name.encode("utf-8")), 32)
+
+                ctx.recv_index = (await ctx.ppsspp_read_unsigned(MHFU_POINTERS[ctx.lang]["AP_SAVE"] + 4, 32))["value"]
 
                 if ctx.refresh:
                     await ctx.get_key_binary()
