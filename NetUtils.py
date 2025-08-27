@@ -356,6 +356,14 @@ def add_json_hint_status(parts: list, hint_status: HintStatus, text: typing.Opti
                   "hint_status": hint_status, "type": JSONTypes.hint_status, **kwargs})
 
 
+class CompatHint(object):
+    def __new__(cls, receiving_player: int, finding_player: int | None, location: int | None, item: int | None,
+                found: bool | None, info: dict[str, str] | str, item_flags: int | None, status: HintStatus | None):
+        if isinstance(info, str):
+            info = {"at": info}
+        return Hint(receiving_player, finding_player, location, item, found, info, item_flags, status)
+
+
 class Hint(typing.NamedTuple):
     receiving_player: int
     finding_player: int | None

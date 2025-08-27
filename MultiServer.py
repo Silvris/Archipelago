@@ -189,7 +189,7 @@ class Context:
     location_checks: typing.Dict[typing.Tuple[int, int], typing.Set[int]]
     hints_used: typing.Dict[typing.Tuple[int, int], int]
     groups: typing.Dict[int, typing.Set[int]]
-    save_version = 2
+    save_version = 3
     stored_data: typing.Dict[str, object]
     read_data: typing.Dict[str, object]
     stored_data_notification_clients: typing.Dict[str, typing.Set[Client]]
@@ -652,7 +652,8 @@ class Context:
         self.received_items = savedata["received_items"]
         self.hints_used.update(savedata["hints_used"])
         self.hints.update(savedata["hints"])
-        self.additional_hints.update(savedata["additional_hints"])
+        if "additional_hints" in savedata:
+            self.additional_hints.update(savedata["additional_hints"])
 
         self.name_aliases.update(savedata["name_aliases"])
         self.client_game_state.update(savedata["client_game_state"])
@@ -667,7 +668,8 @@ class Context:
 
         if "game_options" in savedata:
             self.hint_cost = savedata["game_options"]["hint_cost"]
-            self.bonus_hint_percent = savedata["game_options"]["bonus_hint_percent"]
+            if "bonus_hint_percent" in savedata["game_options"]:
+                self.bonus_hint_percent = savedata["game_options"]["bonus_hint_percent"]
             self.location_check_points = savedata["game_options"]["location_check_points"]
             self.server_password = savedata["game_options"]["server_password"]
             self.password = savedata["game_options"]["password"]
