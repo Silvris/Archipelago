@@ -123,7 +123,7 @@ consumable_size = 698
 
 stage_palettes = [0x60964, 0x60B64, 0x60D64, 0x60F64, 0x61164]
 
-door_enable = 0x3A294
+door_enable = 0x3A293
 
 music_choices = [
     2,  # Boss 1

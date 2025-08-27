@@ -577,12 +577,11 @@ ConsumableSet:
     LDA [$00]
     TAX
     LDA #$0000
-    BRA .Next
+    BRA .LoopLevel
     .DirectLoad:
     LDX $363F
     LDY $3641
     LDA #$0000
-    .Next:
     DEY
     .LoopLevel:
     CPX #$0000
@@ -1316,13 +1315,11 @@ StarsSet:
     LDA [$00]
     TAX
     LDA #$0000
-    BRA .Next
+    BRA .LoopLevel
     .DirectLoad:
     LDX $363F
     LDY $3641
     LDA #$0000
-    .Next:
-    DEY
     .LoopLevel:
     CPX #$0000
     BEQ .LoopStage
