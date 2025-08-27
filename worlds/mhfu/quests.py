@@ -120,11 +120,11 @@ def get_star_name(hub, rank, star):
 
 
 quest_data: typing.List[typing.Dict[str, str]] = \
-    orjson.loads(pkgutil.get_data(__name__, os.path.join("data", "quests.json")))
+    orjson.loads(pkgutil.get_data(__name__, "data/quests.json"))
 
 base_id = 24700000
 
-# filter out treasure and training
+# filter out treasure
 location_name_to_id = {get_proper_name(info): base_id + id for id, info in enumerate(quest_data)
                        if (info["hub"], info["rank"]) != ("0", "4")}
 

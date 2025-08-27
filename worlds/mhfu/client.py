@@ -12,9 +12,10 @@ from websockets import client
 import base64
 import json
 import struct
+from zlib import crc32
 
 from NetUtils import NetworkItem, ClientStatus
-from .quests import quest_data, base_id, goal_quests
+from .quests import quest_data, base_id, goal_quests, get_quest_by_id, get_proper_name, location_name_to_id
 from .items import item_name_to_id, item_id_to_name, item_name_groups
 from .data.monsters import elder_dragons, monster_lookup
 from .data.equipment import blademaster, gunner, blademaster_upgrades, gunner_upgrades, \
@@ -61,12 +62,14 @@ MHFU_POINTERS = {
         "BLADEMASTER_UPGRADES": 0x0894CEC0,
         "GUNNER_UPGRADES": 0x08954C88,
         "NARGA_HYPNOC_CUTSCENE": 0x09995ED4,
+        "TREASURE_SCORE": 0x099FD1A0,
         "ZENNY": 0x099FF090,
         "CURRENT_OVL": 0x09A5A5A0,
         "RESET_ACTION": 0x090AF355,  # byte
         "SET_ACTION": 0x090AF418,  # half
         "FAIL_QUEST": 0x09A01B1C,  # byte
         "POISON_TIMER": 0x090AF508,  # half
+        "AP_SAVE": 0x099FC080,  # 96th GC slot, hopefully you don't have 96 lol
         # "QUEST_VISUAL_GOAL": 0x09B1DA48,
         # "QUEST_VISUAL_MON": 0x9B1DDAE8,
     }
@@ -78,20 +81,22 @@ MHFU_BREAKPOINTS = {
     # disabled effectively acting as an event system
     # memory being this is a memory breakpoint, else it's CPU
     # CPU breakpoints don't use read/write/change
-    "QUEST_LOAD": (True, 0x08A57510, 1, True, True, True, False, False),
-    # "QUEST_COMPLETE": (True, 0x09999DC8, 63, False, True, False, True, True),
-    "MONSTER_LOAD": (False, 0x08871C24, 1, True, True, False, False, False),
-    # "MONSTER_LOAD_RESPAWN": (False, 0x09B18F10, 1, True, True, False, False, False),
-    "QUEST_VISUAL_LOAD": (False, 0x09A8346C, 1, False, True, False, False, False),
-    "QUEST_VISUAL_TYPE": (False, 0x09A8319C, 1, True, True, False, False, False)
+    "JP": {
+        "QUEST_LOAD": (True, 0x08A57510, 1, True, True, True, False, False),
+        # "QUEST_COMPLETE": (True, 0x09999DC8, 63, False, True, False, True, True),
+        "MONSTER_LOAD": (False, 0x08871C24, 1, True, True, False, False, False),
+        "QUEST_VISUAL_LOAD": (False, 0x09A8346C, 1, False, True, False, False, False),
+        "QUEST_VISUAL_TYPE": (False, 0x09A8319C, 1, True, True, False, False, False)
+    },
+    "US": {
 
+    }
 }
 
 MHFU_BREAKPOINT_ARGS = {
     # do this so we can just pass the former directly, while parse this one
     # this lets us pull register info from the breakpoint
     "MONSTER_LOAD": ["{v0+0x2E4:p}"],
-    #"MONSTER_LOAD_RESPAWN": ["{s2}"],
     "QUEST_VISUAL_TYPE": ["{v0},{v0+0x18:p}"],
     "QUEST_VISUAL_LOAD": ["{v0-0x448},{v0-0xa8},{s4+0x20:p}"]
 }
@@ -139,6 +144,16 @@ WEAPON_GROUPS = {
     4: [1, 5, 10]
 }
 
+TREASURE_SCORES = {
+    "m04001": (20000, 30000),
+    "m04002": (30000, 35000),
+    "m04003": (30000, 35000),
+    "m04004": (30000, 40000),
+    "m04005": (30000, 40000),
+    "m04006": (40000, 45000),
+    "m04007": (40000, 50000),
+}
+
 
 def split_log_mem(data: str) -> tuple[int, int]:
     # PPSSPP uses the format %x[%x] for memory logging
@@ -155,7 +170,7 @@ async def handle_logs(ctx: MHFUContext, logs: typing.List):
             print(breakpoint)
             if breakpoint == "QUEST_LOAD":
                 if ctx.randomize_quest:
-                    quest_base = MHFU_BREAKPOINTS[breakpoint][1]
+                    quest_base = MHFU_BREAKPOINTS[ctx.lang][breakpoint][1]
                     quest_id = (await ctx.ppsspp_read_unsigned(quest_base + 100, 16))["value"]
                     large_mon_ptr_ptr = quest_base + 0x14
                     large_mon_ptr = (await ctx.ppsspp_read_unsigned(large_mon_ptr_ptr, 32))["value"]
@@ -253,7 +268,7 @@ async def handle_logs(ctx: MHFUContext, logs: typing.List):
                         qtype = 0x1
                     await ctx.ppsspp_write_bytes(quest_addr, qtype.to_bytes(1, "little"))
 
-            if MHFU_BREAKPOINTS[breakpoint][3]:
+            if MHFU_BREAKPOINTS[ctx.lang][breakpoint][3]:
                 # this break point stops emulation, we need to restart it
                 await send_and_receive(ctx, json.dumps({"event": "cpu.resume"}), "cpu.resume")
 
@@ -325,19 +340,19 @@ async def connect_psp(ctx: MHFUContext, target: typing.Optional[int] = None):
     else:
         ctx.lang = "JP"
     ppsspp_logger.info(f"Connected to PPSSPP {hello['version']} playing Monster Hunter Freedom Unite!")
-    for breakpoint in MHFU_BREAKPOINTS:
-        if MHFU_BREAKPOINTS[breakpoint][0]:
+    for breakpoint in MHFU_BREAKPOINTS[ctx.lang]:
+        if MHFU_BREAKPOINTS[ctx.lang][breakpoint][0]:
             response = await send_and_receive(ctx, json.dumps(
                 dict(zip(["event", "address", "size", "enabled", "log", "read", "write", "change", "logFormat"],
-                         ["memory.breakpoint.add", *MHFU_BREAKPOINTS[breakpoint][1:],
+                         ["memory.breakpoint.add", *MHFU_BREAKPOINTS[ctx.lang][breakpoint][1:],
                           '|'.join([breakpoint, *MHFU_BREAKPOINT_ARGS.get(breakpoint, list())])]
                          ))), "memory.breakpoint.add")
         else:
             response = await send_and_receive(ctx, json.dumps(
                 dict(zip(
                     ["event", "address", "enabled", "log", "logFormat"],
-                    ["cpu.breakpoint.add", MHFU_BREAKPOINTS[breakpoint][1], MHFU_BREAKPOINTS[breakpoint][3],
-                     MHFU_BREAKPOINTS[breakpoint][4], '|'.join([breakpoint, *MHFU_BREAKPOINT_ARGS.get(breakpoint, list())])]
+                    ["cpu.breakpoint.add", MHFU_BREAKPOINTS[ctx.lang][breakpoint][1], MHFU_BREAKPOINTS[ctx.lang][breakpoint][3],
+                     MHFU_BREAKPOINTS[ctx.lang][breakpoint][4], '|'.join([breakpoint, *MHFU_BREAKPOINT_ARGS.get(breakpoint, list())])]
                 ))
             ), "cpu.breakpoint.add")
     return
@@ -388,6 +403,7 @@ class MHFUContext(CommonContext):
     quest_multiplier: float = 1.0
     cash_only: bool = False
     item_queue: list[NetworkItem] = []
+    trap_queue: list[int] = []
     set_cutscene: typing.Optional[bool] = None
 
     # intermitten
@@ -427,7 +443,7 @@ class MHFUContext(CommonContext):
 
     async def ppsspp_write_unsigned(self, offset, value, length=8):
         if length not in (8, 16, 32):
-            raise Exception("Can only read 8/16/32-bit integers.")
+            raise Exception("Can only write 8/16/32-bit integers.")
         if value > pow(2, length):
             raise Exception("Attempted a write greater than the possible size of the location.")
         result = await send_and_receive(self, json.dumps({
@@ -606,15 +622,23 @@ class MHFUContext(CommonContext):
     def pop_trap(self):
         pass
 
-    def receive_items(self, items: typing.List[NetworkItem]):
+    def receive_items(self, items: list[NetworkItem]):
         # we might need to come up with a data storage solution for weapon/armor gifts, but for now, grant always
-        for item in items:
+        self.recv_index = (await self.ppsspp_read_unsigned(MHFU_POINTERS[self.lang]["AP_SAVE"] + 4, 32))["value"]
+        i = 0
+        for i, item in enumerate(items):
             if item.item == 24700077:
                 # Key Quest
                 self.unlocked_keys += 1
             elif item.item in range(24700079, 24700084):
-                # Can only handle these in specific ovls
-                self.item_queue.append(item)
+                if i > self.recv_index:
+                    # Can only handle these in specific ovls
+                    self.item_queue.append(item)
+            elif item.item >= 24700500:
+                # traps
+                if i > self.recv_index:
+                    # Can only handle these in specific ovls
+                    self.trap_queue.append(item.item - 24700500)
             elif item_id_to_name[item.item] in item_name_groups["Weapons"]:
                 # there's like 50 of these gimme a break
                 local_id = item.item - base_id
@@ -637,12 +661,12 @@ class MHFUContext(CommonContext):
                             current_max = 0
                         else:
                             current_max = max(self.weapon_status[0])
-                        for i in range(11):
-                            self.weapon_status[i].add(current_max + 1)
+                        for j in range(11):
+                            self.weapon_status[j].add(current_max + 1)
                     else:
                         rarity = local_id % 11
-                        for i in range(11):
-                            self.weapon_status[i].add(rarity)
+                        for j in range(11):
+                            self.weapon_status[j].add(rarity)
             elif item_id_to_name[item.item] in item_name_groups["Armor"]:
                 local_id = item.item - base_id - 66
                 if local_id == 0:
@@ -654,8 +678,11 @@ class MHFUContext(CommonContext):
                     self.armor_status.add(current_max + 1)
                 else:
                     self.armor_status.add(local_id)
+        else:
+            if i > self.recv_index:
+                self.recv_index = i
+                self.ppsspp_write_unsigned(MHFU_POINTERS[self.lang]["AP_SAVE"] + 4, i, 32)
         self.refresh = True
-        self.recv_index = len(items)
 
     def run_gui(self):
         from kvui import GameManager, MDLabel
@@ -719,49 +746,76 @@ async def game_watcher(ctx):
             if ctx.server is None or ctx.slot is None:
                 continue
 
-            if ctx.refresh:
-                await ctx.get_key_binary()
-                await ctx.set_equipment_status()
-                ctx.refresh = False
-
-            new_checks = []
-            quest_changed = False
-            completion_bytes = await ctx.ppsspp_read_bytes(MHFU_POINTERS[ctx.lang]["QUEST_COMPLETE"], 63)
-            quest_completion = bytearray(base64.b64decode(completion_bytes["base64"]))
-            for id, quest in enumerate(quest_data):
-                flag = int(quest["flag"])
-                mask = int(quest["mask"])
-                if flag >= 0 and mask >= 0:
-                    if quest_completion[flag] & (1 << mask):
-                        if base_id + id not in ctx.checked_locations and base_id + id not in ctx.locations_checked:
-                            new_checks.append(id + base_id)
-                        if quest["qid"] == ctx.goal_quest and not ctx.finished_game:
-                            await ctx.send_msgs([{"cmd": "StatusUpdate", "status": ClientStatus.CLIENT_GOAL}])
-                            ctx.finished_game = True
-                    elif base_id + id in ctx.checked_locations:
-                        quest_changed = True
-                        quest_completion[flag] |= (1 << mask)
-            if quest_changed:
-                await ctx.ppsspp_write_bytes(MHFU_POINTERS[ctx.lang]["QUEST_COMPLETE"], bytes(quest_completion))
-
-            if new_checks:
-                for new_check_id in new_checks:
-                    ctx.locations_checked.add(new_check_id)
-                    location = ctx.location_names.lookup_in_game(new_check_id)
-                    ppsspp_logger.info(
-                        f'New Check: {location} ({len(ctx.locations_checked)}/{len(ctx.missing_locations) + len(ctx.checked_locations)})')
-                    await ctx.send_msgs([{"cmd": 'LocationChecks', "locations": [new_check_id]}])
-
             current_overlay = await ctx.ppsspp_read_string(MHFU_POINTERS[ctx.lang]["CURRENT_OVL"])
-            if current_overlay["value"] in ("game_task.ovl", "lobby_task.ovl"):
+            if current_overlay["value"] in ("game_task.ovl", "lobby_task.ovl", "arcade_task.ovl"):
                 # we have loaded a character, and are in the lobby or on a hunt
+
+                ap_info = (await ctx.ppsspp_read_unsigned(MHFU_POINTERS[ctx.lang]["AP_SAVE"], 32))["value"]
+
+                if ap_info != 0:
+                    if ap_info != crc32(ctx.seed_name):
+                        ppsspp_logger.error("This hunter is registered to another multiworld!"
+                                            "Please make sure you loaded the correct save.")
+                        ctx.disconnect(False)
+                else:
+                    # generate a new id and save on save file
+                    await ctx.ppsspp_write_unsigned(MHFU_POINTERS[ctx.lang]["AP_SAVE"], crc32(ctx.seed_name), 32)
+
+                if ctx.refresh:
+                    await ctx.get_key_binary()
+                    await ctx.set_equipment_status()
+                    ctx.refresh = False
+
+                new_checks = []
+                quest_changed = False
+                completion_bytes = await ctx.ppsspp_read_bytes(MHFU_POINTERS[ctx.lang]["QUEST_COMPLETE"], 63)
+                quest_completion = bytearray(base64.b64decode(completion_bytes["base64"]))
+                for id, quest in enumerate(quest_data):
+                    flag = int(quest["flag"])
+                    mask = int(quest["mask"])
+                    if flag >= 0 and mask >= 0:
+                        if quest_completion[flag] & (1 << mask):
+                            if base_id + id not in ctx.checked_locations and base_id + id not in ctx.locations_checked:
+                                new_checks.append(id + base_id)
+                            if quest["qid"] == ctx.goal_quest and not ctx.finished_game:
+                                await ctx.send_msgs([{"cmd": "StatusUpdate", "status": ClientStatus.CLIENT_GOAL}])
+                                ctx.finished_game = True
+                        elif base_id + id in ctx.checked_locations:
+                            quest_changed = True
+                            quest_completion[flag] |= (1 << mask)
+                if quest_changed:
+                    await ctx.ppsspp_write_bytes(MHFU_POINTERS[ctx.lang]["QUEST_COMPLETE"], bytes(quest_completion))
+
+                treasure_score = struct.unpack("IIIIIII",
+                                               base64.b64decode((await ctx.ppsspp_read_bytes(MHFU_POINTERS[ctx.lang]["TREASURE_SCORE"], 28))["base64"]))
+                for score, quest in zip(treasure_score, (f"m0400{i}" for i in range(1, 8))):
+                    silver, gold = TREASURE_SCORES[quest]
+                    if score >= silver:
+                        quest_name = get_proper_name(get_quest_by_id(quest))
+                        silver_id = location_name_to_id[f"{quest_name} - Silver Crown"]
+                        if silver_id not in ctx.checked_locations:
+                            new_checks.append(silver_id)
+                        if score >= gold:
+                            gold_id = location_name_to_id[f"{quest_name} - Gold Crown"]
+                            if gold_id not in ctx.checked_locations:
+                                new_checks.append(gold_id)
+
+                if new_checks:
+                    for new_check_id in new_checks:
+                        ctx.locations_checked.add(new_check_id)
+                        location = ctx.location_names.lookup_in_game(new_check_id)
+                        ppsspp_logger.info(
+                            f'New Check: {location} ({len(ctx.locations_checked)}/'
+                            f'{len(ctx.missing_locations) + len(ctx.checked_locations)})')
+                        await ctx.send_msgs([{"cmd": 'LocationChecks', "locations": [new_check_id]}])
+
                 if ctx.set_cutscene:
                     cutscenes = (await ctx.ppsspp_read_unsigned(MHFU_POINTERS[ctx.lang]["NARGA_HYPNOC_CUTSCENE"]))[
                         "value"]
                     await ctx.ppsspp_write_unsigned(MHFU_POINTERS[ctx.lang]["NARGA_HYPNOC_CUTSCENE"], cutscenes | 0x60)
                     ctx.set_cutscene = None
                 await ctx.pop_item()
-                if current_overlay["value"] == "game_task.ovl":
+                if current_overlay["value"] in ("game_task.ovl", "arcade_task.ovl"):
                     # we're on a hunt
                     await ctx.pop_trap()
         except Exception as ex:
