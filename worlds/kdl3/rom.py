@@ -565,13 +565,9 @@ def patch_rom(world: "KDL3World", patch: KDL3ProcedurePatch) -> None:
                                                                       (connected.stage - 1) * 2),
                                       int.to_bytes((connected.index * 4) + 0x84, 2, "little"))
 
-    for level in range(1, 6):
-        level_region = world.get_region(level_names_inverse[level])
-        for connection in level_region.get_exits():
-            connected = connection.connected_region
-            if isinstance(connected, KDL3Room):
-                patch.write_token(APTokenTypes.WRITE, 0x4B084 + (connected.index * 4),
-                                  struct.pack("HH", *connected.original))
+    for room in world.rooms:
+        patch.write_token(APTokenTypes.WRITE, 0x4B084 + (room.index * 4),
+                          struct.pack("HH", *room.original))
 
     from Utils import __version__
     patch_name = bytearray(

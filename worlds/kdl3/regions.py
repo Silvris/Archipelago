@@ -441,6 +441,8 @@ def shuffle_doors(world: "KDL3World"):
         if room.name in linked_rooms:
             for region in linked_rooms[room.name]:
                 r_room = world.get_region(region)
+                r_room.level = room.level
+                r_room.stage = room.stage
                 for r_exit in r_room.get_exits():
                     r_exit.randomization_group = stage_group
 
