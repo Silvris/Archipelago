@@ -374,9 +374,6 @@ class Hint(typing.NamedTuple):
     item_flags: int = 0
     status: HintStatus = HintStatus.HINT_UNSPECIFIED
 
-    def __reduce__(self):
-        pass
-
     def re_check(self, ctx, team) -> Hint:
         if self.found and self.status == HintStatus.HINT_FOUND:
             return self
