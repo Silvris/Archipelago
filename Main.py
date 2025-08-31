@@ -240,7 +240,7 @@ def main(args, seed=None, baked_server_options: dict[str, object] | None = None)
 
             def write_multidata():
                 import NetUtils
-                from NetUtils import HintStatus
+                from NetUtils import HintStatus, HintType
                 slot_data: dict[int, Mapping[str, Any]] = {}
                 client_versions: dict[int, tuple[int, int, int]] = {}
                 games: dict[int, str] = {}
@@ -272,7 +272,8 @@ def main(args, seed=None, baked_server_options: dict[str, object] | None = None)
                 def precollect_hint(location: Location, auto_status: HintStatus):
                     entrance = er_hint_data.get(location.player, {}).get(location.address, "")
                     hint = NetUtils.Hint(location.item.player, location.player, location.address,
-                                         location.item.code, False, entrance, location.item.flags, auto_status)
+                                         location.item.code, False, entrance, location.item.flags, auto_status,
+                                         HintType.LocationHint)
                     precollected_hints[location.player].add(hint)
                     if location.item.player not in multiworld.groups:
                         precollected_hints[location.item.player].add(hint)

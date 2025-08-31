@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from collections.abc import Mapping, Sequence
+from re import split
 import typing
 import enum
 import warnings
@@ -356,12 +357,19 @@ def add_json_hint_status(parts: list, hint_status: HintStatus, text: typing.Opti
                   "hint_status": hint_status, "type": JSONTypes.hint_status, **kwargs})
 
 
+class HintType(enum.IntEnum):
+    LocationHint = 0
+    VagueHint = 1
+    FreeTextHint = 2
+
+
 class CompatHint(object):
     def __new__(cls, receiving_player: int, finding_player: int | None, location: int | None, item: int | None,
-                found: bool | None, info: dict[str, str] | str, item_flags: int | None, status: HintStatus | None):
+                found: bool | None, info: dict[str, str] | str, item_flags: int | None, status: HintStatus | None,
+                hint_type: HintType | None):
         if isinstance(info, str):
             info = {"at": info}
-        return Hint(receiving_player, finding_player, location, item, found, info, item_flags, status)
+        return Hint(receiving_player, finding_player, location, item, found, info, item_flags, status, hint_type)
 
 
 class Hint(typing.NamedTuple):
@@ -370,9 +378,11 @@ class Hint(typing.NamedTuple):
     location: int | None
     item: int | None
     found: bool | None
-    info: dict[str, str] | str # verb-noun pair
+    info: dict[str, str]  # verb-noun pair
     item_flags: int = 0
     status: HintStatus = HintStatus.HINT_UNSPECIFIED
+    hint_type: HintType = HintType.LocationHint
+    free_text: str = ""
 
     def re_check(self, ctx, team) -> Hint:
         if self.found and self.status == HintStatus.HINT_FOUND:
@@ -395,27 +405,70 @@ class Hint(typing.NamedTuple):
     def as_network_message(self) -> dict:
         parts = []
         add_json_text(parts, "[Hint]: ")
-        add_json_text(parts, self.receiving_player, type="player_id")
-        add_json_text(parts, "'s ")
-        add_json_item(parts, self.item, self.receiving_player, self.item_flags)
-        add_json_text(parts, " is at ")
-        add_json_location(parts, self.location, self.finding_player)
-        add_json_text(parts, " in ")
-        add_json_text(parts, self.finding_player, type="player_id")
-        add_json_text(parts, "'s World")
-        if self.entrance:
-            add_json_text(parts, "'s World at ")
-            add_json_text(parts, self.entrance, type="entrance_name")
-        else:
+        if self.hint_type < 2:
+            add_json_text(parts, self.receiving_player, type="player_id")
+            add_json_text(parts, "'s ")
+            if self.hint_type == 1:
+                if self.item_flags & 0b001:
+                    item_hint = "Progression Item"
+                elif self.item_flags & 0b010:
+                    item_hint = "Useful Item"
+                elif self.item_flags & 0b100:
+                    item_hint = "Trap Item"
+                else:
+                    item_hint = "Filler Item"
+                add_json_text(parts, item_hint, player=self.receiving_player,
+                              flags=self.item_flags, type=JSONTypes.item_id)
+            else:
+                add_json_item(parts, self.item, self.receiving_player, self.item_flags)
+            add_json_text(parts, " is at ")
+            add_json_location(parts, self.location, self.finding_player)
+            add_json_text(parts, " in ")
+            add_json_text(parts, self.finding_player, type="player_id")
+            add_json_text(parts, "'s World")
             for verb, noun in self.info.items():
                 add_json_text(parts, f" {verb} ")
                 add_json_text(parts, noun, type="entrance_name")
-        add_json_text(parts, ". ")
+            add_json_text(parts, ". ")
+        else:
+            tokens = split(r"(\{\w+})", self.free_text)
+            for token in tokens:
+                if token:
+                    if token.startswith("{"):
+                        token = token[1:-1]
+                        if token.lower() == "receiving":
+                            add_json_text(parts, self.receiving_player, type="player_id")
+                        elif token.lower() == "finding":
+                            add_json_text(parts, self.finding_player, type="player_id")
+                        elif token.lower() == "item":
+                            add_json_item(parts, self.item, self.receiving_player, self.item_flags)
+                        elif token.lower() == "location":
+                            add_json_location(parts, self.location, self.finding_player)
+                        elif token.lower() == "item_flag":
+                            if self.item_flags & 0b001:
+                                item_hint = "Progression Item"
+                            elif self.item_flags & 0b010:
+                                item_hint = "Useful Item"
+                            elif self.item_flags & 0b100:
+                                item_hint = "Trap Item"
+                            else:
+                                item_hint = "Filler Item"
+                            add_json_text(parts, item_hint, player=self.receiving_player,
+                                          flags=self.item_flags, type=JSONTypes.item_id)
+                        # let unrecognized tokens just fall through
+                    else:
+                        add_json_text(parts, token)
         add_json_hint_status(parts, self.status)
+
+        if self.item:
+            net_item = NetworkItem(self.item, self.location, self.finding_player, self.item_flags)
+        else:
+            net_item = None
 
         return {"cmd": "PrintJSON", "data": parts, "type": "Hint",
                 "receiving": self.receiving_player,
-                "item": NetworkItem(self.item, self.location, self.finding_player, self.item_flags),
+                "hint_type": self.hint_type,
+                "item": net_item,
                 "found": self.found}
 
     @property

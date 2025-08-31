@@ -241,7 +241,7 @@ class Context:
         self.location_check_points = location_check_points
         self.hints_used = collections.defaultdict(int)
         self.hints: typing.Dict[team_slot, typing.Set[Hint]] = collections.defaultdict(set)
-        self.additional_hints : typing.Dict[team_slot, float] = collections.defaultdict(float)
+        self.additional_hints: typing.Dict[team_slot, float] = collections.defaultdict(float)
         self.release_mode: str = release_mode
         self.remaining_mode: str = remaining_mode
         self.collect_mode: str = collect_mode
