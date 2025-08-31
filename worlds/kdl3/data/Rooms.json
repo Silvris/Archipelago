@@ -16166,7 +16166,7 @@
         "music": 11,
         "entrances": [
             [
-                264,
+                136,
                 152
             ]
         ],
@@ -16225,7 +16225,7 @@
         "music": 11,
         "entrances": [
             [
-                136,
+                200,
                 152
             ]
         ],
@@ -16283,7 +16283,7 @@
         "music": 11,
         "entrances": [
             [
-                328,
+                264,
                 152
             ]
         ],
@@ -16348,7 +16348,7 @@
         "music": 11,
         "entrances": [
             [
-                200,
+                328,
                 152
             ]
         ],
@@ -16901,7 +16901,7 @@
                 "access_rule": []
             },
             "Cloudy Park 6 - 11 Exit 1": {
-                "room": "Cloudy Park 6 - 4-2",
+                "room": "Cloudy Park 6 - 4-4",
                 "self-x": 8,
                 "self-y": 9,
                 "target-x": 264,
@@ -16910,7 +16910,7 @@
                 "access_rule": []
             },
             "Cloudy Park 6 - 11 Exit 2": {
-                "room": "Cloudy Park 6 - 4-3",
+                "room": "Cloudy Park 6 - 4-2",
                 "self-x": 12,
                 "self-y": 9,
                 "target-x": 136,
@@ -16919,7 +16919,7 @@
                 "access_rule": []
             },
             "Cloudy Park 6 - 11 Exit 3": {
-                "room": "Cloudy Park 6 - 4-4",
+                "room": "Cloudy Park 6 - 4-5",
                 "self-x": 16,
                 "self-y": 9,
                 "target-x": 328,
@@ -16928,7 +16928,7 @@
                 "access_rule": []
             },
             "Cloudy Park 6 - 11 Exit 4": {
-                "room": "Cloudy Park 6 - 4-5",
+                "room": "Cloudy Park 6 - 4-3",
                 "self-x": 20,
                 "self-y": 9,
                 "target-x": 200,

@@ -13,6 +13,7 @@ from .aesthetics import get_palette_bytes, kirby_target_palettes, get_kirby_pale
 from .compression import hal_decompress
 from .names.location_name import level_names_inverse
 from .room import KDL3Room
+from .regions import split_rooms
 import bsdiff4
 
 if TYPE_CHECKING:
@@ -564,6 +565,10 @@ def patch_rom(world: "KDL3World", patch: KDL3ProcedurePatch) -> None:
                     patch.write_token(APTokenTypes.WRITE, 0x3F002E + (((connected.level - 1) * 14) +
                                                                       (connected.stage - 1) * 2),
                                       int.to_bytes((connected.index * 4) + 0x84, 2, "little"))
+                    # special case: if starting room is a split room, we have to update starting coords
+                    if connected.name in split_rooms and connected.entrance_coords:
+                        patch.write_token(APTokenTypes.WRITE, connected.pointer + 72,
+                                          struct.pack("HH", *world.random.choice(connected.entrance_coords)))
 
     for room in world.rooms:
         patch.write_token(APTokenTypes.WRITE, 0x4B084 + (room.index * 4),
