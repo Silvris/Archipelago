@@ -14,7 +14,7 @@ from Utils import async_start
 from worlds.AutoSNIClient import SNIClient
 from .locations import boss_locations
 from .gifting import kdl3_gifting_options, kdl3_trap_gifts, kdl3_gifts, update_object, pop_object, initialize_giftboxes
-from .client_addrs import consumable_addrs, star_addrs, trap_link_matches, trap_link_sends
+from .client_addrs import consumable_addrs, star_addrs, trap_link_matches, trap_link_sends, damage_traps
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -205,18 +205,15 @@ class KDL3SNIClient(SNIClient):
         if cmd == "Bounced" and "tags" in args and "TrapLink" in args["tags"]:
             data: dict = args["data"]
             trap_name: str = data["trap_name"]
-            if data["time"] < self.last_trap_link + 1 or trap_name not in trap_link_matches:
+            if data["time"] < self.last_trap_link + 1 or trap_name not in (*trap_link_matches.keys(),
+                                                                           *damage_traps.keys()):
                 return
 
             snes_logger.info(f"Received {trap_name} from {data['source']}")
-            if not trap_link_matches[trap_name]:
-                # these require special handling
-                if trap_name in ("Instant Death Trap", ):
-                    asyncio.run(self.damage_kirby(ctx, 10))
-                elif trap_name in ("Damage Trap", "TNT Barrel Trap", ):
-                    asyncio.run(self.damage_kirby(ctx, 1))
-            else:
+            if trap_name in trap_link_matches:
                 self.item_queue.extend(trap_link_matches[trap_name])
+            elif trap_name in damage_traps:
+                asyncio.run(self.damage_kirby(ctx, damage_traps[trap_name]))
 
     async def pop_gift(self, ctx: "SNIContext") -> None:
         if self.giftbox_key in ctx.stored_data and ctx.stored_data[self.giftbox_key]:
