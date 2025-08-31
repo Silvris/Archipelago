@@ -623,12 +623,17 @@ def shuffle_doors(world: "KDL3World"):
                 room = entrance.connected_region
                 room.entrances.remove(entrance)
                 entrances.remove(entrance)
-                exit.connected_region = room
+                exit.connect(room)
                 distance -= 1
                 room = find_nearest_entrance(exit.parent_region, world, found_regions).connected_region
-                found_regions.append(room.name)
+                new_regions = [room.name]
+                for exit in room.exits:
+                    if exit.connected_region:
+                        new_regions.append(exit.connected_region.name)
+                found_regions.extend(new_regions)
 
-                if room.name in required_regions or all(region in found_regions for region in required_regions):
+                if any(region in required_regions for region in new_regions) \
+                        or all(region in found_regions for region in required_regions):
                     break
             if not all(region in found_regions for region in required_regions):
                 # manually place the required
@@ -637,12 +642,15 @@ def shuffle_doors(world: "KDL3World"):
                 req = req_regions.pop()
                 req_reg = world.get_region(req)
                 exit: KDL3Door = world.random.choice([ex for ex in req_reg.get_exits() if not ex.connected_region])
-                exit.connected_region = room
+                exit.connect(room)
                 exits.remove(exit)
                 entrance = find_nearest_entrance(room, world, found_regions)
                 room.entrances.remove(entrance)
                 entrances.remove(entrance)
                 found_regions.append(req)
+                for ent in req_reg.entrances:
+                    if ent.parent_region:
+                        found_regions.append(ent.parent_region.name)
                 room = req_reg
 
     for i in range(1, 6):
@@ -660,9 +668,8 @@ def shuffle_doors(world: "KDL3World"):
                     if not retries:
                         raise
 
-
-    visualize_regions(world.multiworld.get_region("Menu", world.player), "kdl3_doors.puml", show_locations=False)
-    #raise NotImplementedError
+    # visualize_regions(world.multiworld.get_region("Menu", world.player), "kdl3_doors.puml", show_locations=False)
+    # raise NotImplementedError
 
 
 def create_levels(world: "KDL3World") -> None:

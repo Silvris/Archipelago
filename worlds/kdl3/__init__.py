@@ -328,8 +328,10 @@ class KDL3World(World):
                 self.copy_abilities[burning_enemy] = "Burning Ability"
                 enemies_to_set.remove(burning_enemy)
             # ensure we place one of every ability
-            if unplaced_abilities and self.options.accessibility != self.options.accessibility.option_minimal:
+            if unplaced_abilities and (self.options.accessibility != self.options.accessibility.option_minimal
+                                       or self.options.door_shuffle):
                 # failsafe, on non-minimal we need to guarantee every copy ability exists
+                # also required for doors since we don't shift the Iceberg 6 requirement
                 for ability in sorted(unplaced_abilities):
                     enemy = self.random.choice(enemies_to_set)
                     self.copy_abilities[enemy] = ability
