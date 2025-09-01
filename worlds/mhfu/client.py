@@ -171,19 +171,19 @@ async def handle_logs(ctx: MHFUContext, debugger: client.WebSocketClientProtocol
             if breakpoint == "QUEST_LOAD":
                 if ctx.randomize_quest:
                     quest_base = MHFU_BREAKPOINTS[ctx.lang][breakpoint][1]
-                    quest_id = (await ctx.ppsspp_read_unsigned(quest_base + 100, 16))["value"]
+                    quest_id = (await ctx.ppsspp_read_unsigned(debugger, quest_base + 100, 16))["value"]
                     large_mon_ptr_ptr = quest_base + 0x14
-                    large_mon_ptr = (await ctx.ppsspp_read_unsigned(large_mon_ptr_ptr, 32))["value"]
-                    large_mon_id_ptr = await ctx.ppsspp_read_unsigned(large_mon_ptr + quest_base + 8, 32)
-                    large_mon_info_ptr = await ctx.ppsspp_read_unsigned(large_mon_ptr + 12 + quest_base, 32)
+                    large_mon_ptr = (await ctx.ppsspp_read_unsigned(debugger, large_mon_ptr_ptr, 32))["value"]
+                    large_mon_id_ptr = await ctx.ppsspp_read_unsigned(debugger, large_mon_ptr + quest_base + 8, 32)
+                    large_mon_info_ptr = await ctx.ppsspp_read_unsigned(debugger, large_mon_ptr + 12 + quest_base, 32)
                     large_mons = struct.unpack("IIII",
                                                base64.b64decode((await ctx.ppsspp_read_bytes(
-                                                   ctx.watcher_debugger, large_mon_id_ptr["value"] + quest_base, 16))[
+                                                   debugger, large_mon_id_ptr["value"] + quest_base, 16))[
                                                                     "base64"]))
                     mons = {}
                     for idx, mon in enumerate([mon for mon in large_mons if mon != 0xFFFFFFFF]):
                         # pull the mons
-                        mons[idx] = await ctx.ppsspp_read_bytes(ctx.watcher_debugger,
+                        mons[idx] = await ctx.ppsspp_read_bytes(debugger,
                                                                 large_mon_info_ptr["value"] + quest_base + (idx * 60),
                                                                 60)
                     # print(mons)
@@ -197,30 +197,30 @@ async def handle_logs(ctx: MHFUContext, debugger: client.WebSocketClientProtocol
                             if ctx.quest_randomization:
                                 mon_data[0:4] = struct.pack("I", quest_mons[mon])
                             info_out.extend(mon_data)
-                        await ctx.ppsspp_write_bytes(ctx.watcher_debugger, large_mon_info_ptr["value"] + quest_base,
+                        await ctx.ppsspp_write_bytes(debugger, large_mon_info_ptr["value"] + quest_base,
                                                      info_out)
                         # need to write new monster ids
-                        await ctx.ppsspp_write_bytes(ctx.watcher_debugger, large_mon_id_ptr["value"] + quest_base,
+                        await ctx.ppsspp_write_bytes(debugger, large_mon_id_ptr["value"] + quest_base,
                                                      struct.pack("IIII", *quest_mons,
                                                                  *[0xFFFFFFFF] * (4 - len(quest_mons))))
                         # now pick one to be the quest target
-                        await ctx.ppsspp_write_bytes(ctx.watcher_debugger, quest_base + 0x4C, struct.pack("I", 1))
+                        await ctx.ppsspp_write_bytes(debugger, quest_base + 0x4C, struct.pack("I", 1))
                         target_mons = ctx.quest_info[quest_str]["targets"].copy()
                         first = target_mons.pop()
-                        await ctx.ppsspp_write_bytes(ctx.watcher_debugger, quest_base + 0x6C, struct.pack("I", 1))
-                        await ctx.ppsspp_write_bytes(ctx.watcher_debugger, quest_base + 0x70,
+                        await ctx.ppsspp_write_bytes(debugger, quest_base + 0x6C, struct.pack("I", 1))
+                        await ctx.ppsspp_write_bytes(debugger, quest_base + 0x70,
                                                      struct.pack("HH", first, 1))
                         if target_mons:
                             # secondary goal
                             target_mon = target_mons.pop()
-                            await ctx.ppsspp_write_bytes(ctx.watcher_debugger, quest_base + 0x74,
+                            await ctx.ppsspp_write_bytes(debugger, quest_base + 0x74,
                                                          struct.pack("I", 1))
 
-                            await ctx.ppsspp_write_bytes(ctx.watcher_debugger, quest_base + 0x78,
+                            await ctx.ppsspp_write_bytes(debugger, quest_base + 0x78,
                                                          struct.pack("HH", target_mon, 1))
                         else:
                             # need to null these 3
-                            await ctx.ppsspp_write_bytes(ctx.watcher_debugger, quest_base + 0x74,
+                            await ctx.ppsspp_write_bytes(debugger, quest_base + 0x74,
                                                          struct.pack("IHH", 0, 0, 0))
                 # this gets pinged twice during quest load, we edit the first and fall through the second
                 ctx.randomize_quest = not ctx.randomize_quest
@@ -228,8 +228,8 @@ async def handle_logs(ctx: MHFUContext, debugger: client.WebSocketClientProtocol
                 breakpoint, mon_addr = breakpoint.split("|")
                 mon_address, health = split_log_mem(mon_addr)
                 health = min(max(int(health * ctx.quest_multiplier), 1), 0xFFFF)
-                await ctx.ppsspp_write_unsigned(mon_address, health, 16)
-                await ctx.ppsspp_write_unsigned(mon_address + 0x13A, health, 16)
+                await ctx.ppsspp_write_unsigned(debugger, mon_address, health, 16)
+                await ctx.ppsspp_write_unsigned(debugger, mon_address + 0x13A, health, 16)
 
             elif "QUEST_VISUAL_LOAD" in breakpoint:
                 breakpoint, args = breakpoint.split("|")
@@ -255,11 +255,11 @@ async def handle_logs(ctx: MHFUContext, debugger: client.WebSocketClientProtocol
                             goal_str += "and \n"
                         goal_str += f"{'the' if is_slay_2 else ('an' if monster_lookup[target].lower()[0] in ('a', 'e', 'i', 'o', 'u') else 'a')}"
                         goal_str += f" {monster_lookup[target]}"
-                    await ctx.ppsspp_write_bytes(ctx.watcher_debugger, int(goal, 16),
+                    await ctx.ppsspp_write_bytes(debugger, int(goal, 16),
                                                  goal_str.encode("ascii") + b"\x00")
                 # now monsters
                 mons_str = f"\n".join([monster_lookup[mon] for mon in quest_info["monsters"]])
-                await ctx.ppsspp_write_bytes(ctx.watcher_debugger, int(mons, 16), mons_str.encode("ascii") + b"\x00")
+                await ctx.ppsspp_write_bytes(debugger, int(mons, 16), mons_str.encode("ascii") + b"\x00")
 
             elif "QUEST_VISUAL_TYPE" in breakpoint:
                 breakpoint, args = breakpoint.split("|")
@@ -271,7 +271,7 @@ async def handle_logs(ctx: MHFUContext, debugger: client.WebSocketClientProtocol
                     qtype = 0x4
                     if any(monster in elder_dragons.values() for monster in ctx.quest_info[quest_str]["targets"]):
                         qtype = 0x1
-                    await ctx.ppsspp_write_bytes(ctx.watcher_debugger, quest_addr, qtype.to_bytes(1, "little"))
+                    await ctx.ppsspp_write_bytes(debugger, quest_addr, qtype.to_bytes(1, "little"))
 
             if MHFU_BREAKPOINTS[ctx.lang][breakpoint][3]:
                 # this break point stops emulation, we need to restart it
@@ -446,7 +446,8 @@ class MHFUContext(CommonContext):
     async def ppsspp_read_string(self, debugger, offset):
         result = await send_and_receive(self, debugger, json.dumps({
             "event": "memory.readString",
-            "address": offset
+            "address": offset,
+            "ticket": "AP_READ_STRING"
         }), "memory.readString")
         return result
 
@@ -582,6 +583,7 @@ class MHFUContext(CommonContext):
                 if self.refresh:
                     await self.get_key_binary()
                     await self.set_equipment_status()
+                    self.refresh = False
             except Exception as ex:
                 Utils.messagebox("Error", str(ex), True)
 
@@ -590,8 +592,8 @@ class MHFUContext(CommonContext):
             item = self.item_queue.pop()
             if item.item == 24700083:
                 # Zenny Bag
-                current_zenny = (await self.ppsspp_read_unsigned(MHFU_POINTERS[self.lang]["ZENNY"], 16))["value"]
-                await self.ppsspp_write_unsigned(MHFU_POINTERS[self.lang]["ZENNY"], current_zenny + 50000, 32)
+                current_zenny = (await self.ppsspp_read_unsigned(self.watcher_debugger, MHFU_POINTERS[self.lang]["ZENNY"], 16))["value"]
+                await self.ppsspp_write_unsigned(self.watcher_debugger, MHFU_POINTERS[self.lang]["ZENNY"], current_zenny + 50000, 32)
             elif item.item in (24700079, 24700080):
                 # Equipment
                 e_type = random.choice([5, 6]) if item.item == 24700079 else random.choice(range(5))
@@ -779,7 +781,7 @@ class MHFUContext(CommonContext):
             self.server_seed_name = args.get("seed_name", None)
 
 
-async def game_watcher(ctx):
+async def game_watcher(ctx: MHFUContext):
     while not ctx.exit_event.is_set():
         try:
             try:
@@ -788,6 +790,18 @@ async def game_watcher(ctx):
                 pass
             ctx.watcher_event.clear()
             if ctx.server is None or ctx.slot is None:
+                continue
+
+            game_status = await send_and_receive(ctx, ctx.watcher_debugger, json.dumps(PPSSPP_STATUS), "game.status")
+            if not game_status["game"] or game_status["game"]["id"] not in (MHFU_SERIAL, MHP2G_SERIAL):
+                ppsspp_logger.error(
+                    "Connected to PPSSPP but MHFU is not currently being played. Please run /psp when MHFU is"
+                    " loaded.")
+                del ctx.watcher_debugger
+                ctx.watcher_debugger = None
+                del ctx.update_debugger
+                ctx.update_debugger = None
+                await ctx.disconnect(False)
                 continue
 
             current_overlay = await ctx.ppsspp_read_string(ctx.watcher_debugger, MHFU_POINTERS[ctx.lang]["CURRENT_OVL"])
@@ -818,11 +832,17 @@ async def game_watcher(ctx):
 
                 ctx.unlocked_keys = sum(1 for item in ctx.items_received if item.item == 24700077)
 
-
-                if ctx.refresh:
-                    await ctx.get_key_binary()
-                    await ctx.set_equipment_status()
-                    ctx.refresh = False
+                if ctx.set_cutscene:
+                    cutscenes = (await ctx.ppsspp_read_unsigned(ctx.watcher_debugger,
+                                                                MHFU_POINTERS[ctx.lang]["NARGA_HYPNOC_CUTSCENE"]))[
+                        "value"]
+                    await ctx.ppsspp_write_unsigned(ctx.watcher_debugger,
+                                                    MHFU_POINTERS[ctx.lang]["NARGA_HYPNOC_CUTSCENE"], cutscenes | 0x60)
+                    ctx.set_cutscene = None
+                await ctx.pop_item()
+                if current_overlay["value"] in ("game_task.ovl", "arcade_task.ovl"):
+                    # we're on a hunt
+                    await ctx.pop_trap()
 
                 new_checks = []
                 quest_changed = False
@@ -871,18 +891,6 @@ async def game_watcher(ctx):
                             f'New Check: {location} ({len(ctx.locations_checked)}/'
                             f'{len(ctx.missing_locations) + len(ctx.checked_locations)})')
                         await ctx.send_msgs([{"cmd": 'LocationChecks', "locations": [new_check_id]}])
-
-                if ctx.set_cutscene:
-                    cutscenes = (await ctx.ppsspp_read_unsigned(ctx.watcher_debugger,
-                                                                MHFU_POINTERS[ctx.lang]["NARGA_HYPNOC_CUTSCENE"]))[
-                        "value"]
-                    await ctx.ppsspp_write_unsigned(ctx.watcher_debugger,
-                                                    MHFU_POINTERS[ctx.lang]["NARGA_HYPNOC_CUTSCENE"], cutscenes | 0x60)
-                    ctx.set_cutscene = None
-                await ctx.pop_item()
-                if current_overlay["value"] in ("game_task.ovl", "arcade_task.ovl"):
-                    # we're on a hunt
-                    await ctx.pop_trap()
         except Exception as ex:
             Utils.messagebox("Error", str(ex), True)
 
@@ -893,7 +901,7 @@ async def main(args):
     if gui_enabled:
         ctx.run_gui()
     ctx.run_cli()
-    print("Connecting")
+    #print("Connecting")
     await connect_psp(ctx)
     ctx.watcher_task = asyncio.create_task(game_watcher(ctx), name="GameWatcher")
     ctx.update_task = asyncio.create_task(ctx.refresh_task(), name="UpdateTask")
