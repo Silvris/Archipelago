@@ -142,15 +142,16 @@ class KSSSNIClient(SNIClient):
             snes_buffered_write(ctx, KSS_MWW_ITEMS, int.to_bytes(i+1, 1, "little"))
 
         known_treasures = int.from_bytes(await snes_read(ctx, KSS_TGCO_TREASURE, 8), "little")
+        known_value = int.from_bytes(await snes_read(ctx, KSS_TGC0_GOLD, 4), "little")
         treasure_data = 0
         treasure_value = 0
         for treasure in [item for item in ctx.items_received if item.item & 0x200]:
             treasure_info = treasures[ctx.item_names.lookup_in_game(treasure.item)]
             treasure_value += treasure_info.value
             treasure_data |= (1 << ((treasure.item & 0xFF) - 1))
-        if treasure_data != known_treasures:
+        if treasure_data != known_treasures or treasure_value != known_value:
             snes_buffered_write(ctx, KSS_TGCO_TREASURE, treasure_data.to_bytes(8, "little"))
-            snes_buffered_write(ctx, KSS_TGC0_GOLD, treasure_value.to_bytes(3, "little"))
+            snes_buffered_write(ctx, KSS_TGC0_GOLD, treasure_value.to_bytes(4, "little"))
 
         unlocked_planets = int.from_bytes(await snes_read(ctx, KSS_RECEIVED_PLANETS, 2), "little")
         for planet_item in [item for item in ctx.items_received if item.item & 0x400]:
