@@ -204,11 +204,12 @@ class KirbyFlavorPreset(Choice, OptionDict):
         if not isinstance(self.value, int):
             super().verify_keys()
 
-    def get_option_name(self, value):
+    @classmethod
+    def get_option_name(self, value: int | dict[str, str]):
         if isinstance(value, int):
             return self.name_lookup[value].replace("_", " ").title()
         else:
-            return super().get_option_name(value)
+            return ", ".join(f"{key}: {v}" for key, v in value.items())
 
 
 class KirbyFlavor(OptionDict):
