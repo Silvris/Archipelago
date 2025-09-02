@@ -40,6 +40,11 @@ MHFU_POINTERS = {
         "GH_VISIBLE": 0x089B1B4C,
         "VL_VISIBLE": 0x089B1D5C,
         "QUEST_COMPLETE": 0x0999E1C8,
+    },
+    "EU": {
+        "GH_VISIBLE": 0x089B1A2C,
+        "VL_VISIBLE": 0x089B1C3C,
+        "QUEST_COMPLETE": 0x0999E088,
         "GH_KEYS": 0x089B1D80,
         "VL_KEYS": 0x089B1DF0,
         "EQUIP_CHEST": 0x0999A1A8,
@@ -55,8 +60,16 @@ MHFU_POINTERS = {
         "SHOP_HAMMER_HORN": 0x0894B9AA,
         "SHOP_GUNNER": 0x0894C712,
         "BLADEMASTER_UPGRADES": 0x0894F9C4,
-        "GUNNER_UPGRADES": 0x0895778C
-
+        "GUNNER_UPGRADES": 0x0895778C,
+        "NARGA_HYPNOC_CUTSCENE": 0x0999A194,
+        "TREASURE_SCORE": 0x09A01460,
+        "ZENNY": 0x09A03350,
+        "CURRENT_OVL": 0x09A5F220,
+        "RESET_ACTION": 0x090B3615,
+        "SET_ACTION": 0x090B36D8,
+        "POISON_TIMER": 0x090B37C8,
+        "FAIL_QUEST": 0x090A5DDC,
+        "AP_SAVE": 0x099FE450,
     },
     "JP": {
         "GH_VISIBLE": 0x089AEAF0,
@@ -98,16 +111,22 @@ MHFU_BREAKPOINTS = {
     # disabled effectively acting as an event system
     # memory being this is a memory breakpoint, else it's CPU
     # CPU breakpoints don't use read/write/change
+    "US": {
+
+    },
+    "EU": {
+        "QUEST_LOAD": (True, 0x08A5C440, 1, True, True, True, False, False),
+        "MONSTER_LOAD": (False, 0x08871C2C, 1, True, True, False, False, False),
+        "QUEST_VISUAL_LOAD": (False, 0x09A8816C, 1, False, True, False, False, False),
+        "QUEST_VISUAL_TYPE": (False, 0x09A87E9C, 1, True, True, False, False, False)
+    },
     "JP": {
         "QUEST_LOAD": (True, 0x08A57510, 1, True, True, True, False, False),
-        # "QUEST_COMPLETE": (True, 0x09999DC8, 63, False, True, False, True, True),
         "MONSTER_LOAD": (False, 0x08871C24, 1, True, True, False, False, False),
         "QUEST_VISUAL_LOAD": (False, 0x09A8346C, 1, False, True, False, False, False),
         "QUEST_VISUAL_TYPE": (False, 0x09A8319C, 1, True, True, False, False, False)
     },
-    "US": {
 
-    }
 }
 
 MHFU_BREAKPOINT_ARGS = {
