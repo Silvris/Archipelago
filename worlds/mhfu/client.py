@@ -39,7 +39,24 @@ MHFU_POINTERS = {
     "US": {
         "GH_VISIBLE": 0x089B1B4C,
         "VL_VISIBLE": 0x089B1D5C,
-        "QUEST_COMPLETE": 0x0999E1C8
+        "QUEST_COMPLETE": 0x0999E1C8,
+        "GH_KEYS": 0x089B1D80,
+        "VL_KEYS": 0x089B1DF0,
+        "EQUIP_CHEST": 0x0999A1A8,
+        "ITEM_CHEST": 0x0999D088,
+        "SHOP_HEAD": 0x0893B818,
+        "SHOP_CHEST": 0x0893E47A,
+        "SHOP_ARM": 0x089410A8,
+        "SHOP_WAIST": 0x08943BEC,
+        "SHOP_LEG": 0x089466FC,
+        "SHOP_GREAT_LONG": 0x0894932C,
+        "SHOP_LANCE_GUN": 0x0894A07A,
+        "SHOP_SNS_DUAL": 0x0894AC5C,
+        "SHOP_HAMMER_HORN": 0x0894B9AA,
+        "SHOP_GUNNER": 0x0894C712,
+        "BLADEMASTER_UPGRADES": 0x0894F9C4,
+        "GUNNER_UPGRADES": 0x0895778C
+
     },
     "JP": {
         "GH_VISIBLE": 0x089AEAF0,
@@ -572,11 +589,11 @@ class MHFUContext(CommonContext):
             (await self.ppsspp_read_bytes(MHFU_POINTERS[self.lang]["GUNNER_UPGRADES"], 9912, "READ_UPGRADE_GN"))[
                 "base64"]))
         for i in range(1, 354):
-            if self.cash_only:
-                gn_upgrade_data[(i * 0x1C): (i * 0x1C) + 0x10] = [0] * 16
             weapon_type, equip_rarity = gunner[i]
             if weapon_type != 10:
                 continue  # small optimization here, only bows use the regular upgrade system in FU
+            if self.cash_only:
+                gn_upgrade_data[(i * 0x1C): (i * 0x1C) + 0x10] = [0] * 16
             for j in range(6):
                 if gunner_upgrades[i][j] > 0:
                     weapon_type, equip_rarity = gunner[gunner_upgrades[i][j]]
