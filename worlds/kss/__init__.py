@@ -215,7 +215,7 @@ class KSSWorld(World):
     def modify_multidata(self, multidata: Dict[str, Any]) -> None:
         # wait for self.rom_name to be available.
         self.rom_name_available_event.wait()
-        assert isinstance(self.rom_name, bytes)
+        assert isinstance(self.rom_name, bytearray)
         rom_name = getattr(self, "rom_name", None)
         # we skip in case of error, so that the original error in the output thread is the one that gets raised
         if rom_name:
