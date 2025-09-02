@@ -26,7 +26,13 @@ ppsspp_logger = logging.getLogger("PPSSPP")
 PPSSPP_REPORTING = "https://report.ppsspp.org/match/list"
 PPSSPP_DEBUG = "debugger.ppsspp.org"
 MHFU_SERIAL = "ULUS10391"
+MHFU_EU_SERIAL = "ULES01213"
 MHP2G_SERIAL = "ULJM05500"
+SERIAL_TO_LANG = {
+    MHFU_SERIAL: "US",
+    MHFU_EU_SERIAL: "EU",
+    MHP2G_SERIAL: "JP",
+}
 PPSSPP_HELLO = {
     "event": "version",
     "name": "Archipelago: MHFU",
@@ -40,6 +46,34 @@ MHFU_POINTERS = {
         "GH_VISIBLE": 0x089B1B4C,
         "VL_VISIBLE": 0x089B1D5C,
         "QUEST_COMPLETE": 0x0999E1C8,
+        "GH_KEYS": 0x089B1EA0,
+        "VL_KEYS": 0x089B1F10,
+        "EQUIP_CHEST": 0x0999A2E8,
+        "ITEM_CHEST": 0x0999D1C8,
+        "SHOP_HEAD": 0x0893B938,
+        "SHOP_CHEST": 0x0893E59A,
+        "SHOP_ARM": 0x089411C8,
+        "SHOP_WAIST": 0x08943D0C,
+        "SHOP_LEG": 0x0894681C,
+        "SHOP_GREAT_LONG": 0x0894944C,
+        "SHOP_LANCE_GUN": 0x0894A19A,
+        "SHOP_SNS_DUAL": 0x0894AD7C,
+        "SHOP_HAMMER_HORN": 0x0894BACA,
+        "SHOP_GUNNER": 0x0894C832,
+        "BLADEMASTER_UPGRADES": 0x0894FAE4,
+        "GUNNER_UPGRADES": 0x089578AC,
+        "NARGA_HYPNOC_CUTSCENE": 0x0999A2D4,
+        "TREASURE_SCORE": 0x09A015A0,
+        "ZENNY": 0x09A03490,
+        "CURRENT_OVL": 0x09A5F320,
+        "RESET_ACTION": 0x090B3755,
+        "SET_ACTION": 0x090B3818,
+        "POISON_TIMER": 0x090B3908,
+        "QUEST_TIMER": 0x09A05F10,
+        "QUEST_REWARD": 0x09A05F14,
+        "QUEST_UNKN": 0x09A05F18,
+        "QUEST_STATUS": 0x09A05F1C,
+        "AP_SAVE": 0x099FE590
     },
     "EU": {
         "GH_VISIBLE": 0x089B1A2C,
@@ -68,7 +102,10 @@ MHFU_POINTERS = {
         "RESET_ACTION": 0x090B3615,
         "SET_ACTION": 0x090B36D8,
         "POISON_TIMER": 0x090B37C8,
-        "FAIL_QUEST": 0x090A5DDC,
+        "QUEST_TIME": 0x09A05DD0,
+        "QUEST_REWARD": 0x09A05DD4,
+        "QUEST_UNKN": 0x09A05DD8,
+        "QUEST_STATUS": 0x09A05DDC,
         "AP_SAVE": 0x099FE450,
     },
     "JP": {
@@ -97,8 +134,11 @@ MHFU_POINTERS = {
         "CURRENT_OVL": 0x09A5A5A0,
         "RESET_ACTION": 0x090AF355,  # byte
         "SET_ACTION": 0x090AF418,  # half
-        "FAIL_QUEST": 0x09A01B1C,  # byte
         "POISON_TIMER": 0x090AF508,  # half
+        "QUEST_TIMER": 0x09A01B10,  # half
+        "QUEST_REWARD": 0x09A01B14,  # half
+        "QUEST_UNKN": 0x09A01B18,  # half
+        "QUEST_STATUS": 0x09A01B1C,  # half
         "AP_SAVE": 0x099FC080,  # 96th GC slot, hopefully you don't have 96 lol
         # "QUEST_VISUAL_GOAL": 0x09B1DA48,
         # "QUEST_VISUAL_MON": 0x9B1DDAE8,
@@ -112,7 +152,10 @@ MHFU_BREAKPOINTS = {
     # memory being this is a memory breakpoint, else it's CPU
     # CPU breakpoints don't use read/write/change
     "US": {
-
+        "QUEST_LOAD": (True, 0x08A5C560, 1, True, True, True, False, False),
+        "MONSTER_LOAD": (False, 0x08871C2C, 1, True, True, False, False, False),
+        "QUEST_VISUAL_LOAD": (False, 0x09A8826C, 1, False, True, False, False, False),
+        "QUEST_VISUAL_TYPE": (False, 0x09A87F9C, 1, True, True, False, False, False)
     },
     "EU": {
         "QUEST_LOAD": (True, 0x08A5C440, 1, True, True, True, False, False),
@@ -391,16 +434,13 @@ async def connect_psp(ctx: MHFUContext, target: typing.Optional[int] = None) -> 
 
     hello = await send_and_receive(ctx, json.dumps(PPSSPP_HELLO), "AP_HELLO")
     game_status = await send_and_receive(ctx, json.dumps(PPSSPP_STATUS), "AP_STATUS")
-    if not game_status["game"] or game_status["game"]["id"] not in (MHFU_SERIAL, MHP2G_SERIAL):
+    if not game_status["game"] or game_status["game"]["id"] not in SERIAL_TO_LANG:
         ppsspp_logger.error("Connected to PPSSPP but MHFU is not currently being played. Please run /psp when MHFU is"
                             " loaded.")
         del ctx.debugger
         ctx.debugger = None
         return
-    if game_status["game"]["id"] == MHFU_SERIAL:
-        ctx.lang = "US"
-    else:
-        ctx.lang = "JP"
+    ctx.lang = SERIAL_TO_LANG[game_status["game"]["id"]]
     ppsspp_logger.info(f"Connected to PPSSPP {hello['version']} playing Monster Hunter Freedom Unite!")
     for bp in MHFU_BREAKPOINTS[ctx.lang]:
         if MHFU_BREAKPOINTS[ctx.lang][bp][0]:
