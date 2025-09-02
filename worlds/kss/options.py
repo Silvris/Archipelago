@@ -1,7 +1,10 @@
+from __future__ import annotations
+
 from Options import (PerGameCommonOptions, Range, Choice, OptionSet, OptionDict, DeathLinkMixin, Toggle,
                      OptionCounter, Visibility)
 from dataclasses import dataclass
 from schema import Schema, And, Use, Optional, Or
+from typing import Any
 import random
 from .aesthetics import palette_addresses
 
@@ -41,7 +44,7 @@ class RequiredSubgames(OptionSet):
         "Milky Way Wishes",
         "The Arena"
     }
-    default = ["Milky Way Wishes"]
+    default = {"Milky Way Wishes"}
 
 
 class StartingSubgame(Choice):
@@ -134,7 +137,7 @@ class Consumables(OptionSet):
     and Invincibility Candy.
     """
     display_name = "Consumable Checks"
-    valid_keys = ("Maxim Tomato", "1-Up", "Invincibility Candy")
+    valid_keys = {"Maxim Tomato", "1-Up", "Invincibility Candy"}
 
     default = frozenset()
 
@@ -174,11 +177,11 @@ class KirbyFlavorPreset(Choice, OptionDict):
     option_miku = 14
     option_custom = -1
 
-    def __init__(self, value):
-        self.value: int | dict = value
+    def __init__(self, value: int | dict[str, Any]) -> None:
+        self.value: int | dict[str, Any] = value
 
     @classmethod
-    def parse_weighted_option(cls, value: dict[str, int]):
+    def parse_weighted_option(cls, value: dict[str, int]) -> str:
         for key in value.keys():
             if key.lower() not in cls.options and key.lower() != "random":
                 raise KeyError(
@@ -187,7 +190,7 @@ class KirbyFlavorPreset(Choice, OptionDict):
         return random.choices(list(value.keys()), weights=list(value.values()), k=1)[0]
 
     @classmethod
-    def from_any(cls, value):
+    def from_any(cls, value: Any) -> Choice | OptionDict:
         if isinstance(value, dict):
             if any(key not in cls.valid_keys for key in value.keys()):
                 # We have to assume that this is a weighted option
@@ -200,14 +203,14 @@ class KirbyFlavorPreset(Choice, OptionDict):
         else:
             return super().from_any(value)
 
-    def verify_keys(self):
+    def verify_keys(self) -> None:
         if not isinstance(self.value, int):
             super().verify_keys()
 
     @classmethod
-    def get_option_name(self, value: int | dict[str, str]):
+    def get_option_name(cls, value: int | dict[str, str]) -> str:
         if isinstance(value, int):
-            return self.name_lookup[value].replace("_", " ").title()
+            return cls.name_lookup[value].replace("_", " ").title()
         else:
             return ", ".join(f"{key}: {v}" for key, v in value.items())
 
@@ -245,3 +248,4 @@ class KSSOptions(PerGameCommonOptions, DeathLinkMixin):
     milky_way_wishes_mode: MilkyWayWishesMode
     kirby_flavor_preset: KirbyFlavorPreset
     kirby_flavor: KirbyFlavor
+    

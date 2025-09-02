@@ -20,11 +20,11 @@ class KSSRegion(Region):
     game = "Kirby Super Star"
 
 
-def create_region(name, world: "KSSWorld"):
+def create_region(name, world: "KSSWorld") -> KSSRegion:
     return KSSRegion(name, world.player, world.multiworld)
 
 
-def add_locations(world: "KSSWorld", region: KSSRegion, locations: dict[str, LocationData]):
+def add_locations(world: "KSSWorld", region: KSSRegion, locations: dict[str, LocationData]) -> None:
     filter_list = [""]
     if "Maxim Tomato" in world.options.consumables:
         filter_list.append("maxim")
@@ -40,7 +40,7 @@ def add_locations(world: "KSSWorld", region: KSSRegion, locations: dict[str, Loc
     region.add_locations(filtered, KSSLocation)
 
 
-def create_trivial_regions(world: "KSSWorld", menu: KSSRegion, included_subgames: set[str]):
+def create_trivial_regions(world: "KSSWorld", menu: KSSRegion, included_subgames: set[str]) -> None:
     if "Gourmet Race" in included_subgames:
         gourmet_race = create_region("Gourmet Race", world)
         add_locations(world, gourmet_race, gourmet_race_locations)
@@ -58,7 +58,7 @@ def create_trivial_regions(world: "KSSWorld", menu: KSSRegion, included_subgames
         world.multiworld.regions.append(arena)
 
 
-def create_spring_breeze(world: "KSSWorld", menu: KSSRegion):
+def create_spring_breeze(world: "KSSWorld", menu: KSSRegion) -> None:
     spring_breeze = create_region("Spring Breeze", world)
     green_greens = create_region("Green Greens", world)
     float_islands = create_region("Float Islands", world)
@@ -81,7 +81,7 @@ def create_spring_breeze(world: "KSSWorld", menu: KSSRegion):
     world.multiworld.regions.extend([spring_breeze, green_greens, float_islands, bubbly_clouds, mt_dedede])
 
 
-def create_dyna_blade(world: "KSSWorld", menu: KSSRegion):
+def create_dyna_blade(world: "KSSWorld", menu: KSSRegion) -> None:
     dyna_blade = create_region("Dyna Blade", world)
     peanut_plains = create_region("Peanut Plains", world)
     mallow_castle = create_region("Mallow Castle", world)
@@ -113,7 +113,7 @@ def create_dyna_blade(world: "KSSWorld", menu: KSSRegion):
             world.multiworld.regions.append(region)
 
 
-def create_great_cave_offensive(world: "KSSWorld", menu: KSSRegion):
+def create_great_cave_offensive(world: "KSSWorld", menu: KSSRegion) -> None:
     tgco = create_region("The Great Cave Offensive", world)
     subtree = create_region("Sub-Tree", world)
     crystal = create_region("Crystal", world)
@@ -136,7 +136,7 @@ def create_great_cave_offensive(world: "KSSWorld", menu: KSSRegion):
     world.multiworld.regions.extend([tgco, subtree, crystal, old_tower, garden])
 
 
-def create_revenge_meta_knight(world: "KSSWorld", menu: KSSRegion):
+def create_revenge_meta_knight(world: "KSSWorld", menu: KSSRegion) -> None:
     revenge_of_meta_knight = create_region("Revenge of Meta Knight", world)
     chapter_1 = create_region("RoMK - Chapter 1", world)
     chapter_2 = create_region("RoMK - Chapter 2", world)
@@ -168,7 +168,7 @@ def create_revenge_meta_knight(world: "KSSWorld", menu: KSSRegion):
                                      chapter_6, chapter_7])
 
 
-def create_milky_way_wishes(world: "KSSWorld", menu: KSSRegion):
+def create_milky_way_wishes(world: "KSSWorld", menu: KSSRegion) -> None:
     milky_way_wishes = create_region("Milky Way Wishes", world)
     floria = create_region("Floria", world)
     aqualiss = create_region("Aqualiss", world)
@@ -199,7 +199,7 @@ def create_milky_way_wishes(world: "KSSWorld", menu: KSSRegion):
                                      mecheye, halfmoon, copy_planet])
 
 
-def create_regions(world: "KSSWorld"):
+def create_regions(world: "KSSWorld") -> None:
     menu = create_region("Menu", world)
     world.multiworld.regions.append(menu)
     included_subgames = world.options.included_subgames.value

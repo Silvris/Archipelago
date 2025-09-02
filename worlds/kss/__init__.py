@@ -65,7 +65,7 @@ class KSSWorld(World):
 
     def __init__(self, multiworld: MultiWorld, player: int):
         super().__init__(multiworld, player)
-        self.rom_name: bytes = bytes()
+        self.rom_name: bytearray = bytearray()
         self.rom_name_available_event = threading.Event()
         self.treasure_value = []
 
@@ -115,12 +115,12 @@ class KSSWorld(World):
             self.options.consumables.value = Consumables.valid_keys
             self.options.essences.value = True
 
-    def create_item(self, name, force_classification: ItemClassification | None = None):
+    def create_item(self, name: str, force_classification: ItemClassification | None = None) -> KSSItem:
         if name not in item_table:
             raise Exception(f"{name} is not a valid item name for Kirby Super Star.")
         data = item_table[name]
         classification = force_classification if force_classification else data.classification
-        return KSSItem(name, data.classification, data.code, self.player)
+        return KSSItem(name, classification, data.code, self.player)
 
     def get_filler_item_name(self) -> str:
         return self.random.choices(list(filler_item_weights.keys()), weights=list(filler_item_weights.values()), k=1)[0]
@@ -128,7 +128,7 @@ class KSSWorld(World):
     def create_items(self) -> None:
         itempool = []
         modes = [self.create_item(name) for name in sub_games if name in self.options.included_subgames]
-        starting_mode = self.create_item(subgame_mapping[self.options.starting_subgame])
+        starting_mode = self.create_item(subgame_mapping[self.options.starting_subgame.value])
         modes.remove(starting_mode)
         self.multiworld.push_precollected(starting_mode)
         itempool.extend([self.create_item(name) for name in copy_abilities])

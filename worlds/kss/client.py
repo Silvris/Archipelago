@@ -84,7 +84,7 @@ class KSSSNIClient(SNIClient):
         self.consumable_filter = int.from_bytes(consumable_filter, "little")
         return True
 
-    async def pop_item(self, ctx: "SNIContext", game_state: int):
+    async def pop_item(self, ctx: "SNIContext", game_state: int) -> None:
         from SNIClient import snes_read, snes_buffered_write
         if game_state not in (0x3, 0xC):
             return
@@ -112,6 +112,9 @@ class KSSSNIClient(SNIClient):
 
     async def game_watcher(self, ctx: "SNIContext") -> None:
         from SNIClient import snes_read, snes_buffered_write, snes_flush_writes, DeathState
+
+        if not ctx.slot or not ctx.server:
+            return
 
         demo_state = int.from_bytes(await snes_read(ctx, KSS_DEMO_STATE, 2), "little")
         if not demo_state:
@@ -279,7 +282,7 @@ class KSSSNIClient(SNIClient):
         await ctx.check_locations(new_checks)
         for new_check_id in new_checks:
             ctx.locations_checked.add(new_check_id)
-            location = ctx.location_names.lookup_in_game(new_check_id)
+            loc = ctx.location_names.lookup_in_game(new_check_id)
             snes_logger.info(
-                f'New Check: {location} ({len(ctx.locations_checked)}/'
+                f'New Check: {loc} ({len(ctx.locations_checked)}/'
                 f'{len(ctx.missing_locations) + len(ctx.checked_locations)})')

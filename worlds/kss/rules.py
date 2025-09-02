@@ -1,3 +1,4 @@
+import typing
 from typing import TYPE_CHECKING
 from .names import location_names, item_names
 from .items import sub_game_completion
@@ -8,11 +9,11 @@ if TYPE_CHECKING:
     from BaseClasses import CollectionState
 
 
-def can_fight_wind(state: "CollectionState", player: int):
+def can_fight_wind(state: "CollectionState", player: int) -> bool:
     return state.has_any([item_names.wing, item_names.jet, item_names.ninja], player)
 
 
-def set_dyna_blade_rules(world: "KSSWorld"):
+def set_dyna_blade_rules(world: "KSSWorld") -> None:
     set_rule(world.get_location(location_names.db_switch_1), lambda state: state.has_any([item_names.mirror,
                                                                                           item_names.beam,
                                                                                           item_names.plasma],
@@ -53,9 +54,9 @@ def set_dyna_blade_rules(world: "KSSWorld"):
             set_rule(world.get_location(location), lambda state: state.has(item_names.fire, world.player))
 
 
-def set_great_cave_rules(world: "KSSWorld"):
+def set_great_cave_rules(world: "KSSWorld") -> None:
     if hasattr(world.multiworld, "re_gen_passthrough"):
-        re_gen_passthrough: dict = getattr(world.multiworld, "re_gen_passthrough")
+        re_gen_passthrough: dict[str, typing.Any] = getattr(world.multiworld, "re_gen_passthrough")
         if "Kirby Super Star" in re_gen_passthrough:
             world.treasure_value = re_gen_passthrough["Kirby Super Star"]["treasure_value"]
 
@@ -178,7 +179,7 @@ def set_great_cave_rules(world: "KSSWorld"):
                   and state.has(item_names.stone, world.player)))
 
 
-def set_revenge_rules(world: "KSSWorld"):
+def set_revenge_rules(world: "KSSWorld") -> None:
     # Revenge of Meta Knight
     set_rule(world.get_location(location_names.romk_chapter_3),
              lambda state: state.has(item_names.fire, world.player))
@@ -219,7 +220,7 @@ def set_revenge_rules(world: "KSSWorld"):
                      lambda state: state.has_any([item_names.wing, item_names.suplex], world.player))
 
 
-def set_milky_way_wishes_rules(world: "KSSWorld"):
+def set_milky_way_wishes_rules(world: "KSSWorld") -> None:
     if world.options.milky_way_wishes_mode == "local":
         set_rule(world.get_location(location_names.mww_complete),
                  lambda state: state.has_all([item_names.floria, item_names.aqualiss,
@@ -267,7 +268,7 @@ def set_milky_way_wishes_rules(world: "KSSWorld"):
             set_rule(world.get_location(location), lambda state: state.has(item_names.plasma, world.player))
 
 
-def set_rules(world: "KSSWorld"):
+def set_rules(world: "KSSWorld") -> None:
     if "Dyna Blade" in world.options.included_subgames:
         # Dyna Blade
         set_dyna_blade_rules(world)
@@ -293,4 +294,4 @@ def set_rules(world: "KSSWorld"):
 
     world.multiworld.completion_condition[world.player] = lambda state: \
         state.has_all(sub_game_required, world.player) and state.has_from_list(
-            sub_game_complete, world.player, world.options.required_subgame_completions)
+            sub_game_complete, world.player, world.options.required_subgame_completions.value)

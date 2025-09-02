@@ -44,14 +44,14 @@ class KSSProcedurePatch(APProcedurePatch, APTokenMixin):
     def get_source_data(cls) -> bytes:
         return get_base_rom_bytes()
 
-    def write_byte(self, offset: int, value: int):
+    def write_byte(self, offset: int, value: int) -> None:
         self.write_token(APTokenTypes.WRITE, offset, value.to_bytes(1, "little"))
 
-    def write_bytes(self, offset: int, value: Iterable[int]):
+    def write_bytes(self, offset: int, value: Iterable[int]) -> None:
         self.write_token(APTokenTypes.WRITE, offset, bytes(value))
 
 
-def patch_rom(world: "KSSWorld", patch: KSSProcedurePatch):
+def patch_rom(world: "KSSWorld", patch: KSSProcedurePatch) -> None:
     patch.write_file("kss_basepatch.bsdiff4", pkgutil.get_data(__name__, os.path.join("data", "kss_basepatch.bsdiff4")))
 
     patch.write_byte(starting_stage + 1, 1 << world.options.starting_subgame.value)
@@ -102,10 +102,10 @@ def patch_rom(world: "KSSWorld", patch: KSSProcedurePatch):
             for palette in palette_addresses[ability]:
                 patch.write_bytes(palette, get_palette_bytes(get_palette(world, flavor), palette_factors[palette]))
 
-    patch_name = bytearray(
+    patch_name: bytearray = bytearray(
         f'KSS{Utils.__version__.replace(".", "")[0:3]}_{world.player}_{world.multiworld.seed:11}\0', 'utf8')[:21]
     patch_name.extend([0] * (21 - len(patch_name)))
-    patch.name = bytes(patch_name)
+    patch.name = patch_name
     patch.write_bytes(0x7FC0, patch.name)
 
     patch.write_file("token_patch.bin", patch.get_token_binary())

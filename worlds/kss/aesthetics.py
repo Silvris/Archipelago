@@ -5,26 +5,26 @@ if TYPE_CHECKING:
     from . import KSSWorld
 
 palette_addresses = {
-    "Kirby": [0x467D6],
-    "Cutter": [0x469D6],
-    "Beam": [0x469F6],
-    "Yo-Yo": [0x46A16],
-    "Ninja": [0x46A36],
-    "Wing": [0x46A56],
-    "Fighter": [0x46A76],
-    "Jet": [0x46A96],
-    "Sword": [0x46AB6],
-    "Fire": [0x46AD6, 0x46AF6, 0x46B16, 0x46B36, 0x64B56],
-    "Stone": [0x46C16],  # There's one for each transformation, but since they use different setup we won't touch
-    "Bomb": [0x46CD6],
-    "Plasma": [0x46CF6, 0x46D16, 0x46D36, 0x46D56, 0x46D76, 0x46D96, 0x46DB6, 0x46DD6],
-    "Wheel": [0x46DF6, 0x46E16, 0x46E36],
-    "Ice": [0x46E56, 0x46E76, 0x46E96],
-    "Mirror": [0x46EB6, 0x46ED6, 0x46EF6],
+    "Kirby": [0x467D8],
+    "Cutter": [0x469D8],
+    "Beam": [0x469F8],
+    "Yo-Yo": [0x46A18],
+    "Ninja": [0x46A38],
+    "Wing": [0x46A58],
+    "Fighter": [0x46A78],
+    "Jet": [0x46A98],
+    "Sword": [0x46AB8],
+    "Fire": [0x46AD8, 0x46AF8, 0x46B18, 0x46B38, 0x64B58],
+    "Stone": [0x46C18],  # There's one for each transformation, but since they use different setup we won't touch
+    "Bomb": [0x46CD8],
+    "Plasma": [0x46CF8, 0x46D18, 0x46D38, 0x46D58, 0x46D78, 0x46D98, 0x46DB8, 0x46DD8],
+    "Wheel": [0x46DF8, 0x46E18, 0x46E38],
+    "Ice": [0x46E58, 0x46E78, 0x46E98],
+    "Mirror": [0x46EB8, 0x46ED8, 0x46EF8],
     # "Copy": [],  # too complex for the moment
-    "Suplex": [0x471B6],
-    "Hammer": [0x471D6],
-    "Parasol": [0x471F6],
+    "Suplex": [0x471B8],
+    "Hammer": [0x471D8],
+    "Parasol": [0x471F8],
     # as are the rest of the screen nukes + Sleep
 }
 
