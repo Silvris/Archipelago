@@ -1,5 +1,21 @@
-from Options import DeathLink, Choice, Toggle, DefaultOnToggle, PerGameCommonOptions, Range, NamedRange
+from Options import Choice, Toggle, DefaultOnToggle, PerGameCommonOptions, Range, NamedRange, OptionCounter
+from .items import trap_item_table
 from dataclasses import dataclass
+
+
+class MHFUDeathLink(Choice):
+    """
+    When you die, everyone who enabled death link dies. Of course, the reverse is true too.
+    Cart: DeathLinks are sent upon carting, and receiving will cart the player.
+    Quest: DeathLinks are sent upon failing a quest, and receiving will fail the current quest.
+    """
+    display_name = "Death Link"
+    option_none = 0
+    option_cart = 1
+    option_quest = 2
+    alias_true = 1
+    alias_false = 0
+    default = 0
 
 
 class Goal(Choice):
@@ -106,6 +122,20 @@ class TrapPercentage(Range):
     default = 50
 
 
+class TrapWeights(OptionCounter):
+    """
+    Relative weights for each individual trap item to appear when a trap item is created.
+    """
+    max = 100
+    min = 0
+    display_name = "Trap Weights"
+    valid_keys = frozenset(trap_item_table.keys())
+
+    default = {
+        key: 50 for key in sorted(valid_keys)
+    }
+
+
 class Weapons(Choice):
     """
     Individual: Each individual weapon tree rank can be received separately, not in sequence.
@@ -155,9 +185,17 @@ class CashOnly(Toggle):
     display_name = "Cash-Only Equipment"
 
 
+class TrapLink(Toggle):
+    """
+    When enabled, traps you receive will be shared across compatible games, and you
+    will receive equivalent traps when other TrapLink players receive trap items.
+    """
+    display_name = "TrapLink"
+
+
 @dataclass
 class MHFUOptions(PerGameCommonOptions):
-    death_link: DeathLink
+    death_link: MHFUDeathLink
     goal: Goal
     guild_depth: GuildQuestDepth
     village_depth: VillageQuestDepth
@@ -166,9 +204,11 @@ class MHFUOptions(PerGameCommonOptions):
     total_keys: TotalKeyQuests
     required_keys: RequiredKeyQuests
     filler_percentage: FillerPercentage
-    #trap_percentage: TrapPercentage
+    trap_percentage: TrapPercentage
+    trap_weights: TrapWeights
     weapons: Weapons
     progressive_armor: ProgressiveArmor
     quest_randomization: QuestRandomization
     quest_difficulty_multiplier: QuestDifficulty
     cash_only_equipment: CashOnly
+    trap_link: TrapLink

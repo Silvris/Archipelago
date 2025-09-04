@@ -100,52 +100,66 @@ rank_sort = defaultdict(lambda: 99, {
 })
 
 
+class QuestInfo(typing.TypedDict):
+    qid: str
+    name: str
+    hub: int
+    rank: int
+    star: int
+    idx: int
+    flag: int
+    mask: int
+    stage: int
+    monsters: list[int]
+    max_mon: int
+
+
 class MHFULocation(Location):
     game: str = "Monster Hunter Freedom Unite"
 
 
-def get_proper_name(info):
+def get_proper_name(info: QuestInfo) -> str:
     base_name = info["name"]
-    hub = hubs[int(info["hub"])]
-    rank = ranks[int(info["rank"]) + (1 if hub != "Guild" else 0)]
-    star = hub_rank_start[(int(info["hub"]), int(info["rank"]))] + int(info["star"]) + 1
-    if int(info["rank"]) != 4 and int(info["hub"]) != 2:
+    hub = hubs[info["hub"]]
+    rank = ranks[info["rank"] + (1 if hub != "Guild" else 0)]
+    star = hub_rank_start[(info["hub"], info["rank"])] + info["star"] + 1
+    if info["rank"] != 4 and info["hub"] != 2:
         return f"({hub} {rank} {star}*) {base_name}"
     else:
         return f"({hub} {rank}) {base_name}"
 
 
-def get_star_name(hub, rank, star):
+def get_star_name(hub: int, rank: int, star: int) -> str:
     return f"{hubs[hub]} {ranks[rank]} {hub_rank_start[(hub, rank)] + star + 1}"
 
 
-quest_data: typing.List[typing.Dict[str, str]] = \
+quest_data: list[QuestInfo] = \
     orjson.loads(pkgutil.get_data(__name__, "data/quests.json"))
 
 base_id = 24700000
 
 # filter out treasure
 location_name_to_id = {get_proper_name(info): base_id + id for id, info in enumerate(quest_data)
-                       if (info["hub"], info["rank"]) != ("0", "4")}
+                       if (info["hub"], info["rank"]) != (0, 4)}
 
 # now handle manually
 next_id = max(location_name_to_id.values()) + 1
-for i, treasure in enumerate([quest for quest in quest_data if quest["hub"] == "0" and quest["rank"] == "4"]):
+for i, treasure in enumerate([quest for quest in quest_data if quest["hub"] == 0 and quest["rank"] == 4]):
     quest_name = get_proper_name(treasure)
     location_name_to_id[f"{quest_name} - Silver Crown"] = next_id + (i * 2)
     location_name_to_id[f"{quest_name} - Gold Crown"] = next_id + (i * 2) + 1
 
 
-def get_quest_by_id(idx: str) -> dict[str, str] | None:
-    return next((quest for quest in quest_data if quest["qid"] == idx), None)
+def get_quest_by_id(idx: str) -> QuestInfo:
+    return next((quest for quest in quest_data if quest["qid"] == idx))
 
 
-def get_area_quests(ranks: typing.Iterable[tuple[int, int, int]], areas: tuple[int]) -> list[dict[str, typing.Any]]:
-    return [quest for quest in quest_data if (int(quest["hub"]), int(quest["rank"]), int(quest["star"]) in ranks and
-                                              int(quest["stage"]) in areas)]
+def get_area_quests(ranks: typing.Iterable[tuple[int, int, int]], areas: tuple[int]) -> list[QuestInfo]:
+    return [quest for quest in quest_data if ((quest["hub"], quest["rank"], quest["star"]) in ranks and
+                                              quest["stage"] in areas)]
 
 
-def create_ranks(world: "MHFUWorld"):
+def create_ranks(world: "MHFUWorld") -> None:
     menu_region = Region("Menu", world.player, world.multiworld)
     world.multiworld.regions.append(menu_region)
     # we only write 0 into rank requirements, since we need to know how many quests we have access to
@@ -178,8 +192,8 @@ def create_ranks(world: "MHFUWorld"):
         for i in range(3 if world.options.guild_depth.value == GuildQuestDepth.option_g_rank else 2):
             world.rank_requirements[2, i, 0] = 0
     for hub, rank, star in world.rank_requirements:
-        valid_quests = [quest for quest in quest_data if int(quest["hub"]) == hub
-                        and int(quest["rank"]) == rank and int(quest["star"]) == star]
+        valid_quests = [quest for quest in quest_data if quest["hub"] == hub
+                        and quest["rank"] == rank and quest["star"] == star]
         world.location_num[hub, rank, star] = len(valid_quests)
         region = Region(get_star_name(hub, rank, star),
                         world.player, world.multiworld)

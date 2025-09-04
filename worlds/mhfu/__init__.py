@@ -1,7 +1,6 @@
 import logging
 import math
-from typing import Dict, Any, List, ClassVar
-from operator import itemgetter
+from typing import Tuple, Any, ClassVar
 import settings
 from BaseClasses import Tutorial, ItemClassification, MultiWorld
 from worlds.AutoWorld import WebWorld, World
@@ -13,7 +12,7 @@ from .options import MHFUOptions
 from .rules import set_rules
 
 
-def launch_client():
+def launch_client() -> None:
     from .client import launch
     launch_subprocess(launch, name="MHFUClient")
 
@@ -52,19 +51,19 @@ class MHFUWorld(World):
     data_version = 0
     options_dataclass = MHFUOptions
     options: MHFUOptions
-    settings: ClassVar[MHFUSettings]
+    # settings: ClassVar[MHFUSettings]
 
     item_name_to_id = item_name_to_id
     location_name_to_id = location_name_to_id
-    item_names = item_name_groups
+    item_name_groups = item_name_groups
 
     create_regions = create_ranks
 
     def __init__(self, multiworld: MultiWorld, player: int):
         super().__init__(multiworld, player)
-        self.location_num: dict[(int, int, int), int] = {}
-        self.rank_requirements: dict[(int, int, int), int] = {}
-        self.quest_info: dict[str, dict[str, list[int]] | int | list[int]] = {}
+        self.location_num: dict[Tuple[int, int, int], int] = {}
+        self.rank_requirements: dict[Tuple[int, int, int], int] = {}
+        self.quest_info: dict[str, dict[str, list[int] | int]] = {}
         self.required_keys: int = 0
 
     def generate_early(self) -> None:
@@ -81,7 +80,7 @@ class MHFUWorld(World):
             logging.warning(f"{self.player_name}) Village Depth too low for goal, increasing to "
                             f"{self.options.village_depth.get_option_name(goal_rank[1])}")
 
-    def create_item(self, name: str, force_non_progression=False) -> MHFUItem:
+    def create_item(self, name: str, force_non_progression: bool = False) -> MHFUItem:
         item = item_table[name]
         classification = ItemClassification.filler
         if item.progression and not force_non_progression:
@@ -164,7 +163,7 @@ class MHFUWorld(World):
 
     set_rules = set_rules
 
-    def fill_slot_data(self) -> Dict[str, Any]:
+    def fill_slot_data(self) -> dict[str, Any]:
         options = self.options.as_dict(
             "death_link",
             "goal",

@@ -9,11 +9,11 @@ if TYPE_CHECKING:
     from . import MHFUWorld
 
 
-def can_complete_quest(state: "CollectionState", qid: str, player: int):
+def can_complete_quest(state: "CollectionState", qid: str, player: int) -> bool:
     return state.can_reach_location(get_proper_name(get_quest_by_id(qid)), player)
 
 
-def can_complete_all_quests(state: "CollectionState", qids: list[str], player: int):
+def can_complete_all_quests(state: "CollectionState", qids: list[str], player: int) -> bool:
     for qid in qids:
         if not can_complete_quest(state, qid, player):
             return False
@@ -21,7 +21,7 @@ def can_complete_all_quests(state: "CollectionState", qids: list[str], player: i
 
 
 def can_reach_area(state: "CollectionState", areas: tuple[int],
-                   rank_requirements: dict[tuple[int, int, int], int], player: int):
+                   rank_requirements: dict[tuple[int, int, int], int], player: int) -> bool:
     # this can be very slow
     possible_quests = get_area_quests(rank_requirements.keys(), areas)
     for quest in possible_quests:
@@ -30,31 +30,31 @@ def can_reach_area(state: "CollectionState", areas: tuple[int],
     return False
 
 
-def can_hunt_any_monster(state: "CollectionState", quest_monsters: dict[str, dict[str, list[int]]],
-                         monsters: list[str], player: int, quest_id: str):
+def can_hunt_any_monster(state: "CollectionState", quest_info: dict[str, dict[str, list[int] | int]],
+                         monsters: list[str], player: int, quest_id: str) -> bool:
     relevant_mons = [monster_ids[monster] for monster in monsters]
     for monster in relevant_mons:
-        monster_quests = [f"m{quest}" for quest in quest_monsters if monster in quest_monsters[quest]["monsters"]
+        monster_quests = [f"m{quest}" for quest in quest_info if monster in quest_info[quest]["monsters"]
                           and f"m{quest}" != quest_id
-                          and get_quest_by_id(f"m{quest}")["rank"] != "4"]
+                          and get_quest_by_id(f"m{quest}")["rank"] != 4]
         if any(can_complete_quest(state, quest, player) for quest in monster_quests):
             return True
     return False
 
 
-def can_hunt_all_monsters(state: "CollectionState", quest_monsters: dict[str, dict[str, list[int]]],
-                          monsters: list[str], player: int, quest_id: str):
+def can_hunt_all_monsters(state: "CollectionState", quest_info: dict[str, dict[str, list[int] | int]],
+                          monsters: list[str], player: int, quest_id: str) -> bool:
     relevant_mons = [monster_ids[monster] for monster in monsters]
     for monster in relevant_mons:
-        monster_quests = [f"m{quest}" for quest in quest_monsters if monster in quest_monsters[quest]["monsters"]
+        monster_quests = [f"m{quest}" for quest in quest_info if monster in quest_info[quest]["monsters"]
                           and f"m{quest}" != quest_id
-                          and get_quest_by_id(f"m{quest}")["rank"] != "4"]
+                          and get_quest_by_id(f"m{quest}")["rank"] != 4]
         if not any(can_complete_quest(state, quest, player) for quest in monster_quests):
             return False
     return True
 
 
-def set_rules(world: "MHFUWorld"):
+def set_rules(world: "MHFUWorld") -> None:
     for hub, rank, star in world.rank_requirements:
         if (hub, rank, star + 1) in world.rank_requirements:
             add_rule(world.get_entrance(f"To {get_star_name(hub, rank, star + 1)}"),

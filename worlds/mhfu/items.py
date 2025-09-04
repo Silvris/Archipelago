@@ -1,6 +1,5 @@
 import typing
 from BaseClasses import Item
-from .quests import base_id
 
 
 class ItemData(typing.NamedTuple):
@@ -150,5 +149,5 @@ item_name_groups = {
     "Armor": {name for name in armor_item_table}
 }
 
-item_name_to_id = {name: item_table[name].code for name in item_table}
-item_id_to_name = {item_table[name].code: name for name in item_table}
+item_name_to_id: dict[str, int] = {name: data.code for name, data in item_table.items() if data.code is not None}
+item_id_to_name: dict[int, str] = {data.code: name for name, data in item_table.items() if data.code is not None}

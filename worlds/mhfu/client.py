@@ -1,18 +1,18 @@
 from __future__ import annotations
 
 import random
-import typing
 
 from operator import itemgetter
 import Utils
 import logging
 from CommonClient import CommonContext, ClientCommandProcessor, gui_enabled, get_base_parser, server_loop
 import asyncio
-from websockets import client
+from websockets import client, Subprotocol
 import base64
 import json
 import struct
 from zlib import crc32
+from typing import Tuple, Any
 
 from NetUtils import NetworkItem, ClientStatus
 from .quests import quest_data, base_id, goal_quests, get_quest_by_id, get_proper_name, location_name_to_id
@@ -241,7 +241,7 @@ def split_log_mem(data: str) -> tuple[int, int]:
     return int(pointer, 16), int(data[:-1], 16)
 
 
-async def handle_logs(ctx: MHFUContext):
+async def handle_logs(ctx: MHFUContext) -> None:
     while not ctx.exit_event.is_set():
         try:
             try:
@@ -391,24 +391,25 @@ async def receive_all(ctx: MHFUContext) -> None:
             Utils.messagebox("Error", str(ex), True)
 
 
-async def send_and_receive(ctx: MHFUContext, message: str, ticket: str) -> dict[str, typing.Any]:
+async def send_and_receive(ctx: MHFUContext, message: str, ticket: str) -> dict[str, Any]:
     # since we can't register for a specific change in value,
     # we can just wait until we receive the one we're looking for
     if not ticket:
         raise Exception("Cannot perform read/write without valid ticket.")
-
-    await ctx.debugger.send(message)
-    while ticket not in ctx.outgoing_tickets:
-        await asyncio.sleep(0.125)
-    return ctx.outgoing_tickets.pop(ticket)
+    if ctx.debugger:
+        await ctx.debugger.send(message)
+        while ticket not in ctx.outgoing_tickets:
+            await asyncio.sleep(0.125)
+        return ctx.outgoing_tickets.pop(ticket)
 
 
 async def send_without_receive(ctx: MHFUContext, message: str):
     # cpu actions do not return tickets
-    await ctx.debugger.send(message)
+    if ctx.debugger:
+        await ctx.debugger.send(message)
 
 
-async def connect_psp(ctx: MHFUContext, target: typing.Optional[int] = None) -> None:
+async def connect_psp(ctx: MHFUContext, target: int | None = None) -> None:
     from urllib.request import urlopen, Request
     if ctx.debugger:
         del ctx.debugger
@@ -430,7 +431,8 @@ async def connect_psp(ctx: MHFUContext, target: typing.Optional[int] = None) -> 
             ppsspp_logger.error("No PPSSPP instances found to connect to. Make sure PPSSPP is running and "
                                 "\"Allow remote debugging\" is enabled in the settings.")
             return
-    ctx.debugger = await client.connect(f"ws://{psp['ip']}:{psp['p']}/debugger", subprotocols=[PPSSPP_DEBUG])
+    ctx.debugger = await client.connect(f"ws://{psp['ip']}:{psp['p']}/debugger",
+                                        subprotocols=[Subprotocol(PPSSPP_DEBUG)])
 
     hello = await send_and_receive(ctx, json.dumps(PPSSPP_HELLO), "AP_HELLO")
     game_status = await send_and_receive(ctx, json.dumps(PPSSPP_STATUS), "AP_STATUS")
@@ -465,7 +467,7 @@ async def connect_psp(ctx: MHFUContext, target: typing.Optional[int] = None) -> 
 class MHFUClientCommandProcessor(ClientCommandProcessor):
     ctx: MHFUContext
 
-    def _cmd_psp(self):
+    def _cmd_psp(self) -> None:
         asyncio.create_task(connect_psp(self.ctx))
 
 
@@ -476,13 +478,14 @@ class MHFUContext(CommonContext):
     command_processor = MHFUClientCommandProcessor
     lang: str = "JP"
     debugger: client.WebSocketClientProtocol | None = None
-    watcher_task = None
-    update_task = None
-    socket_task = None
-    want_slot_data = True
+    watcher_task: asyncio.Task[None] | None = None
+    update_task: asyncio.Task[None] | None = None
+    breakpoint_task: asyncio.Task[None] | None = None
+    socket_task: asyncio.Task[None] | None = None
+    want_slot_data: bool = True
     server_seed_name: str | None = None
-    outgoing_tickets: dict[str, dict[str, typing.Any]] = {}
-    breakpoint_queue: list[dict[str, typing.Any]] = []
+    outgoing_tickets: dict[str, dict[str, Any]] = {}
+    breakpoint_queue: list[dict[str, Any]] = []
 
     # game info
     recv_index = -1
@@ -492,7 +495,7 @@ class MHFUContext(CommonContext):
     unlocked_keys: int = 0
     required_keys: int = 0
     refresh: bool = False
-    rank_requirements: dict[(int, int, int), int] = {}
+    rank_requirements: dict[Tuple[int, int, int], int] = {}
     weapon_status: dict[int, set[int]] = {
         0: set(),  # Great Sword
         1: set(),  # Heavy Bowgun
@@ -508,17 +511,17 @@ class MHFUContext(CommonContext):
     }
     armor_status: set[int] = set()
     quest_randomization: bool = False
-    quest_info: dict[str, dict[str, list[int]] | int | list[int]] = {}
+    quest_info: dict[str, dict[str, list[int] | int]] = {}
     quest_multiplier: float = 1.0
     cash_only: bool = False
     item_queue: list[NetworkItem] = []
     trap_queue: list[int] = []
-    set_cutscene: typing.Optional[bool] = None
+    set_cutscene: bool | None = None
 
-    # intermitten
+    # intermittent
     randomize_quest: bool = True
 
-    async def ppsspp_read_bytes(self, offset: int, length: int, ticket: str) -> dict[str, typing.Any]:
+    async def ppsspp_read_bytes(self, offset: int, length: int, ticket: str) -> dict[str, Any]:
         result = await send_and_receive(self, json.dumps({
             "event": "memory.read",
             "address": offset,
@@ -527,7 +530,7 @@ class MHFUContext(CommonContext):
         }), ticket)
         return result
 
-    async def ppsspp_read_unsigned(self, offset: int, ticket: str, length: int = 8) -> dict[str, typing.Any]:
+    async def ppsspp_read_unsigned(self, offset: int, ticket: str, length: int = 8) -> dict[str, Any]:
         if length not in (8, 16, 32):
             raise Exception("Can only read 8/16/32-bit integers.")
         result = await send_and_receive(self, json.dumps({
@@ -537,7 +540,7 @@ class MHFUContext(CommonContext):
         }), ticket)
         return result
 
-    async def ppsspp_read_string(self, offset: int, ticket: str):
+    async def ppsspp_read_string(self, offset: int, ticket: str) -> dict[str, Any]:
         result = await send_and_receive(self, json.dumps({
             "event": "memory.readString",
             "address": offset,
@@ -545,7 +548,7 @@ class MHFUContext(CommonContext):
         }), ticket)
         return result
 
-    async def ppsspp_write_bytes(self, offset: int, data: bytes | bytearray, ticket: str) -> dict[str, typing.Any]:
+    async def ppsspp_write_bytes(self, offset: int, data: bytes | bytearray, ticket: str) -> dict[str, Any]:
         result = await send_and_receive(self, json.dumps({
             "event": "memory.write",
             "address": offset,
@@ -555,7 +558,7 @@ class MHFUContext(CommonContext):
         return result
 
     async def ppsspp_write_unsigned(self, offset: int, value: int,
-                                    ticket: str, length: int = 8) -> dict[str, typing.Any]:
+                                    ticket: str, length: int = 8) -> dict[str, Any]:
         if length not in (8, 16, 32):
             raise Exception("Can only write 8/16/32-bit integers.")
         if value > pow(2, length):
@@ -593,7 +596,13 @@ class MHFUContext(CommonContext):
         if self.ui:
             self.ui.update_keys(self.unlocked_keys, target)
 
-    async def set_equipment_status(self):
+    async def set_equipment_status(self) -> None:
+        equip_group: str
+        length: int
+        remap: dict[int, int]
+        equipment_type: int
+        weapon_type: int
+        equip_rarity: int
         for equip_group, length, remap, equipment_type in zip([
             "SHOP_HEAD", "SHOP_CHEST", "SHOP_ARM", "SHOP_WAIST", "SHOP_LEG",
             "SHOP_GREAT_LONG", "SHOP_LANCE_GUN", "SHOP_SNS_DUAL", "SHOP_HAMMER_HORN", "SHOP_GUNNER"],
@@ -666,7 +675,7 @@ class MHFUContext(CommonContext):
                                       bytes(gn_upgrade_data), "WRITE_UPGRADE_GN")
         ppsspp_logger.info("Refreshed equipment status.")
 
-    async def refresh_task(self):
+    async def refresh_task(self) -> None:
         # set of initialization we need to handle first
         while not self.exit_event.is_set():
             try:
@@ -684,7 +693,7 @@ class MHFUContext(CommonContext):
             except Exception as ex:
                 Utils.messagebox("Error", str(ex), True)
 
-    async def pop_item(self):
+    async def pop_item(self) -> None:
         if self.item_queue:
             item = self.item_queue.pop()
             if item.item == 24700083:
@@ -758,7 +767,7 @@ class MHFUContext(CommonContext):
             else:
                 self.item_queue.append(item)
 
-    async def pop_trap(self):
+    async def pop_trap(self) -> None:
         if self.trap_queue:
             trap = self.trap_queue.pop()
             if trap == 13:
@@ -770,7 +779,7 @@ class MHFUContext(CommonContext):
                 await self.ppsspp_write_unsigned(MHFU_POINTERS[self.lang]["SET_ACTION"],
                                                  ACTIONS[trap], "SET_ACTION", 16)
 
-    async def receive_items(self, item: NetworkItem, ):
+    async def receive_items(self, item: NetworkItem) -> None:
         if item.item in range(24700079, 24700084):
             self.item_queue.append(item)
         elif item.item >= 24700500:
@@ -818,8 +827,10 @@ class MHFUContext(CommonContext):
                 self.armor_status.add(local_id)
             self.refresh = True
 
-    def run_gui(self):
-        from kvui import GameManager, MDLabel
+    def run_gui(self) -> None:
+        from kvui import GameManager
+        from kivymd.uix.label import MDLabel
+        from kivy.uix.widget import Widget
 
         class MHFUManager(GameManager):
             ctx: MHFUContext
@@ -828,9 +839,9 @@ class MHFUContext(CommonContext):
                 ("PPSSPP", "PPSSPP"),
             ]
             base_title = "Archipelago Monster Hunter Freedom Unite Client"
-            keys: typing.Optional[MDLabel] = None
+            keys: MDLabel | None = None
 
-            def build(self):
+            def build(self) -> Widget:
                 b = super().build()
 
                 keys = MDLabel(text="Key Quests: 0/0",
@@ -840,20 +851,14 @@ class MHFUContext(CommonContext):
                 self.connect_layout.add_widget(keys)
                 return b
 
-            def on_stop(self):
-                if self.ctx:
-                    if self.ctx.debugger:
-                        asyncio.wait_for(self.ctx.debugger.close(), None)
-                super().on_stop()
-
-            def update_keys(self, current, target):
+            def update_keys(self, current: int, target: int) -> None:
                 if self.keys:
                     self.keys.text = f"Key Quests: {current}/{target}"
 
         self.ui = MHFUManager(self)
         self.ui_task = asyncio.create_task(self.ui.async_run(), name="UI")
 
-    def on_package(self, cmd: str, args: dict):
+    def on_package(self, cmd: str, args: dict[str, Any]) -> None:
         if cmd == "Connected":
             # pick up our slot data
             self.death_link = args["slot_data"]["death_link"]
@@ -875,8 +880,21 @@ class MHFUContext(CommonContext):
         elif cmd == "RoomInfo":
             self.server_seed_name = args.get("seed_name", None)
 
+    async def shutdown(self) -> None:
+        await super().shutdown()
+        if self.debugger and not self.debugger.closed:
+            await self.debugger.close()
+        if self.breakpoint_task:
+            self.breakpoint_task.cancel()
+        if self.watcher_task:
+            self.watcher_task.cancel()
+        if self.update_task:
+            self.update_task.cancel()
+        if self.socket_task:
+            self.socket_task.cancel()
 
-async def game_watcher(ctx: MHFUContext):
+
+async def game_watcher(ctx: MHFUContext) -> None:
     while not ctx.exit_event.is_set():
         try:
             try:
@@ -902,7 +920,7 @@ async def game_watcher(ctx: MHFUContext):
                 # we have loaded a character, and are in the lobby or on a hunt
 
                 ap_info = (await ctx.ppsspp_read_unsigned(MHFU_POINTERS[ctx.lang]["AP_SAVE"], "AP_SAVE", 32))["value"]
-
+                assert ctx.server_seed_name is not None
                 if ap_info != 0:
                     if ap_info != crc32(ctx.server_seed_name.encode("utf-8")):
                         ppsspp_logger.error("This hunter is registered to another multiworld!\n"
@@ -941,8 +959,8 @@ async def game_watcher(ctx: MHFUContext):
                                                                63, "QUEST_COMPLETE")
                 quest_completion = bytearray(base64.b64decode(completion_bytes["base64"]))
                 for idx, quest in enumerate(quest_data):
-                    flag = int(quest["flag"])
-                    mask = int(quest["mask"])
+                    flag = quest["flag"]
+                    mask = quest["mask"]
                     if flag >= 0 and mask >= 0:
                         if quest_completion[flag] & (1 << mask):
                             if base_id + idx not in ctx.checked_locations and base_id + idx not in ctx.locations_checked:
@@ -962,10 +980,10 @@ async def game_watcher(ctx: MHFUContext):
                                                                                                  "TREASURE_SCORE"],
                                                                                              28, "TREASURE")
                                                                  )["base64"]))
-                for score, quest in zip(treasure_score, (f"m0400{i}" for i in range(1, 8))):
-                    silver, gold = TREASURE_SCORES[quest]
+                for score, t_quest in zip(treasure_score, (f"m0400{i}" for i in range(1, 8))):
+                    silver, gold = TREASURE_SCORES[t_quest]
                     if score >= silver:
-                        quest_name = get_proper_name(get_quest_by_id(quest))
+                        quest_name = get_proper_name(get_quest_by_id(t_quest))
                         silver_id = location_name_to_id[f"{quest_name} - Silver Crown"]
                         if silver_id not in ctx.checked_locations:
                             new_checks.append(silver_id)
@@ -986,7 +1004,7 @@ async def game_watcher(ctx: MHFUContext):
             Utils.messagebox("Error", str(ex), True)
 
 
-async def main(args):
+async def main(args) -> None:
     ctx = MHFUContext(args.connect, args.password)
     ctx.server_task = asyncio.create_task(server_loop(ctx), name="ServerLoop")
     if gui_enabled:
@@ -1003,7 +1021,7 @@ async def main(args):
     await ctx.shutdown()
 
 
-def launch():
+def launch() -> None:
     import colorama
     colorama.init()
     args = get_base_parser().parse_args()
