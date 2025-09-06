@@ -134,6 +134,8 @@ trap_item_table = {
     "Gustcrab": ItemData(24700517, False, trap=True),
     "Wailnard": ItemData(24700518, False, trap=True),
     "Pincercrab": ItemData(24700519, False, trap=True),
+    # "Conga Artillery": ItemData(24700520, False, trap=True)
+    # "Chameleos Spit": ItemData(24700521, False, trap=True)
 }
 
 item_table = {

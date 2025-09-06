@@ -13,8 +13,11 @@ import json
 import struct
 from zlib import crc32
 from typing import Tuple, Any
+from enum import IntEnum
+from time import time
 
 from NetUtils import NetworkItem, ClientStatus
+from .data.trap_link import trap_link_matches, local_trap_to_type
 from .quests import quest_data, base_id, goal_quests, get_quest_by_id, get_proper_name, location_name_to_id
 from .items import item_name_to_id, item_id_to_name, item_name_groups
 from .data.monsters import elder_dragons, monster_lookup
@@ -22,7 +25,13 @@ from .data.equipment import blademaster, gunner, blademaster_upgrades, gunner_up
     helms, chests, arms, waists, legs
 from .data.item_gifts import item_gifts, decoration_gifts
 
+class DeathState(IntEnum):
+    alive = 0
+    killing_player = 1
+    dead = 2
+
 ppsspp_logger = logging.getLogger("PPSSPP")
+logger = logging.getLogger("Client")
 PPSSPP_REPORTING = "https://report.ppsspp.org/match/list"
 PPSSPP_DEBUG = "debugger.ppsspp.org"
 MHFU_SERIAL = "ULUS10391"
@@ -486,10 +495,11 @@ class MHFUContext(CommonContext):
     server_seed_name: str | None = None
     outgoing_tickets: dict[str, dict[str, Any]] = {}
     breakpoint_queue: list[dict[str, Any]] = []
+    last_trap_link: float = -1
 
     # game info
     recv_index = -1
-    death_link = False
+    death_link: int = 0
     goal: int = 0
     goal_quest: str = "m03233"  # This is Ukanlos, pick the furthest out to potentially avoid collision
     unlocked_keys: int = 0
@@ -517,9 +527,12 @@ class MHFUContext(CommonContext):
     item_queue: list[NetworkItem] = []
     trap_queue: list[int] = []
     set_cutscene: bool | None = None
+    trap_link: bool = False
+    allowed_traps: list[str] = []
 
     # intermittent
     randomize_quest: bool = True
+    death_state: DeathState = DeathState.alive
 
     async def ppsspp_read_bytes(self, offset: int, length: int, ticket: str) -> dict[str, Any]:
         result = await send_and_receive(self, json.dumps({
@@ -693,6 +706,23 @@ class MHFUContext(CommonContext):
             except Exception as ex:
                 Utils.messagebox("Error", str(ex), True)
 
+    async def send_trap_link(self, item: NetworkItem):
+        item_name = self.item_names.lookup_in_game(item.item)
+        if self.slot < 0 or "TrapLink" not in self.tags or item_name not in local_trap_to_type:
+            return
+
+        self.last_trap_link = time.time()
+
+        await self.send_msgs([{
+            "cmd": "Bounce",
+            "tags": ["TrapLink"],
+            "data": {
+                "time": self.last_trap_link,
+                "source": self.player_names[self.slot],
+                "trap_name": item_name
+            },
+        }])
+
     async def pop_item(self) -> None:
         if self.item_queue:
             item = self.item_queue.pop()
@@ -784,6 +814,8 @@ class MHFUContext(CommonContext):
             self.item_queue.append(item)
         elif item.item >= 24700500:
             # traps
+            if self.trap_link:
+                await self.send_trap_link(item)
             self.trap_queue.append(item.item - 24700500)
         elif item_id_to_name[item.item] in item_name_groups["Weapons"]:
             # there's like 50 of these gimme a break
@@ -858,6 +890,27 @@ class MHFUContext(CommonContext):
         self.ui = MHFUManager(self)
         self.ui_task = asyncio.create_task(self.ui.async_run(), name="UI")
 
+    def on_deathlink(self, data: dict[str, Any]) -> None:
+        self.last_death_link = max(data["time"], self.last_death_link)
+        cause = data.get("cause", "")
+        if not cause:
+            logger.info(f"DeathLink: Received from {data['source']}")
+        else:
+            logger.info(f"DeathLink: {cause}")
+        self.death_state = DeathState.killing_player
+
+    def handle_bounce(self, args: dict[str, Any]):
+        if "tags" in args:
+            if "TrapLink" in args["tags"]:
+                source = args["source"]
+                if source != self.player_names[self.slot]:
+                    name = args["trap_name"]
+                    if name in trap_link_matches:
+                        self.trap_queue.extend([trap for trap in trap_link_matches[name]
+                                                if trap in self.allowed_traps])
+                    logger.info(f"TrapLink: Received {name} from {source}")
+
+
     def on_package(self, cmd: str, args: dict[str, Any]) -> None:
         if cmd == "Connected":
             # pick up our slot data
@@ -868,6 +921,9 @@ class MHFUContext(CommonContext):
             self.quest_randomization = args["slot_data"]["quest_randomization"]
             self.quest_info = args["slot_data"]["quest_info"]
             self.cash_only = args["slot_data"]["cash_only_equipment"]
+            self.set_cutscene = args["slot_data"]["set_cutscene"]
+            self.trap_link = args["slot_data"]["trap_link"]
+            self.allowed_traps = args["slot_data"]["allowed_traps"]
             self.required_keys = args["slot_data"]["required_keys"]
             for group, value in args["slot_data"]["rank_requirements"].items():
                 hub, rank, star = group.split(",")
@@ -876,9 +932,11 @@ class MHFUContext(CommonContext):
             self.recv_index = 0
             self.unlocked_keys = 0
             self.refresh = True
-            self.set_cutscene = args["slot_data"]["set_cutscene"]
+
         elif cmd == "RoomInfo":
             self.server_seed_name = args.get("seed_name", None)
+        elif cmd == "Bounced":
+            self.handle_bounce(args)
 
     async def shutdown(self) -> None:
         await super().shutdown()
@@ -904,6 +962,9 @@ async def game_watcher(ctx: MHFUContext) -> None:
             ctx.watcher_event.clear()
             if ctx.server is None or ctx.slot is None:
                 continue
+
+            if ctx.death_link and "DeathLink" not in ctx.tags:
+                await ctx.update_death_link(ctx.death_link > 0)
 
             game_status = await send_and_receive(ctx, json.dumps(PPSSPP_STATUS), "AP_STATUS")
             if not game_status["game"] or game_status["game"]["id"] not in (MHFU_SERIAL, MHP2G_SERIAL):
@@ -950,8 +1011,27 @@ async def game_watcher(ctx: MHFUContext) -> None:
                     ctx.set_cutscene = None
                 await ctx.pop_item()
                 if current_overlay["value"] in ("game_task.ovl", "arcade_task.ovl"):
-                    # we're on a hunt
-                    await ctx.pop_trap()
+                    # we're on a hunt, pop traps and check deathlink
+                    current_action = (await ctx.ppsspp_read_unsigned(MHFU_POINTERS[ctx.lang]["SET_ACTION"],
+                                                                     "CURRENT_ACTION", 2))["value"]
+                    if current_action == 0x0300 and ctx.death_link == 1:
+                        if ctx.death_state == DeathState.alive:
+                            await ctx.send_death(f"{ctx.player_names[ctx.slot]} carted.")
+                        ctx.death_state = DeathState.dead
+                    else:
+                        if ctx.death_link == 1:
+                            if ctx.death_state == DeathState.killing_player:
+                                await ctx.ppsspp_write_unsigned(MHFU_POINTERS[ctx.lang]["RESET_ACTION"], 1,
+                                                                 "RESET_DEATH")
+                                await ctx.ppsspp_write_unsigned(MHFU_POINTERS[ctx.lang]["SET_ACTION"],
+                                                                 ACTIONS[-1], "SET_DEATH", 16)
+                            else:
+                                ctx.death_state = DeathState.alive
+                        await ctx.pop_trap()
+                else:
+                    # if we're not in a hunt, we just need to reset deathlinks
+                    if ctx.death_state != DeathState.alive:
+                        ctx.death_state = DeathState.alive
 
                 new_checks = []
                 quest_changed = False

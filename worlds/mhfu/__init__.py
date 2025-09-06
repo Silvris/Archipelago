@@ -10,6 +10,7 @@ from .quests import create_ranks, location_name_to_id, base_id, goal_quests,\
 from .items import MHFUItem, item_table, filler_item_table, filler_weights, item_name_to_id, weapons, item_name_groups
 from .options import MHFUOptions
 from .rules import set_rules
+from .data.trap_link import local_trap_to_type
 
 
 def launch_client() -> None:
@@ -170,8 +171,14 @@ class MHFUWorld(World):
             "weapons",
             "quest_randomization",
             "quest_difficulty_multiplier",
-            "cash_only_equipment"
+            "cash_only_equipment",
+            "trap_link",
         )
+        allowed_traps = set()
+        if self.options.trap_link:
+            allowed_traps.update([local_trap_to_type[key]
+                                  for key, value in self.options.trap_weights.items() if value > 0])
+        options["allowed_traps"] = allowed_traps
         options["required_keys"] = self.required_keys
         rank_requirements = {}
         for rank in self.rank_requirements:
