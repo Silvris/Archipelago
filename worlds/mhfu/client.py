@@ -264,6 +264,8 @@ async def handle_logs(ctx: MHFUContext) -> None:
             ctx.watcher_event.clear()
             if not ctx.debugger or ctx.debugger.closed:
                 continue
+            if ctx.server is None or ctx.slot is None:
+                continue
             if ctx.breakpoint_queue:
                 log = ctx.breakpoint_queue.pop(0)
                 if log["channel"] in ("MEMMAP", "JIT"):
@@ -701,7 +703,7 @@ class MHFUContext(CommonContext):
                 except asyncio.TimeoutError:
                     pass
                 self.watcher_event.clear()
-                if self.server is None or self.slot is None:
+                if self.server is None or self.slot is None or self.debugger is None or self.debugger.closed:
                     continue
                 if self.refresh:
                     await self.get_key_binary()
@@ -965,7 +967,7 @@ async def game_watcher(ctx: MHFUContext) -> None:
             except asyncio.TimeoutError:
                 pass
             ctx.watcher_event.clear()
-            if ctx.server is None or ctx.slot is None:
+            if ctx.server is None or ctx.slot is None or ctx.debugger is None or ctx.debugger.closed:
                 continue
 
             if ctx.death_link and "DeathLink" not in ctx.tags:
@@ -1106,9 +1108,26 @@ async def main(args: "argparse.Namespace") -> None:
     await ctx.shutdown()
 
 
-def launch() -> None:
+def launch(*launch_args) -> None:
     import colorama
+    import urllib.parse
     colorama.init()
-    args = get_base_parser().parse_args()
+    parser = get_base_parser()
+    parser.add_argument("url", type=str, nargs="?", help="Archipelago Webhost uri to auto connect to.")
+    args = parser.parse_args(launch_args)
+
+    # handle if text client is launched using the "archipelago://name:pass@host:port" url from webhost
+    if args.url:
+        url = urllib.parse.urlparse(args.url)
+        if url.scheme == "archipelago":
+            if url.password:
+                args.password = urllib.parse.unquote(url.password)
+            if url.username:
+                args.connect = f'{urllib.parse.unquote(url.username)}:None@{url.hostname}:{url.port}'
+            else:
+                args.connect = f'{url.hostname}:{url.port}'
+        else:
+            parser.error(f"bad url, found {args.url}, expected url in form of archipelago://archipelago.gg:38281")
+
     asyncio.run(main(args))
     colorama.deinit()

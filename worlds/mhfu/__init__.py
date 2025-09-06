@@ -13,20 +13,21 @@ from .rules import set_rules
 from .data.trap_link import local_trap_to_type
 
 
-def launch_client() -> None:
+def launch_client(*args) -> None:
     from .client import launch
-    launch_subprocess(launch, name="MHFUClient")
+    launch_subprocess(launch, name="MHFUClient", args=args)
 
 
-components.append(Component("MHFU Client", "MHFUClient", func=launch_client, component_type=Type.CLIENT))
+components.append(Component("MHFU Client", "MHFUClient", func=launch_client,
+                            supports_uri=True, game_name="Monster Hunter Freedom Unite", component_type=Type.CLIENT))
 
 
 class MHFUSettings(settings.Group):
-    class PPSSPPSaveDirectory(settings.UserFolderPath):
-        """PPSSPP Save Directory, for automatic mod loading"""
-        description = "PPSSPP Save Directory"
+    class PPSSPPExe(settings.UserFolderPath):
+        """PPSSPP Executable, for automatic launching"""
+        description = "PPSSPP Executable"
 
-    save_directory: PPSSPPSaveDirectory = PPSSPPSaveDirectory("C:/Program Files/PPSSPP/memstick/PSP")
+    ppsspp_exe: PPSSPPExe = PPSSPPExe("C:/Program Files/PPSSPP/PPSSPPWindows64.exe")
 
 
 class MHFUWebWorld(WebWorld):
