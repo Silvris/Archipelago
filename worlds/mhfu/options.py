@@ -86,7 +86,7 @@ class TotalKeyQuests(Range):
     Maximum number of key quests to include in the pool of items.
     This number may not be exact depending on other settings.
     """
-    display_name = "Total Key Quests"
+    display_name = "Max Key Quests"
     range_start = 25  # set to 25 because we don't want it too low
     range_end = 250  # this is mostly a guess tbh
     default = 100
@@ -201,7 +201,7 @@ class MHFUOptions(PerGameCommonOptions):
     village_depth: VillageQuestDepth
     training_quests: TrainingQuests
     treasure_quests: TreasureQuests
-    total_keys: TotalKeyQuests
+    max_keys: TotalKeyQuests
     required_keys: RequiredKeyQuests
     filler_percentage: FillerPercentage
     trap_percentage: TrapPercentage

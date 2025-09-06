@@ -131,6 +131,8 @@ class MHFUWorld(World):
         non_required = free_items - self.required_keys
         filler_items = int(non_required * (self.options.filler_percentage / 100))
         non_required -= filler_items
+        trap_amount = math.floor(filler_items * (self.options.trap_percentage / 100.0))
+        filler_items -= trap_amount
         # notes about the special cases
         # training is either always open aside from each individual quest unlocks, or locked behind GR access
         # so we lock the entrance by can_reach(Region), which opens a can of worms for rules
@@ -150,10 +152,15 @@ class MHFUWorld(World):
         itempool += [self.create_item("Key Quest") for _ in range(self.required_keys)]
         itempool += [self.create_item("Key Quest", True) for _ in range(non_required)]
         itempool += [self.create_item(self.get_filler_item_name()) for _ in range(filler_items)]
+        itempool += [self.create_item(name) for name in self.get_trap_item_names(trap_amount)]
         self.multiworld.itempool += itempool
 
     def get_filler_item_name(self) -> str:
         return self.random.choices(list(filler_item_table.keys()), weights=list(filler_weights.values()))[0]
+
+    def get_trap_item_names(self, num: int = 1) -> list[str]:
+        return self.random.choices(list(self.options.trap_weights.keys()),
+                                   weights=list(self.options.trap_weights.values()), k=num)
 
     set_rules = set_rules
 
