@@ -12,7 +12,7 @@ trap_link_matches: dict[str, list[int]] = {
     "Conga Artillery": [20],
     "Chameleos Spit": [21],
 
-    
+
 }
 
 local_trap_to_type: dict[str, int] = {

@@ -115,7 +115,11 @@ class QuestInfo(typing.TypedDict):
 
 
 class MHFULocation(Location):
-    game: str = "Monster Hunter Freedom Unite"
+    game = "Monster Hunter Freedom Unite"
+
+
+class MHFURegion(Region):
+    game = "Monster Hunter Freedom Unite"
 
 
 def get_proper_name(info: QuestInfo) -> str:
@@ -195,7 +199,7 @@ def create_ranks(world: "MHFUWorld") -> None:
         valid_quests = [quest for quest in quest_data if quest["hub"] == hub
                         and quest["rank"] == rank and quest["star"] == star]
         world.location_num[hub, rank, star] = len(valid_quests)
-        region = Region(get_star_name(hub, rank, star),
+        region = MHFURegion(get_star_name(hub, rank, star),
                         world.player, world.multiworld)
         if (hub, rank, star) == (0, 4, 0):
             # treasure quests are a little weird
@@ -218,6 +222,7 @@ def create_ranks(world: "MHFUWorld") -> None:
                 valid_quests = [quest for quest in valid_quests if quest["qid"] not in ("m22005", "m22006")]
             elif world.options.guild_depth == GuildQuestDepth.option_high_rank:
                 valid_quests = [quest for quest in valid_quests if quest["qid"] != "m22006"]
+            world.location_num[hub, rank, star] = len(valid_quests)
             region.add_locations({get_proper_name(quest): location_name_to_id[get_proper_name(quest)]
                                   for quest in valid_quests}, MHFULocation)
         else:
@@ -246,8 +251,14 @@ def create_ranks(world: "MHFUWorld") -> None:
                                      for quest in valid_quests})
         world.multiworld.regions.append(region)
     for hub, rank, star in world.rank_requirements:
-        region = world.multiworld.get_region(get_star_name(hub, rank, star), world.player)
+        region = world.get_region(get_star_name(hub, rank, star))
         if star != hub_rank_max[(hub, rank)] - 1:
             region.add_exits({get_star_name(hub, rank, star + 1): f"To {get_star_name(hub, rank, star + 1)}"})
         if star == 0:
             menu_region.connect(region, f"To {region.name}")
+    goal_quest = goal_quests[world.options.goal.value]
+    quest_name = get_proper_name(get_quest_by_id(goal_quest))
+    goal_location = world.get_location(quest_name)
+    goal_location.address = None  # This lets us keep the id reserved, even though it's an event this playthrough
+    goal_location.place_locked_item(world.create_item("Victory"))
+    world.multiworld.completion_condition[world.player] = lambda state: state.has("Victory", world.player)

@@ -154,14 +154,6 @@ class MHFUWorld(World):
     def get_filler_item_name(self) -> str:
         return self.random.choices(list(filler_item_table.keys()), weights=list(filler_weights.values()))[0]
 
-    def generate_basic(self) -> None:
-        goal_quest = goal_quests[self.options.goal.value]
-        quest_name = get_proper_name(get_quest_by_id(goal_quest))
-        goal_location = self.multiworld.get_location(quest_name, self.player)
-        goal_location.address = None  # This lets us keep the id reserved, even though it's an event this playthrough
-        goal_location.place_locked_item(self.create_item("Victory"))
-        self.multiworld.completion_condition[self.player] = lambda state: state.has("Victory", self.player)
-
     set_rules = set_rules
 
     def fill_slot_data(self) -> dict[str, Any]:
