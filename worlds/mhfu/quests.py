@@ -114,6 +114,12 @@ class QuestInfo(typing.TypedDict):
     max_mon: int
 
 
+class SlotQuestInfo(typing.TypedDict):
+    monsters: list[int]
+    mon_num: int
+    targets: list[int]
+
+
 class MHFULocation(Location):
     game = "Monster Hunter Freedom Unite"
 
@@ -230,10 +236,11 @@ def create_ranks(world: "MHFUWorld") -> None:
                                   for quest in valid_quests}, MHFULocation)
         if world.options.quest_randomization:
             for quest in valid_quests:
-                quest_info = {
+                quest_info: SlotQuestInfo = {
                     "monsters": world.random.choices(monster_habitats[quest["stage"]],
                                                      k=len(quest["monsters"])) if quest["monsters"] else [],
-                    "mon_num": world.random.choice(range(1, len(quest["monsters"]) + 1)) if quest["monsters"] else 0
+                    "mon_num": world.random.choice(range(1, len(quest["monsters"]) + 1)) if quest["monsters"] else 0,
+                    "targets": []
                 }
                 if quest["qid"] == "m10501":
                     # Special case: this quest crashes if the first monster isn't a Rathalos
@@ -247,7 +254,8 @@ def create_ranks(world: "MHFUWorld") -> None:
                 world.quest_info[quest["qid"][1:]] = quest_info
         else:
             # only need monsters for the resulting quest info
-            world.quest_info.update({quest["qid"][1:]: {"monsters": quest["monsters"]}
+            world.quest_info.update({quest["qid"][1:]: {"monsters": quest["monsters"], "mon_num": len(quest["monsters"]),
+                                                        "targets": []}
                                      for quest in valid_quests})
         world.multiworld.regions.append(region)
     for hub, rank, star in world.rank_requirements:
@@ -257,8 +265,8 @@ def create_ranks(world: "MHFUWorld") -> None:
         if star == 0:
             menu_region.connect(region, f"To {region.name}")
     goal_quest = goal_quests[world.options.goal.value]
-    quest_name = get_proper_name(get_quest_by_id(goal_quest))
-    goal_location = world.get_location(quest_name)
+    goal_name = get_proper_name(get_quest_by_id(goal_quest))
+    goal_location = world.get_location(goal_name)
     goal_location.address = None  # This lets us keep the id reserved, even though it's an event this playthrough
     goal_location.place_locked_item(world.create_item("Victory"))
     world.multiworld.completion_condition[world.player] = lambda state: state.has("Victory", world.player)

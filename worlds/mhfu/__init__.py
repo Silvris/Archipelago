@@ -5,8 +5,8 @@ import settings
 from BaseClasses import Tutorial, ItemClassification, MultiWorld
 from worlds.AutoWorld import WebWorld, World
 from worlds.LauncherComponents import launch_subprocess, components, Component, Type
-from .quests import create_ranks, location_name_to_id, base_id, goal_quests,\
-    get_quest_by_id, get_proper_name, goal_ranks, hub_rank_max, rank_sort
+from .quests import create_ranks, location_name_to_id, base_id, goal_quests, \
+    get_quest_by_id, get_proper_name, goal_ranks, hub_rank_max, rank_sort, SlotQuestInfo
 from .items import MHFUItem, item_table, filler_item_table, filler_weights, item_name_to_id, weapons, item_name_groups
 from .options import MHFUOptions
 from .rules import set_rules
@@ -64,7 +64,7 @@ class MHFUWorld(World):
         super().__init__(multiworld, player)
         self.location_num: dict[Tuple[int, int, int], int] = {}
         self.rank_requirements: dict[Tuple[int, int, int], int] = {}
-        self.quest_info: dict[str, dict[str, list[int] | int]] = {}
+        self.quest_info: dict[str, SlotQuestInfo] = {}
         self.required_keys: int = 0
 
     def generate_early(self) -> None:

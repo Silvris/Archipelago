@@ -12,18 +12,22 @@ import base64
 import json
 import struct
 from zlib import crc32
-from typing import Tuple, Any
+from typing import Tuple, Any, TYPE_CHECKING
 from enum import IntEnum
 from time import time
 
 from NetUtils import NetworkItem, ClientStatus
 from .data.trap_link import trap_link_matches, local_trap_to_type
-from .quests import quest_data, base_id, goal_quests, get_quest_by_id, get_proper_name, location_name_to_id
+from .quests import (quest_data, base_id, goal_quests, get_quest_by_id,
+                     get_proper_name, location_name_to_id, SlotQuestInfo)
 from .items import item_name_to_id, item_id_to_name, item_name_groups
 from .data.monsters import elder_dragons, monster_lookup
 from .data.equipment import blademaster, gunner, blademaster_upgrades, gunner_upgrades, \
     helms, chests, arms, waists, legs
 from .data.item_gifts import item_gifts, decoration_gifts
+
+if TYPE_CHECKING:
+    import argparse
 
 class DeathState(IntEnum):
     alive = 0
@@ -410,9 +414,9 @@ async def send_and_receive(ctx: MHFUContext, message: str, ticket: str) -> dict[
         while ticket not in ctx.outgoing_tickets:
             await asyncio.sleep(0.125)
         return ctx.outgoing_tickets.pop(ticket)
+    return {}
 
-
-async def send_without_receive(ctx: MHFUContext, message: str):
+async def send_without_receive(ctx: MHFUContext, message: str) -> None:
     # cpu actions do not return tickets
     if ctx.debugger:
         await ctx.debugger.send(message)
@@ -521,14 +525,14 @@ class MHFUContext(CommonContext):
     }
     armor_status: set[int] = set()
     quest_randomization: bool = False
-    quest_info: dict[str, dict[str, list[int] | int]] = {}
+    quest_info: dict[str, SlotQuestInfo] = {}
     quest_multiplier: float = 1.0
     cash_only: bool = False
     item_queue: list[NetworkItem] = []
     trap_queue: list[int] = []
     set_cutscene: bool | None = None
     trap_link: bool = False
-    allowed_traps: list[str] = []
+    allowed_traps: list[int] = []
 
     # intermittent
     randomize_quest: bool = True
@@ -706,12 +710,12 @@ class MHFUContext(CommonContext):
             except Exception as ex:
                 Utils.messagebox("Error", str(ex), True)
 
-    async def send_trap_link(self, item: NetworkItem):
+    async def send_trap_link(self, item: NetworkItem) -> None:
         item_name = self.item_names.lookup_in_game(item.item)
-        if self.slot < 0 or "TrapLink" not in self.tags or item_name not in local_trap_to_type:
+        if not self.slot or self.slot < 0 or "TrapLink" not in self.tags or item_name not in local_trap_to_type:
             return
 
-        self.last_trap_link = time.time()
+        self.last_trap_link = time()
 
         await self.send_msgs([{
             "cmd": "Bounce",
@@ -862,7 +866,7 @@ class MHFUContext(CommonContext):
     def run_gui(self) -> None:
         from kvui import GameManager
         from kivymd.uix.label import MDLabel
-        from kivy.uix.widget import Widget
+        from kivy.uix.layout import Layout
 
         class MHFUManager(GameManager):
             ctx: MHFUContext
@@ -873,7 +877,7 @@ class MHFUContext(CommonContext):
             base_title = "Archipelago Monster Hunter Freedom Unite Client"
             keys: MDLabel | None = None
 
-            def build(self) -> Widget:
+            def build(self) -> Layout:
                 b = super().build()
 
                 keys = MDLabel(text="Key Quests: 0/0",
@@ -899,7 +903,8 @@ class MHFUContext(CommonContext):
             logger.info(f"DeathLink: {cause}")
         self.death_state = DeathState.killing_player
 
-    def handle_bounce(self, args: dict[str, Any]):
+    def handle_bounce(self, args: dict[str, Any]) -> None:
+        assert self.slot is not None
         if "tags" in args:
             if "TrapLink" in args["tags"]:
                 source = args["source"]
@@ -1084,7 +1089,7 @@ async def game_watcher(ctx: MHFUContext) -> None:
             Utils.messagebox("Error", str(ex), True)
 
 
-async def main(args) -> None:
+async def main(args: "argparse.Namespace") -> None:
     ctx = MHFUContext(args.connect, args.password)
     ctx.server_task = asyncio.create_task(server_loop(ctx), name="ServerLoop")
     if gui_enabled:

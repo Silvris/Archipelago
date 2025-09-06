@@ -1,4 +1,5 @@
-from .quests import get_quest_by_id, get_proper_name, get_star_name, goal_quests, hub_rank_max, get_area_quests
+from .quests import (get_quest_by_id, get_proper_name, get_star_name, goal_quests, hub_rank_max, get_area_quests,
+                     SlotQuestInfo)
 from .data.monsters import flying_wyverns, piscene_wyverns, bird_wyverns, monster_ids
 from .options import VillageQuestDepth, GuildQuestDepth
 from typing import TYPE_CHECKING
@@ -30,7 +31,7 @@ def can_reach_area(state: "CollectionState", areas: tuple[int],
     return False
 
 
-def can_hunt_any_monster(state: "CollectionState", quest_info: dict[str, dict[str, list[int] | int]],
+def can_hunt_any_monster(state: "CollectionState", quest_info: dict[str, SlotQuestInfo],
                          monsters: list[str], player: int, quest_id: str) -> bool:
     relevant_mons = [monster_ids[monster] for monster in monsters]
     for monster in relevant_mons:
@@ -42,7 +43,7 @@ def can_hunt_any_monster(state: "CollectionState", quest_info: dict[str, dict[st
     return False
 
 
-def can_hunt_all_monsters(state: "CollectionState", quest_info: dict[str, dict[str, list[int] | int]],
+def can_hunt_all_monsters(state: "CollectionState", quest_info: dict[str, SlotQuestInfo],
                           monsters: list[str], player: int, quest_id: str) -> bool:
     relevant_mons = [monster_ids[monster] for monster in monsters]
     for monster in relevant_mons:
