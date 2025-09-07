@@ -1086,7 +1086,7 @@ async def game_watcher(ctx: MHFUContext) -> None:
                         ppsspp_logger.info(
                             f'New Check: {location} ({len(ctx.locations_checked)}/'
                             f'{len(ctx.missing_locations) + len(ctx.checked_locations)})')
-                        await ctx.send_msgs([{"cmd": 'LocationChecks', "locations": [new_check_id]}])
+                    await ctx.check_locations(new_checks)
         except Exception as ex:
             Utils.messagebox("Error", str(ex), True)
 
