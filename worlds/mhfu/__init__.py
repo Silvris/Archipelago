@@ -13,7 +13,7 @@ from .rules import set_rules
 from .data.trap_link import local_trap_to_type
 
 
-def launch_client(*args) -> None:
+def launch_client(*args: str) -> None:
     from .client import launch
     launch_subprocess(launch, name="MHFUClient", args=args)
 
@@ -63,8 +63,8 @@ class MHFUWorld(World):
 
     def __init__(self, multiworld: MultiWorld, player: int):
         super().__init__(multiworld, player)
-        self.location_num: dict[Tuple[int, int, int], int] = {}
-        self.rank_requirements: dict[Tuple[int, int, int], int] = {}
+        self.location_num: dict[tuple[int, int, int], int] = {}
+        self.rank_requirements: dict[tuple[int, int, int], int] = {}
         self.quest_info: dict[str, SlotQuestInfo] = {}
         self.required_keys: int = 0
 

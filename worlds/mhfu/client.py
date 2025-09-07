@@ -1108,7 +1108,7 @@ async def main(args: "argparse.Namespace") -> None:
     await ctx.shutdown()
 
 
-def launch(*launch_args) -> None:
+def launch(*launch_args: str) -> None:
     import colorama
     import urllib.parse
     colorama.init()
