@@ -3,6 +3,7 @@ import math
 from typing import Tuple, Any, ClassVar
 import settings
 from BaseClasses import Tutorial, ItemClassification, MultiWorld
+from Options import OptionError
 from worlds.AutoWorld import WebWorld, World
 from worlds.LauncherComponents import launch_subprocess, components, Component, Type
 from .quests import create_ranks, location_name_to_id, base_id, goal_quests, \
@@ -71,7 +72,7 @@ class MHFUWorld(World):
     def generate_early(self) -> None:
         # there's an impossible set of options, so we just need to block it
         if not self.options.guild_depth and not self.options.village_depth:
-            raise Exception(f"{self.player_name}) Must have at least one rank of quests to play through.")
+            raise OptionError(f"{self.player_name}) Must have at least one rank of quests to play through.")
         goal_rank = goal_ranks[self.options.goal.value]
         if goal_rank[0] == 0 and goal_rank[1] > self.options.guild_depth:
             self.options.guild_depth.value = goal_rank[1]
