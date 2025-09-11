@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import random
+import traceback
 
 from operator import itemgetter
 import Utils
@@ -53,6 +54,7 @@ PPSSPP_HELLO = {
     "ticket": "AP_HELLO"
 }
 PPSSPP_STATUS = {"event": "game.status", "ticket": "AP_STATUS"}
+PPSSPP_CONFIG = {"event": "broadcast.config.set", "ticket": "AP_CONFIG", "disallowed": {"input": False}}
 
 MHFU_POINTERS = {
     "US": {
@@ -233,7 +235,8 @@ WEAPON_GROUPS = {
     1: [2, 8],
     2: [4, 6],
     3: [3, 9],
-    4: [1, 5, 10]
+    4: [1, 5, 10],
+    5: [i for i in range(11)]
 }
 
 TREASURE_SCORES = {
@@ -343,7 +346,7 @@ async def handle_logs(ctx: MHFUContext) -> None:
                         _, quest = split_log_mem(qid)
                         quest_id = quest & 0xFFFF
                         quest_info = ctx.quest_info[f"{quest_id:05}"]
-                        if "targets" in quest_info:
+                        if "targets" in quest_info and quest_info["targets"]:
                             # now we can construct the strings
                             targets = [mon for mon in quest_info["targets"]]
                             targets.reverse()
@@ -373,7 +376,7 @@ async def handle_logs(ctx: MHFUContext) -> None:
                         quest_addr = int(qaddr, 16)
                         quest_id_addr, quest_mix = split_log_mem(quest_id_str)
                         quest_str = str("%.5i" % (quest_mix & 0xFFFF))
-                        if "targets" in ctx.quest_info[quest_str]:
+                        if "targets" in ctx.quest_info[quest_str] and ctx.quest_info[quest_str]["targets"]:
                             qtype = 0x4
                             if any(monster in elder_dragons.values() for monster in ctx.quest_info[quest_str]["targets"]):
                                 qtype = 0x1
@@ -384,9 +387,11 @@ async def handle_logs(ctx: MHFUContext) -> None:
                         await send_without_receive(ctx, json.dumps({"event": "cpu.resume", "ticket": "RESTART"}))
         except Exception as ex:
             Utils.messagebox("Error", str(ex), True)
+            logger.error(traceback.format_exc())
 
 
 async def receive_all(ctx: MHFUContext) -> None:
+    import websockets
     while not ctx.exit_event.is_set():
         try:
             try:
@@ -396,7 +401,10 @@ async def receive_all(ctx: MHFUContext) -> None:
             ctx.watcher_event.clear()
             if not ctx.debugger or ctx.debugger.closed:
                 continue
-            new_message = await ctx.debugger.recv()
+            try:
+                new_message = await ctx.debugger.recv()
+            except websockets.exceptions.ConnectionClosedError:
+                continue
             event = json.loads(new_message)
             if event["event"] == "log":
                 ctx.breakpoint_queue.append(event)
@@ -404,6 +412,7 @@ async def receive_all(ctx: MHFUContext) -> None:
                 ctx.outgoing_tickets[event["ticket"]] = event
         except Exception as ex:
             Utils.messagebox("Error", str(ex), True)
+            logger.error(traceback.format_exc())
 
 
 async def send_and_receive(ctx: MHFUContext, message: str, ticket: str) -> dict[str, Any]:
@@ -459,6 +468,7 @@ async def connect_psp(ctx: MHFUContext, target: int | None = None) -> None:
         return
     ctx.lang = SERIAL_TO_LANG[game_status["game"]["id"]]
     ppsspp_logger.info(f"Connected to PPSSPP {hello['version']} playing Monster Hunter Freedom Unite!")
+    await send_and_receive(ctx, json.dumps(PPSSPP_CONFIG), "AP_CONFIG")
     for bp in MHFU_BREAKPOINTS[ctx.lang]:
         if MHFU_BREAKPOINTS[ctx.lang][bp][0]:
             await send_and_receive(ctx, json.dumps(
@@ -600,6 +610,7 @@ class MHFUContext(CommonContext):
         target = 65535
         for hub, rank, star in sorted(self.rank_requirements, key=itemgetter(0, 1, 2)):
             if (hub, rank, star) in KEY_OFFSETS:
+                print(self.rank_requirements[hub, rank, star], self.unlocked_keys)
                 address = MHFU_POINTERS[self.lang]["GH_KEYS" if hub == 0 else "VL_KEYS"]
                 address += KEY_OFFSETS[hub, rank, star]
                 data = bytearray()
@@ -711,6 +722,7 @@ class MHFUContext(CommonContext):
                     self.refresh = False
             except Exception as ex:
                 Utils.messagebox("Error", str(ex), True)
+                logger.error(traceback.format_exc())
 
     async def send_trap_link(self, item: NetworkItem) -> None:
         item_name = self.item_names.lookup_in_game(item.item)
@@ -863,6 +875,7 @@ class MHFUContext(CommonContext):
                 self.armor_status.add(current_max + 1)
             else:
                 self.armor_status.add(local_id)
+        if item.item not in range(24700079, 24700084) and item.item < 24700500:
             self.refresh = True
 
     def run_gui(self) -> None:
@@ -1007,8 +1020,10 @@ async def game_watcher(ctx: MHFUContext) -> None:
                     ctx.recv_index += 1
                     await ctx.ppsspp_write_unsigned(MHFU_POINTERS[ctx.lang]["AP_SAVE"] + 4,
                                                     ctx.recv_index, "WRITE_RECV_INDEX", 32)
-
+                old_keys = ctx.unlocked_keys
                 ctx.unlocked_keys = sum(1 for item in ctx.items_received if item.item == 24700077)
+                if ctx.unlocked_keys != old_keys:
+                    ctx.refresh = True
 
                 if ctx.set_cutscene:
                     cutscenes = (await ctx.ppsspp_read_unsigned(MHFU_POINTERS[ctx.lang]["NARGA_HYPNOC_CUTSCENE"],
@@ -1020,7 +1035,7 @@ async def game_watcher(ctx: MHFUContext) -> None:
                 if current_overlay["value"] in ("game_task.ovl", "arcade_task.ovl"):
                     # we're on a hunt, pop traps and check deathlink
                     current_action = (await ctx.ppsspp_read_unsigned(MHFU_POINTERS[ctx.lang]["SET_ACTION"],
-                                                                     "CURRENT_ACTION", 2))["value"]
+                                                                     "CURRENT_ACTION", 16))["value"]
                     if current_action == 0x0300 and ctx.death_link == 1:
                         if ctx.death_state == DeathState.alive:
                             await ctx.send_death(f"{ctx.player_names[ctx.slot]} carted.")
@@ -1089,6 +1104,7 @@ async def game_watcher(ctx: MHFUContext) -> None:
                     await ctx.check_locations(new_checks)
         except Exception as ex:
             Utils.messagebox("Error", str(ex), True)
+            logger.error(traceback.format_exc())
 
 
 async def main(args: "argparse.Namespace") -> None:

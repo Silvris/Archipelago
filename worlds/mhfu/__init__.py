@@ -78,10 +78,10 @@ class MHFUWorld(World):
             self.options.guild_depth.value = goal_rank[1]
             logging.warning(f"({self.player_name}) Guild Depth too low for goal, increasing to "
                             f"{self.options.guild_depth.get_option_name(goal_rank[1])}")
-        elif goal_rank[0] == 1 and goal_rank[1] > self.options.village_depth:
-            self.options.village_depth.value = goal_rank[1]
+        elif goal_rank[0] == 1 and (goal_rank[1] + 1) > self.options.village_depth:
+            self.options.village_depth.value = goal_rank[1] + 1
             logging.warning(f"{self.player_name}) Village Depth too low for goal, increasing to "
-                            f"{self.options.village_depth.get_option_name(goal_rank[1])}")
+                            f"{self.options.village_depth.get_option_name(goal_rank[1] + 1)}")
 
     def create_item(self, name: str, force_non_progression: bool = False) -> MHFUItem:
         item = item_table[name]
