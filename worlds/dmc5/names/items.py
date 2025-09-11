@@ -87,3 +87,13 @@ dante_sin_inferno = "Sin Inferno (Dante)"  # Inferno
 dante_demolition = "Demolition (Dante)"  # Explosion
 dante_the_luce = "The Luce (Dante)"  # FeatherLaser
 dante_quadruple_s = "Quadruple S (Dante)"  # SSS_Transform
+# Weapons
+devil_sword_sparda = "Devil Sword Sparda"
+devil_sword_dante = "Devil Sword Dante"
+balrog = "Balrog"
+cavaliere = "Cavaliere"
+cerberus = "Cerberus"
+coyote = "Coyote"
+kalina_ann = "Kalina Ann"
+w_kalina_ann = "W Kalina Ann"
+dr_faust = "Dr. Faust"
