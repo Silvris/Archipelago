@@ -83,7 +83,7 @@ nero_upgrades: dict[str, ItemData] = {
     items.nero_payline: ItemData(127, True, True),
     items.nero_exceed: ItemData(128, True, True, 2),
     items.nero_max_act: ItemData(130, True, True),
-    items.nero_wire_snatch: ItemData(132, True, False, 3),
+    items.nero_wire_snatch: ItemData(132, True, False, 2),
     items.nero_flat_top: ItemData(135, True, True),
     items.nero_showdown: ItemData(137, True, True),
     items.nero_maximum_bet: ItemData(138, True, True),
