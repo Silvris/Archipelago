@@ -142,7 +142,12 @@ class MHFUWorld(World):
         running_total = 0
         for key in ((0, 0, 0), (0, 0, 1), (0, 4, 0), (2, 0, 0), (2, 1, 0), (2, 2, 0)):
             if key in location_count:
-                running_total += location_count.pop(key)
+                if key in ((0, 0, 0), (0, 0, 1)):
+                    running_total += location_count.pop(key)
+                else:
+                    # ignore treasure and arena for calculating key counts
+                    # we'll probably want to make this smarter eventually, but being a little lax doesn't hurt for now
+                    location_count.pop(key)
         all_locs = sum(self.location_num.values())
         rank_order = sorted(location_count, key=lambda tup: rank_sort[tup])
         for i, rank in enumerate(rank_order):

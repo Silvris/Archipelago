@@ -54,7 +54,7 @@ PPSSPP_HELLO = {
     "ticket": "AP_HELLO"
 }
 PPSSPP_STATUS = {"event": "game.status", "ticket": "AP_STATUS"}
-PPSSPP_CONFIG = {"event": "broadcast.config.set", "ticket": "AP_CONFIG", "disallowed": {"input": False}}
+PPSSPP_CONFIG = {"event": "broadcast.config.set", "ticket": "AP_CONFIG", "disallowed": {"input": True}}
 
 MHFU_POINTERS = {
     "US": {
@@ -468,7 +468,7 @@ async def connect_psp(ctx: MHFUContext, target: int | None = None) -> None:
         return
     ctx.lang = SERIAL_TO_LANG[game_status["game"]["id"]]
     ppsspp_logger.info(f"Connected to PPSSPP {hello['version']} playing Monster Hunter Freedom Unite!")
-    await send_and_receive(ctx, json.dumps(PPSSPP_CONFIG), "AP_CONFIG")
+    config = await send_and_receive(ctx, json.dumps(PPSSPP_CONFIG), "AP_CONFIG")
     for bp in MHFU_BREAKPOINTS[ctx.lang]:
         if MHFU_BREAKPOINTS[ctx.lang][bp][0]:
             await send_and_receive(ctx, json.dumps(
@@ -929,7 +929,6 @@ class MHFUContext(CommonContext):
                         self.trap_queue.extend([trap for trap in trap_link_matches[name]
                                                 if trap in self.allowed_traps])
                     logger.info(f"TrapLink: Received {name} from {source}")
-
 
     def on_package(self, cmd: str, args: dict[str, Any]) -> None:
         if cmd == "Connected":
