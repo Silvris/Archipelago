@@ -170,9 +170,11 @@ def set_rules(world: "MHFUWorld") -> None:
             for quest in ("m02214", "m02215"):
                 add_rule(world.get_location(get_proper_name(get_quest_by_id(quest))),
                          lambda state: can_hunt_any_monster(state, world.quest_info,
-                                                            [*list(piscene_wyverns.keys()),
-                                                             *list(flying_wyverns.keys()),
-                                                             *list(bird_wyverns.keys())], world.player, quest))
+                                                            sorted({*flying_wyverns.keys(),
+                                                                    *bird_wyverns.keys(),
+                                                                    *piscene_wyverns.keys()}.difference(
+                                                                ["Velocidrome", "Gendrome",
+                                                                 "Giadrome", "Iodrome"])), world.player, quest))
             for quest in ("m02217", "m02218", "m02219", "m02220", "m02221", "m02222"):
                 add_rule(world.get_location(get_proper_name(get_quest_by_id(quest))),
                          lambda state: can_complete_all_quests(state, ["m02214", "m02215", "m02124", "m02228",

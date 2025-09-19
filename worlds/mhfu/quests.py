@@ -6,6 +6,7 @@ import os
 from collections import defaultdict
 from BaseClasses import Location, Region
 from .data.monster_habitats import monster_habitats
+from .data.monsters import bird_wyverns, flying_wyverns, piscene_wyverns, monster_ids
 from .options import VillageQuestDepth, GuildQuestDepth
 
 if typing.TYPE_CHECKING:
@@ -235,13 +236,37 @@ def create_ranks(world: "MHFUWorld") -> None:
             region.add_locations({get_proper_name(quest): location_name_to_id[get_proper_name(quest)]
                                   for quest in valid_quests}, MHFULocation)
         if world.options.quest_randomization:
-            for quest in valid_quests:
+            required_mons: set[str] = set()
+            sorted_required: list[str] = []
+            if world.options.village_depth:
+                required_mons.add("Yian Kut-Ku")
+                if world.options.training_quests:
+                    required_mons.update(["Cephadrome", "Blangonga", "Rathalos", "Rajang"])
+            elif world.options.guild_depth:
+                # don't have to check for a bird if village depth
+                # cause kut-ku is valid
+                random_mon = world.random.choice(sorted({*flying_wyverns.keys(),
+                                                         *bird_wyverns.keys(),
+                                                         *piscene_wyverns.keys()}.difference(["Velocidrome", "Gendrome",
+                                                                                              "Giadrome", "Iodrome"])))
+                required_mons.add(random_mon)
+            if world.options.training_quests:
+                if world.options.guild_depth >= GuildQuestDepth.option_high_rank:
+                    required_mons.update({"Rathian", "Shogun Ceanataur", "Cephadrome"})
+                    if world.options.guild_depth == GuildQuestDepth.option_g_rank:
+                        required_mons.add("Tigrex")
+
+            for i, quest in enumerate(valid_quests):
                 quest_info: SlotQuestInfo = {
                     "monsters": world.random.choices(monster_habitats[quest["stage"]],
                                                      k=len(quest["monsters"])) if quest["monsters"] else [],
                     "mon_num": world.random.choice(range(1, len(quest["monsters"]) + 1)) if quest["monsters"] else 0,
                     "targets": []
                 }
+                if quest_info["monsters"] and required_mons and world.random.random() > 0.5:
+                    # this isn't guaranteed but it should make it so everything isn't piled up at the start
+                    # failing a 50/50 400+ is nigh impossible
+                    quest_info["monsters"][0] = monster_ids[world.random.choice(sorted(required_mons))]
                 if quest["qid"] == "m10501":
                     # Special case: this quest crashes if the first monster isn't a Rathalos
                     if 11 in quest_info["monsters"] or 49 in quest_info["monsters"]:
@@ -250,6 +275,8 @@ def create_ranks(world: "MHFUWorld") -> None:
                         quest_info["monsters"][0] = world.random.choice([11, 49])
                 if quest_info["mon_num"]:
                     quest_info["targets"] = world.random.choices(quest_info["monsters"], k=quest_info["mon_num"])
+
+                required_mons.difference_update(quest_info["monsters"])
 
                 world.quest_info[quest["qid"][1:]] = quest_info
         else:
