@@ -21,7 +21,7 @@ from NetUtils import NetworkItem, ClientStatus
 from .data.trap_link import trap_link_matches, local_trap_to_type
 from .quests import (quest_data, base_id, goal_quests, get_quest_by_id,
                      get_proper_name, location_name_to_id, SlotQuestInfo)
-from .items import item_name_to_id, item_id_to_name, item_name_groups
+from .items import item_name_groups
 from .data.monsters import elder_dragons, monster_lookup
 from .data.equipment import blademaster, gunner, blademaster_upgrades, gunner_upgrades, \
     helms, chests, arms, waists, legs
@@ -522,6 +522,7 @@ class MHFUContext(CommonContext):
     required_keys: int = 0
     refresh: bool = False
     rank_requirements: dict[Tuple[int, int, int], int] = {}
+    received_weapons: int = 0
     weapon_status: dict[int, set[int]] = {
         0: set(),  # Great Sword
         1: set(),  # Heavy Bowgun
@@ -835,48 +836,66 @@ class MHFUContext(CommonContext):
             if self.trap_link:
                 await self.send_trap_link(item)
             self.trap_queue.append(item.item - 24700500)
-        elif item_id_to_name[item.item] in item_name_groups["Weapons"]:
-            # there's like 50 of these gimme a break
-            self.refresh = True
-            local_id = item.item - base_id
-            weapon_group = local_id // 11
-            if weapon_group < 11:
-                for weapon in WEAPON_GROUPS[weapon_group]:
+
+
+    async def check_equipment(self):
+        # might be a smarter route for this, but this works
+        self.weapon_status = {
+            0: set(),  # Great Sword
+            1: set(),  # Heavy Bowgun
+            2: set(),  # Hammer
+            3: set(),  # Lance
+            4: set(),  # Sword and Shield
+            5: set(),  # Light Bowgun
+            6: set(),  # Dual Blades
+            7: set(),  # Long Sword
+            8: set(),  # Hunting Horn
+            9: set(),  # Gunlance
+            10: set(),  # Bow
+        }
+        self.armor_status = set()
+        for item in self.items_received:
+            if self.item_names.lookup_in_slot(item.item) in item_name_groups["Weapons"]:
+                # there's like 50 of these gimme a break
+                self.refresh = True
+                local_id = item.item - base_id
+                weapon_group = local_id // 11
+                if weapon_group < 11:
+                    for weapon in WEAPON_GROUPS[weapon_group]:
+                        if not local_id % 11:
+                            # progressive
+                            if not self.weapon_status[weapon]:
+                                current_max = 0
+                            else:
+                                current_max = max(self.weapon_status[weapon])
+                            self.weapon_status[weapon].add(current_max + 1)
+                        else:
+                            self.weapon_status[weapon].add(local_id % 11)
+                else:
                     if not local_id % 11:
                         # progressive
-                        if not self.weapon_status[weapon]:
+                        if not self.weapon_status[0]:
                             current_max = 0
                         else:
-                            current_max = max(self.weapon_status[weapon])
-                        self.weapon_status[weapon].add(current_max + 1)
+                            current_max = max(self.weapon_status[0])
+                        for j in range(11):
+                            self.weapon_status[j].add(current_max + 1)
                     else:
-                        self.weapon_status[weapon].add(local_id % 11)
-            else:
-                if not local_id % 11:
+                        rarity = local_id % 11
+                        for j in range(11):
+                            self.weapon_status[j].add(rarity)
+            elif self.item_names.lookup_in_slot(item.item) in item_name_groups["Armor"]:
+                local_id = item.item - base_id - 66
+                if local_id == 0:
                     # progressive
-                    if not self.weapon_status[0]:
+                    if not self.armor_status:
                         current_max = 0
                     else:
-                        current_max = max(self.weapon_status[0])
-                    for j in range(11):
-                        self.weapon_status[j].add(current_max + 1)
+                        current_max = max(self.armor_status)
+                    self.armor_status.add(current_max + 1)
                 else:
-                    rarity = local_id % 11
-                    for j in range(11):
-                        self.weapon_status[j].add(rarity)
-        elif item_id_to_name[item.item] in item_name_groups["Armor"]:
-            local_id = item.item - base_id - 66
-            if local_id == 0:
-                # progressive
-                if not self.armor_status:
-                    current_max = 0
-                else:
-                    current_max = max(self.armor_status)
-                self.armor_status.add(current_max + 1)
-            else:
-                self.armor_status.add(local_id)
-        if item.item not in range(24700079, 24700084) and item.item < 24700500:
-            self.refresh = True
+                    self.armor_status.add(local_id)
+
 
     def run_gui(self) -> None:
         from kvui import GameManager
@@ -1022,6 +1041,13 @@ async def game_watcher(ctx: MHFUContext) -> None:
                 old_keys = ctx.unlocked_keys
                 ctx.unlocked_keys = sum(1 for item in ctx.items_received if item.item == 24700077)
                 if ctx.unlocked_keys != old_keys:
+                    ctx.refresh = True
+
+                old_weapons = ctx.received_weapons
+                ctx.received_weapons = sum(1 for item in ctx.items_received if ctx.item_names.lookup_in_slot(item.item)
+                                           in item_name_groups["Weapons"])
+                if ctx.received_weapons != old_weapons:
+                    await ctx.check_equipment()
                     ctx.refresh = True
 
                 if ctx.set_cutscene:
