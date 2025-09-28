@@ -718,9 +718,10 @@ class MHFUContext(CommonContext):
                 if self.server is None or self.slot is None or self.debugger is None or self.debugger.closed:
                     continue
                 if self.refresh:
+                    self.refresh = False # run this first, if we receive a key/equipment before finishing the
+                    # equipment/key binary we'll miss another update
                     await self.get_key_binary()
                     await self.set_equipment_status()
-                    self.refresh = False
             except Exception as ex:
                 Utils.messagebox("Error", str(ex), True)
                 logger.error(traceback.format_exc())
