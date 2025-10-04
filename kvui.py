@@ -749,7 +749,6 @@ class CommandButton(MDButton, MDTooltip):
         self._tooltip.font_size = dp(20 - (len(self._tooltip.text) // 400))  # mostly guessing on the numbers here
         if self._tooltip.parent:
             self.remove_tooltip()
-            print("Tooltip has parent")
 
         Clock.schedule_once(self.display_tooltip, 0.5)
 
