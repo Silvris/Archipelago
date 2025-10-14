@@ -30,10 +30,12 @@ from .data.item_gifts import item_gifts, decoration_gifts
 if TYPE_CHECKING:
     import argparse
 
+
 class DeathState(IntEnum):
     alive = 0
     killing_player = 1
     dead = 2
+
 
 ppsspp_logger = logging.getLogger("PPSSPP")
 logger = logging.getLogger("Client")
@@ -378,7 +380,8 @@ async def handle_logs(ctx: MHFUContext) -> None:
                         quest_str = str("%.5i" % (quest_mix & 0xFFFF))
                         if "targets" in ctx.quest_info[quest_str] and ctx.quest_info[quest_str]["targets"]:
                             qtype = 0x4
-                            if any(monster in elder_dragons.values() for monster in ctx.quest_info[quest_str]["targets"]):
+                            if any(monster in elder_dragons.values() for monster in
+                                   ctx.quest_info[quest_str]["targets"]):
                                 qtype = 0x1
                             await ctx.ppsspp_write_bytes(quest_addr, qtype.to_bytes(1, "little"), "Q_VTYPE")
 
@@ -427,6 +430,7 @@ async def send_and_receive(ctx: MHFUContext, message: str, ticket: str) -> dict[
         return ctx.outgoing_tickets.pop(ticket)
     return {}
 
+
 async def send_without_receive(ctx: MHFUContext, message: str) -> None:
     # cpu actions do not return tickets
     if ctx.debugger:
@@ -468,7 +472,7 @@ async def connect_psp(ctx: MHFUContext, target: int | None = None) -> None:
         return
     ctx.lang = SERIAL_TO_LANG[game_status["game"]["id"]]
     ppsspp_logger.info(f"Connected to PPSSPP {hello['version']} playing Monster Hunter Freedom Unite!")
-    config = await send_and_receive(ctx, json.dumps(PPSSPP_CONFIG), "AP_CONFIG")
+    await send_and_receive(ctx, json.dumps(PPSSPP_CONFIG), "AP_CONFIG")
     for bp in MHFU_BREAKPOINTS[ctx.lang]:
         if MHFU_BREAKPOINTS[ctx.lang][bp][0]:
             await send_and_receive(ctx, json.dumps(
@@ -718,7 +722,7 @@ class MHFUContext(CommonContext):
                 if self.server is None or self.slot is None or self.debugger is None or self.debugger.closed:
                     continue
                 if self.refresh:
-                    self.refresh = False # run this first, if we receive a key/equipment before finishing the
+                    self.refresh = False  # run this first, if we receive a key/equipment before finishing the
                     # equipment/key binary we'll miss another update
                     await self.get_key_binary()
                     await self.set_equipment_status()
@@ -838,7 +842,6 @@ class MHFUContext(CommonContext):
                 await self.send_trap_link(item)
             self.trap_queue.append(item.item - 24700500)
 
-
     async def check_equipment(self):
         # might be a smarter route for this, but this works
         self.weapon_status = {
@@ -896,7 +899,6 @@ class MHFUContext(CommonContext):
                     self.armor_status.add(current_max + 1)
                 else:
                     self.armor_status.add(local_id)
-
 
     def run_gui(self) -> None:
         from kvui import GameManager
@@ -1070,9 +1072,9 @@ async def game_watcher(ctx: MHFUContext) -> None:
                         if ctx.death_link == 1:
                             if ctx.death_state == DeathState.killing_player:
                                 await ctx.ppsspp_write_unsigned(MHFU_POINTERS[ctx.lang]["RESET_ACTION"], 1,
-                                                                 "RESET_DEATH")
+                                                                "RESET_DEATH")
                                 await ctx.ppsspp_write_unsigned(MHFU_POINTERS[ctx.lang]["SET_ACTION"],
-                                                                 ACTIONS[-1], "SET_DEATH", 16)
+                                                                ACTIONS[-1], "SET_DEATH", 16)
                             else:
                                 ctx.death_state = DeathState.alive
                         await ctx.pop_trap()
@@ -1091,7 +1093,8 @@ async def game_watcher(ctx: MHFUContext) -> None:
                     mask = quest["mask"]
                     if flag >= 0 and mask >= 0:
                         if quest_completion[flag] & (1 << mask):
-                            if base_id + idx not in ctx.checked_locations and base_id + idx not in ctx.locations_checked:
+                            if base_id + idx not in ctx.checked_locations \
+                                    and base_id + idx not in ctx.locations_checked:
                                 new_checks.append(idx + base_id)
                             if quest["qid"] == ctx.goal_quest and not ctx.finished_game:
                                 await ctx.send_msgs([{"cmd": "StatusUpdate", "status": ClientStatus.CLIENT_GOAL}])
