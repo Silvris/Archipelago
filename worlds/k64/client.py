@@ -1,13 +1,11 @@
 import logging
 import struct
 import sys
-import time
 import typing
 from base64 import b64encode
-from struct import unpack, pack
-from typing import Any, TYPE_CHECKING
+from typing import TYPE_CHECKING
 
-from NetUtils import ClientStatus, color
+from NetUtils import ClientStatus
 from worlds._bizhawk.client import BizHawkClient
 
 from .regions import default_levels
@@ -15,48 +13,46 @@ from .rom import slot_data, crystal_requirements
 
 if TYPE_CHECKING:
     from worlds._bizhawk.context import BizHawkClientContext
-    from kvui import Label
-else:
-    BizHawkClientContext = Any
+    from kivymd.uix.label import MDLabel
 
 k64_logger = logging.getLogger("K64")
 
 ability_to_bit = {
-    0x640001: 0,
-    0x640002: 1,
-    0x640003: 2,
-    0x640004: 3,
-    0x640005: 4,
-    0x640006: 5,
-    0x640007: 6,
-    0x640200: 7,
-    0x640201: 8,
-    0x640202: 9,
-    0x640203: 10,
-    0x640204: 11,
-    0x640205: 12,
-    0x640206: 13,
-    0x640207: 14,
-    0x640208: 15,
-    0x640209: 16,
-    0x64020A: 17,
-    0x64020B: 18,
-    0x64020C: 19,
-    0x64020D: 20,
-    0x64020E: 21,
-    0x64020F: 22,
-    0x640210: 23,
-    0x640211: 24,
-    0x640212: 25,
-    0x640213: 26,
-    0x640214: 27,
-    0x640215: 28,
-    0x640216: 29,
-    0x640217: 30,
-    0x640218: 31,
-    0x640219: 32,
-    0x64021A: 33,
-    0x64021B: 34,
+    0x0001: 0,
+    0x0002: 1,
+    0x0003: 2,
+    0x0004: 3,
+    0x0005: 4,
+    0x0006: 5,
+    0x0007: 6,
+    0x0200: 7,
+    0x0201: 8,
+    0x0202: 9,
+    0x0203: 10,
+    0x0204: 11,
+    0x0205: 12,
+    0x0206: 13,
+    0x0207: 14,
+    0x0208: 15,
+    0x0209: 16,
+    0x020A: 17,
+    0x020B: 18,
+    0x020C: 19,
+    0x020D: 20,
+    0x020E: 21,
+    0x020F: 22,
+    0x0210: 23,
+    0x0211: 24,
+    0x0212: 25,
+    0x0213: 26,
+    0x0214: 27,
+    0x0215: 28,
+    0x0216: 29,
+    0x0217: 30,
+    0x0218: 31,
+    0x0219: 32,
+    0x021A: 33,
+    0x021B: 34,
 }
 
 power_combos = {
@@ -136,7 +132,7 @@ class K64Client(BizHawkClient):
     levels: typing.Optional[typing.Dict[int, typing.List[int]]] = None
     split_power_combos: typing.Optional[bool] = None
     boss_requirements: typing.Optional[bytes] = None
-    crystal_label: "Label" = None
+    crystal_label: "MDLabel" = None
 
     def interpret_copy_ability(self, current, new_ability):
         if self.split_power_combos:
@@ -173,7 +169,7 @@ class K64Client(BizHawkClient):
         from worlds._bizhawk import write
         await write(ctx.bizhawk_ctx, [(K64_DEATHLINK_SET, int.to_bytes(1, 4, "big"), "RDRAM")])
 
-    async def set_auth(self, ctx: BizHawkClientContext) -> None:
+    async def set_auth(self, ctx: "BizHawkClientContext") -> None:
         if self.rom:
             ctx.auth = b64encode(self.rom).decode()
 
@@ -202,14 +198,14 @@ class K64Client(BizHawkClient):
         ctx.items_handling = 0b111
         return True
 
-    async def update_crystal_label(self, ctx: BizHawkClientContext):
+    async def update_crystal_label(self, ctx: "BizHawkClientContext"):
         from kvui import TooltipLabel
 
         if not self.crystal_label:
             self.crystal_label = TooltipLabel(text=f"", size_hint_x=None, width=125, halign="center", valign="center")
             ctx.ui.connect_layout.add_widget(self.crystal_label)
 
-        current_crystals = sum(1 for item in ctx.items_received if item.item == 0x640020)
+        current_crystals = sum(1 for item in ctx.items_received if item.item == 0x0020)
         highest = 1
         for crystal in self.boss_requirements:
             if current_crystals < crystal:
@@ -219,7 +215,7 @@ class K64Client(BizHawkClient):
         else:
             self.crystal_label.text = "Level 7"
 
-    async def game_watcher(self, ctx: BizHawkClientContext) -> None:
+    async def game_watcher(self, ctx: "BizHawkClientContext") -> None:
         from worlds._bizhawk import read, write
 
         if ctx.server is None:
@@ -307,23 +303,23 @@ class K64Client(BizHawkClient):
                 writes.append(self.interpret_copy_ability(struct.unpack(">Q", copy_ability)[0], item.item))
             elif item.item & 0x100:
                 writes.append((K64_FRIENDS + (item.item & 0xF), int.to_bytes(1, 1, "little"), "RDRAM"))
-            elif item.item == 0x640020:
+            elif item.item == 0x0020:
                 # crystal shard
                 writes.append((K64_CRYSTAL_ADDRESS, struct.pack(">I", struct.unpack(">I", crystals)[0] + 1), "RDRAM"))
-            elif item.item == 0x640021:
+            elif item.item == 0x0021:
                 # 1-Up
                 current_lives = int.from_bytes(lives, "big")
                 writes.extend([
                     (K64_KIRBY_LIVES, struct.pack(">I", current_lives + 1), "RDRAM"),
                     (K64_KIRBY_LIVES_VISUAL, struct.pack(">I", current_lives + 1), "RDRAM"),
                 ])
-            elif item.item == 0x640022:
+            elif item.item == 0x0022:
                 # Maxim Tomato
                 writes.extend([
                     (K64_KIRBY_HEALTH, struct.pack(">f", 6), "RDRAM"),
                     (K64_KIRBY_HEALTH_VISUAL, struct.pack(">I", 6), "RDRAM"),
                 ])
-            elif item.item == 0x640023:
+            elif item.item == 0x0023:
                 # Invincibility Candy
                 writes.extend([(K64_INVINCIBILITY_CANDY, [1], "RDRAM")])
 
@@ -368,14 +364,14 @@ class K64Client(BizHawkClient):
 
         for i, crystal in zip(range(6), boss_crystals):
             # purposely leave out the last two
-            loc_id = i + 0x640200
+            loc_id = i + 0x0200
             if loc_id not in ctx.checked_locations and crystal != 0x00:
                 new_checks.append(loc_id)
 
         # check stages
         for level, stage_num in zip(range(1, 7), (3, 4, 4, 4, 4, 3)):
             for stage in range(stage_num):
-                loc_id = 0x640000 + self.levels[level][stage]
+                loc_id = 0x0000 + self.levels[level][stage]
                 if loc_id not in ctx.checked_locations and stage_array[stage_to_byte[level][stage]] == 0x02:
                     new_checks.append(loc_id)
                 elif loc_id in ctx.checked_locations:
@@ -386,7 +382,7 @@ class K64Client(BizHawkClient):
             level_crystals = struct.unpack("I", crystal_array[level*4:(level*4)+4])[0]
             for stage in range(stage_num):
                 shifter = (stage * 8)
-                current_crystal = 0x640101 + (((default_levels[level + 1][stage] & 0xFF) - 1) * 3)
+                current_crystal = 0x0101 + (((default_levels[level + 1][stage] & 0xFF) - 1) * 3)
                 for i in range(3):
                     if level_crystals & (1 << shifter) and current_crystal not in ctx.checked_locations:
                         new_checks.append(current_crystal)
@@ -397,7 +393,8 @@ class K64Client(BizHawkClient):
             ctx.locations_checked.add(new_check_id)
             location = ctx.location_names[new_check_id]
             k64_logger.info(
-                f'New Check: {location} ({len(ctx.locations_checked)}/{len(ctx.missing_locations) + len(ctx.checked_locations)})')
-            await ctx.send_msgs([{"cmd": 'LocationChecks', "locations": [new_check_id]}])
+                f'New Check: {location} ({len(ctx.locations_checked)}/'
+                f'{len(ctx.missing_locations) + len(ctx.checked_locations)})')
+        await ctx.check_locations(new_checks)
 
         await write(ctx.bizhawk_ctx, writes)
