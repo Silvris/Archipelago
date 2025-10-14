@@ -15,7 +15,7 @@ import schema
 import MultiServer
 from NetUtils import GamesPackage, SlotType
 from Utils import VersionException, __version__
-from worlds.Files import AutoPatchRegister
+from worlds.Files import get_player_from_container
 from worlds.AutoWorld import data_package_checksum
 from . import app
 from .models import Seed, Room, Slot, GameDataPackage
@@ -109,17 +109,9 @@ def upload_zip_to_db(zfile: zipfile.ZipFile, owner=None, meta={"race": False}, s
 
     # Load files.
     for file in infolist:
-        handler = AutoPatchRegister.get_handler(file.filename)
         if banned_file(file.filename):
             return "Uploaded data contained a rom file, which is likely to contain copyrighted material. " \
                    "Your file was deleted."
-
-        # AP Container
-        elif handler:
-            data = zfile.open(file, "r").read()
-            with zipfile.ZipFile(BytesIO(data)) as container:
-                player = json.loads(container.open("archipelago.json").read())["player"]
-            files[player] = data
 
         # Spoiler
         elif file.filename.endswith(".txt"):
@@ -133,16 +125,12 @@ def upload_zip_to_db(zfile: zipfile.ZipFile, owner=None, meta={"race": False}, s
                 flash("Could not load multidata. File may be corrupted or incompatible.")
                 multidata = None
 
-
-        # Factorio
-        elif file.filename.endswith(".zip"):
-            try:
-                _, _, slot_id, *_ = file.filename.split('_')[0].split('-', 3)
-            except ValueError:
-                flash("Error: Unexpected file found in .zip: " + file.filename)
-                return
+        # AP Container
+        elif zipfile.is_zipfile(BytesIO(zfile.open(file, "r").read())):
             data = zfile.open(file, "r").read()
-            files[int(slot_id[1:])] = data
+            player = get_player_from_container(data)
+            if player:
+                files[player] = data
 
         # All other files using the standard MultiWorld.get_out_file_name_base method
         else:

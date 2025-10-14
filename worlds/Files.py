@@ -84,6 +84,17 @@ def is_ap_player_container(game: str, data: bytes, player: int):
     return False
 
 
+def get_player_from_container(data: bytes) -> int | None:
+    if not zipfile.is_zipfile(BytesIO(data)):
+        return None
+    with zipfile.ZipFile(BytesIO(data), mode='r') as zf:
+        if "archipelago.json" in zf.namelist():
+            manifest = json.loads(zf.read("archipelago.json"))
+            if "game" in manifest and "player" in manifest:
+                return manifest["player"]
+    return None
+
+
 class InvalidDataError(Exception):
     """
     Since games can override `read_contents` in APContainer,
