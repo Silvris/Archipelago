@@ -15,7 +15,7 @@ MM1NESHASH = "4de82cfceadbf1a5e693b669b1221107"
 PROTEUSHASH = "b69fff40212b80c94f19e786d1efbf61"
 
 wily_requirement = 0x1AAB4
-energylink = 0x1FF93
+energylink = 0x1FF69
 
 MM1_BOSS_WEAKNESSES = {
     0: 0x1FDEE,  # Cut Man
@@ -67,6 +67,7 @@ def patch_rom(world: "MM1World", patch: MM1ProcedurePatch):
     patch.write_bytes(0x1FFED, world.world_version)
     patch.write_byte(0x1FFEC, (world.options.energy_link.value << 1) + world.options.death_link.value)
 
+    patch.write_file("token_patch.bin", patch.get_token_binary())
 
 header = b'\x4E\x45\x53\x1A\x08\x00\x21\x00\x00\x00\x00\x00\x00\x00\x00\x00'
 

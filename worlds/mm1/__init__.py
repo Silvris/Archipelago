@@ -10,6 +10,7 @@ from copy import deepcopy
 from hashlib import md5
 from Options import OptionError
 from typing import Any, ClassVar, Sequence
+from .client import MegaMan1Client
 from .items import MM1Item, all_items, item_lookup, stage_access, weapons, item_groups
 from .locations import location_lookup, MM1Location, MM1Region, mm1_regions
 from .options import MM1Options

@@ -77,6 +77,15 @@ MM1_REFIGHTS = {
     5: 0xF
 }
 
+MM1_RBM_REMAP = {
+    1: 0x20,
+    2: 0x10,
+    3: 0x2,
+    4: 0x40,
+    5: 0x4,
+    6: 0x8,
+}
+
 def cmd_pool(self: "BizHawkClientCommandProcessor") -> None:
     """Check the current pool of EnergyLink, and requestable refills from it."""
     if self.ctx.game != "Mega Man":
@@ -178,12 +187,12 @@ class MegaMan1Client(BizHawkClient):
                     ctx.command_processor.commands.pop("autoheal")
                 return False
 
-            game_name, version = (await read(ctx.bizhawk_ctx, [(0x1FFF0, 16, "PRG ROM"),
-                                                               (0x1FFED, 3, "PRG ROM")]))
+            game_name, version = (await read(ctx.bizhawk_ctx, [(0x1FFE0, 16, "PRG ROM"),
+                                                               (0x1FFDD, 3, "PRG ROM")]))
             if game_name[:3] != b"MM1" or version != bytes(MM1World.world_version):
                 if game_name[:3] == b"MM1":
                     # I think this is an easier check than the other?
-                    older_version = "0.2.1" if version == b"\xFF\xFF\xFF" else f"{version[0]}.{version[1]}.{version[2]}"
+                    older_version = "unknown" if version == b"\xFF\xFF\xFF" else f"{version[0]}.{version[1]}.{version[2]}"
                     logger.warning(f"This Mega Man patch was generated for an different version of the apworld. "
                                    f"Please use that version to connect instead.\n"
                                    f"Patch version: ({older_version})\n"
@@ -204,7 +213,7 @@ class MegaMan1Client(BizHawkClient):
         self.rom = game_name
         ctx.items_handling = 0b111
         ctx.want_slot_data = False
-        deathlink = (await read(ctx.bizhawk_ctx, [(0x1FFEC, 1, "PRG ROM")]))[0][0]
+        deathlink = (await read(ctx.bizhawk_ctx, [(0x1FFDC, 1, "PRG ROM")]))[0][0]
         if deathlink & 0x01:
             self.death_link = True
         if deathlink & 0x02:
@@ -324,14 +333,14 @@ class MegaMan1Client(BizHawkClient):
                 color(ctx.player_names[item.player], 'yellow'),
                 ctx.location_names.lookup_in_slot(item.location, item.player), recv_amount, len(ctx.items_received)))
 
-            if item.item & 0x130 == 0:
+            if item.item & 0x30 == 0:
                 # Robot Master Weapon
                 new_weapons = weapons_unlocked[0] | (1 << ((item.item & 0xF) - 1))
                 writes.append((MM1_UNLOCKED_WEAPONS, new_weapons.to_bytes(1, 'little'), "RAM"))
                 writes.extend(get_sfx_writes(0x22))
-            elif item.item & 0x30 == 0:
+            elif item.item & 0x20 == 0:
                 # Robot Master Stage Access
-                new_stages = robot_masters_unlocked[0] & ~(1 << ((item.item & 0xF) - 1))
+                new_stages = robot_masters_unlocked[0] | MM1_RBM_REMAP[item.item & 0xF]
                 writes.append((MM1_UNLOCKED_RBM, new_stages.to_bytes(1, 'little'), "RAM"))
                 writes.extend(get_sfx_writes(0x1C))
                 writes.append((MM1_RBM_STROBE, b"\x01", "RAM"))
@@ -477,8 +486,9 @@ class MegaMan1Client(BizHawkClient):
         if magnet_beam_get[0] & 0x80:
             new_checks.append(0x17)
 
+        stages_complete = int.from_bytes(completed_stages, "little")
         for boss, boss_id in MM1_STAGE_CHECKS.items():
-            if completed_stages[boss] != 0:
+            if stages_complete & (1 << boss) != 0:
                 if boss_id not in ctx.checked_locations:
                     new_checks.append(boss_id)
 
