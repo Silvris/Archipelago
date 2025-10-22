@@ -1,5 +1,5 @@
-from BaseClasses import Location, Region
-from typing import NamedTuple
+from BaseClasses import Location, Region, CollectionState
+from typing import NamedTuple, Callable
 
 
 class MM1Region(Region):
@@ -18,6 +18,7 @@ class LocationData(NamedTuple):
 class RegionData(NamedTuple):
     name: str
     locations: dict[str, LocationData]
+    required_items: list[str]
     parent: str = ""
 
 
@@ -26,7 +27,7 @@ mm1_regions: list[RegionData] = [
         "Cut Man - Defeated": LocationData(0x1),
         "Rolling Cutter - Received": LocationData(0x11),
         "Cut Man Stage - Health Energy 1": LocationData(0x101, True),
-    }),
+    }, ["Cut Man Access Codes"]),
     RegionData("Ice Man Stage", {
         "Ice Man - Defeated": LocationData(0x2),
         "Ice Slasher - Received": LocationData(0x12),
@@ -39,7 +40,7 @@ mm1_regions: list[RegionData] = [
         "Ice Man Stage - Weapon Energy 2": LocationData(0x108, True),
         "Ice Man Stage - Weapon Energy 3": LocationData(0x109, True),
         "Ice Man Stage - Weapon Energy 4": LocationData(0x10A, True),
-    }),
+    }, ["Ice Man Access Codes"]),
     RegionData("Bomb Man Stage", {
         "Bomb Man - Defeated": LocationData(0x3),
         "Hyper Bomb - Received": LocationData(0x13),
@@ -48,8 +49,7 @@ mm1_regions: list[RegionData] = [
         "Bomb Man Stage - Weapon Energy 1": LocationData(0x10D, True),
         "Bomb Man Stage - Health Energy 3": LocationData(0x10E, True),
         "Bomb Man Stage - 1-Up": LocationData(0x10F, True),
-
-    }),
+    }, ["Bomb Man Access Codes"]),
     RegionData("Fire Man Stage", {
         "Fire Man - Defeated": LocationData(0x4),
         "Fire Storm - Received": LocationData(0x14),
@@ -62,7 +62,7 @@ mm1_regions: list[RegionData] = [
         "Fire Man Stage - Health Energy 5": LocationData(0x116, True),
         "Fire Man Stage - Health Energy 6": LocationData(0x117, True),
         "Fire Man Stage - Weapon Energy 3": LocationData(0x118, True),
-    }),
+    }, ["Fire Man Access Codes"]),
     RegionData("Elec Man Stage", {
         "Elec Man - Defeated": LocationData(0x5),
         "Elec Beam - Received": LocationData(0x15),
@@ -72,7 +72,7 @@ mm1_regions: list[RegionData] = [
         "Elec Man Stage - Weapon Energy 2": LocationData(0x11B, True),
         "Elec Man Stage - Weapon Energy 3": LocationData(0x11C, True),
         "Elec Man Stage - Health Energy 2": LocationData(0x11D, True),
-    }),
+    }, ["Elec Man Access Codes"]),
     RegionData("Guts Man Stage", {
         "Guts Man - Defeated": LocationData(0x6),
         "Super Arm - Received": LocationData(0x16),
@@ -84,7 +84,7 @@ mm1_regions: list[RegionData] = [
         "Guts Man Stage - 1-Up": LocationData(0x123, True),
         "Guts Man Stage - Health Energy 5": LocationData(0x124, True),
 
-    }),
+    }, ["Guts Man Access Codes"]),
     RegionData("Wily Stage 1", {
         "Yellow Devil - Defeated": LocationData(0x7),
         "Wily Stage 1 - Complete": LocationData(None),
@@ -92,7 +92,7 @@ mm1_regions: list[RegionData] = [
         "Wily Stage 1 - Health Energy 2": LocationData(0x126, True),
         "Wily Stage 1 - Weapon Energy 1": LocationData(0x127, True),
         "Wily Stage 1 - Weapon Energy 2": LocationData(0x128, True),
-    }),
+    }, []),
     RegionData("Wily Stage 2", {
         "Wily Stage 2 - Cut Man Rematch": LocationData(0x8),
         "Wily Stage 2 - Elec Man Rematch": LocationData(0x9),
@@ -108,11 +108,11 @@ mm1_regions: list[RegionData] = [
         "Wily Stage 2 - Weapon Energy 6": LocationData(0x130, True),
         "Wily Stage 2 - 1-Up": LocationData(0x131, True),
         "Wily Stage 2 - Weapon Energy 7": LocationData(0x132, True),
-    }, "Wily Stage 1"),
+    }, ["Wily Stage 1 - Complete"], "Wily Stage 1"),
     RegionData("Wily Stage 3", {
         "CWU-01P - Defeated": LocationData(0xB),
         "Wily Stage 3 - Complete": LocationData(None),
-    }, "Wily Stage 2"),
+    }, ["Wily Stage 2 - Complete"], "Wily Stage 2"),
     RegionData("Wily Stage 4", {
         "Wily Stage 4 - Bomb Man Rematch": LocationData(0xC),
         "Wily Stage 4 - Fire Man Rematch": LocationData(0xD),
@@ -123,7 +123,7 @@ mm1_regions: list[RegionData] = [
         "Wily Stage 4 - 1-Up": LocationData(0x134, True),
         "Wily Stage 4 - Yashichi": LocationData(0x135, True),
         "Wily Stage 4 - Weapon Energy 2": LocationData(0x136, True),
-    }, "Wily Stage 3")
+    }, ["Wily Stage 3 - Complete"], "Wily Stage 3")
 ]
 
 all_locations: dict[str, LocationData] = {key: value for region in mm1_regions

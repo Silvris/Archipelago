@@ -35,12 +35,17 @@ misc_items: dict[str, ItemData] = {
     "1-Up": ItemData(0x20, False),
     "Weapon Energy (L)": ItemData(0x21, False),
     "Health Energy (L)": ItemData(0x22, False),
+    "Yashichi": ItemData(0x23, False, True)
 }
 
 all_items: dict[str, ItemData] = {
     **weapons,
     **stage_access,
     **misc_items
+}
+
+item_groups: dict[str, set[str]] = {
+    "Weapons": {weapon for weapon in weapons.keys()}
 }
 
 item_lookup: dict[str, int] = {item: data.item_id for item, data in all_items.items() if data.item_id}
