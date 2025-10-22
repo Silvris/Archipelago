@@ -96,7 +96,7 @@ class MM1World(World):
         for region in mm1_regions:
             stage = MM1Region(region.name, self.player, self.multiworld)
             stage.add_locations({name: data.location_id for name, data in region.locations.items()
-                                 if not data.consumable or self.options.consumables}, MM1Location)
+                                 if (not data.consumable) or self.options.consumables}, MM1Location)
             for name, data in region.locations.items():
                 if not data.location_id:
                     self.get_location(name).place_locked_item(MM1Item(name, ItemClassification.progression,
@@ -110,7 +110,7 @@ class MM1World(World):
             else:
                 parent_region = menu
             parent_region.connect(self.get_region(region.name), f"To {region.name}",
-                                  lambda state: state.has_all(region.required_items, self.player))
+                                  lambda state, req=tuple(region.required_items): state.has_all(req, self.player))
 
     def create_items(self):
         # Define our local itempool

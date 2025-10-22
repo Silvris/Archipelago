@@ -12,7 +12,7 @@ if TYPE_CHECKING:
 
 MM1LCHASH = "f26a4de87f10552fde0ab93c3069d24c"
 MM1NESHASH = "4de82cfceadbf1a5e693b669b1221107"
-PROTEUSHASH = "9ff045a3ca30018b6e874c749abb3ec4"
+PROTEUSHASH = "b69fff40212b80c94f19e786d1efbf61"
 
 wily_requirement = 0x1AAB4
 energylink = 0x1FF93
@@ -110,7 +110,7 @@ def get_base_rom_path(file_name: str = "") -> str:
     return file_name
 
 
-PRG_OFFSET = 0x2AEEB0
+PRG_OFFSET = 0x2AF2B0
 PRG_SIZE = 0x20000
 
 
