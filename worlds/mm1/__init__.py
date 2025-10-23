@@ -1,9 +1,9 @@
 import base64
+import logging
 import os
-
-import Utils
 import settings
 import threading
+import Utils
 from worlds.AutoWorld import World, WebWorld
 from BaseClasses import ItemClassification
 from copy import deepcopy
@@ -79,6 +79,12 @@ class MM1World(World):
         self.rom_name = bytearray()
         self.rom_name_available_event = threading.Event()
         self.weapon_damage = deepcopy(weapon_damage)
+
+    def generate_early(self) -> None:
+        if self.multiworld.players == 1 and self.options.required_weapons >= 4:
+            logging.warning(f"Player {self.player} ({self.player_name}): "
+                            f"Required weapons too high for singleplayer game, reducing to 3")
+            self.options.required_weapons.value = 3
 
     def create_item(self, name: str) -> MM1Item:
         if name not in all_items:

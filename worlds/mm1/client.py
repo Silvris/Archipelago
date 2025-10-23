@@ -472,14 +472,14 @@ class MegaMan1Client(BizHawkClient):
 
         new_checks = []
         # check for locations
-        for i in range(8):
-            flag = 1 << i
-            if robot_masters_defeated[0] & flag:
-                wep_id = 0x11 + i
+        for i in range(1, 7):
+            flag = 1 << (i - 1)
+            if robot_masters_defeated[0] & MM1_RBM_REMAP[i]:
+                wep_id = 0x10 + i
                 if wep_id not in ctx.checked_locations:
                     new_checks.append(wep_id)
             if boss_refights[0] & flag:
-                boss_id = MM1_REFIGHTS[i]
+                boss_id = MM1_REFIGHTS[i-1]
                 if boss_id not in ctx.checked_locations:
                     new_checks.append(boss_id)
 

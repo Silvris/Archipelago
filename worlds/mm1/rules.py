@@ -142,7 +142,7 @@ def set_rules(world: "MM1World"):
     set_rule(world.get_entrance(f"To Wily Stage 1"),
              lambda state: state.has("Magnet Beam", world.player) and
              state.has_any(["Thunder Beam", "Super Arm"], world.player)
-             and state.has_group_unique("Weapons", world.options.required_weapons.value, world.player))
+             and state.has_group_unique("Weapons", world.player, world.options.required_weapons.value))
 
     # boss refight chaining
     add_rule(world.get_location("Wily Stage 2 - Elec Man Rematch"),
@@ -161,3 +161,5 @@ def set_rules(world: "MM1World"):
     add_rule(world.get_location("Wily Machine - Defeated"),
              lambda state: state.can_reach_location("Wily Stage 4 - Guts Man Rematch", world.player))
 
+    world.multiworld.completion_condition[world.player] = lambda state: state.has("Wily Machine - Defeated",
+                                                                                  world.player)
