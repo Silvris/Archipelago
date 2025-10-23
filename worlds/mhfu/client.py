@@ -1,31 +1,32 @@
 from __future__ import annotations
 
-import random
-import traceback
-
-from operator import itemgetter
-import Utils
-import logging
-from CommonClient import CommonContext, ClientCommandProcessor, gui_enabled, get_base_parser, server_loop
 import asyncio
-from websockets import client, Subprotocol
 import base64
 import json
+import logging
+import random
 import struct
-from zlib import crc32
-from typing import Tuple, Any, TYPE_CHECKING
-from enum import IntEnum
-from time import time
+import traceback
+import Utils
 
+from enum import IntEnum
+from operator import itemgetter
+from time import time
+from typing import Tuple, Any, TYPE_CHECKING
+from websockets import client, Subprotocol
+from zlib import crc32
+
+from CommonClient import CommonContext, ClientCommandProcessor, gui_enabled, get_base_parser, server_loop
 from NetUtils import NetworkItem, ClientStatus
+
+from .data.equipment import (blademaster, gunner, blademaster_upgrades, gunner_upgrades,
+                             helms, chests, arms, waists, legs)
+from .data.item_gifts import item_gifts, decoration_gifts
+from .data.monsters import elder_dragons, monster_lookup
 from .data.trap_link import trap_link_matches, local_trap_to_type
+from .items import item_name_groups
 from .quests import (quest_data, base_id, goal_quests, get_quest_by_id,
                      get_proper_name, location_name_to_id, SlotQuestInfo)
-from .items import item_name_groups
-from .data.monsters import elder_dragons, monster_lookup
-from .data.equipment import blademaster, gunner, blademaster_upgrades, gunner_upgrades, \
-    helms, chests, arms, waists, legs
-from .data.item_gifts import item_gifts, decoration_gifts
 
 if TYPE_CHECKING:
     import argparse
@@ -1147,10 +1148,29 @@ async def main(args: "argparse.Namespace") -> None:
     ctx.breakpoint_task = asyncio.create_task(handle_logs(ctx), name="LogHandler")
     ctx.watcher_task = asyncio.create_task(game_watcher(ctx), name="GameWatcher")
     ctx.update_task = asyncio.create_task(ctx.refresh_task(), name="UpdateTask")
+    Utils.async_start(_launch_ppsspp())
     await ctx.exit_event.wait()
     if ctx.debugger and not ctx.debugger.closed:
         await ctx.debugger.close()
     await ctx.shutdown()
+
+
+async def _launch_ppsspp():
+    import os
+    import subprocess
+    from settings import get_settings
+    ppsspp = get_settings().mhfu_options.ppsspp_exe
+
+    if os.path.exists(ppsspp) and get_settings().mhfu_options.auto_start:
+        subprocess.Popen(
+            [
+                ppsspp
+            ],
+            cwd=Utils.local_path("."),
+            stdin=subprocess.DEVNULL,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+        )
 
 
 def launch(*launch_args: str) -> None:
@@ -1171,6 +1191,7 @@ def launch(*launch_args: str) -> None:
                 args.connect = f'{urllib.parse.unquote(url.username)}:None@{url.hostname}:{url.port}'
             else:
                 args.connect = f'{url.hostname}:{url.port}'
+
         else:
             parser.error(f"bad url, found {args.url}, expected url in form of archipelago://archipelago.gg:38281")
 

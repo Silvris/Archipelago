@@ -2,7 +2,7 @@
 
 ## Required Software
 - [Archipelago](https://github.com/ArchipelagoMW/Archipelago/releases).
-- [PPSSPP 1.11 or later](https://www.ppsspp.org/). The most recent version is recommended.
+- [The newest nightly build of PPSSPP](https://www.ppsspp.org/devbuilds/). Build must be equal or newer than devbuild v1.19.3-725.
 - Monster Hunter Freedom Unite (`ULUS10391`, `ULES01213`) or Monster Hunter Portable 2nd (`ULJM05500`)
 
 ## Installation Procedures

@@ -24,11 +24,12 @@ components.append(Component("MHFU Client", "MHFUClient", func=launch_client,
 
 
 class MHFUSettings(settings.Group):
-    class PPSSPPExe(settings.UserFolderPath):
+    class PPSSPPExe(settings.OptionalUserFilePath):
         """PPSSPP Executable, for automatic launching"""
         description = "PPSSPP Executable"
 
     ppsspp_exe: PPSSPPExe = PPSSPPExe("C:/Program Files/PPSSPP/PPSSPPWindows64.exe")
+    auto_start: bool = True
 
 
 class MHFUWebWorld(WebWorld):
@@ -54,7 +55,7 @@ class MHFUWorld(World):
     data_version = 0
     options_dataclass = MHFUOptions
     options: MHFUOptions
-    # settings: ClassVar[MHFUSettings]
+    settings: ClassVar[MHFUSettings]
 
     item_name_to_id = item_name_to_id
     location_name_to_id = location_name_to_id
