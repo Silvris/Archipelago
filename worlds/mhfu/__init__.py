@@ -129,7 +129,7 @@ class MHFUWorld(World):
         else:
             itempool += [self.create_item(f"Armor Rarity {i}") for i in range(1, max_rarity + 1)]
         free_items = sum(self.location_num.values()) - len(itempool) - 1
-        self.required_keys = int(free_items * (self.options.required_keys.value / 100))
+        self.required_keys = max(len(self.location_num), int(free_items * (self.options.required_keys.value / 100)))
         non_required = free_items - self.required_keys
         filler_items = int(non_required * (self.options.filler_percentage / 100))
         non_required -= filler_items

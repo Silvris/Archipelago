@@ -497,8 +497,12 @@ async def connect_psp(ctx: MHFUContext, target: int | None = None) -> None:
 class MHFUClientCommandProcessor(ClientCommandProcessor):
     ctx: MHFUContext
 
-    def _cmd_psp(self) -> None:
-        asyncio.create_task(connect_psp(self.ctx))
+    def _cmd_psp(self, target: int | None = None) -> None:
+        """
+        Trigger a connection/re-connection to PPSSPP.
+        :param target: Specific instance of PPSSPP to connect to if multiple are running.
+        """
+        asyncio.create_task(connect_psp(self.ctx, target))
 
 
 class MHFUContext(CommonContext):

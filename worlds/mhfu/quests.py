@@ -241,7 +241,7 @@ def create_ranks(world: "MHFUWorld") -> None:
             if world.options.village_depth:
                 required_mons.add("Yian Kut-Ku")
                 if world.options.training_quests:
-                    required_mons.update(["Cephadrome", "Blangonga", "Rathalos", "Rajang"])
+                    required_mons.update(["Cephadrome", "Blangonga", "Rathalos", "Rajang", "Plesioth"])
             elif world.options.guild_depth:
                 # don't have to check for a bird if village depth
                 # cause kut-ku is valid
