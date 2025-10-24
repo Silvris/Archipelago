@@ -1,16 +1,16 @@
 import typing
 import pkgutil
 import orjson
-import os
 
 from collections import defaultdict
-from BaseClasses import Location, Region
+from BaseClasses import Location, Region, CollectionState
 from .data.monster_habitats import monster_habitats
 from .data.monsters import bird_wyverns, flying_wyverns, piscene_wyverns, monster_ids
 from .options import VillageQuestDepth, GuildQuestDepth
 
 if typing.TYPE_CHECKING:
     from . import MHFUWorld
+    from .rules import MHFULogicMixin
 
 hubs = {
     0: "Guild",
@@ -121,14 +121,6 @@ class SlotQuestInfo(typing.TypedDict):
     targets: list[int]
 
 
-class MHFULocation(Location):
-    game = "Monster Hunter Freedom Unite"
-
-
-class MHFURegion(Region):
-    game = "Monster Hunter Freedom Unite"
-
-
 def get_proper_name(info: QuestInfo) -> str:
     base_name = info["name"]
     hub = hubs[info["hub"]]
@@ -144,30 +136,64 @@ def get_star_name(hub: int, rank: int, star: int) -> str:
     return f"{hubs[hub]} {ranks[rank]} {hub_rank_start[(hub, rank)] + star + 1}"
 
 
+def get_location_ids():
+    # filter out treasure
+    location_names = {get_proper_name(info): base_id + idx for idx, info in enumerate(quest_data)
+                      if (info["hub"], info["rank"]) != (0, 4)}
+
+    # now handle manually
+    next_id = max(location_names.values()) + 1
+    for quest_idx, treasure in enumerate([quest for quest in quest_data if quest["hub"] == 0 and quest["rank"] == 4]):
+        quest_name = get_proper_name(treasure)
+        location_names[f"{quest_name} - Silver Crown"] = next_id + (quest_idx * 2)
+        location_names[f"{quest_name} - Gold Crown"] = next_id + (quest_idx * 2) + 1
+
+    return location_names
+
+
 quest_data: list[QuestInfo] = \
     orjson.loads(pkgutil.get_data(__name__, "data/quests.json"))
 
 base_id = 24700000
-
-# filter out treasure
-location_name_to_id = {get_proper_name(info): base_id + id for id, info in enumerate(quest_data)
-                       if (info["hub"], info["rank"]) != (0, 4)}
-
-# now handle manually
-next_id = max(location_name_to_id.values()) + 1
-for i, treasure in enumerate([quest for quest in quest_data if quest["hub"] == 0 and quest["rank"] == 4]):
-    quest_name = get_proper_name(treasure)
-    location_name_to_id[f"{quest_name} - Silver Crown"] = next_id + (i * 2)
-    location_name_to_id[f"{quest_name} - Gold Crown"] = next_id + (i * 2) + 1
+location_name_to_id = get_location_ids()
 
 
 def get_quest_by_id(idx: str) -> QuestInfo:
     return next((quest for quest in quest_data if quest["qid"] == idx))
 
 
-def get_area_quests(ranks: typing.Iterable[tuple[int, int, int]], areas: tuple[int]) -> list[QuestInfo]:
-    return [quest for quest in quest_data if ((quest["hub"], quest["rank"], quest["star"]) in ranks and
+def get_area_quests(valid_ranks: typing.Iterable[tuple[int, int, int]], areas: tuple[int]) -> list[QuestInfo]:
+    return [quest for quest in quest_data if ((quest["hub"], quest["rank"], quest["star"]) in valid_ranks and
                                               quest["stage"] in areas)]
+
+
+def mhfu_sweep_monsters(state: "CollectionState | MHFULogicMixin", player: int):
+    world: "MHFUWorld" = state.multiworld.worlds[player]
+    # it should now be safe to check can_reach, for the most part
+    world_locations = {location.name for location in world.get_locations()}
+    monsters = set()
+    for quest in quest_data:
+        proper_name = get_proper_name(quest)
+        if proper_name in world_locations:
+            location = world.get_location(proper_name)
+            if location.can_reach(state):
+                quest_mons = world.quest_info[quest["qid"][1:]].get("monsters", [])
+                monsters.update(quest_mons)
+    state.mhfu_monsters[player] = monsters
+
+
+class MHFULocation(Location):
+    game = "Monster Hunter Freedom Unite"
+
+    def can_reach(self, state: "CollectionState | MHFULogicMixin") -> bool:
+        if state.mhfu_stale[self.player]:
+            state.mhfu_stale[self.player] = False
+            mhfu_sweep_monsters(state, self.player)
+        return super().can_reach(state)
+
+
+class MHFURegion(Region):
+    game = "Monster Hunter Freedom Unite"
 
 
 def create_ranks(world: "MHFUWorld") -> None:
@@ -207,7 +233,7 @@ def create_ranks(world: "MHFUWorld") -> None:
                         and quest["rank"] == rank and quest["star"] == star]
         world.location_num[hub, rank, star] = len(valid_quests)
         region = MHFURegion(get_star_name(hub, rank, star),
-                        world.player, world.multiworld)
+                            world.player, world.multiworld)
         if (hub, rank, star) == (0, 4, 0):
             # treasure quests are a little weird
             # 1 is default, 5 are LR Village, 1 is G
@@ -237,7 +263,6 @@ def create_ranks(world: "MHFUWorld") -> None:
                                   for quest in valid_quests}, MHFULocation)
         if world.options.quest_randomization:
             required_mons: set[str] = set()
-            sorted_required: list[str] = []
             if world.options.village_depth:
                 required_mons.add("Yian Kut-Ku")
                 if world.options.training_quests:
@@ -281,7 +306,8 @@ def create_ranks(world: "MHFUWorld") -> None:
                 world.quest_info[quest["qid"][1:]] = quest_info
         else:
             # only need monsters for the resulting quest info
-            world.quest_info.update({quest["qid"][1:]: {"monsters": quest["monsters"], "mon_num": len(quest["monsters"]),
+            world.quest_info.update({quest["qid"][1:]: {"monsters": quest["monsters"],
+                                                        "mon_num": len(quest["monsters"]),
                                                         "targets": []}
                                      for quest in valid_quests})
         world.multiworld.regions.append(region)

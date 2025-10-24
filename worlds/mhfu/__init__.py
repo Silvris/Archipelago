@@ -1,8 +1,8 @@
 import logging
 import math
-from typing import Tuple, Any, ClassVar
+from typing import Any, ClassVar
 import settings
-from BaseClasses import Tutorial, ItemClassification, MultiWorld
+from BaseClasses import Tutorial, ItemClassification, MultiWorld, CollectionState, Item
 from Options import OptionError
 from worlds.AutoWorld import WebWorld, World
 from worlds.LauncherComponents import launch_subprocess, components, Component, Type
@@ -10,7 +10,7 @@ from .quests import create_ranks, location_name_to_id, base_id, goal_quests, \
     get_quest_by_id, get_proper_name, goal_ranks, hub_rank_max, rank_sort, SlotQuestInfo
 from .items import MHFUItem, item_table, filler_item_table, filler_weights, item_name_to_id, weapons, item_name_groups
 from .options import MHFUOptions
-from .rules import set_rules
+from .rules import set_rules, MHFULogicMixin
 from .data.trap_link import local_trap_to_type
 
 
@@ -60,7 +60,6 @@ class MHFUWorld(World):
     item_name_to_id = item_name_to_id
     location_name_to_id = location_name_to_id
     item_name_groups = item_name_groups
-
     create_regions = create_ranks
 
     def __init__(self, multiworld: MultiWorld, player: int):
@@ -171,8 +170,20 @@ class MHFUWorld(World):
 
     set_rules = set_rules
 
+    def collect(self, state: CollectionState | MHFULogicMixin, item: Item) -> bool:
+        changed = super().collect(state, item)
+        if changed and item.name == "Key Quest":
+            state.mhfu_stale[self.player] = True
+        return changed
+
+    def remove(self, state: CollectionState | MHFULogicMixin, item: Item) -> bool:
+        changed = super().remove(state, item)
+        if changed and item.name == "Key Quest":
+            state.mhfu_stale[self.player] = True
+        return changed
+
     def fill_slot_data(self) -> dict[str, Any]:
-        options = self.options.as_dict(
+        slot_info = self.options.as_dict(
             "death_link",
             "goal",
             "weapons",
@@ -185,12 +196,12 @@ class MHFUWorld(World):
         if self.options.trap_link:
             allowed_traps.update([local_trap_to_type[key]
                                   for key, value in self.options.trap_weights.items() if value > 0])
-        options["allowed_traps"] = allowed_traps
-        options["required_keys"] = self.required_keys
+        slot_info["allowed_traps"] = allowed_traps
+        slot_info["required_keys"] = self.required_keys
         rank_requirements = {}
         for rank in self.rank_requirements:
             rank_requirements[f"{rank[0]},{rank[1]},{rank[2]}"] = self.rank_requirements[rank]
-        options["rank_requirements"] = rank_requirements
-        options["quest_info"] = self.quest_info if self.options.quest_randomization else {}
-        options["set_cutscene"] = not self.options.village_depth.value == 2
-        return options
+        slot_info["rank_requirements"] = rank_requirements
+        slot_info["quest_info"] = self.quest_info if self.options.quest_randomization else {}
+        slot_info["set_cutscene"] = not self.options.village_depth.value == 2
+        return slot_info
