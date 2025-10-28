@@ -153,6 +153,7 @@ MHFU_POINTERS = {
         "RESET_ACTION": 0x090AF355,  # byte
         "SET_ACTION": 0x090AF418,  # half
         "POISON_TIMER": 0x090AF508,  # half
+        "ACTION_TIMER": 0x090AF594,  # int
         "QUEST_TIMER": 0x09A01B10,  # half
         "QUEST_REWARD": 0x09A01B14,  # half
         "QUEST_UNKN": 0x09A01B18,  # half
@@ -199,16 +200,16 @@ MHFU_BREAKPOINT_ARGS = {
 }
 
 ACTIONS = {
-    -1: 0x0300,  # Kill Player
-    10: 0x0072,  # Farcaster
-    11: 0x0215,  # Sleep
-    13: 0x0216,  # Paralysis
-    14: 0x021B,  # Snowman
-    15: 0x0019,  # Use Item
+    -1: 0x0003,  # Kill Player
+    10: 0x7200,  # Farcaster
+    11: 0x1502,  # Sleep
+    13: 0x1602,  # Paralysis
+    14: 0x1B02,  # Snowman
+    15: 0x1900,  # Use Item
     16: 0x0202,  # Knockback
-    17: 0x0204,  # Blowback
-    18: 0x0219,  # Roar
-    19: 0x0205,  # Trip
+    17: 0x0402,  # Blowback
+    18: 0x1902,  # Roar
+    19: 0x0502,  # Trip
 }
 
 KEY_OFFSETS = {
@@ -835,6 +836,10 @@ class MHFUContext(CommonContext):
             else:
                 # Set Action
                 await self.ppsspp_write_unsigned(MHFU_POINTERS[self.lang]["RESET_ACTION"], 1, "RESET_ACTION")
+                # THIS IS BIG ENDIAN
+                # CAPCOM WHY
+                # YOU ARE ON LITTLE ENDIAN HARDWARE
+                # YOU USE LITTLE ENDIAN EVERYWHERE ELSE
                 await self.ppsspp_write_unsigned(MHFU_POINTERS[self.lang]["SET_ACTION"],
                                                  ACTIONS[trap], "SET_ACTION", 16)
 
@@ -949,9 +954,10 @@ class MHFUContext(CommonContext):
         assert self.slot is not None
         if "tags" in args:
             if "TrapLink" in args["tags"]:
-                source = args["source"]
+                data = args["data"]
+                source = data["source"]
                 if source != self.player_names[self.slot]:
-                    name = args["trap_name"]
+                    name = data["trap_name"]
                     if name in trap_link_matches:
                         self.trap_queue.extend([trap for trap in trap_link_matches[name]
                                                 if trap in self.allowed_traps])
@@ -969,6 +975,8 @@ class MHFUContext(CommonContext):
             self.cash_only = args["slot_data"]["cash_only_equipment"]
             self.set_cutscene = args["slot_data"]["set_cutscene"]
             self.trap_link = args["slot_data"]["trap_link"]
+            if self.trap_link:
+                self.tags.add("TrapLink")
             self.allowed_traps = args["slot_data"]["allowed_traps"]
             self.required_keys = args["slot_data"]["required_keys"]
             for group, value in args["slot_data"]["rank_requirements"].items():
