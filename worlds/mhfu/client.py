@@ -461,8 +461,15 @@ async def connect_psp(ctx: MHFUContext, target: int | None = None) -> None:
             ppsspp_logger.error("No PPSSPP instances found to connect to. Make sure PPSSPP is running and "
                                 "\"Allow remote debugging\" is enabled in the settings.")
             return
-    ctx.debugger = await client.connect(f"ws://{psp['ip']}:{psp['p']}/debugger",
-                                        subprotocols=[Subprotocol(PPSSPP_DEBUG)])
+    try:
+        ctx.debugger = await client.connect(f"ws://{psp['ip']}:{psp['p']}/debugger",
+                                            subprotocols=[Subprotocol(PPSSPP_DEBUG)])
+    except ConnectionRefusedError:
+        ppsspp_logger.error("Unknown error occurred, please try again.")
+        return
+    except TimeoutError:
+        ppsspp_logger.error("Connection timed out, please try again.")
+        return
 
     hello = await send_and_receive(ctx, json.dumps(PPSSPP_HELLO), "AP_HELLO")
     game_status = await send_and_receive(ctx, json.dumps(PPSSPP_STATUS), "AP_STATUS")
@@ -835,7 +842,7 @@ class MHFUContext(CommonContext):
                 await self.ppsspp_write_unsigned(MHFU_POINTERS[self.lang]["POISON_TIMER"], 60, "POISON", 16)
             else:
                 # Set Action
-                await self.ppsspp_write_unsigned(MHFU_POINTERS[self.lang]["RESET_ACTION"], 1, "RESET_ACTION")
+                await self.ppsspp_write_unsigned(MHFU_POINTERS[self.lang]["RESET_ACTION"], 0, "RESET_ACTION")
                 # THIS IS BIG ENDIAN
                 # CAPCOM WHY
                 # YOU ARE ON LITTLE ENDIAN HARDWARE
@@ -1151,6 +1158,7 @@ async def game_watcher(ctx: MHFUContext) -> None:
 
 async def main(args: "argparse.Namespace") -> None:
     ctx = MHFUContext(args.connect, args.password)
+    await _launch_ppsspp()
     ctx.server_task = asyncio.create_task(server_loop(ctx), name="ServerLoop")
     if gui_enabled:
         ctx.run_gui()
@@ -1160,7 +1168,6 @@ async def main(args: "argparse.Namespace") -> None:
     ctx.breakpoint_task = asyncio.create_task(handle_logs(ctx), name="LogHandler")
     ctx.watcher_task = asyncio.create_task(game_watcher(ctx), name="GameWatcher")
     ctx.update_task = asyncio.create_task(ctx.refresh_task(), name="UpdateTask")
-    Utils.async_start(_launch_ppsspp())
     await ctx.exit_event.wait()
     if ctx.debugger and not ctx.debugger.closed:
         await ctx.debugger.close()
