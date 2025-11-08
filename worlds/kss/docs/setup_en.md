@@ -43,7 +43,7 @@ guide: [Basic Multiworld Setup Guide](/tutorial/Archipelago/setup/en)
 
 ### Where do I get a config file?
 
-The [Player Options](/games/Kirby's%20Dream%20Land%203/player-options) page on the website allows you to configure
+The [Player Options](/games/Kirby%20Super%20Star/player-options) page on the website allows you to configure
 your personal options and export a config file from them.
 
 ### Verifying your config file
@@ -67,7 +67,7 @@ If you would like to validate your config file to make sure it works, you may do
 
 When you join a multiworld game, you will be asked to provide your config file to whoever is hosting. Once that is done,
 the host will provide you with either a link to download your patch file, or with a zip file containing everyone's patch
-files. Your patch file should have a `.apkdl3` extension.
+files. Your patch file should have a `.apkss` extension.
 
 Put your patch file on your desktop or somewhere convenient, and double click it. This should automatically launch the
 client, and will also create your ROM in the same place as your patch file.
