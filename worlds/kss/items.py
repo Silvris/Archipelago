@@ -13,6 +13,7 @@ class ItemData(NamedTuple):
     code: Optional[int]
     classification: ItemClassification
     value: int = 0
+    num: int = 1
 
 
 sub_games: Dict[str, ItemData] = {
@@ -139,6 +140,7 @@ planets: Dict[str, ItemData] = {
 dyna_items: Dict[str, ItemData] = {
     item_names.dyna_blade_ex1: ItemData(BASE_ID + 0x800, ItemClassification.progression),
     item_names.dyna_blade_ex2: ItemData(BASE_ID + 0x801, ItemClassification.progression),
+    item_names.progressive_dyna_blade: ItemData(BASE_ID + 0x802, ItemClassification.progression, num=4)
 }
 
 misc_items: Dict[str, ItemData] = {

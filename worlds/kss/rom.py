@@ -22,7 +22,7 @@ starting_stage = 0xAFCA3
 goal_numeric = 0xAFCA8
 goal_specific = 0xAFCB0
 treasure_values = 0xAFCEF
-mww_mode = 0xAFD6D
+mww_mode = 0xAFD7C
 
 slot_data = 0x3FD00
 

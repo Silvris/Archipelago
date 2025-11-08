@@ -67,6 +67,7 @@ sa1rom
 !left = #$0003
 
 ; Game variables
+!current_revenge_chapter = $7A69
 !received_sub_games = $7A85
 !current_selected_sub_game = $7A91
 !completed_sub_games = $7A93
@@ -97,6 +98,13 @@ hook_soft_reset:
     NOP
     NOP
     NOP
+
+org $00C408
+hook_dyna_clear:
+    JSL dyna_clear
+    NOP
+    NOP
+
 
 org $00C46F
 hook_set_star_complete:
@@ -129,8 +137,8 @@ org $059810
 org $07DEB2
     NOP #3 ; Grants the initial treasure of TGCO for some reason, probably for the tutorial?
 
-org $07DF3E
-    NOP #3 ; Dyna Blade initialization, just need to preserve switch state
+org $07DF3B
+    NOP #6 ; Dyna Blade initialization, just need to preserve switch state
 
 org $07DF95
     JSL load_game
@@ -1022,7 +1030,12 @@ block_tgco_access:
     BRA .SetWithPull
     .Block:
     PLB
-    JML $019223
+    LDY #$0002
+    LDA $6986, Y
+    STA $330C
+    LDA $6A00, Y
+    STA $3310
+    JML $019254
 
 set_star_complete:
     JSL set_treasure
@@ -1330,6 +1343,13 @@ subgame_requirement_visual:
     STA $73B6
     PLB
     JML $CABCDA
+
+dyna_clear:
+    LDA $407A63
+    INC
+    STA $407A63
+    LDA #$0009
+    RTL
 
 org $CEE9C4
 hook_credits:

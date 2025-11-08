@@ -140,7 +140,10 @@ class KSSWorld(World):
             force = None
             if not self.options.essences and "Maxim Tomato" not in self.options.consumables:
                 force = ItemClassification.useful
-            itempool.extend([self.create_item(name, force) for name in dyna_items])
+            itempool.extend([self.create_item(name, force if "Extra" in name else None)
+                             for name, data in dyna_items.items()
+                             for _num in range(data.num)
+                             ])
         if "The Great Cave Offensive" in self.options.included_subgames:
             max_gold = (math.floor((9999990 - self.options.the_great_cave_offensive_required_gold.value) *
                                    (self.options.the_great_cave_offensive_excess_gold.value / 100))

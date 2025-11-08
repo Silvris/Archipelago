@@ -89,13 +89,22 @@ def create_dyna_blade(world: "KSSWorld", menu: KSSRegion) -> None:
     candy_mountain = create_region("Candy Mountain", world)
     dyna_blade_nest = create_region("Dyna Blade's Nest", world)
 
-    for region, connection, locations in zip((peanut_plains, mallow_castle, cocoa_cave, candy_mountain, dyna_blade_nest),
+    region: KSSRegion
+    connection: KSSRegion
+    locations: dict[str, LocationData]
+
+    for i, (region, connection, locations) in enumerate(
+                                        zip((peanut_plains, mallow_castle, cocoa_cave, candy_mountain, dyna_blade_nest),
                                              (mallow_castle, cocoa_cave, candy_mountain, dyna_blade_nest, None),
                                              (peanut_plains_locations, mallow_castle_locations, cocoa_cave_locations,
                                               candy_mountain_locations, dyna_blade_nest_locations)
-                                             ):
+                                             )):
         if connection:
-            region.connect(connection)
+            if i > 0:
+                access_rule = lambda state, x=i + 1: state.has(item_names.progressive_dyna_blade, world.player, x)
+            else:
+                access_rule = lambda state: True
+            region.connect(connection, rule=access_rule)
         add_locations(world, region, locations)
 
     menu.connect(dyna_blade, None, lambda state: state.has(item_names.dyna_blade, world.player))

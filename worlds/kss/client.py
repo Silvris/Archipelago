@@ -20,7 +20,7 @@ KSS_KIRBY_HP = SRAM_1_START + 0x137C
 KSS_DEMO_STATE = SRAM_1_START + 0x138E
 KSS_GAME_STATE = SRAM_1_START + 0x1390
 KSS_GOURMET_RACE_WON = SRAM_1_START + 0x171D
-KSS_DYNA_COMPLETED = SRAM_1_START + 0x1A63
+KSS_DYNA_UNLOCKED = SRAM_1_START + 0x1A63
 KSS_DYNA_SWITCHES = SRAM_1_START + 0x1A64
 KSS_DYNA_IRON_MAM = SRAM_1_START + 0x1A67
 KSS_REVENGE_CHAPTERS = SRAM_1_START + 0x1A69
@@ -34,6 +34,7 @@ KSS_TGC0_GOLD = SRAM_1_START + 0x1B0F  # 3-byte 24-bit int
 KSS_COPY_ABILITIES = SRAM_1_START + 0x1B1D  # originally Milky Way Wishes deluxe essences
 KSS_MWW_ITEMS = SRAM_1_START + 0x1B20
 # Remapped for sending
+KSS_DYNA_COMPLETED = SRAM_1_START + 0x7A63
 KSS_SENT_DYNA_SWITCH = SRAM_1_START + 0x7A64
 KSS_COMPLETED_PLANETS = SRAM_1_START + 0x7A6B
 KSS_SENT_TGCO_TREASURE = SRAM_1_START + 0x7B05  # 8 bytes
@@ -162,8 +163,14 @@ class KSSSNIClient(SNIClient):
             unlocked_planets |= (1 << planet)
         snes_buffered_write(ctx, KSS_RECEIVED_PLANETS, unlocked_planets.to_bytes(2, "little"))
 
+        dyna_stage = int.from_bytes(await snes_read(ctx, KSS_DYNA_UNLOCKED, 1), "little")
+        stage_count = sum(1 for item in ctx.items_received if (item.item & 0x802) == 0x802)
+        if dyna_stage != stage_count:
+            snes_buffered_write(ctx, KSS_DYNA_UNLOCKED, stage_count.to_bytes(1, "little"))
+
+
         unlocked_switches = int.from_bytes(await snes_read(ctx, KSS_DYNA_SWITCHES, 1), "little")
-        for switch_item in [item for item in ctx.items_received if item.item & 0x800]:
+        for switch_item in [item for item in ctx.items_received if (item.item & 0x803) in (0x800, 0x801)]:
             switch = switch_item.item & 0xFF
             unlocked_switches |= (1 << switch)
         snes_buffered_write(ctx, KSS_DYNA_SWITCHES, unlocked_switches.to_bytes(1, "little"))
