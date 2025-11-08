@@ -164,7 +164,7 @@ class KSSSNIClient(SNIClient):
         snes_buffered_write(ctx, KSS_RECEIVED_PLANETS, unlocked_planets.to_bytes(2, "little"))
 
         dyna_stage = int.from_bytes(await snes_read(ctx, KSS_DYNA_UNLOCKED, 1), "little")
-        stage_count = sum(1 for item in ctx.items_received if (item.item & 0x802) == 0x802)
+        stage_count = min(4, sum(1 for item in ctx.items_received if (item.item & 0x802) == 0x802))
         if dyna_stage != stage_count:
             snes_buffered_write(ctx, KSS_DYNA_UNLOCKED, stage_count.to_bytes(1, "little"))
 
