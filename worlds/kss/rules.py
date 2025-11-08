@@ -258,7 +258,7 @@ def set_milky_way_wishes_rules(world: "KSSWorld") -> None:
                  lambda state: state.has(item_names.plasma, world.player))
 
     if "1-Up" in world.options.consumables:
-        set_rule(world.get_location(location_names.mww_aq_1up_1),
+        set_rule(world.get_location(location_names.mww_aq_1up_2),
                  lambda state: state.has_any([item_names.jet, item_names.fire], world.player))
         set_rule(world.get_location(location_names.mww_cv_1up_1),
                  lambda state: state.has_any([item_names.hammer, item_names.stone], world.player))
