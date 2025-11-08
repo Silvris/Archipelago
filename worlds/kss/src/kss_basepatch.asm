@@ -249,6 +249,9 @@ SetEntityFlag:
     RTS
 
 hook_maxim_tomato:
+    LDA $32EA
+    CMP #$0006
+    BEQ .ArenaMaxim
     LDA $7573
     BEQ .Maxim
     JML $05981E
@@ -256,6 +259,7 @@ hook_maxim_tomato:
     print "Maxims: ", hex(snestopc(realbase()))
     LDA #$0000
     BNE .Continue
+    .DoMaxim:
     LDA $28
     CMP $737A, Y
     BEQ .Full
@@ -266,6 +270,11 @@ hook_maxim_tomato:
     LDY $39
     JSL SetEntityFlagY
     JML $059840
+    .ArenaMaxim:
+    print "Arena Maxims: ", hex(snestopc(realbase()))
+    LDA #$0000
+    BNE .Continue
+    BRA .DoMaxim
 
 hook_one_up:
     print "OneUp: ", hex(snestopc(realbase()))

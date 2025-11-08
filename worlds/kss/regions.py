@@ -32,6 +32,8 @@ def add_locations(world: "KSSWorld", region: KSSRegion, locations: dict[str, Loc
         filter_list.append("one_up")
     if "Invincibility Candy" in world.options.consumables:
         filter_list.append("candy")
+    if "Arena Maxim Tomato" in world.options.consumables:
+        filter_list.append("arena_maxim")
     if world.options.essences:
         filter_list.append("essence")
 

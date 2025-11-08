@@ -137,7 +137,7 @@ class Consumables(OptionSet):
     and Invincibility Candy.
     """
     display_name = "Consumable Checks"
-    valid_keys = {"Maxim Tomato", "1-Up", "Invincibility Candy"}
+    valid_keys = {"Maxim Tomato", "1-Up", "Invincibility Candy", "Arena Maxim Tomato"}
 
     default = frozenset()
 

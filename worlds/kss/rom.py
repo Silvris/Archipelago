@@ -15,9 +15,10 @@ if TYPE_CHECKING:
 KSS_UHASH = "cb76ea8ac989e71210c89102d91c6c57"
 KSS_VCHASH = "5e0be1a462ffaca1351d446b96b25b74"
 
-maxims = 0x7FA9F
-one_ups = 0x7FABD
-candies = 0x7FAD8
+maxims = 0x7FAA7
+arena_maxims = 0x7FAC5
+one_ups = 0x7FACC
+candies = 0x7FAE7
 starting_stage = 0xAFCA3
 goal_numeric = 0xAFCA8
 goal_specific = 0xAFCB0
@@ -75,6 +76,10 @@ def patch_rom(world: "KSSWorld", patch: KSSProcedurePatch) -> None:
     filter = 0
     if "Maxim Tomato" in world.options.consumables:
         patch.write_bytes(maxims + 1, int.to_bytes(1, 2, "little"))
+        filter |= 0x100
+
+    if "Arena Maxim Tomato" in world.options.consumables:
+        patch.write_bytes(arena_maxims + 1, int.to_bytes(1, 2, "little"))
         filter |= 0x100
 
     if "1-Up" in world.options.consumables:
