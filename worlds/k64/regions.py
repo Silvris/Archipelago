@@ -38,12 +38,12 @@ class K64Region(Region):
 
 
 default_levels = {
-    1: [0x640001, 0x640002, 0x640003, 0x640200],
-    2: [0x640004, 0x640005, 0x640006, 0x640007, 0x640201],
-    3: [0x640008, 0x640009, 0x64000A, 0x64000B, 0x640202],
-    4: [0x64000C, 0x64000D, 0x64000E, 0x64000F, 0x640203],
-    5: [0x640010, 0x640011, 0x640012, 0x640013, 0x640204],
-    6: [0x640014, 0x640015, 0x640016, 0x640205],
+    1: [0x0001, 0x0002, 0x0003, 0x0200],
+    2: [0x0004, 0x0005, 0x0006, 0x0007, 0x0201],
+    3: [0x0008, 0x0009, 0x000A, 0x000B, 0x0202],
+    4: [0x000C, 0x000D, 0x000E, 0x000F, 0x0203],
+    5: [0x0010, 0x0011, 0x0012, 0x0013, 0x0204],
+    6: [0x0014, 0x0015, 0x0016, 0x0205],
 }
 
 first_stage_blacklist = {
@@ -181,7 +181,7 @@ def create_levels(world: "K64World") -> None:
             region = K64Region(location_table[real_stage].replace(" - Complete", "").replace(" Defeated", ""),
                                world.player, world.multiworld)
             levels[level].connect(region)
-            crystals = [(((real_stage & 0xFF) - 1) * 3) + i + 0x640101 for i in range(3) if not real_stage & 0x200]
+            crystals = [(((real_stage & 0xFF) - 1) * 3) + i + 0x0101 for i in range(3) if not real_stage & 0x200]
             locations = {
                 location_table[code]: code for code in location_table
                 if code in [real_stage, *crystals]
