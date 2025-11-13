@@ -65,7 +65,7 @@ mm1_regions: list[RegionData] = [
     }, ["Fire Man Access Codes"]),
     RegionData("Elec Man Stage", {
         "Elec Man - Defeated": LocationData(0x5),
-        "Elec Beam - Received": LocationData(0x15),
+        "Thunder Beam - Received": LocationData(0x15),
         "Elec Man Stage - Magnet Beam": LocationData(0x17),
         "Elec Man Stage - Health Energy 1": LocationData(0x119, True),
         "Elec Man Stage - Weapon Energy 1": LocationData(0x11A, True),

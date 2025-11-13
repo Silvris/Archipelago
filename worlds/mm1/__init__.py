@@ -5,7 +5,7 @@ import settings
 import threading
 import Utils
 from worlds.AutoWorld import World, WebWorld
-from BaseClasses import ItemClassification
+from BaseClasses import ItemClassification, Item, Location
 from copy import deepcopy
 from hashlib import md5
 from Options import OptionError
@@ -13,9 +13,9 @@ from typing import Any, ClassVar, Sequence
 from .client import MegaMan1Client
 from .items import MM1Item, all_items, item_lookup, stage_access, weapons, item_groups
 from .locations import location_lookup, MM1Location, MM1Region, mm1_regions
-from .options import MM1Options
+from .options import MM1Options, robot_masters
 from .rom import MM1ProcedurePatch, MM1NESHASH, MM1LCHASH, PROTEUSHASH, patch_rom
-from .rules import set_rules, weapon_damage
+from .rules import set_rules, weapon_damage, minimum_weakness_requirement, weapons_to_name
 
 
 class MM1Settings(settings.Group):
@@ -82,9 +82,12 @@ class MM1World(World):
 
     def generate_early(self) -> None:
         if self.multiworld.players == 1 and self.options.required_weapons >= 4:
+            num = 3
+            if self.options.strict_weakness:
+                num = 1
             logging.warning(f"Player {self.player} ({self.player_name}): "
-                            f"Required weapons too high for singleplayer game, reducing to 3")
-            self.options.required_weapons.value = 3
+                            f"Required weapons too high for singleplayer game, reducing to {num}")
+            self.options.required_weapons.value = num
 
     def create_item(self, name: str) -> MM1Item:
         if name not in all_items:
@@ -135,6 +138,62 @@ class MM1World(World):
         self.multiworld.itempool.extend(itempool)
 
     set_rules = set_rules
+
+    def fill_hook(self,
+                  progitempool: list[Item],
+                  usefulitempool: list[Item],
+                  filleritempool: list[Item],
+                  fill_locations: list[Location]) -> None:
+        # on a solo gen, fill can try to force Wily into sphere 2, but for most generations this is impossible
+        # since MM1 can have a 2 item sphere 1, and at least 3 items are required for Wily
+        if self.multiworld.players > 1:
+            return  # Don't need to change anything on a multi gen, fill should be able to solve it with a 4 sphere 1
+        # emphasis on should
+        rbm_to_item = {
+            0: "Cut Man Access Codes",
+            1: "Ice Man Access Codes",
+            2: "Bomb Man Access Codes",
+            3: "Fire Man Access Codes",
+            4: "Elec Man Access Codes",
+            5: "Guts Man Access Codes",
+        }
+        valid_second = [item for item in progitempool
+                            if item.name in rbm_to_item.values()
+                            and item.player == self.player]
+        placed_item = self.random.choice(valid_second)
+        valid_second.remove(placed_item)
+        rbm_location = self.get_location(f"{robot_masters[self.options.starting_robot_master.value]} - Defeated")
+        rbm_location.place_locked_item(placed_item)
+        progitempool.remove(placed_item)
+        fill_locations.remove(rbm_location)
+        target_rbm = (placed_item.code & 0xF) - 1
+        # have to place a second one to reach max items required for Wily (5)
+        second_location = self.get_location(f"{robot_masters[target_rbm]} - Defeated")
+        placed_second = self.random.choice(valid_second)
+        second_location.place_locked_item(placed_second)
+        progitempool.remove(placed_second)
+        fill_locations.remove(second_location)
+        for boss, target in ((self.options.starting_robot_master.value, target_rbm),
+                             (target_rbm, (placed_second.code & 0xF) - 1)):
+            if self.options.strict_weakness or (self.options.random_weakness
+                                                and not (self.weapon_damage[0][target] > 0)):
+                # we need to find a weakness for this boss
+                weaknesses = [weapon for weapon in range(1, 6)
+                                if self.weapon_damage[weapon][target] >= minimum_weakness_requirement[weapon]]
+                weapons = list(map(lambda s: weapons_to_name[s], weaknesses))
+                valid_weapons = [item for item in progitempool
+                                 if item.name in weapons
+                                 and item.player == self.player
+                                 and not item.location]
+                if not valid_weapons:
+                    continue # This should mean that we have already placed the weapon that can deal damage to the RBM
+                placed_weapon = self.random.choice(valid_weapons)
+                weapon_name = next(name for name, idx in location_lookup.items()
+                                   if idx == 0x11 + boss)
+                weapon_location = self.get_location(weapon_name)
+                weapon_location.place_locked_item(placed_weapon)
+                progitempool.remove(placed_weapon)
+                fill_locations.remove(weapon_location)
 
     def generate_output(self, output_directory: str) -> None:
         try:
