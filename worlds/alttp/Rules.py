@@ -1141,6 +1141,9 @@ def set_trock_key_rules(multiworld, player):
     can_reach_big_chest = all_state.can_reach(multiworld.get_region('Turtle Rock (Big Chest)', player))
     can_reach_middle = all_state.can_reach(multiworld.get_region('Turtle Rock (Second Section)', player))
 
+    # since big key and small keys can be placed in different steps, we should see if the big key is locked to the dungeon
+    local_big_key = multiworld.worlds[player].options.big_key_shuffle.current_key in ("original_dungeon", "own_dungeons")
+
     # If you can't enter from the back, the door to the front of TR requires only 2 small keys if the big key is in one of these chests since 2 key doors are locked behind the big key door.
     # If you can only enter from the middle, this includes all locations that can only be reached by exiting the front.  This can include Laser Bridge and Crystaroller if the front and back connect via Dark DM Ledge!
     front_locked_locations = {('Turtle Rock - Compass Chest', player), ('Turtle Rock - Roller Room - Left', player), ('Turtle Rock - Roller Room - Right', player)}
@@ -1176,11 +1179,11 @@ def set_trock_key_rules(multiworld, player):
     else:
         # Middle to front requires 3 keys if the back is locked by this door, otherwise 5
         set_rule(multiworld.get_entrance('Turtle Rock (Chain Chomp Room) (South)', player), lambda state: state._lttp_has_key('Small Key (Turtle Rock)', player, 3)
-                if item_name_in_location_names(state, 'Big Key (Turtle Rock)', player, front_locked_locations.union({('Turtle Rock - Pokey 1 Key Drop', player)}))
+                if (not local_big_key or item_name_in_location_names(state, 'Big Key (Turtle Rock)', player, front_locked_locations.union({('Turtle Rock - Pokey 1 Key Drop', player)})))
                 else state._lttp_has_key('Small Key (Turtle Rock)', player, 5))
         # Middle to front requires 4 keys if the back is locked by this door, otherwise 6
         set_rule(multiworld.get_entrance('Turtle Rock (Pokey Room) (South)', player), lambda state: state._lttp_has_key('Small Key (Turtle Rock)', player, 4)
-                if item_name_in_location_names(state, 'Big Key (Turtle Rock)', player, front_locked_locations)
+                if (not local_big_key or item_name_in_location_names(state, 'Big Key (Turtle Rock)', player, front_locked_locations))
                 else state._lttp_has_key('Small Key (Turtle Rock)', player, 6))
 
         # Front to middle requires 3 keys (if the middle is accessible then these doors can be avoided, otherwise no keys can be wasted)
