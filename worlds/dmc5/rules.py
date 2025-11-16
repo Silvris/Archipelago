@@ -33,7 +33,7 @@ def set_rules(world: "DMC5World"):
     if True:  # self.options.mode == GameMode.option_classic:
         world.multiworld.completion_condition[world.player] = lambda state: state.has("Victory against Vergil",
                                                                                       world.player)
-    elif False:  # self.options.mode == GameMode.vergil:
+    elif False:  # self.options.mode == GameMode.option_vergil:
         world.multiworld.completion_condition[world.player] = lambda state: state.has("Victory against Dante",
                                                                                       world.player)
     else:
