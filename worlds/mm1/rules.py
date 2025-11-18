@@ -132,13 +132,20 @@ def set_rules(world: "MM1World"):
             for boss in range(10):
                 for weapon in world.weapon_damage:
                     if boss not in (0, 4, 5, 8) and weapon == 6:
+                        # Bosses cannot take Super Arm damage
+                        world.weapon_damage[weapon].append(-1)
+                    elif boss in (6, 8) and weapon == 3:
+                        # Bosses cannot take Hyper Bomb damage
                         world.weapon_damage[weapon].append(-1)
                     else:
                         world.weapon_damage[weapon].append(min(14, max(-1, int(world.random.normalvariate(3, 3)))))
                 if not any([world.weapon_damage[weapon][boss] >= max(4, minimum_weakness_requirement[weapon])
                             for weapon in range(1, 6)]):
                     # failsafe, there should be at least one defined non-Buster, non-Super Arm weakness
-                    weapon = world.random.randint(1, 5)
+                    weapons = [1, 2, 4, 5]
+                    if boss not in (6, 8):
+                        weapons.append(3)
+                    weapon = world.random.choice(weapons)
                     world.weapon_damage[weapon][boss] = world.random.randint(
                         max(4, minimum_weakness_requirement[weapon]), 14)  # Force weakness
 
@@ -179,13 +186,14 @@ def set_rules(world: "MM1World"):
                 weakness = world.random.choice(range(1, 6))
                 world.weapon_damage[weakness][boss] = minimum_weakness_requirement[weakness]
 
-        if (world.weapon_damage[2][9] >= minimum_weakness_requirement[1] and
-                not any(world.weapon_damage[i][9] >= minimum_weakness_requirement[i]
-                        for i in range(6) if i != 2)):
-            # Hyper Bomb cannot be Wily's only weakness
-            world.weapon_damage[1][9] = 0
-            weakness = world.random.choice((1, 3, 4, 5))
-            world.weapon_damage[weakness][9] = minimum_weakness_requirement[weakness]
+        for boss in (6, 8):
+            if (world.weapon_damage[2][boss] >= minimum_weakness_requirement[1] and
+                    not any(world.weapon_damage[i][boss] >= minimum_weakness_requirement[i]
+                            for i in range(6) if i != 3)):
+                # Hyper Bomb cannot be Wily or Yellow Devil's only weakness
+                world.weapon_damage[1][boss] = 0
+                weakness = world.random.choice((1, 2, 4, 5))
+                world.weapon_damage[weakness][boss] = minimum_weakness_requirement[weakness]
 
         if world.weapon_damage[0][world.options.starting_robot_master.value] < 1:
             world.weapon_damage[0][world.options.starting_robot_master.value] = \
@@ -209,7 +217,7 @@ def set_rules(world: "MM1World"):
         for location in locations:
             if "Wily" in location and boss != 8:
                 # Special case: Super Arm cannot be logical for any Wily locations
-                add_rule(world.get_location(location), lambda state, weps=tuple(weapons): state.has_any([wep for wep in weps if wep != "Super Arm"], world.player))
+                add_rule(world.get_location(location), lambda state, weps=tuple([wep for wep in weapons if wep != "Super Arm"]): state.has_any(weps, world.player))
             else:
                 add_rule(world.get_location(location), lambda state, weps=tuple(weapons): state.has_any(weps, world.player))
 

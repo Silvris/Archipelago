@@ -335,7 +335,7 @@ class MegaMan1Client(BizHawkClient):
 
             if item.item & 0x30 == 0:
                 # Robot Master Weapon
-                new_weapons = weapons_unlocked[0] | (1 << ((item.item & 0xF) - 1))
+                new_weapons = weapons_unlocked[0] | MM1_RBM_REMAP[item.item & 0xF]
                 writes.append((MM1_UNLOCKED_WEAPONS, new_weapons.to_bytes(1, 'little'), "RAM"))
                 writes.extend(get_sfx_writes(0x22))
             elif item.item & 0x20 == 0:

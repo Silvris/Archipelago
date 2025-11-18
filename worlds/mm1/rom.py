@@ -22,11 +22,11 @@ MM1_BOSS_WEAKNESSES = {
     1: 0x1FDF6,  # Ice Man
     2: 0x1FDFE,  # Bomb Man
     3: 0x1FE06,  # Fire Man
-    4: 0x1FE0F,  # Elec Man
+    4: 0x1FE0E,  # Elec Man
     5: 0x1FE16,  # Guts Man
-    6: 0x1FE1F,  # Yellow Devil
+    6: 0x1FE1E,  # Yellow Devil
     7: 0x1FE26,  # Copy Robot
-    8: 0x1FE2F,  # CWU 001
+    8: 0x1FE2E,  # CWU 001
     9: 0x1FE36,  # Wily Machine
 }
 
@@ -58,6 +58,14 @@ def patch_rom(world: "MM1World", patch: MM1ProcedurePatch):
 
     patch.write_byte(wily_requirement + 1, world.options.required_weapons.value)
     patch.write_byte(energylink + 1, world.options.energy_link.value)
+
+    if world.options.strict_weakness or world.options.plando_weakness or world.options.random_weakness:
+        # write weaknesses
+        for boss, ptr in MM1_BOSS_WEAKNESSES.items():
+            patch.write_bytes(ptr, [
+                world.weapon_damage[weapon][boss]
+                for weapon in range(7)
+            ])
 
     from Utils import __version__
     patch.name = bytearray(f'MM1{__version__.replace(".", "")[0:3]}_{world.player}_{world.multiworld.seed:11}\0',
