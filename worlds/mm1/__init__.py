@@ -5,7 +5,7 @@ import settings
 import threading
 import Utils
 from worlds.AutoWorld import World, WebWorld
-from BaseClasses import ItemClassification, Item, Location
+from BaseClasses import ItemClassification, Item, Location, Tutorial
 from copy import deepcopy
 from hashlib import md5
 from Options import OptionError
@@ -59,6 +59,16 @@ class MM1Settings(settings.Group):
 
 class MM1WebWorld(WebWorld):
     theme = "partyTime"
+    tutorials = [
+        Tutorial(
+            "Multiworld Setup Guide",
+            "A guide to setting up the Mega Man randomizer connected to an Archipelago Multiworld.",
+            "English",
+            "setup_en.md",
+            "setup/en",
+            ["Silvris"]
+        )
+    ]
 
 
 class MM1World(World):
@@ -71,8 +81,6 @@ class MM1World(World):
     settings: ClassVar[MM1Settings]
     web = MM1WebWorld()
     weapon_damage: dict[int, list[int]]
-    if Utils.version_tuple < (0, 6, 4):
-        world_version = (0, 0, 1)
 
     def __init__(self, multiworld, player):
         super().__init__(multiworld, player)
@@ -83,8 +91,6 @@ class MM1World(World):
     def generate_early(self) -> None:
         if self.multiworld.players == 1 and self.options.required_weapons >= 4:
             num = 3
-            if self.options.strict_weakness:
-                num = 1
             logging.warning(f"Player {self.player} ({self.player_name}): "
                             f"Required weapons too high for singleplayer game, reducing to {num}")
             self.options.required_weapons.value = num
