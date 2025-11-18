@@ -39,6 +39,15 @@ macro org(address,bank)
     endif
 endmacro
 
+%org($906C, $05)
+HookStageLoad:
+    JMP SetLastWily
+    NOP
+StageWilyReturn:
+
+%org($9075, $05)
+StageNormalReturn:
+
 %org($9165, $05)
 HookPlayerControl:
     JMP ForceGameOver
@@ -120,6 +129,31 @@ HookBossKill:
     JSR SetBossRefight
 
 ; free space hooks
+
+%org($BF80, $05)
+SetLastWily:
+    CPX #$06
+    BCC .ReturnNormal
+    BNE .ReturnWily
+    PHA
+    LDX !last_wily
+    BEQ .ReturnWilyRead
+    LDA !controller_mirror
+    AND !CONTROLLER_SELECT
+    BNE .ReturnWilyRead
+    PLA
+    STX !current_stage
+    SEC
+    BCS .ReturnWily
+    .ReturnWilyRead:
+    PLA
+    LDX !current_stage
+    .ReturnWily:
+    JMP StageWilyReturn
+    .ReturnNormal:
+    JMP StageNormalReturn
+
+assert realbase() <= $018000 ;
 
 %org($AA80, $06)
 RerouteWily:
