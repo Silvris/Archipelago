@@ -6,6 +6,7 @@ import Utils
 
 from typing import Iterable, TYPE_CHECKING
 from worlds.Files import APProcedurePatch, APTokenMixin, APTokenTypes
+from .options import RandomMusic
 
 if TYPE_CHECKING:
     from . import MM1World
@@ -18,17 +19,19 @@ wily_requirement = 0x1AAB4
 energylink = 0x1FF69
 
 MM1_BOSS_WEAKNESSES = {
-    0: 0x1FDEE,  # Cut Man
-    1: 0x1FDF6,  # Ice Man
-    2: 0x1FDFE,  # Bomb Man
-    3: 0x1FE06,  # Fire Man
-    4: 0x1FE0E,  # Elec Man
-    5: 0x1FE16,  # Guts Man
-    6: 0x1FE1E,  # Yellow Devil
-    7: 0x1FE26,  # Copy Robot
-    8: 0x1FE2E,  # CWU 001
-    9: 0x1FE36,  # Wily Machine
+    0: 0x1FDFE,  # Cut Man
+    1: 0x1FE06,  # Ice Man
+    2: 0x1FE0E,  # Bomb Man
+    3: 0x1FE16,  # Fire Man
+    4: 0x1FE1E,  # Elec Man
+    5: 0x1FE26,  # Guts Man
+    6: 0x1FE2E,  # Yellow Devil
+    7: 0x1FE36,  # Copy Robot
+    8: 0x1FE3E,  # CWU 001
+    9: 0x1FE46,  # Wily Machine
 }
+
+MM1_MUSIC = 0x153A4
 
 
 class MM1ProcedurePatch(APProcedurePatch, APTokenMixin):
@@ -66,6 +69,19 @@ def patch_rom(world: "MM1World", patch: MM1ProcedurePatch):
                 world.weapon_damage[weapon][boss]
                 for weapon in range(7)
             ])
+
+    if world.options.random_music:
+        if world.options.random_music == RandomMusic.option_shuffled:
+            pool = [5, 6, 7, 8, 9, 0xA, 0xC, 0xC, 0x10, 0x10, 0x1, 0xD, 0xB]
+        elif world.options.random_music == RandomMusic.option_randomized:
+            pool = world.random.choices([1, 5, 6, 7, 8, 9, 0xA, 0xB, 0xC, 0xD, 0x10], k=13)
+        else:
+            pool = [0xFF for _ in range(13)]
+
+        patch.write_bytes(MM1_MUSIC, pool[:10])
+        patch.write_byte(0x1BDEA, pool[10]) # RBM Select
+        patch.write_byte(0x15340, pool[11]) # Robot Master
+        patch.write_byte(0x15344, pool[12]) # Wily Boss
 
     from Utils import __version__
     patch.name = bytearray(f'MM1{__version__.replace(".", "")[0:3]}_{world.player}_{world.multiworld.seed:11}\0',

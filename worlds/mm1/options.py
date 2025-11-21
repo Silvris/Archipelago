@@ -119,6 +119,20 @@ class EnergyLink(Toggle):
     visibility = Visibility.none
 
 
+class RandomMusic(Choice):
+    """
+    Vanilla: music is unchanged
+    Shuffled: stage and certain menu music is shuffled.
+    Randomized: stage and certain menu music is randomly selected
+    None: no music will play
+    """
+    display_name = "Random Music"
+    option_vanilla = 0
+    option_shuffled = 1
+    option_randomized = 2
+    option_none = 3
+
+
 @dataclass
 class MM1Options(PerGameCommonOptions, DeathLinkMixin):
     starting_robot_master: StartingRobotMaster
@@ -128,3 +142,4 @@ class MM1Options(PerGameCommonOptions, DeathLinkMixin):
     plando_weakness: WeaknessPlando
     consumables: Consumables
     energy_link: EnergyLink
+    random_music: RandomMusic
