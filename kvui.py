@@ -67,6 +67,7 @@ from kivy.animation import Animation
 from kivy.uix.popup import Popup
 from kivy.uix.image import AsyncImage
 from kivymd.app import MDApp
+from kivymd.uix.behaviors import HoverBehavior
 from kivymd.uix.dialog import MDDialog, MDDialogHeadlineText, MDDialogSupportingText, MDDialogButtonContainer
 from kivymd.uix.gridlayout import MDGridLayout
 from kivymd.uix.floatlayout import MDFloatLayout
@@ -209,45 +210,6 @@ def on_release(self: MDButton, *args):
 MDButton.on_release = on_release
 
 
-# I was surprised to find this didn't already exist in kivy :(
-class HoverBehavior(object):
-    """originally from https://stackoverflow.com/a/605348110"""
-    hovered = BooleanProperty(False)
-    border_point = ObjectProperty(None)
-
-    def __init__(self, **kwargs):
-        self.register_event_type("on_enter")
-        self.register_event_type("on_leave")
-        Window.bind(mouse_pos=self.on_mouse_pos)
-        Window.bind(on_cursor_leave=self.on_cursor_leave)
-        super(HoverBehavior, self).__init__(**kwargs)
-
-    def on_mouse_pos(self, window, pos):
-        if not self.get_root_window():
-            return  # Abort if not displayed
-
-        # to_widget translates window pos to within widget pos
-        inside = self.collide_point(*self.to_widget(*pos))
-        if self.hovered == inside:
-            return  # We have already done what was needed
-        self.border_point = pos
-        self.hovered = inside
-
-        if inside:
-            self.dispatch("on_enter")
-        else:
-            self.dispatch("on_leave")
-
-    def on_cursor_leave(self, *args):
-        # if the mouse left the window, it is obviously no longer inside the hover label.
-        self.hovered = BooleanProperty(False)
-        self.border_point = ObjectProperty(None)
-        self.dispatch("on_leave")
-
-
-Factory.register("HoverBehavior", HoverBehavior)
-
-
 class ToolTip(MDTooltipPlain):
     markup = True
 
@@ -256,7 +218,7 @@ class ServerToolTip(ToolTip):
     pass
 
 
-class HovererableLabel(HoverBehavior, MDLabel):
+class HovererableLabel(MDLabel, HoverBehavior):
     pass
 
 
@@ -278,17 +240,12 @@ class TooltipLabel(HovererableLabel, MDTooltip):
             # update
             self._tooltip.text = text
         else:
-            self._tooltip = ToolTip(text=text, pos_hint={})
+            self._tooltip = ToolTip(text=text)
             self.display_tooltip()
 
-    def on_mouse_pos(self, window, pos):
-        if not self.get_root_window():
-            return  # Abort if not displayed
-        if self.disabled:
-            return
-        super().on_mouse_pos(window, pos)
-        if self.refs and self.hovered:
-
+    def on_mouse_update(self, window, pos):
+        super().on_mouse_update(window, pos)
+        if self.refs and self.hover_visible:
             tx, ty = self.to_widget(*pos, relative=True)
             # Why TF is Y flipped *within* the texture?
             ty = self.texture_size[1] - ty
@@ -302,6 +259,7 @@ class TooltipLabel(HovererableLabel, MDTooltip):
                         break
             if not hit:
                 self.remove_tooltip()
+                self._tooltip = None
 
     def on_enter(self):
         pass
@@ -327,7 +285,7 @@ class ServerLabel(HoverBehavior, MDTooltip, MDBoxLayout):
         self.display_tooltip()
 
     def on_leave(self):
-        self.animation_tooltip_dismiss()
+        self.remove_tooltip()
 
     @property
     def ctx(self) -> context_type:
@@ -827,7 +785,7 @@ class CommandButton(MDButton, MDTooltip):
         self.display_tooltip()
 
     def on_leave(self):
-        self.animation_tooltip_dismiss()
+        self.remove_tooltip()
 
 
 class GameManager(ThemedApp):
