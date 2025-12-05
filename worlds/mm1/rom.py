@@ -7,6 +7,7 @@ import Utils
 from typing import Iterable, TYPE_CHECKING
 from worlds.Files import APProcedurePatch, APTokenMixin, APTokenTypes
 from .options import RandomMusic
+from .color import write_palette_shuffle
 
 if TYPE_CHECKING:
     from . import MM1World
@@ -66,7 +67,7 @@ def patch_rom(world: "MM1World", patch: MM1ProcedurePatch):
         # write weaknesses
         for boss, ptr in MM1_BOSS_WEAKNESSES.items():
             patch.write_bytes(ptr, [
-                world.weapon_damage[weapon][boss]
+                world.weapon_damage[weapon][boss] if world.weapon_damage[weapon][boss] >= 0 else world.weapon_damage[weapon][boss] + 256
                 for weapon in range(7)
             ])
 
@@ -82,6 +83,8 @@ def patch_rom(world: "MM1World", patch: MM1ProcedurePatch):
         patch.write_byte(0x1BDEA, pool[10]) # RBM Select
         patch.write_byte(0x15340, pool[11]) # Robot Master
         patch.write_byte(0x15344, pool[12]) # Wily Boss
+
+    write_palette_shuffle(world, patch)
 
     from Utils import __version__
     patch.name = bytearray(f'MM1{__version__.replace(".", "")[0:3]}_{world.player}_{world.multiworld.seed:11}\0',

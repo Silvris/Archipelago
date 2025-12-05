@@ -119,6 +119,26 @@ class EnergyLink(Toggle):
     visibility = Visibility.none
 
 
+class PaletteShuffle(TextChoice):
+    """
+    Change the color of Mega Man and the Robot Masters.
+    None: The palettes are unchanged.
+    Shuffled: Palette colors are shuffled amongst the robot masters.
+    Randomized: Random (usually good) palettes are generated for each robot master.
+    Singularity: one palette is generated and used for all robot masters.
+    Supports custom palettes using HTML named colors in the
+    following format: Mega Buster-Lavender|Violet;randomized
+    The first value is the character whose palette you'd like to define, then separated by - is a set of 2 colors for
+    that character. separate every color with a pipe, and separate every character as well as the remaining shuffle with
+    a semicolon.
+    """
+    display_name = "Palette Shuffle"
+    option_none = 0
+    option_shuffled = 1
+    option_randomized = 2
+    option_singularity = 3
+
+
 class RandomMusic(Choice):
     """
     Vanilla: music is unchanged
@@ -142,4 +162,5 @@ class MM1Options(PerGameCommonOptions, DeathLinkMixin):
     plando_weakness: WeaknessPlando
     consumables: Consumables
     energy_link: EnergyLink
+    palette_shuffle: PaletteShuffle
     random_music: RandomMusic
