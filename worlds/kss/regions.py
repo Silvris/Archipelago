@@ -102,10 +102,7 @@ def create_dyna_blade(world: "KSSWorld", menu: KSSRegion) -> None:
                                               candy_mountain_locations, dyna_blade_nest_locations)
                                              )):
         if connection:
-            if i > 0:
-                access_rule = lambda state, x=i + 1: state.has(item_names.progressive_dyna_blade, world.player, x)
-            else:
-                access_rule = lambda state: True
+            access_rule = lambda state, x=i + 1: state.has(item_names.progressive_dyna_blade, world.player, x)
             region.connect(connection, rule=access_rule)
         add_locations(world, region, locations)
 
