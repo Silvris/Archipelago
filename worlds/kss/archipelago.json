@@ -1,5 +1,6 @@
 {
   "game": "Kirby Super Star",
   "world_version": "0.1.5",
-  "minimum_ap_version": "0.6.4"
+  "minimum_ap_version": "0.6.4",
+  "authors": ["Silvris"]
 }
