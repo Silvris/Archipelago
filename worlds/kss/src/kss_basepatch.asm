@@ -99,11 +99,15 @@ hook_soft_reset:
     NOP
     NOP
 
-org $00C408
+org $00C3EA
+always_check_dyna:
+    CMP #$0007
+
+
+org $00C406
 hook_dyna_clear:
     JSL dyna_clear
-    NOP
-    NOP
+    NOP #4
 
 
 org $00C46F
@@ -1354,8 +1358,16 @@ subgame_requirement_visual:
     JML $CABCDA
 
 dyna_clear:
-    LDA $407A63
-    INC
+    LDA #$0001
+    LDX $02
+    DEX
+    .Loop:
+    BEQ .Continue
+    ASL
+    DEX
+    BRA .Loop
+    .Continue:
+    ORA $407A63
     STA $407A63
     LDA #$0009
     RTL

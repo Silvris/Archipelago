@@ -193,9 +193,11 @@ class KSSWorld(World):
     set_rules = set_rules
 
     def fill_slot_data(self) -> Mapping[str, Any]:
-        return {
+        slot_data = self.options.as_dict("included_subgames", "consumables", "essences", "milky_way_wishes_mode")
+        slot_data.update({
             "treasure_value": self.treasure_value
-        }
+        })
+        return slot_data
 
     @staticmethod
     def interpret_slot_data(slot_data: Dict[str, Any]) -> Dict[str, Any]:

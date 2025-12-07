@@ -139,11 +139,14 @@ class KSSSNIClient(SNIClient):
 
         save_abilities = 0
         i = 0
+        non_mww = 0
         for i, ability in enumerate([item for item in ctx.items_received if item.item & 0x100]):
             save_abilities |= (1 << ((ability.item & 0xFF) - 1))
+            if ability.item & 0xFF > 0x13:
+                non_mww += 1
         snes_buffered_write(ctx, KSS_COPY_ABILITIES, int.to_bytes(save_abilities, 3, "little"))
         if save_abilities:
-            snes_buffered_write(ctx, KSS_MWW_ITEMS, int.to_bytes(i+1, 1, "little"))
+            snes_buffered_write(ctx, KSS_MWW_ITEMS, int.to_bytes(i - non_mww + 1, 1, "little"))
 
         known_treasures = int.from_bytes(await snes_read(ctx, KSS_TGCO_TREASURE, 8), "little")
         known_value = int.from_bytes(await snes_read(ctx, KSS_TGC0_GOLD, 4), "little")
@@ -239,9 +242,9 @@ class KSSSNIClient(SNIClient):
                 new_checks.append(location)
 
         dyna_stage = int.from_bytes(await snes_read(ctx, KSS_DYNA_COMPLETED, 1), "little")
-        for i in range(dyna_stage):
+        for i in range(5):
             location = BASE_ID + 4 + i
-            if location not in ctx.checked_locations:
+            if dyna_stage & (1 << i) and location not in ctx.checked_locations:
                 new_checks.append(location)
 
         dyna_mam = int.from_bytes(await snes_read(ctx, KSS_DYNA_IRON_MAM, 1), "little")
