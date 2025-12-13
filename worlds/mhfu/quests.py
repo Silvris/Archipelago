@@ -101,7 +101,7 @@ rank_sort = defaultdict(lambda: 99, {
 })
 
 
-class QuestInfo(typing.TypedDict):
+class QuestInfo:
     qid: str
     name: str
     hub: int
@@ -114,23 +114,26 @@ class QuestInfo(typing.TypedDict):
     monsters: list[int]
     max_mon: int
 
+    def __init__(self, dct: dict[str, typing.Any]):
+        for key, val in dct.items():
+            setattr(self, key, val)
+
+    @property
+    def proper_name(self):
+        base_name = self.name
+        hub = hubs[self.hub]
+        rank = ranks[self.rank + (1 if hub != "Guild" else 0)]
+        star = hub_rank_start[(self.hub, self.rank)] + self.star + 1
+        if self.rank != 4 and self.hub != 2:
+            return f"({hub} {rank} {star}*) {base_name}"
+        else:
+            return f"({hub} {rank}) {base_name}"
+
 
 class SlotQuestInfo(typing.TypedDict):
     monsters: list[int]
     mon_num: int
     targets: list[int]
-
-
-def get_proper_name(info: QuestInfo) -> str:
-    base_name = info["name"]
-    hub = hubs[info["hub"]]
-    rank = ranks[info["rank"] + (1 if hub != "Guild" else 0)]
-    star = hub_rank_start[(info["hub"], info["rank"])] + info["star"] + 1
-    if info["rank"] != 4 and info["hub"] != 2:
-        return f"({hub} {rank} {star}*) {base_name}"
-    else:
-        return f"({hub} {rank}) {base_name}"
-
 
 def get_star_name(hub: int, rank: int, star: int) -> str:
     return f"{hubs[hub]} {ranks[rank]} {hub_rank_start[(hub, rank)] + star + 1}"
@@ -138,13 +141,13 @@ def get_star_name(hub: int, rank: int, star: int) -> str:
 
 def get_location_ids():
     # filter out treasure
-    location_names = {get_proper_name(info): base_id + idx for idx, info in enumerate(quest_data)
-                      if (info["hub"], info["rank"]) != (0, 4)}
+    location_names = {info.proper_name: base_id + idx for idx, info in enumerate(quest_data)
+                      if (info.hub, info.rank) != (0, 4)}
 
     # now handle manually
     next_id = max(location_names.values()) + 1
-    for quest_idx, treasure in enumerate([quest for quest in quest_data if quest["hub"] == 0 and quest["rank"] == 4]):
-        quest_name = get_proper_name(treasure)
+    for quest_idx, treasure in enumerate([quest for quest in quest_data if quest.hub == 0 and quest.rank == 4]):
+        quest_name = treasure.proper_name
         location_names[f"{quest_name} - Silver Crown"] = next_id + (quest_idx * 2)
         location_names[f"{quest_name} - Gold Crown"] = next_id + (quest_idx * 2) + 1
 
@@ -152,44 +155,38 @@ def get_location_ids():
 
 
 quest_data: list[QuestInfo] = \
-    orjson.loads(pkgutil.get_data(__name__, "data/quests.json"))
+    [QuestInfo(quest) for quest in orjson.loads(pkgutil.get_data(__name__, "data/quests.json"))]
 
 base_id = 24700000
 location_name_to_id = get_location_ids()
 
 
 def get_quest_by_id(idx: str) -> QuestInfo:
-    return next((quest for quest in quest_data if quest["qid"] == idx))
+    return next((quest for quest in quest_data if quest.qid == idx))
 
 
 def get_area_quests(valid_ranks: typing.Iterable[tuple[int, int, int]], areas: tuple[int]) -> list[QuestInfo]:
-    return [quest for quest in quest_data if ((quest["hub"], quest["rank"], quest["star"]) in valid_ranks and
-                                              quest["stage"] in areas)]
-
-
-def mhfu_sweep_monsters(state: "CollectionState | MHFULogicMixin", player: int):
-    world: "MHFUWorld" = state.multiworld.worlds[player]
-    # it should now be safe to check can_reach, for the most part
-    world_locations = {location.name for location in world.get_locations()}
-    monsters = set()
-    for quest in quest_data:
-        proper_name = get_proper_name(quest)
-        if proper_name in world_locations:
-            location = world.get_location(proper_name)
-            if location.can_reach(state):
-                quest_mons = world.quest_info[quest["qid"][1:]].get("monsters", [])
-                monsters.update(quest_mons)
-    state.mhfu_monsters[player] = monsters
+    return [quest for quest in quest_data if ((quest.hub, quest.rank, quest.star) in valid_ranks and
+                                              quest.stage in areas)]
 
 
 class MHFULocation(Location):
     game = "Monster Hunter Freedom Unite"
+    monsters: list[int] | None = None
 
     def can_reach(self, state: "CollectionState | MHFULogicMixin") -> bool:
-        if state.mhfu_stale[self.player]:
-            state.mhfu_stale[self.player] = False
-            mhfu_sweep_monsters(state, self.player)
-        return super().can_reach(state)
+        reach = super().can_reach(state)
+        if self.monsters:
+            mons = sorted(set(self.monsters))
+            if reach:
+                for mon in mons:
+                    state.mhfu_monsters[self.player][mon] += 1
+            else:
+                for mon in mons:
+                    state.mhfu_monsters[self.player][mon] -= 1
+                    if not state.mhfu_monsters[self.player][mon]:
+                        del state.mhfu_monsters[self.player][mon]
+        return reach
 
 
 class MHFURegion(Region):
@@ -229,8 +226,8 @@ def create_ranks(world: "MHFUWorld") -> None:
         for i in range(3 if world.options.guild_depth.value == GuildQuestDepth.option_g_rank else 2):
             world.rank_requirements[2, i, 0] = 0
     for hub, rank, star in world.rank_requirements:
-        valid_quests = [quest for quest in quest_data if quest["hub"] == hub
-                        and quest["rank"] == rank and quest["star"] == star]
+        valid_quests = [quest for quest in quest_data if quest.hub == hub
+                        and quest.rank == rank and quest.star == star]
         world.location_num[hub, rank, star] = len(valid_quests)
         region = MHFURegion(get_star_name(hub, rank, star),
                             world.player, world.multiworld)
@@ -238,28 +235,28 @@ def create_ranks(world: "MHFUWorld") -> None:
             # treasure quests are a little weird
             # 1 is default, 5 are LR Village, 1 is G
             if not world.options.village_depth:
-                valid_quests = [quest for quest in valid_quests if quest["qid"] in ("m04001", "m04007")]
+                valid_quests = [quest for quest in valid_quests if quest.qid in ("m04001", "m04007")]
             if world.options.guild_depth.value != GuildQuestDepth.option_g_rank:
-                valid_quests = [quest for quest in valid_quests if quest["qid"] != "m04007"]
+                valid_quests = [quest for quest in valid_quests if quest.qid != "m04007"]
             world.location_num[hub, rank, star] = len(valid_quests) * 2
-            region.add_locations({f"{get_proper_name(quest)} - {qtype}":
-                                  location_name_to_id[f"{get_proper_name(quest)} - {qtype}"]
+            region.add_locations({f"{quest.proper_name} - {qtype}":
+                                  location_name_to_id[f"{quest.proper_name} - {qtype}"]
                                   for quest in valid_quests for qtype in ("Silver Crown", "Gold Crown")}, MHFULocation)
         elif (hub, rank, star) == (2, 1, 0):
             # Solo/Group Training has some special casing
             # namely, guild required
             if not world.options.guild_depth:
-                valid_quests = [quest for quest in valid_quests if quest["qid"] not in ("m22002", "m22003", "m22004",
+                valid_quests = [quest for quest in valid_quests if quest.qid not in ("m22002", "m22003", "m22004",
                                                                                         "m22005", "m22006")]
             elif world.options.guild_depth == GuildQuestDepth.option_low_rank:
-                valid_quests = [quest for quest in valid_quests if quest["qid"] not in ("m22005", "m22006")]
+                valid_quests = [quest for quest in valid_quests if quest.qid not in ("m22005", "m22006")]
             elif world.options.guild_depth == GuildQuestDepth.option_high_rank:
-                valid_quests = [quest for quest in valid_quests if quest["qid"] != "m22006"]
+                valid_quests = [quest for quest in valid_quests if quest.qid != "m22006"]
             world.location_num[hub, rank, star] = len(valid_quests)
-            region.add_locations({get_proper_name(quest): location_name_to_id[get_proper_name(quest)]
+            region.add_locations({quest.proper_name: location_name_to_id[quest.proper_name]
                                   for quest in valid_quests}, MHFULocation)
         else:
-            region.add_locations({get_proper_name(quest): location_name_to_id[get_proper_name(quest)]
+            region.add_locations({quest.proper_name: location_name_to_id[quest.proper_name]
                                   for quest in valid_quests}, MHFULocation)
         if world.options.quest_randomization:
             required_mons: set[str] = set()
@@ -283,16 +280,16 @@ def create_ranks(world: "MHFUWorld") -> None:
 
             for i, quest in enumerate(valid_quests):
                 quest_info: SlotQuestInfo = {
-                    "monsters": world.random.choices(monster_habitats[quest["stage"]],
-                                                     k=len(quest["monsters"])) if quest["monsters"] else [],
-                    "mon_num": world.random.choice(range(1, len(quest["monsters"]) + 1)) if quest["monsters"] else 0,
+                    "monsters": world.random.choices(monster_habitats[quest.stage],
+                                                     k=len(quest.monsters)) if quest.monsters else [],
+                    "mon_num": world.random.choice(range(1, len(quest.monsters) + 1)) if quest.monsters else 0,
                     "targets": []
                 }
                 if quest_info["monsters"] and required_mons and world.random.random() > 0.5:
                     # this isn't guaranteed but it should make it so everything isn't piled up at the start
                     # failing a 50/50 400+ is nigh impossible
                     quest_info["monsters"][0] = monster_ids[world.random.choice(sorted(required_mons))]
-                if quest["qid"] == "m10501":
+                if quest.qid == "m10501":
                     # Special case: this quest crashes if the first monster isn't a Rathalos
                     if 11 in quest_info["monsters"] or 49 in quest_info["monsters"]:
                         quest_info["monsters"].sort(key=lambda x: x in (11, 49), reverse=True)
@@ -303,13 +300,19 @@ def create_ranks(world: "MHFUWorld") -> None:
 
                 required_mons.difference_update(quest_info["monsters"])
 
-                world.quest_info[quest["qid"][1:]] = quest_info
+                world.quest_info[quest.qid[1:]] = quest_info
+                if quest.rank != 4:
+                    world.get_location(quest.proper_name).monsters = quest_info["monsters"].copy()
         else:
             # only need monsters for the resulting quest info
-            world.quest_info.update({quest["qid"][1:]: {"monsters": quest["monsters"],
-                                                        "mon_num": len(quest["monsters"]),
-                                                        "targets": []}
-                                     for quest in valid_quests})
+            for quest in valid_quests:
+
+                world.quest_info[quest.qid[1:]] = {"monsters": quest.monsters,
+                                                   "mon_num": len(quest.monsters),
+                                                   "targets": []}
+                if quest.rank != 4:
+                    world.get_location(quest.proper_name).monsters = quest.monsters.copy()
+
         world.multiworld.regions.append(region)
     for hub, rank, star in world.rank_requirements:
         region = world.get_region(get_star_name(hub, rank, star))
@@ -318,7 +321,7 @@ def create_ranks(world: "MHFUWorld") -> None:
         if star == 0:
             menu_region.connect(region, f"To {region.name}")
     goal_quest = goal_quests[world.options.goal.value]
-    goal_name = get_proper_name(get_quest_by_id(goal_quest))
+    goal_name = get_quest_by_id(goal_quest).proper_name
     goal_location = world.get_location(goal_name)
     goal_location.address = None  # This lets us keep the id reserved, even though it's an event this playthrough
     goal_location.place_locked_item(world.create_item("Victory"))

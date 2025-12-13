@@ -7,7 +7,7 @@ from Options import OptionError
 from worlds.AutoWorld import WebWorld, World
 from worlds.LauncherComponents import launch_subprocess, components, Component, Type
 from .quests import create_ranks, location_name_to_id, base_id, goal_quests, \
-    get_quest_by_id, get_proper_name, goal_ranks, hub_rank_max, rank_sort, SlotQuestInfo
+    get_quest_by_id, goal_ranks, hub_rank_max, rank_sort, SlotQuestInfo
 from .items import MHFUItem, item_table, filler_item_table, filler_weights, item_name_to_id, weapons, item_name_groups
 from .options import MHFUOptions
 from .rules import set_rules, MHFULogicMixin
@@ -169,20 +169,6 @@ class MHFUWorld(World):
                                    weights=list(self.options.trap_weights.values()), k=num)
 
     set_rules = set_rules
-
-    def collect(self, state: CollectionState | MHFULogicMixin, item: Item) -> bool:
-        changed = super().collect(state, item)
-        if changed and item.name == "Key Quest" and \
-                (state.prog_items[self.player]["Key Quest"] in self.rank_requirements.values()):
-            state.mhfu_stale[self.player] = True
-        return changed
-
-    def remove(self, state: CollectionState | MHFULogicMixin, item: Item) -> bool:
-        changed = super().remove(state, item)
-        if changed and item.name == "Key Quest" and \
-                (state.prog_items[self.player]["Key Quest"] + 1 in self.rank_requirements.values()):
-            state.mhfu_stale[self.player] = True
-        return changed
 
     def fill_slot_data(self) -> dict[str, Any]:
         slot_info = self.options.as_dict(
