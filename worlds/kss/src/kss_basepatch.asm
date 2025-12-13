@@ -82,6 +82,8 @@ sa1rom
 !received_planets = $408004
 !play_sfx = $408006
 !activate_candy = $408008
+!mirror_game = $40800A
+!mirror_room = $40800C
 
 
 org $008C29
@@ -753,9 +755,14 @@ set_treasure:
     STX $14
     LDX #$0040
     STX $16
+    ;// quick return if game mode == 2
+    LDX $7390
+    CPX #$0002
+    BEQ .Return
     JSR determine_treasure
     ORA [$14], Y
     STA [$14], Y
+    .Return:
     RTL
 
 hook_copy_ability:
@@ -1095,10 +1102,15 @@ MainLoop:
     STA !play_sfx
     .Candy:
     LDA !activate_candy
-    BEQ .Return
+    BEQ .Mirror
     JSL invincibility_candy
     LDA #$0000
     STA !activate_candy
+    .Mirror:
+    LDA $32EA
+    STA !mirror_game
+    LDA $32F2
+    STA !mirror_room
     .Return:
     PLX
     RTL

@@ -19,11 +19,11 @@ maxims = 0x7FAA7
 arena_maxims = 0x7FAC5
 one_ups = 0x7FACC
 candies = 0x7FAE7
-starting_stage = 0xAFCA3
-goal_numeric = 0xAFCA8
-goal_specific = 0xAFCB0
-treasure_values = 0xAFCEF
-mww_mode = 0xAFD7C
+starting_stage = 0xAFCAB
+goal_numeric = 0xAFCB0
+goal_specific = 0xAFCB8
+treasure_values = 0xAFCF7
+mww_mode = 0xAFD84
 
 slot_data = 0x3FD00
 

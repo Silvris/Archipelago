@@ -46,17 +46,29 @@ KSS_RECEIVED_ITEMS = SRAM_1_START + 0x8002
 KSS_RECEIVED_PLANETS = SRAM_1_START + 0x8004
 KSS_PLAY_SFX = SRAM_1_START + 0x8006
 KSS_ACTIVATE_CANDY = SRAM_1_START + 0x8008
+KSS_MIRROR_GAME = SRAM_1_START + 0x800A
+KSS_MIRROR_ROOM = SRAM_1_START + 0x800C
 
 KSS_ROMNAME = SRAM_1_START + 0x8100
 KSS_DEATH_LINK_ADDR = SRAM_1_START + 0x9000
 KSS_CONSUMABLE_FILTER = SRAM_1_START + 0x9001
 
+KSS_DEATH_MESSAGES = {
+    0: ("Pop Star was too much for ", "."),
+    1: ("", " failed to defeat Dyna Blade."),
+    2: ("", " is not very good at eating."), # like 85% sure you can't actually die naturally in Gourmet Race
+    3: ("", " got lost in the great cave."),
+    4: ("Meta Knight defeated ", " and took over Pop Star."),
+    5: ("", " was lost in the stars."),
+    6: ("", " was defeated in The Arena."),
+}
 
 class KSSSNIClient(SNIClient):
     game = "Kirby Super Star"
     patch_suffix = ".apkss"
     item_queue: typing.List[NetworkItem] = []
     consumable_filter: int = 0
+    tracker_key: str = ""
 
     async def deathlink_kill_player(self, ctx: "SNIContext") -> None:
         from SNIClient import DeathState, snes_buffered_write, snes_read, snes_flush_writes
@@ -121,6 +133,10 @@ class KSSSNIClient(SNIClient):
         if not demo_state:
             return
 
+        if not self.tracker_key and ctx.slot:
+            self.tracker_key = f"KSS_STAGE_{ctx.team}_{ctx.slot}"
+            ctx.set_notify(self.tracker_key)
+
         current_subgames = int.from_bytes(await snes_read(ctx, KSS_CURRENT_SUBGAMES, 2), "little")
         if current_subgames & 0x0080 != 0:
             await ctx.send_msgs([{"cmd": "StatusUpdate", "status": ClientStatus.CLIENT_GOAL}])
@@ -129,13 +145,32 @@ class KSSSNIClient(SNIClient):
         game_state = int.from_bytes(await snes_read(ctx, KSS_GAME_STATE, 1), "little")
 
         kirby_hp = int.from_bytes(await snes_read(ctx, KSS_KIRBY_HP, 2), "little")
+        mirror_game = int.from_bytes(await snes_read(ctx, KSS_MIRROR_GAME, 2), "little")
         if "DeathLink" in ctx.tags and game_state == 3 and ctx.last_death_link + 1 < time.time() \
                 and ctx.death_state == DeathState.alive:
             if kirby_hp == 0:
-                # TODO: see if I can get gamemode specific messages
-                await ctx.handle_deathlink_state(True, f"Pop Star was too much for {ctx.player_names[ctx.slot]}.")
+                death_pre, death_post = KSS_DEATH_MESSAGES[mirror_game]
+                await ctx.handle_deathlink_state(True, f"{death_pre}{ctx.player_names[ctx.slot]}{death_post}")
         elif "DeathLink" in ctx.tags and game_state == 3 and kirby_hp > 0:
             ctx.death_state = DeathState.alive
+
+        if self.tracker_key:
+            mirror_room = int.from_bytes(await snes_read(ctx, KSS_MIRROR_ROOM, 2), "little")
+            if game_state in (0, 1):
+                tracker_val = "M_M"
+            else:
+                tracker_val = f"{mirror_game}_{mirror_room}"
+            if ctx.stored_data.get(self.tracker_key, None) != tracker_val:
+                await ctx.send_msgs([{
+                        "cmd": "Set",
+                        "key": self.tracker_key,
+                        "default": "M_M",
+                        "want_reply": False,
+                        "operations": [
+                            {"operation": "replace", "value": tracker_val}
+                        ]
+                    }])
+            print(ctx.stored_data.get(self.tracker_key, None))
 
         save_abilities = 0
         i = 0
