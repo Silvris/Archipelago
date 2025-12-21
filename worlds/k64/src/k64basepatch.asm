@@ -10,6 +10,11 @@ nop
 .org 0x648
 nop
 
+.headersize 0x80000400 - 0x1000 //;ovl0
+
+.org 0x80005400
+alloc_with_alignment:
+
 .headersize 0x8009B540 - 0x43790 //;ovl1
 
 .org 0x800A28A8
@@ -51,6 +56,9 @@ nop
 .org 0x800A3EFC
 jal     SetZeroTwoComplete
 nop
+
+.org 0x800A7678
+PlaySFX:
 
 .org 0x800B8C94
 jal     SetStartingStage
@@ -100,6 +108,9 @@ StageIndex:
 .dw 0, 1, 2, 3, 4, -1, -1, -1
 .dw 0, 1, 2, 3, 4, -1, -1, -1
 .dw 0, 1, 2, 3, -1, -1, -1, -1
+ConsumablePointer:
+.dw 0, 0
+
 CopyAbilityBlocker:
 lui     at, 0x800D
 ld      t0, 0x6C68 (at) //; Get Copy Ability Flag dw
@@ -308,12 +319,96 @@ nop
 //; ex. cart waddle dee has the cart as the first entity, but is linked to the waddle dee entity that follows
 //; for now, we'll hardcode them and make something more scalable later
 
+ScaleGObjNone: //; arg0 - gobj ptr
+@@Scale:
+lw      t1, 0x0000 (a0)
+blez    t1, @@Return
+sll     t1, t1, 2
+li      at, gEntitiesScaleXArray
+addu    at, at, t1
+li      t2, 0x00000000
+sw      t2, 0x0000 (at)
+li      at, gEntitiesScaleYArray
+addu    at, at, t1
+sw      t2, 0x0000 (at)
+li      at, gEntitiesScaleZArray
+addu    at, at, t1
+sw      t2, 0x0000 (at)
+lw      a0, 0x0004 (a0)
+bnez     a0, @@Scale
+nop
+@@Return:
+jr      ra
+nop
+
+.macro safe_call,func,arg0, ret0
+    addiu   sp, sp, -0x10
+    sw      ra, 0x10 (sp)
+    sw      v0, 0xC (sp)
+    sw      v1, 0x8 (sp)
+    sw      a0, 0x4 (sp)
+    jal     func
+    or      a0, arg0, r0
+    or      ret0, v0, r0
+    lw      a0, 0x4 (sp)
+    lw      v1, 0x8 (sp)
+    lw      v0, 0xC (sp)
+    lw      ra, 0x10 (sp)
+    addiu   sp, sp, 0x10
+.endmacro
+
+.macro safe_call_2, func, arg0, arg1, ret0
+    addiu   sp, sp, -0x14
+    sw      ra, 0x14 (sp)
+    sw      v0, 0x10 (sp)
+    sw      v1, 0xC (sp)
+    sw      a1, 0x8 (sp)
+    sw      a0, 0x4 (sp)
+    or      a1, arg1, r0
+    jal     func
+    or      a0, arg0, r0
+    or      ret0, v0, r0
+    lw      a0, 0x4 (sp)
+    lw      a1, 0x8 (sp)
+    lw      v1, 0xC (sp)
+    lw      v0, 0x10 (sp)
+    lw      ra, 0x14 (sp)
+    addiu   sp, sp, 0x14
+.endmacro
+
+.macro scale_gobj,gobj
+    addiu   sp, sp, -0x10
+    sw      ra, 0x10 (sp)
+    sw      t1, 0xC (sp)
+    sw      t2, 0x8 (sp)
+    sw      a0, 0x4 (sp)
+    jal     ScaleGObjNone
+    or     a0, gobj, r0
+    lw      a0, 0x4 (sp)
+    lw      t2, 0x8 (sp)
+    lw      t1, 0xC (sp)
+    lw      ra, 0x10 (sp)
+    addiu   sp, sp, 0x10
+.endmacro
+
+BridgeDededeVisual:
+lui     t1, 0x800D
+lb      t1, 0x6C82 (t1)
+bnez    t1, @@SetCorrect
+nop
+scale_gobj a0
+@@SetCorrect:
+j       0x8021F0AC
+lw      v0, 0xA7C4 (v0)
+
 BridgeDededeOverride: //; t1 replace with 4f
 lui     t1, 0x800D
 lb      t1, 0x6C82 (t1)
 bnez    t1, @@SetCorrect
 nop
 
+li      t1, 0x26A
+safe_call   PlaySFX,t1, t1
 li      t1, 0x0000
 beqz    t1, @@Return
 nop
@@ -324,33 +419,48 @@ sb      t1, 0x000C (a0)
 j       0x8021F100
 nop
 
-CeilingWaddleDeeOverride: //; t9 safe with exit set
+CeilingWaddleDeeOverride: //; t9 safe
+BC1FL   @@ReturnFalse
+nop
 lui     t9, 0x800D
 lb      t9, 0x6C80 (t9)
-bnez    t9, @@SetCorrect
+bnez    t9, @@ReturnTrue
 nop
+li      t9, FriendPlayedSFXFlag
+lw      t9, 0x0000 (t9)
+bnez    t9, @@ReturnFalse
+li      t9, 0x26A
+safe_call   PlaySFX, t9, t9
 li      t9, 0x0001
-bnez    t9, @@Return
+li      t6, FriendPlayedSFXFlag
+sw      t9, 0x0000 (t6)
+b       @@ReturnFalse
 nop
-@@SetCorrect:
-li      t9, 0x0000
-@@Return:
-sb      t9, 0x000C (a2)
-j       0x8021FF78
-lb      t9, 0x0000 (a2)
+
+@@ReturnTrue:
+j       0x8021FF4C
+nop
+
+@@ReturnFalse:
+j       0x8021FF84
+lw      ra, 0x0014 (sp)
 
 CartWaddleDeeOverride: //; t1 safe
 lui     t1, 0x800D
 lb      t1, 0x6C80 (t1)
 bnez    t1, @@Continue
 nop
-li      at, gEntitiesScaleXArray
-li      t1, 0x00000000
-sw      t1, 0x00F4 (at)
-li      at, gEntitiesScaleYArray
-sw      t1, 0x00F4 (at)
-li      at, gEntitiesScaleZArray
-sw      t1, 0x00F4 (at)
+lw      a0, 0x0018 (sp)
+scale_gobj a0
+li      t1, FriendPlayedSFXFlag
+lw      t1, 0x0000 (t1)
+bnez    t1, @@Passthrough
+li      t1, 0x26A
+safe_call PlaySFX, t1, t1
+li      a0, 0x0001
+li      t1, FriendPlayedSFXFlag
+sw      a0, 0x0000 (t1)
+@@Passthrough:
 j       0x80228450
 nop
 @@Continue:
@@ -358,11 +468,17 @@ jal     0x80122F94
 sb      t9, 0x000C (v0)
 j       0x80228430
 
+RaftWaddleDeeVisual:
+
 RaftWaddleDeeOverride: //; t6 safe
 lui     t6, 0x800D
 lb      t6, 0x6C80 (t6)
 bnez    t6, @@Continue
 nop
+li      t6, 0x26A
+safe_call PlaySFX, t6, t6
+@@Skip:
+scale_gobj v1
 j       0x80228EE4
 nop
 @@Continue:
@@ -375,6 +491,9 @@ lui     t7, 0x800D
 lb      t7, 0x6C80 (t7)
 bnez    t7, @@Continue
 nop
+li      t7, 0x26A
+safe_call PlaySFX, t7, t7
+@@Skip:
 j       0x8022857C
 nop
 @@Continue:
@@ -389,6 +508,8 @@ lui     t9, 0x800D
 lb      t9, 0x6C82 (t9)
 bnez    t9, @@SetCorrect
 nop
+li      t9, 0x26A
+safe_call PlaySFX, t9, t9
 li      t9, 0x0000
 beqz    t9, @@Return
 nop
@@ -409,7 +530,15 @@ lui     t6, 0x800D
 lb      t6, 0x6C82 (t6)
 bnez    t6, @@Passthrough
 nop
+li      t6, FriendPlayedSFXFlag
+lw      t6, 0x0000 (t6)
+bnez    t6, @@Passthrough
 or      v0, r0, r0
+li      t6, 0x26A
+safe_call PlaySFX,t6, t6
+li      t5, 0x0001
+li      t6, FriendPlayedSFXFlag
+sw      t5, 0x0000 (t6)
 @@Passthrough:
 jr      ra
 nop
@@ -425,8 +554,30 @@ nop
 j       0x80220C00
 nop
 @@ReturnFalse:
+li      t6, FriendPlayedSFXFlag
+lw      t6, 0x0000 (t6)
+bnez    t6, @@Passthrough
+li      t6, 0x26A
+safe_call PlaySFX,t6, t6
+li      t5, 0x0001
+li      t6, FriendPlayedSFXFlag
+sw      t5, 0x0000 (t6)
+@@Passthrough:
 j       0x80220BF0
 nop
+
+MatchAdeleineVisual://; all temp safe with return specific
+lui     t4, 0x800D
+lb      t4, 0x6C81 (t4)
+bnez    t4, @@Return
+nop
+scale_gobj a0
+li      t4, 0x26A
+safe_call PlaySFX, t4, t4
+@@Return:
+addiu   sp, sp, -0x18
+j       0x802209EC
+sw      ra, 0x0014 (sp)
 
 PaintingAdeleineOverride://; t4 safe
 lui     t4, 0x800D
@@ -436,8 +587,23 @@ nop
 j       0x80221318
 nop
 @@ReturnFalse:
+li      t4, 0x26A
+safe_call PlaySFX, t4, t4
 j       0x80221308
 nop
+
+PaintingAdeleineVisual://; all safe after start
+addiu   sp, sp, -0x20
+sw      ra, 0x1C (sp)
+scale_gobj a0
+j       0x80220F94
+nop
+
+PaintingAdeleinePaintVisual://; all safe after start
+scale_gobj a0
+lui     t6, 0x8005
+j       0x80220F50
+lw      t6, 0xA7C4 (t6)
 
 AdeleineOverride://; t9 safe
 bne     t8, r0, @@ReturnFalse
@@ -448,7 +614,106 @@ nop
 j       0x8021F644
 nop
 @@ReturnFalse:
+scale_gobj a0
+li      t9, FriendPlayedSFXFlag
+lw      t9, 0x0000 (t9)
+bnez    t9, @@Passthrough
+li      t9, 0x26A
+safe_call PlaySFX,t9, t9
+li      t8, 0x0001
+li      t9, FriendPlayedSFXFlag
+sw      t8, 0x0000 (t9)
+@@Passthrough:
 j       0x8021F6C8
+nop
+
+AllocConsumables://; t6/t7 safe
+li      t6, 0x2000
+li      t7, 0x0004
+safe_call_2 alloc_with_alignment, t6, t7, t6
+sw      t6, ConsumablePointer
+jr      ra
+nop
+
+ConsumablesBase://; assumptions: the gobj is at 0x20 from the current sp
+sw      t8, 0x001C (sp)
+lw      v0, 0x0088 (t8)
+li      t7, SlotData
+lb      t7, 0x0003 (t7)
+beqz    t7, @@ReturnEarly
+lw      t5, 0x0000 (a0) //; gobj id
+addiu   sp, sp, -0x08
+lui     t8, 0x800E
+addu    t8, t8, t5
+lb      t8, 0x7730 (t8)
+li      t7, 0x0003
+bne     t8, t7, @@ReturnWithStack
+lui     t8, 0x800E
+addu    t8, t8, t5
+addu    t8, t8, t5
+lhu     t8, 0x77A0 (t8)
+li      t7, 0x0005
+beq     t8, t7, @@ReturnWithStack //; filter out invin candy
+nop
+li      t7, SlotData
+lb      t7, 0x0003 (t7)
+andi    t6, t7, 0x0001
+beqz    t6, @@OneUp
+nop
+li      t6, 0x0005
+blt     t8, t6, @@Apply
+nop
+@@OneUp:
+andi    t6, t7, 0x0002
+beqz    t6, @@Stars
+nop
+li      t6, 0x0009
+beq     t8, t6, @@Apply
+nop
+@@Stars:
+andi    t6, t7, 0x0004
+beqz    t6, @@ReturnWithStack
+nop
+li      t6, 0x0006
+beq     t8, t6, @@Apply
+nop
+li      t7, 0x0007
+beq     t8, t6, @@Apply
+nop
+b       @@ReturnWithStack
+nop
+
+@@Apply:
+lui     t7, 0x800E
+addu    t7, t7, t5
+lb      t5, 0x76C0 (t7)
+li      t7, 0x0001
+dsllv   t7, t7, t5
+sd      t7, 0x0000 (sp)
+lui     t5, 0x800C
+lw      t7, 0xE500 (t5)
+lw      t4, 0xE508 (t5)
+lw      t5, 0xE504 (t5)
+sll     t7, t7, 9
+sll     t5, t5, 7
+sll     t4, t4, 4
+addu    t5, t5, t7
+addu    t5, t5, t4
+li      t6, ConsumablePointer
+lw      t6, 0x0000 (t6)
+addu    t5, t5, t6
+ld      t7, 0x0000 (sp)
+sw      t5, 0x0000 (sp)
+ld      t5, 0x0000 (t5)
+or      t7, t7, t5
+lw      t5, 0x0000 (sp)
+sd      t7, 0x0000 (t5)
+j       0x801BD73C
+@@ReturnWithStack:
+addiu   sp, sp, 0x08
+
+@@ReturnEarly:
+j       0x801BD540
 nop
 
 .org 0x8011E1BC //; write our jump
@@ -471,7 +736,7 @@ b       0x80158770
 addiu   t6, r0, 0x0001 //; force 1 for miracle matter check
 
 .org 0x80158788
-nop
+jal     AllocConsumables
 nop
 nop
 nop                     //; remove percentage check
@@ -481,12 +746,23 @@ lw      v0, 0x6C78 (t6) //; read from save area for cutscene check
 addiu   a0, r0, 0x000D
 bnez    v0, 0x801587BC
 
+.headersize 0x80198880 - 0x13E8F0 //; ovl7
+
+.org 0x801BD538
+j ConsumablesBase
+nop
+
+
 .headersize 0x801D0C60 - 0x174740 //; ovl8
 
 .org 0x801D2C60
 b       0x801D2CD4 //; always spawn a crystal shard for friend miniboss
 
 .headersize 0x8021DF20 - 0x23E630 //; ovl19
+
+.org 0x8021F0A4
+j       BridgeDededeVisual
+lui     v0, 0x8005
 
 .org 0x8021F0F8
 j       BridgeDededeOverride
@@ -495,13 +771,26 @@ j       BridgeDededeOverride
 .org 0x8021F640
 j       AdeleineOverride
 
-.org 0x8021FF70
+.org 0x8021FF44
 j       CeilingWaddleDeeOverride
+nop
 //; don't care about nop here, just keep what's there
 
 .org 0x80220BE8
 j       MatchAdeleineOverride
 //; already followed by nop
+
+.org 0x802209E4
+j       MatchAdeleineVisual
+nop
+
+.org 0x80220F48
+j       PaintingAdeleinePaintVisual
+nop
+
+.org 0x80220F8C
+j       PaintingAdeleineVisual
+nop
 
 .org 0x802212F8
 j       PaintingAdeleineOverride
@@ -522,11 +811,14 @@ nop
 .org 0x80228570
 j       SledWaddleDeeOverride
 nop
-nop
+FriendPlayedSFXFlag: //; this is sketchy as hell, but we need it loaded in this ovl
+//; since this ovl gets refreshed on level load
+.dw 0
 
 .notice "Crystal Requirements: " + orga(CrystalRequirements)
 .notice "Slot Data: " + orga(SlotData)
 .notice "Level Index: " + orga(LevelIndex)
 .notice "Stage Index: " + orga(StageIndex) 
+.notice "Consumable Pointer: " + orga(ConsumablePointer)
 
 .close

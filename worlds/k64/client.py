@@ -371,7 +371,7 @@ class K64Client(BizHawkClient):
         # check stages
         for level, stage_num in zip(range(1, 7), (3, 4, 4, 4, 4, 3)):
             for stage in range(stage_num):
-                loc_id = 0x0000 + self.levels[level][stage]
+                loc_id = self.levels[level][stage]
                 if loc_id not in ctx.checked_locations and stage_array[stage_to_byte[level][stage]] == 0x02:
                     new_checks.append(loc_id)
                 elif loc_id in ctx.checked_locations:
