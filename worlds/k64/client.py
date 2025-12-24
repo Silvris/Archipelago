@@ -113,8 +113,10 @@ K64_DEATHLINK_SET = K64_SAVE_ADDRESS + 0x17C
 K64_FRIENDS = K64_SAVE_ADDRESS + 0x180
 K64_KIRBY_LIVES = K64_SAVE_ADDRESS + 0x34C
 K64_KIRBY_HEALTH = K64_SAVE_ADDRESS + 0x350
+K64_STAR_COUNT = K64_SAVE_ADDRESS + 0x360
 K64_KIRBY_LIVES_VISUAL = K64_SAVE_ADDRESS + 0x388
 K64_KIRBY_HEALTH_VISUAL = K64_SAVE_ADDRESS + 0x38C
+
 K64_INVINCIBILITY_CANDY = 0x12E7C9
 
 K64_CONSUMABLES = 0x500000
@@ -270,7 +272,7 @@ class K64Client(BizHawkClient):
         (halken, is_demo, game_state, stage_array, boss_crystals, crystal_array,
          copy_ability, crystals, recv_index, health, health_visual,
          lives, lives_visual, current_level, current_stage,
-         menu_level, consumable_checks) = await read(ctx.bizhawk_ctx, [
+         menu_level, consumable_checks, star_count) = await read(ctx.bizhawk_ctx, [
             (K64_SAVE_ADDRESS, 16, "RDRAM"),
             (K64_IS_DEMO, 4, "RDRAM"),
             (K64_GAME_STATE, 4, "RDRAM"),
@@ -288,9 +290,16 @@ class K64Client(BizHawkClient):
             (K64_CURRENT_STAGE, 4, "RDRAM"),
             (K64_MENU_LEVEL, 4, "RDRAM"),
             (K64_CONSUMABLES, 0xC00, "RDRAM"),
+            (K64_STAR_COUNT, 4, "RDRAM"),
             ])
 
         if halken != b'-HALKEN--KIRBY4-':
+            return
+
+        game_state_val = int.from_bytes(game_state, "big")
+        if game_state_val in range(11):
+            # 0x0 - 0xA are main menu states
+            # 0xB is the world select
             return
 
         if boss_crystals[6] != 0:
@@ -328,13 +337,24 @@ class K64Client(BizHawkClient):
             elif item.item == 0x0023:
                 # Invincibility Candy
                 writes.extend([(K64_INVINCIBILITY_CANDY, [1], "RDRAM")])
+            elif item.item == 0x0024:
+                # Small Star
+                writes.extend([
+                    (K64_STAR_COUNT, int.to_bytes(int.from_bytes(star_count, "little") + 1, 4, "little"), "RDRAM"),
+                ])
+            elif item.item in (0x0025, 0x0026, 0x0027, 0x0028):
+                # Food
+                new_health = min(struct.unpack(">f", health)[0] + 1, 6)
+                writes.extend([
+                    (K64_KIRBY_HEALTH, struct.pack(">f", new_health), "RDRAM"),
+                    (K64_KIRBY_HEALTH_VISUAL, struct.pack(">I", new_health), "RDRAM"),
+                ])
 
         # update crystals here
         if ctx.ui:
             await self.update_crystal_label(ctx)
 
         # update data storage
-        game_state_val = int.from_bytes(game_state, "big")
         if game_state_val == 0xC:
             # We are on a world menu, update to that world
             world_str = f"{int.from_bytes(menu_level, 'big')}_S"

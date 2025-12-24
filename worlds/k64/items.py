@@ -109,12 +109,20 @@ misc_item_table = {
     ItemName.maxim_tomato: ItemData(0x0022, False),
     ItemName.invincibility_candy: ItemData(0x0023, False),
     ItemName.small_star: ItemData(0x0024, False),
+    ItemName.ice_cream: ItemData(0x0025, False),
+    ItemName.cake: ItemData(0x0026, False),
+    ItemName.sandwich: ItemData(0x0027, False),
+    ItemName.meat: ItemData(0x0028, False),
 }
 
 filler_item_weights = {
-    ItemName.one_up: 4,
-    ItemName.maxim_tomato: 2,
-    ItemName.invincibility_candy: 2,
+    ItemName.one_up: 3,
+    ItemName.maxim_tomato: 1,
+    ItemName.ice_cream: 1,
+    ItemName.sandwich: 1,
+    ItemName.meat: 1,
+    ItemName.cake: 1,
+    ItemName.invincibility_candy: 1,
 }
 
 star_filler_item_weights = {

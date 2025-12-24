@@ -441,7 +441,7 @@ aqua_star_3_t13 = "Aqua Star 3 - Star 13"
 aqua_star_3_t14 = "Aqua Star 3 - Star 14"
 aqua_star_3_f1 = "Aqua Star 3 - Cake 1"
 aqua_star_3_f2 = "Aqua Star 3 - Maxim Tomato"
-aqua_star_3_t15 = "Aqua Star 3 - Star 15"
+aqua_star_3_t15 = "Aqua Star 3 - Star 15"  # Dedede needed from here
 aqua_star_3_t16 = "Aqua Star 3 - Star 16"
 aqua_star_3_f3 = "Aqua Star 3 - Cake 2"
 aqua_star_3_u1 = "Aqua Star 3 - 1-Up" # Needs Stone/Cutter
@@ -858,7 +858,7 @@ shiver_star_4_t4 = "Shiver Star 4 - Star 4"
 shiver_star_4_t5 = "Shiver Star 4 - Star 5"
 shiver_star_4_t6 = "Shiver Star 4 - Star 6"  # needs Drill
 shiver_star_4_t7 = "Shiver Star 4 - Star 7"  # needs Drill
-shiver_star_4_f3 = "Shiver Star 4 - Meat 2"
+shiver_star_4_f3 = "Shiver Star 4 - Meat 2"  # Dedede needed from here
 shiver_star_4_t8 = "Shiver Star 4 - Star 8"
 shiver_star_4_t9 = "Shiver Star 4 - Star 9"
 shiver_star_4_t10 = "Shiver Star 4 - Star 10"
@@ -936,7 +936,7 @@ ripple_star_2_t5 = "Ripple Star 2 - Star 5"
 ripple_star_2_t6 = "Ripple Star 2 - Star 6"
 ripple_star_2_t7 = "Ripple Star 2 - Star 7"
 ripple_star_2_f2 = "Ripple Star 2 - Sandwich 1"
-ripple_star_2_t8 = "Ripple Star 2 - Star 8"
+ripple_star_2_t8 = "Ripple Star 2 - Star 8"  # Dedede needed from here
 ripple_star_2_f3 = "Ripple Star 2 - Sandwich 2"
 ripple_star_2_f4 = "Ripple Star 2 - Ice Cream 1"
 ripple_star_2_f5 = "Ripple Star 2 - Maxim Tomato"
@@ -953,9 +953,9 @@ ripple_star_2_f7 = "Ripple Star 2 - Meat 2"
 ripple_star_2_f8 = "Ripple Star 2 - Ice Cream 2"
 ripple_star_2_f9 = "Ripple Star 2 - Sandwich 3"
 ripple_star_2_u1 = "Ripple Star 2 - 1-Up 1"
-ripple_star_2_u2 = "Ripple Star 2 - 1-Up 2"
-ripple_star_2_f10 = "Ripple Star 2 - Sandwich 4"
-ripple_star_2_f11 = "Ripple Star 2 - Cake 2"
+ripple_star_2_u2 = "Ripple Star 2 - 1-Up 2"  # Spark
+ripple_star_2_f10 = "Ripple Star 2 - Sandwich 4"  # Ice
+ripple_star_2_f11 = "Ripple Star 2 - Cake 2"  # Needle
 
 ripple_star_3_t1 = "Ripple Star 3 - Star 1"
 ripple_star_3_t2 = "Ripple Star 3 - Star 2"
@@ -1012,11 +1012,11 @@ level_max = {
 level_names_inverse = {level_names[idx]: idx for idx in level_names}
 
 boss_names = {
-    "Whispy Woods": 0x640200,
-    "Pix": 0x640201,
-    "Acro": 0x640202,
-    "Magman": 0x640203,
-    "HR-H": 0x640204,
-    "Miracle Matter": 0x640205,
+    "Whispy Woods": 0x0200,
+    "Pix": 0x0201,
+    "Acro": 0x0202,
+    "Magman": 0x0203,
+    "HR-H": 0x0204,
+    "Miracle Matter": 0x0205,
 
 }
