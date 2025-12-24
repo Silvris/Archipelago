@@ -252,6 +252,7 @@ class K64Client(BizHawkClient):
             ]))[0]
 
             self.death_link = bool(deathlink[0])
+            await ctx.update_death_link(self.death_link)
 
         if self.split_power_combos is None:
             split_power_combos = (await read(ctx.bizhawk_ctx, [
