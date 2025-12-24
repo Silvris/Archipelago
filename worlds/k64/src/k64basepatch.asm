@@ -108,8 +108,6 @@ StageIndex:
 .dw 0, 1, 2, 3, 4, -1, -1, -1
 .dw 0, 1, 2, 3, 4, -1, -1, -1
 .dw 0, 1, 2, 3, -1, -1, -1, -1
-ConsumablePointer:
-.dw 0, 0
 
 CopyAbilityBlocker:
 lui     at, 0x800D
@@ -258,7 +256,9 @@ sw      s2, 0x6C78 (at)
 jr      ra
 nop
 @@SetFalse:
-li      s2, 0x0000
+li      s2, 6
+sw      s2, 0x6B90 (at)
+li      s2, 0x0004
 beqz    s2, @@Set
 
 RedirectStage:
@@ -308,7 +308,7 @@ nop
 SetZeroTwoComplete:
 addiu   t3, r0, 0x0001
 lui     at, 0x800D
-sb      t3, 0x6BC0 (at)
+sb      t3, 0x6BC6 (at)
 j       0x800A74D8
 nop
 
@@ -592,21 +592,46 @@ safe_call PlaySFX, t4, t4
 j       0x80221308
 nop
 
-PaintingAdeleineVisual://; all safe after start
-addiu   sp, sp, -0x20
-sw      ra, 0x1C (sp)
-scale_gobj a0
-j       0x80220F94
+PaintingAdeleineVisual1://; t7 safe with return set
+lui     t7, 0x800D
+lb      t7, 0x6C81 (t7)
+bnez    t7, @@Return
+nop
+mtc1    r0, f0
+
+@@Return:
+swc1    f0, 0x4550 (at)
+lw      t7, 0x0000 (v1)
+j       0x8022105C
+nop
+
+PaintingAdeleineVisual2://; all safe after start
+lui     t3, 0x800D
+lb      t3, 0x6C81 (t3)
+bnez    t3, @@Return
+nop
+mtc1    r0, f0
+
+@@Return:
+swc1    f0, 0x4550 (at)
+lw      t3, 0x0000 (v0)
+j       0x80221604
 nop
 
 PaintingAdeleinePaintVisual://; all safe after start
+lui     t6, 0x800D
+lb      t6, 0x6C81 (t6)
+bnez    t6, @@Continue
+nop
 scale_gobj a0
+
+@@Continue:
 lui     t6, 0x8005
 j       0x80220F50
 lw      t6, 0xA7C4 (t6)
 
 AdeleineOverride://; t9 safe
-bne     t8, r0, @@ReturnFalse
+bne     t8, r0, @@Passthrough
 lui     t9, 0x800D
 lb      t9, 0x6C81 (t9)
 beqz    t9, @@ReturnFalse
@@ -614,12 +639,13 @@ nop
 j       0x8021F644
 nop
 @@ReturnFalse:
-scale_gobj a0
+
 li      t9, FriendPlayedSFXFlag
 lw      t9, 0x0000 (t9)
 bnez    t9, @@Passthrough
 li      t9, 0x26A
 safe_call PlaySFX,t9, t9
+scale_gobj a0
 li      t8, 0x0001
 li      t9, FriendPlayedSFXFlag
 sw      t8, 0x0000 (t9)
@@ -627,17 +653,39 @@ sw      t8, 0x0000 (t9)
 j       0x8021F6C8
 nop
 
-AllocConsumables://; t6/t7 safe
-li      t6, 0x2000
-li      t7, 0x0004
-safe_call_2 alloc_with_alignment, t6, t7, t6
-sw      t6, ConsumablePointer
+FriendCheck: //; friend in a0, kirby is friend 0, return 1 in v0 for true else 0
+//; kirby - 0
+//; dedede - 1
+//; waddle - 2
+//; adeleine - 3
+beqz    a0, @@ReturnTrue
+li      t1, 1
+beq     a0, t1, @@SetDedede
+nop
+addiu   a0, a0, -1
+b       @@WriteProper
+nop
+@@SetDedede:
+li      a0, 3
+
+@@WriteProper:
+lui     t1, 0x800D
+addu    t1, t1, a0
+lb      t1, 0x6C7F (t1)
+bnez    t1, @@ReturnTrue
+
+li      v0, 0
+b       @@Return
+nop
+
+@@ReturnTrue:
+li      v0, 1
+@@Return:
 jr      ra
 nop
 
-ConsumablesBase://; assumptions: the gobj is at 0x20 from the current sp
-sw      t8, 0x001C (sp)
-lw      v0, 0x0088 (t8)
+
+ConsumableBase://; assumptions: the gobj is at 0x20 from the current sp
 li      t7, SlotData
 lb      t7, 0x0003 (t7)
 beqz    t7, @@ReturnEarly
@@ -699,22 +747,48 @@ sll     t5, t5, 7
 sll     t4, t4, 4
 addu    t5, t5, t7
 addu    t5, t5, t4
-li      t6, ConsumablePointer
-lw      t6, 0x0000 (t6)
-addu    t5, t5, t6
+li      t6, 0x80500000
+addu    t6, t5, t6
 ld      t7, 0x0000 (sp)
-sw      t5, 0x0000 (sp)
-ld      t5, 0x0000 (t5)
+ld      t5, 0x0000 (t6)
 or      t7, t7, t5
-lw      t5, 0x0000 (sp)
-sd      t7, 0x0000 (t5)
-j       0x801BD73C
+sd      t7, 0x0000 (t6)
+li      v0, 1
+b       @@Return
 @@ReturnWithStack:
 addiu   sp, sp, 0x08
-
 @@ReturnEarly:
+li      v0, 0
+@@Return:
+jr      ra
+nop
+
+ConsumableCollide:
+sw      t8, 0x001C (sp)
+lw      v0, 0x0088 (t8)
+safe_call ConsumableBase, a0, t5
+beqz    t5, @@ReturnNormal
+nop
+j       0x801BD73C
+nop
+@@ReturnNormal:
 j       0x801BD540
 nop
+
+ConsumableInhale:
+lui     t1, 0x8005
+lw      t1, 0xA7C4 (t1)
+safe_call ConsumableBase, t1, t1
+bnez    t1, @@ReturnQuick
+nop
+@@ReturnNormal:
+jal     0x801A94D8
+nop
+
+@@ReturnQuick:
+j       0x801A93B4
+nop
+
 
 .org 0x8011E1BC //; write our jump
 jal     CopyAbilityBlocker
@@ -722,7 +796,17 @@ jal     CopyAbilityBlocker
 .org 0x80121354
 jal     DeathLink
 
-.headersize 0x80151100 - 0xF8630 //; ovl3
+.headersize 0x80151100 - 0xB1B40 //; ovl3
+
+
+.headersize 0x80151100 - 0xF8630 //; ovl4
+
+.org 0x80152134
+nop  //; always skip check, assume all friends init
+
+.org 0x801521B4
+j       FriendCheck
+nop
 
 .org 0x8015329C
 j       RemapStage
@@ -736,7 +820,7 @@ b       0x80158770
 addiu   t6, r0, 0x0001 //; force 1 for miracle matter check
 
 .org 0x80158788
-jal     AllocConsumables
+nop
 nop
 nop
 nop                     //; remove percentage check
@@ -748,8 +832,13 @@ bnez    v0, 0x801587BC
 
 .headersize 0x80198880 - 0x13E8F0 //; ovl7
 
+.org 0x801A93AC
+j   ConsumableInhale
+nop
+
+
 .org 0x801BD538
-j ConsumablesBase
+j   ConsumableCollide
 nop
 
 
@@ -788,8 +877,12 @@ nop
 j       PaintingAdeleinePaintVisual
 nop
 
-.org 0x80220F8C
-j       PaintingAdeleineVisual
+.org 0x80221054
+j       PaintingAdeleineVisual1
+nop
+
+.org 0x802215FC
+j       PaintingAdeleineVisual2
 nop
 
 .org 0x802212F8
@@ -819,6 +912,5 @@ FriendPlayedSFXFlag: //; this is sketchy as hell, but we need it loaded in this 
 .notice "Slot Data: " + orga(SlotData)
 .notice "Level Index: " + orga(LevelIndex)
 .notice "Stage Index: " + orga(StageIndex) 
-.notice "Consumable Pointer: " + orga(ConsumablePointer)
 
 .close
