@@ -84,6 +84,7 @@ MM1_RBM_REMAP = {
     4: 0x40,
     5: 0x4,
     6: 0x8,
+    7: 0x80,
 }
 
 def cmd_pool(self: "BizHawkClientCommandProcessor") -> None:
