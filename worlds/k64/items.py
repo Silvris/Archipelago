@@ -108,6 +108,7 @@ misc_item_table = {
     ItemName.one_up: ItemData(0x0021, False),
     ItemName.maxim_tomato: ItemData(0x0022, False),
     ItemName.invincibility_candy: ItemData(0x0023, False),
+    ItemName.small_star: ItemData(0x0024, False),
 }
 
 filler_item_weights = {
@@ -116,6 +117,10 @@ filler_item_weights = {
     ItemName.invincibility_candy: 2,
 }
 
+star_filler_item_weights = {
+    ItemName.small_star: 16,
+    **filler_item_weights
+}
 
 item_table = {
     **copy_ability_table,

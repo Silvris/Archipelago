@@ -183,15 +183,16 @@ def create_levels(world: "K64World") -> None:
                                world.player, world.multiworld)
             levels[level].connect(region)
             crystals = [(((real_stage & 0xFF) - 1) * 3) + i + 0x0101 for i in range(3) if not real_stage & 0x200]
-            consumables = range(*consumable_by_level[real_stage])
             real_consumables = []
-            for consumable in consumables:
-                if consumable in star_locations and "Stars" in world.options.consumables:
-                    real_consumables.append(consumable)
-                elif consumable in one_up_locations and "1-Up" in world.options.consumables:
-                    real_consumables.append(consumable)
-                elif consumable in food_locations and "Food" in world.options.consumables:
-                    real_consumables.append(consumable)
+            if real_stage in consumable_by_level:
+                consumables = range(*consumable_by_level[real_stage])
+                for consumable in consumables:
+                    if consumable in star_locations and "Stars" in world.options.consumables:
+                        real_consumables.append(consumable)
+                    elif consumable in one_up_locations and "1-Ups" in world.options.consumables:
+                        real_consumables.append(consumable)
+                    elif consumable in food_locations and "Food" in world.options.consumables:
+                        real_consumables.append(consumable)
             locations = {
                 location_table[code]: code for code in location_table
                 if code in [real_stage, *crystals, *real_consumables]

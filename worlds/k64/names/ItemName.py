@@ -53,6 +53,7 @@ crystal_shard = "Crystal Shard"
 one_up = "1-Up"
 maxim_tomato = "Maxim Tomato"
 invincibility_candy = "Invicibility Candy"
+small_star = "Small Star"
 
 # Event Ability Access
 burn_event = "Burning Ability"

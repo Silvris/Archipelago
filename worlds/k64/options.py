@@ -107,7 +107,7 @@ class Consumables(OptionSet):
     The large stars that replace Crystals are not considered checks.
     """
     display_name = "Consumables"
-    valid_keys = {"1-Up", "Food", "Stars"}
+    valid_keys = {"1-Ups", "Food", "Stars"}
 
     default = frozenset({})
 
