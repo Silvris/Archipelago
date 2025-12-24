@@ -301,6 +301,7 @@ food_locations = {
     0x0756: LocationName.ripple_star_3_f2,
     0x0759: LocationName.ripple_star_3_f3,
     0x075B: LocationName.ripple_star_3_f4,
+    0x0761: LocationName.dark_star_adeleine,
 }
 
 star_locations = {
@@ -992,4 +993,7 @@ location_table = {
     **stage_locations,
     **crystal_shard_locations,
     **boss_locations,
+    **one_up_locations,
+    **food_locations,
+    **star_locations,
 }

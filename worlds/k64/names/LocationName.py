@@ -168,7 +168,7 @@ pop_star_3_t10 = "Pop Star 3 - Star 10"
 pop_star_3_t11 = "Pop Star 3 - Star 11"
 pop_star_3_f2 = "Pop Star 3 - Maxim Tomato"
 pop_star_3_f3 = "Pop Star 3 - Cake"
-pop_star_3_f4 = "Pop Star 3 - Adeleine Reward"
+pop_star_3_f4 = "Pop Star 3 - Adeleine Gift"
 pop_star_3_t12 = "Pop Star 3 - Star 12"
 pop_star_3_t13 = "Pop Star 3 - Star 13"
 pop_star_3_t14 = "Pop Star 3 - Star 14"
@@ -356,7 +356,7 @@ aqua_star_1_f6 = "Aqua Star 1 - Meat 3"
 aqua_star_1_f7 = "Aqua Star 1 - Cake"
 aqua_star_1_t31 = "Aqua Star 1 - Star 31"
 aqua_star_1_t32 = "Aqua Star 1 - Star 32"
-aqua_star_1_f8 = "Aqua Star 1 - Adeleine Reward"
+aqua_star_1_f8 = "Aqua Star 1 - Adeleine Gift"
 aqua_star_1_t33 = "Aqua Star 1 - Star 33"
 aqua_star_1_t34 = "Aqua Star 1 - Star 34"
 aqua_star_1_t35 = "Aqua Star 1 - Star 35" # ice/bomb for remaining
@@ -988,6 +988,8 @@ ripple_star_3_t24 = "Ripple Star 3 - Star 24"
 ripple_star_3_t25 = "Ripple Star 3 - Star 25"
 ripple_star_3_u1 = "Ripple Star 3 - 1-Up"
 ripple_star_3_t26 = "Ripple Star 3 - Star 26"
+
+dark_star_adeleine = "Dark Star - Adeleine Gift"
 
 level_names = {
     1: "Pop Star",

@@ -8,6 +8,7 @@ from typing import TYPE_CHECKING
 from NetUtils import ClientStatus
 from worlds._bizhawk.client import BizHawkClient
 
+from .consumable_info import consumables
 from .regions import default_levels
 from .rom import slot_data, crystal_requirements
 
@@ -115,6 +116,8 @@ K64_KIRBY_HEALTH = K64_SAVE_ADDRESS + 0x350
 K64_KIRBY_LIVES_VISUAL = K64_SAVE_ADDRESS + 0x388
 K64_KIRBY_HEALTH_VISUAL = K64_SAVE_ADDRESS + 0x38C
 K64_INVINCIBILITY_CANDY = 0x12E7C9
+
+K64_CONSUMABLES = 0x500000
 
 K64_SPLIT_POWER_COMBO = slot_data
 K64_DEATHLINK = slot_data + 1
@@ -265,7 +268,8 @@ class K64Client(BizHawkClient):
 
         (halken, is_demo, game_state, stage_array, boss_crystals, crystal_array,
          copy_ability, crystals, recv_index, health, health_visual,
-         lives, lives_visual, current_level, current_stage, menu_level) = await read(ctx.bizhawk_ctx, [
+         lives, lives_visual, current_level, current_stage,
+         menu_level, consumable_checks) = await read(ctx.bizhawk_ctx, [
             (K64_SAVE_ADDRESS, 16, "RDRAM"),
             (K64_IS_DEMO, 4, "RDRAM"),
             (K64_GAME_STATE, 4, "RDRAM"),
@@ -282,6 +286,7 @@ class K64Client(BizHawkClient):
             (K64_CURRENT_LEVEL, 4, "RDRAM"),
             (K64_CURRENT_STAGE, 4, "RDRAM"),
             (K64_MENU_LEVEL, 4, "RDRAM"),
+            (K64_CONSUMABLES, 0xC00, "RDRAM"),
             ])
 
         if halken != b'-HALKEN--KIRBY4-':
@@ -388,6 +393,15 @@ class K64Client(BizHawkClient):
                         new_checks.append(current_crystal)
                     shifter += 1
                     current_crystal += 1
+
+        # check consumables
+        for location in ctx.missing_locations:
+            if location in consumables:
+                idx, shift = consumables[location]
+                check_val = int.from_bytes(consumable_checks[idx: idx + 8])
+                if check_val & shift:
+                    new_checks.append(location)
+
 
         for new_check_id in new_checks:
             ctx.locations_checked.add(new_check_id)

@@ -1,7 +1,8 @@
 import typing
 
 from BaseClasses import Region, CollectionState, ItemClassification
-from .locations import K64Location, location_table
+from .consumable_info import consumable_by_level
+from .locations import K64Location, location_table, star_locations, food_locations, one_up_locations
 from .items import K64Item
 from .names import LocationName, ItemName
 from .rules import (burn_levels, needle_levels, stone_levels,
@@ -182,14 +183,29 @@ def create_levels(world: "K64World") -> None:
                                world.player, world.multiworld)
             levels[level].connect(region)
             crystals = [(((real_stage & 0xFF) - 1) * 3) + i + 0x0101 for i in range(3) if not real_stage & 0x200]
+            consumables = range(*consumable_by_level[real_stage])
+            real_consumables = []
+            for consumable in consumables:
+                if consumable in star_locations and "Stars" in world.options.consumables:
+                    real_consumables.append(consumable)
+                elif consumable in one_up_locations and "1-Up" in world.options.consumables:
+                    real_consumables.append(consumable)
+                elif consumable in food_locations and "Food" in world.options.consumables:
+                    real_consumables.append(consumable)
             locations = {
                 location_table[code]: code for code in location_table
-                if code in [real_stage, *crystals]
+                if code in [real_stage, *crystals, *real_consumables]
             }
+
             region.add_locations(locations, K64Location)
             world.multiworld.regions.append(region)
 
-    level7.add_locations({LocationName.dark_star: None}, K64Location)
+    dark_star_locations: dict[str, int|None] = {LocationName.dark_star: None}
+
+    if "Food" in world.options.consumables:
+        dark_star_locations[LocationName.dark_star_adeleine] = 0x0761
+
+    level7.add_locations(dark_star_locations, K64Location)
 
     menu.connect(level1, "Start Game")
     level1.connect(level2, "To Level 2")
