@@ -17,7 +17,7 @@ MM1NESHASH = "4de82cfceadbf1a5e693b669b1221107"
 PROTEUSHASH = "b69fff40212b80c94f19e786d1efbf61"
 
 wily_requirement = 0x1AAB4
-energylink = 0x1FF69
+energylink = 0x1FF8A
 
 MM1_BOSS_WEAKNESSES = {
     0: 0x1FDFE,  # Cut Man

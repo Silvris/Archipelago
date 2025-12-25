@@ -28,6 +28,10 @@ norom
 !rbm_strobe = $CA ; unsure on feasibility here, but better to reserve early
 !boss_refights = $CB 
 
+!PpuControl_2000 = $2000
+!PpuMask_2001 = $2001
+!PpuAddr_2006 = $2006
+!PpuData_2007 = $2007
 
 macro org(address,bank)
     if <bank> == $07
@@ -70,6 +74,10 @@ RerouteWilyVisual:
     JSR RerouteWily
     NOP
 
+%org($B655, $06)
+HookRBMTiles:
+    JMP RBMRefreshHook
+
 %org($B665, $06)
 RerouteWilyVisual2:
     JSR RerouteWily
@@ -83,6 +91,10 @@ RerouteGutsCheck:
 
 %org($B6AE, $06)
 GutsCheckTarget:
+
+%org($B724, $06)
+HookStageSelectLoop:
+    JMP StageSelectLoopHook
 
 %org($B72A, $06)
 HijackStageSelect:
@@ -109,6 +121,10 @@ RerouteStageClear:
     LDA !cleared_robot_master
     ORA $C148, X
     STA !cleared_robot_master
+
+%org($C847, $07)
+ConsumableFunc:
+    JMP ConsumableCheck
 
 %org($C863, $07)
 HookConsumableDrop:
@@ -201,6 +217,40 @@ RerouteWily:
     LDA #$00
     RTS
 
+StageSelectLoopHook:
+    LDA !rbm_strobe
+    BEQ .Continue
+    ;// beware ye who enter here
+    LDA !PpuMask_2001
+    AND #$E7
+    STA !PpuMask_2001
+    JMP $B59C
+    .ReturnFrom:
+    LDA !PpuMask_2001
+    ORA #$18
+    STA !PpuMask_2001
+    LDA #$00
+    STA !rbm_strobe
+    .Continue:
+    LDA $18
+    AND #$C8
+    BEQ .ReturnFalse
+    JMP $B72A
+    .ReturnFalse:
+    JMP $B75E
+
+RBMRefreshHook:
+    ;// this one is done differently than usual
+    ;// we hook to return rather than to start
+    LDA !rbm_strobe
+    BNE .ReturnTrue
+    ;// false code path, a real load
+    STX !PpuAddr_2006
+    JMP $B658
+    .ReturnTrue:
+    JMP StageSelectLoopHook_ReturnFrom
+    
+
 assert realbase() <= $01AB00 ;
 
 
@@ -254,16 +304,31 @@ ForceGameOver:
     STA !deathlink
     JMP $C219
 
-Energylink:
-    TAX
-    print "Energylink: ", hex(realbase())
-    LDA #$00
-    BEQ .ApplyNormal
-    TXA
-    STA !energylink_packet
+ConsumableCheck:
+    CPY #$12
+    BEQ .QuickCheck
+    CPY #$0C
+    BCS .QuickJump
+    .QuickCheck:
+    LDY $0640, X
+    BEQ .Check
+    .QuickJump:
+    JMP ($0004)
+    .Check:
+    LDA $0460, X
+    STA $07E0
+    LDA $0480, X
+    STA $07E1
+    LDA !current_stage
+    STA $07E2
     RTS
+
+Energylink:
+    print "Energylink: ", hex(realbase())
+    LDX #$00
+    BEQ .ApplyNormal
+    STA !energylink_packet
     .ApplyNormal:
-    TXA
     STA $AD
     RTS
 
@@ -271,17 +336,15 @@ ELLife:
     LDA Energylink+2
     BEQ .ApplyNormal
     ; we kinda get free reign to put anything here
-    LDA #$FE
-    STA !energylink_packet
-    LDA #$00
-    JMP $C87F
-    .ApplyNormal:
     LDA #$32
+    STA !energylink_packet
+    .ApplyNormal:
     CPX #$63
     BCS .RetFalse
     JMP $C86F
     .RetFalse:
-    JMP $C87F
+    RTS
+
 
 SetStageClear:
     JSR $C01B ; this first, so we're just adding a new subroutine to our check
@@ -336,4 +399,5 @@ SetBossRefight:
     STA !boss_refights
     .Return:
     RTS
-assert realbase() <= $01FFE0 ;
+print hex(realbase())
+assert realbase() < $01FFF0 ;
