@@ -10,6 +10,7 @@ import struct
 import settings
 from worlds.Files import APProcedurePatch, APTokenMixin, APTokenTypes, APPatchExtension
 import bsdiff4
+from io import BytesIO
 
 from .aesthetics import write_aesthetics
 from .regions import default_levels
@@ -285,12 +286,33 @@ def patch_rom(world: "K64World", player: int, patch: K64ProcedurePatch):
 
     patch.write_file("token_data.bin", patch.get_token_binary())
 
+def read_n64_rom(path: str) -> bytes:
+    with open(path, "rb", buffering=0) as f:
+        if path.endswith(".n64"):
+            # little endian, byteswap on the half
+            byte_data = bytearray(f.read())
+            for i in range(0, len(byte_data), 2):
+                temp = byte_data[i]
+                byte_data[i] = byte_data[i + 1]
+                byte_data[i + 1] = temp
+            f = BytesIO(byte_data)
+        elif path.endswith(".v64"):
+            # byteswapped, byteswap on the word
+            byte_data = bytearray(f.read())
+            for i in range(0, len(byte_data), 4):
+                temp = byte_data[i]
+                byte_data[i] = byte_data[i + 3]
+                byte_data[i + 1] = byte_data[i + 2]
+                byte_data[i + 2] = byte_data[i + 1]
+                byte_data[i + 3] = temp
+            f = BytesIO(byte_data)
+        return f.read()
 
 def get_base_rom_bytes() -> bytes:
     rom_file: str = get_base_rom_path()
     base_rom_bytes: Optional[bytes] = getattr(get_base_rom_bytes, "base_rom_bytes", None)
     if not base_rom_bytes:
-        base_rom_bytes = bytes(Utils.read_snes_rom(open(rom_file, "rb")))
+        base_rom_bytes = bytes(read_n64_rom(rom_file))
 
         basemd5 = hashlib.md5()
         basemd5.update(base_rom_bytes)
