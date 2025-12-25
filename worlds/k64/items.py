@@ -116,7 +116,7 @@ misc_item_table = {
 }
 
 filler_item_weights = {
-    ItemName.one_up: 3,
+    ItemName.one_up: 2,
     ItemName.maxim_tomato: 1,
     ItemName.ice_cream: 1,
     ItemName.sandwich: 1,
