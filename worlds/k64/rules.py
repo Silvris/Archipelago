@@ -533,6 +533,14 @@ def set_rules(world: "K64World") -> None:
         set_rule(world.multiworld.get_location(f"{LocationName.level_names[i]} - Boss Defeated", world.player),
                  lambda state, j=level: state.has(ItemName.crystal_shard, world.player, j))
 
+    # Consumables
+    if "1-Ups" in world.options.consumables:
+        set_oneup_rules(world)
+    if "Food" in world.options.consumables:
+        set_food_rules(world)
+    if "Stars" in world.options.consumables:
+        set_star_rules(world)
+
     # Friend Requirement
     add_rule(world.get_entrance("To Level 7"), lambda state: state.has_all([ItemName.waddle_dee, ItemName.adeleine,
                                                                             ItemName.king_dedede], world.player))
