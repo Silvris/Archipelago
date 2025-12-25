@@ -566,18 +566,21 @@ sw      t5, 0x0000 (t6)
 j       0x80220BF0
 nop
 
-MatchAdeleineVisual://; all temp safe with return specific
-lui     t4, 0x800D
-lb      t4, 0x6C81 (t4)
-bnez    t4, @@Return
+MatchAdeleineVisual://; t8 safe with return set
+lui     t8, 0x800D
+lb      t8, 0x6C81 (t8)
+bnez    t8, @@Return
 nop
-scale_gobj a0
-li      t4, 0x26A
-safe_call PlaySFX, t4, t4
+mtc1    r0, f0
+swc1    f0, 0x4554 (at)
+swc1    f0, 0x4710 (at)
+swc1    f0, 0x48D0 (at)
+
 @@Return:
-addiu   sp, sp, -0x18
-j       0x802209EC
-sw      ra, 0x0014 (sp)
+swc1    f0, 0x4550 (at)
+lw      t8, 0x0000 (v1)
+j       0x80220AD8
+nop
 
 PaintingAdeleineOverride://; t4 safe
 lui     t4, 0x800D
@@ -869,7 +872,7 @@ nop
 j       MatchAdeleineOverride
 //; already followed by nop
 
-.org 0x802209E4
+.org 0x80220AD0
 j       MatchAdeleineVisual
 nop
 

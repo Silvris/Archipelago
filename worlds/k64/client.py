@@ -340,11 +340,11 @@ class K64Client(BizHawkClient):
             elif item.item == 0x0024:
                 # Small Star
                 writes.extend([
-                    (K64_STAR_COUNT, int.to_bytes(int.from_bytes(star_count, "little") + 1, 4, "little"), "RDRAM"),
+                    (K64_STAR_COUNT, int.to_bytes(int.from_bytes(star_count, "big") + 1, 4, "big"), "RDRAM"),
                 ])
             elif item.item in (0x0025, 0x0026, 0x0027, 0x0028):
                 # Food
-                new_health = min(struct.unpack(">f", health)[0] + 1, 6)
+                new_health = min(int(struct.unpack(">f", health)[0]) + 1, 6)
                 writes.extend([
                     (K64_KIRBY_HEALTH, struct.pack(">f", new_health), "RDRAM"),
                     (K64_KIRBY_HEALTH_VISUAL, struct.pack(">I", new_health), "RDRAM"),
@@ -426,7 +426,7 @@ class K64Client(BizHawkClient):
 
         for new_check_id in new_checks:
             ctx.locations_checked.add(new_check_id)
-            location = ctx.location_names[new_check_id]
+            location = ctx.location_names.lookup_in_slot(new_check_id)
             k64_logger.info(
                 f'New Check: {location} ({len(ctx.locations_checked)}/'
                 f'{len(ctx.missing_locations) + len(ctx.checked_locations)})')
