@@ -47,15 +47,22 @@ default_levels = {
     6: [0x0014, 0x0015, 0x0016, 0x0205],
 }
 
-first_stage_blacklist = {
-
+first_level_restrict = {
+    0x0009,
+    0x000A,
+    0x000D,
+    0x000F,
+    0x0010,
+    0x0013,
+    0x0015,
 }
 
 
-def generate_valid_level(level, stage, possible_stages, slot_random):
+def generate_valid_level(level, stage, possible_stages, restrict, slot_random):
     new_stage = slot_random.choice(possible_stages)
-    if level == 1 and stage == 0 and new_stage in first_stage_blacklist:
-        return generate_valid_level(level, stage, possible_stages, slot_random)
+    possible_stages.remove(new_stage)
+    if restrict and new_stage in first_level_restrict:
+        return generate_valid_level(level, stage, possible_stages, restrict, slot_random)
     else:
         return new_stage
 
@@ -98,8 +105,14 @@ def generate_valid_levels(world: "K64World", enforce_world: bool) -> dict:
                                         if (not enforce_world)
                                         or (enforce_world and candidate in default_levels[level])
                                         ]
-                    new_stage = generate_valid_level(level, stage, stage_candidates,
-                                                     world.random)
+                    if level == 1:
+                        if any(levels[level][x] in first_level_restrict for x in range(len(levels[level]))):
+                            restrict = True
+                        else:
+                            restrict = False
+                    else:
+                        restrict = False
+                    new_stage = generate_valid_level(level, stage, stage_candidates, restrict, world.random)
                     possible_stages.remove(new_stage)
                     levels[level][stage] = new_stage
             except Exception:

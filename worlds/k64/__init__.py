@@ -100,6 +100,12 @@ class K64World(World):
         self.boss_requirements: list[int] = []
         self.player_levels = default_levels.copy()
 
+    def generate_early(self) -> None:
+        if self.multiworld.players == 1 and self.options.required_crystals.value > 90:
+            logger.warning(f"Kirby 64 ({self.player_name}): Required Crystal percentage is too high "
+                           f"for a single player game, setting to 90.")
+            self.options.required_crystals.value = 90
+
     create_regions = create_levels
 
     def create_item(self, name: str, force_non_progression=False) -> K64Item:
