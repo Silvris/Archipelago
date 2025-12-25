@@ -289,7 +289,7 @@ class K64Client(BizHawkClient):
             (K64_CURRENT_LEVEL, 4, "RDRAM"),
             (K64_CURRENT_STAGE, 4, "RDRAM"),
             (K64_MENU_LEVEL, 4, "RDRAM"),
-            (K64_CONSUMABLES, 0xC00, "RDRAM"),
+            (K64_CONSUMABLES, 0xC80, "RDRAM"),
             (K64_STAR_COUNT, 4, "RDRAM"),
             ])
 
