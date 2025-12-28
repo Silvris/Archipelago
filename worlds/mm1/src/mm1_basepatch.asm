@@ -16,7 +16,6 @@ norom
 !current_weapon = $5F
 !megaman_hp = $6A
 !bonus_balls = $AE
-; !received_index = $C0
 !cleared_robot_master = $C1
 !unlocked_robot_master = $C2
 !deathlink = $C3
@@ -27,6 +26,7 @@ norom
 !play_sfx = $C9
 !rbm_strobe = $CA ; unsure on feasibility here, but better to reserve early
 !boss_refights = $CB 
+; !received_index = $CC
 
 !PpuControl_2000 = $2000
 !PpuMask_2001 = $2001
