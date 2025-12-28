@@ -82,7 +82,7 @@ class KSSWorld(World):
                                F"adding to included subgames")
                 self.options.included_subgames.value.add(game)
 
-        if self.options.starting_subgame.current_option_name not in self.options.included_subgames:
+        if subgame_mapping[self.options.starting_subgame.value] not in self.options.included_subgames:
             logger.warning(f"Kirby Super Star ({self.player_name}): Starting subgame not included, choosing random.")
             self.options.starting_subgame.value = self.random.choice([value[0] for value in subgame_mapping.items()
                                                                       if value[1] in self.options.included_subgames])
