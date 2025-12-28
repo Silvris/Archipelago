@@ -5,7 +5,7 @@ import settings
 import threading
 import Utils
 from worlds.AutoWorld import World, WebWorld
-from BaseClasses import ItemClassification, Item, Location, Tutorial
+from BaseClasses import ItemClassification, Item, Location, Tutorial, MultiWorld
 from copy import deepcopy
 from hashlib import md5
 from Options import OptionError
@@ -82,11 +82,12 @@ class MM1World(World):
     web = MM1WebWorld()
     weapon_damage: dict[int, list[int]]
 
-    def __init__(self, multiworld, player):
+    def __init__(self, multiworld: MultiWorld, player: int) -> None:
         super().__init__(multiworld, player)
         self.rom_name = bytearray()
         self.rom_name_available_event = threading.Event()
         self.weapon_damage = deepcopy(weapon_damage)
+        self.wily_weapons: dict[int, set[int]] = {}
 
     def generate_early(self) -> None:
         if self.multiworld.players == 1 and self.options.required_weapons >= 4:
@@ -96,9 +97,9 @@ class MM1World(World):
             self.options.required_weapons.value = num
 
     def create_item(self, name: str) -> MM1Item:
-        if name not in all_items:
+        item_data = all_items.get(name, None)
+        if not item_data:
             raise OptionError(f"{name} is not a valid item name for Mega Man.")
-        item_data = all_items.get(name)
         classification = ItemClassification.filler
         if item_data.progression:
             classification |= ItemClassification.progression
@@ -106,7 +107,7 @@ class MM1World(World):
             classification |= ItemClassification.useful
         return MM1Item(name, classification, item_data.item_id, self.player)
 
-    def create_regions(self):
+    def create_regions(self) -> None:
         menu = MM1Region(self.origin_region_name, self.player, self.multiworld)
         regions = [menu]
         for region in mm1_regions:
@@ -128,7 +129,7 @@ class MM1World(World):
             parent_region.connect(self.get_region(region.name), f"To {region.name}",
                                   lambda state, req=tuple(region.required_items): state.has_all(req, self.player))
 
-    def create_items(self):
+    def create_items(self) -> None:
         # Define our local itempool
         itempool = []
         starting_robot_master = self.item_id_to_name[self.options.starting_robot_master.value + 0x11]
@@ -137,6 +138,8 @@ class MM1World(World):
                          if name != starting_robot_master])
         itempool.extend([self.create_item(name) for name in weapons.keys()])
         itempool.append(self.create_item("Magnet Beam"))
+        if self.options.consumables:
+            itempool.append(self.create_item("Yashichi")) # Ensure only one in the pool by default
         filler_count = len(self.multiworld.get_unfilled_locations(self.player)) - len(itempool)
         itempool.extend(self.create_item(item)
                         for item in self.random.choices(["1-Up", "Health Energy (L)", "Weapon Energy (L)"],

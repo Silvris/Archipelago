@@ -66,7 +66,7 @@ class MM1ProcedurePatch(APProcedurePatch, APTokenMixin):
         self.write_token(APTokenTypes.WRITE, offset, bytes(value))
 
 
-def patch_rom(world: "MM1World", patch: MM1ProcedurePatch):
+def patch_rom(world: "MM1World", patch: MM1ProcedurePatch) -> None:
     patch.write_file("mm1_basepatch.bsdiff4", pkgutil.get_data(__name__, "data/mm1_basepatch.bsdiff4"))
 
     patch.write_byte(wily_requirement + 1, world.options.required_weapons.value)

@@ -42,7 +42,7 @@ weapon_costs = {
 }
 
 
-def validate_fights(world: "MM1World", fights: tuple[int, ...]):
+def validate_fights(world: "MM1World", fights: tuple[int, ...]) -> dict[int, set[int]]:
     boss_health = {boss: 0x1C if boss != 9 else 0x1C * 2 for boss in fights}
 
     weapon_energy = {key: float(0x1C) for key in weapon_costs}
@@ -56,9 +56,9 @@ def validate_fights(world: "MM1World", fights: tuple[int, ...]):
         )
         for boss, weapon_damages in weapon_boss.items() if boss != 9
     }
-    flexibility = sorted(flexibility, key=flexibility.get)  # Fast way to sort dict by value
-    used_weapons = {i: set() for i in fights}
-    for boss in flexibility:
+    flex = sorted(flexibility, key=flexibility.get)  # Fast way to sort dict by value
+    used_weapons: dict[int, set[int]] = {i: set() for i in fights}
+    for boss in flex:
         boss_damage = weapon_boss[boss]
         weapon_weight = {weapon: (weapon_energy[weapon] / damage) if damage else 0 for weapon, damage in
                          boss_damage.items() if weapon != 6 and weapon_energy[weapon] > 0}
@@ -206,20 +206,20 @@ def set_rules(world: "MM1World"):
     for boss, locations in boss_locations.items():
         if world.weapon_damage[0][boss] > 0:
             continue  # this can always be in logic
-        weapons = []
+        boss_weapons: list[str] = []
         for weapon in range(1, 7):
             if world.weapon_damage[weapon][boss] > 0:
                 if world.weapon_damage[weapon][boss] < minimum_weakness_requirement[weapon]:
                     continue
-                weapons.append(weapons_to_name[weapon])
-        if not weapons:
+                boss_weapons.append(weapons_to_name[weapon])
+        if not boss_weapons:
             raise Exception(f"Attempted to have boss {boss} with no weakness! Seed: {world.multiworld.seed}")
         for location in locations:
             if "Wily" in location and boss != 8:
                 # Special case: Super Arm cannot be logical for any Wily locations
-                add_rule(world.get_location(location), lambda state, weps=tuple([wep for wep in weapons if wep != "Super Arm"]): state.has_any(weps, world.player))
+                add_rule(world.get_location(location), lambda state, weps=tuple([wep for wep in boss_weapons if wep != "Super Arm"]): state.has_any(weps, world.player))
             else:
-                add_rule(world.get_location(location), lambda state, weps=tuple(weapons): state.has_any(weps, world.player))
+                add_rule(world.get_location(location), lambda state, weps=tuple(boss_weapons): state.has_any(weps, world.player))
 
     # magnet beam
     set_rule(world.get_location("Elec Man Stage - Magnet Beam"),

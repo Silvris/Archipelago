@@ -2,7 +2,7 @@ import logging
 import time
 from enum import IntEnum
 from base64 import b64encode
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, Sequence
 from NetUtils import ClientStatus, color, NetworkItem
 from worlds._bizhawk.client import BizHawkClient
 
@@ -194,7 +194,7 @@ def cmd_request(self: "BizHawkClientCommandProcessor", amount: str, target: str)
     logger.info(f"Restoring {amount} {request_to_name[target.upper()]}.")
 
 
-def cmd_autoheal(self) -> None:
+def cmd_autoheal(self: "BizHawkClientCommandProcessor") -> None:
     """Enable auto heal from EnergyLink."""
     if self.ctx.game != "Mega Man":
         logger.warning("This command can only be used when playing Mega Man.")
@@ -355,7 +355,7 @@ class MegaMan1Client(BizHawkClient):
                 "cmd": "StatusUpdate",
                 "status": ClientStatus.CLIENT_GOAL
             }])
-        writes = []
+        writes: list[tuple[int, Sequence[int], str]] = []
 
         # deathlink
         if self.death_link:
@@ -443,20 +443,20 @@ class MegaMan1Client(BizHawkClient):
             # Weapon Energy
             # We parse the whole thing to spread it as thin as possible
             current_energy = self.weapon_energy
-            weapon_energy = bytearray(weapon_energy)
-            for i, weapon in zip(range(len(weapon_energy)), weapon_energy):
+            wep_energy = bytearray(weapon_energy)
+            for i, weapon in zip(range(len(wep_energy)), wep_energy):
                 if weapon < 0x1C:
                     missing = 0x1C - weapon
                     if missing > self.weapon_energy:
                         missing = self.weapon_energy
                     self.weapon_energy -= missing
-                    weapon_energy[i] = weapon + missing
+                    wep_energy[i] = weapon + missing
                     if not self.weapon_energy:
-                        writes.append((MM1_HEALTH + 1, weapon_energy, "RAM"))
+                        writes.append((MM1_HEALTH + 1, wep_energy, "RAM"))
                         break
             else:
                 if current_energy != self.weapon_energy:
-                    writes.append((MM1_HEALTH + 1, weapon_energy, "RAM"))
+                    writes.append((MM1_HEALTH + 1, wep_energy, "RAM"))
 
         if self.health_energy or self.auto_heal:
             # Health Energy
@@ -528,7 +528,7 @@ class MegaMan1Client(BizHawkClient):
             elif idx == 3:
                 # Yashichi, full health and weapon refill
                 writes.extend(get_sfx_writes(0x1a))
-                writes.extend((MM1_HEALTH, bytes([0x1C]*8), "RAM"))
+                writes.append((MM1_HEALTH, bytes([0x1C]*8), "RAM"))
 
         await write(ctx.bizhawk_ctx, writes)
 
