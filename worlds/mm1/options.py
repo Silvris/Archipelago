@@ -105,7 +105,6 @@ class Consumables(Toggle):
     Whether in-stage consumable pickups should be randomized. This includes the Yashichi.
     """
     display_name = "Consumables"
-    visibility = Visibility.none
 
 
 class EnergyLink(Toggle):

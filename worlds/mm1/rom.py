@@ -31,6 +31,15 @@ MM1_BOSS_WEAKNESSES = {
     8: 0x1FE3E,  # CWU 001
     9: 0x1FE46,  # Wily Machine
 }
+MM1_ENEMY_WEAKNESSES = {
+    0: 0x1FC61,
+    1: 0x1FC9C,
+    2: 0x1FCD7,
+    3: 0x1FD12,
+    4: 0x1FD4D,
+    5: 0x1FD88,
+    6: 0x1FDC3,
+}
 
 MM1_MUSIC = 0x153A4
 
@@ -70,6 +79,9 @@ def patch_rom(world: "MM1World", patch: MM1ProcedurePatch):
                 world.weapon_damage[weapon][boss] if world.weapon_damage[weapon][boss] >= 0 else world.weapon_damage[weapon][boss] + 256
                 for weapon in range(7)
             ])
+        # like boobeam, CWU is considered an enemy
+        for weapon, ptr in MM1_ENEMY_WEAKNESSES.items():
+            patch.write_byte(ptr + 0x3A, world.weapon_damage[weapon][8])
 
     if world.options.random_music:
         if world.options.random_music == RandomMusic.option_shuffled:

@@ -2,7 +2,7 @@ import logging
 import time
 from enum import IntEnum
 from base64 import b64encode
-from typing import TYPE_CHECKING, Dict, Tuple, List, Optional, Any
+from typing import TYPE_CHECKING, Any
 from NetUtils import ClientStatus, color, NetworkItem
 from worlds._bizhawk.client import BizHawkClient
 
@@ -25,7 +25,7 @@ class MM1EnergyLinkType(IntEnum):
     OneUP = 8
 
 
-request_to_name: Dict[str, str] = {
+request_to_name: dict[str, str] = {
     "HP": "health",
     "RC": "Rolling Cutter energy",
     "IS": "Ice Slasher energy",
@@ -44,7 +44,6 @@ ONEUP_EXCHANGE_RATE = 14000000000
 MM1_UNLOCKED_WEAPONS = 0x5D
 MM1_HEALTH = 0x6A  # weapon energy immediately follows
 MM1_LIVES = 0xA6
-MM1_RECEIVED_ITEMS = 0xC0
 MM1_CLEARED_RBM = 0xC1
 MM1_UNLOCKED_RBM = 0xC2
 MM1_DEATHLINK = 0xC3
@@ -53,8 +52,10 @@ MM1_MAGNET_BEAM = 0xC5
 MM1_LAST_WILY = 0xC6
 MM1_COMPLETED_STAGES = 0xC7  # and C8
 MM1_SFX_QUEUE = 0xC9
-MM1_RBM_STROBE = 0xCA  # not implemented yet
+MM1_RBM_STROBE = 0xCA
 MM1_BOSS_REFIGHTS = 0xCB
+MM1_RECEIVED_ITEMS = 0xCC # C0 is used in a single location, the credits
+MM1_CONSUMABLE_CHECK = 0x7E0
 
 MM1_STAGE_CHECKS = {
     0: 1,
@@ -171,7 +172,7 @@ def cmd_request(self: "BizHawkClientCommandProcessor", amount: str, target: str)
     if not self.ctx.server or not self.ctx.slot:
         logger.warning("You must be connected to a server to use this command.")
         return
-    valid_targets: Dict[str, MM1EnergyLinkType] = {
+    valid_targets: dict[str, MM1EnergyLinkType] = {
         "HP": MM1EnergyLinkType.Life,
         "RC": MM1EnergyLinkType.RollingCutter,
         "IS": MM1EnergyLinkType.IceSlasher,
@@ -211,7 +212,7 @@ def cmd_autoheal(self) -> None:
             logger.info(f"Auto healing enabled.")
 
 
-def get_sfx_writes(sfx: int) -> Tuple[Tuple[int, bytes, str], ...]:
+def get_sfx_writes(sfx: int) -> tuple[tuple[int, bytes, str], ...]:
     return (MM1_SFX_QUEUE, sfx.to_bytes(1, 'little'), "RAM"),
 
 
@@ -219,7 +220,7 @@ class MegaMan1Client(BizHawkClient):
     game = "Mega Man"
     system = "NES"
     patch_suffix = ".apmm1"
-    item_queue: List[NetworkItem] = []
+    item_queue: list[NetworkItem] = []
     pending_death_link: bool = False
     # default to true, as we don't want to send a deathlink until Mega Man's HP is initialized once
     sending_death_link: bool = True
@@ -229,8 +230,8 @@ class MegaMan1Client(BizHawkClient):
     weapon_energy: int = 0
     health_energy: int = 0
     auto_heal: bool = False
-    refill_queue: List[Tuple[MM1EnergyLinkType, int]] = []
-    last_wily: Optional[int] = None  # default to wily 1
+    refill_queue: list[tuple[MM1EnergyLinkType, int]] = []
+    last_wily: int | None = None  # default to wily 1
 
     async def validate_rom(self, ctx: "BizHawkClientContext") -> bool:
         from worlds._bizhawk import RequestFailedError, read, get_memory_size
@@ -292,15 +293,15 @@ class MegaMan1Client(BizHawkClient):
         if self.rom:
             ctx.auth = b64encode(self.rom).decode()
 
-    def on_package(self, ctx: "BizHawkClientContext", cmd: str, args: Dict[str, Any]) -> None:
+    def on_package(self, ctx: "BizHawkClientContext", cmd: str, args: dict[str, Any]) -> None:
         if cmd == "Bounced":
             if "tags" in args:
                 assert ctx.slot is not None
                 if "DeathLink" in args["tags"] and args["data"]["source"] != ctx.slot_info[ctx.slot].name:
                     self.on_deathlink(ctx)
         elif cmd == "Retrieved":
-            if f"MM2_LAST_WILY_{ctx.team}_{ctx.slot}" in args["keys"]:
-                self.last_wily = args["keys"][f"MM2_LAST_WILY_{ctx.team}_{ctx.slot}"]
+            if f"MM1_LAST_WILY_{ctx.team}_{ctx.slot}" in args["keys"]:
+                self.last_wily = args["keys"][f"MM1_LAST_WILY_{ctx.team}_{ctx.slot}"]
         elif cmd == "Connected":
             if self.energy_link:
                 ctx.set_notify(f"EnergyLink{ctx.team}")
@@ -328,7 +329,8 @@ class MegaMan1Client(BizHawkClient):
         # get our relevant bytes
         items_received, robot_masters_unlocked, robot_masters_defeated, magnet_beam_get, \
             weapons_unlocked, lives, weapon_energy, health, death_link_status, \
-            energy_link_packet, last_wily, completed_stages, boss_refights = await read(ctx.bizhawk_ctx, [
+            energy_link_packet, last_wily, completed_stages, boss_refights,\
+            consumable_check = await read(ctx.bizhawk_ctx, [
                 (MM1_RECEIVED_ITEMS, 1, "RAM"),
                 (MM1_UNLOCKED_RBM, 1, "RAM"),
                 (MM1_CLEARED_RBM, 1, "RAM"),
@@ -342,6 +344,7 @@ class MegaMan1Client(BizHawkClient):
                 (MM1_LAST_WILY, 1, "RAM"),
                 (MM1_COMPLETED_STAGES, 2, "RAM"),
                 (MM1_BOSS_REFIGHTS, 1, "RAM"),
+                (MM1_CONSUMABLE_CHECK, 3, "RAM")
             ])
 
         #if difficulty[0] not in (0, 1):
@@ -367,19 +370,19 @@ class MegaMan1Client(BizHawkClient):
             elif health[0] != 0x00 and not death_link_status[0]:
                 self.sending_death_link = False
 
-        if self.last_wily != last_wily[0]:
+        if self.last_wily != int.from_bytes(last_wily, "little"):
             if self.last_wily is None:
                 # revalidate last wily from data storage
                 await ctx.send_msgs([{"cmd": "Set", "key": f"MM1_LAST_WILY_{ctx.team}_{ctx.slot}", "operations": [
                     {"operation": "default", "value": 8}
                 ]}])
                 await ctx.send_msgs([{"cmd": "Get", "keys": [f"MM1_LAST_WILY_{ctx.team}_{ctx.slot}"]}])
-            elif last_wily[0] == 0:
+            elif int.from_bytes(last_wily, "little") == 0:
                 writes.append((MM1_LAST_WILY, self.last_wily.to_bytes(1, "little"), "RAM"))
             else:
                 # correct our setting
-                self.last_wily = last_wily[0]
-                await ctx.send_msgs([{"cmd": "Set", "key": f"MM2_LAST_WILY_{ctx.team}_{ctx.slot}", "operations": [
+                self.last_wily = int.from_bytes(last_wily, "little")
+                await ctx.send_msgs([{"cmd": "Set", "key": f"MM1_LAST_WILY_{ctx.team}_{ctx.slot}", "operations": [
                     {"operation": "replace", "value": self.last_wily}
                 ]}])
 
@@ -551,12 +554,10 @@ class MegaMan1Client(BizHawkClient):
                 if boss_id not in ctx.checked_locations:
                     new_checks.append(boss_id)
 
-        #for consumable in MM2_CONSUMABLE_TABLE:
-        #    if consumable not in ctx.checked_locations:
-        #        is_checked = consumable_checks[MM2_CONSUMABLE_TABLE[consumable][0]] \
-        #                     & MM2_CONSUMABLE_TABLE[consumable][1]
-        #        if is_checked:
-        #            new_checks.append(consumable)
+        consumable_tuple = (consumable_check[0], consumable_check[1], consumable_check[2])
+        if consumable_tuple in MM1_CONSUMABLES:
+            if MM1_CONSUMABLES[consumable_tuple] not in ctx.checked_locations:
+                new_checks.append(MM1_CONSUMABLES[consumable_tuple])
 
         for new_check_id in new_checks:
             ctx.locations_checked.add(new_check_id)
