@@ -136,6 +136,14 @@ class Essences(Toggle):
 class KirbyFlavorPreset(TextChoice, OptionDict):
     """
     The color of Kirby, from a list of presets.
+    Can also accept a valid preset defined in `kirby_flavors`, 1/2 direct hex colors (#RRGGBB|#RRGGBB), a single hex
+    color and a method to derive a second color (#RRGGBB|complement/analogous/intensify), or a dict taking each Copy
+    Ability (and Kirby) as a key and one of the former options as the value.
+
+    kirby_flavor_preset:
+        kirby: #99EEDD|analogous
+        Copy: bubblegum
+        Cutter: #AAEEDD
     """
     display_name = "Kirby Flavor"
     valid_keys = sorted(palette_addresses.keys())
