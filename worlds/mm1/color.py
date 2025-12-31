@@ -207,7 +207,7 @@ def write_palette_shuffle(world: "MM1World", rom: "MM1ProcedurePatch") -> None:
         for pointer in palette_pointers[character]:
             rom.write_bytes(pointer, bytes(palettes_to_write[character]))
 
-        if character == "Atomic Fire":
-            # special case, we need to update Atomic Fire's flashing routine
-            rom.write_byte(0x3DE4A, palettes_to_write[character][1])
-            rom.write_byte(0x3DE4C, palettes_to_write[character][1])
+            if character == "Mega Buster":
+                # why did they hard code the respawn palette?
+                rom.write_byte(0x12CAB, palettes_to_write[character][0])
+                rom.write_byte(0x12CB0, palettes_to_write[character][1])

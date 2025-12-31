@@ -91,10 +91,9 @@ class MM1World(World):
 
     def generate_early(self) -> None:
         if self.multiworld.players == 1 and self.options.required_weapons >= 4:
-            num = 3
             logging.warning(f"Player {self.player} ({self.player_name}): "
-                            f"Required weapons too high for singleplayer game, reducing to {num}")
-            self.options.required_weapons.value = num
+                            f"Required weapons too high for singleplayer game, reducing to 3.")
+            self.options.required_weapons.value = 3
 
     def create_item(self, name: str) -> MM1Item:
         item_data = all_items.get(name, None)

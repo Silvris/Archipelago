@@ -29,6 +29,31 @@ weapons_to_id: dict[str, int] = {
     "Super Arm": 6,
 }
 
+enemy_indexes: dict[str, int] = {
+    "Bunby Heli": 0x00,
+    "Metall": 0x01,
+    "Kamadoma": 0x02,
+    "Gabyoall": 0x03,
+    "Adhering Suzy (Vertical)": 0x04,
+    "Screw Driver": 0x05,
+    "Peng": 0x07,
+    "Killer Bomb": 0x08,
+    "Big Eye": 0x09,
+    "Mambu": 0x0A,
+    "Blaster": 0x0B,
+    "Super Cutter": 0x11,
+    "Sniper Joe": 0x12,
+    "Pickelman": 0x15,
+    "Screw Driver (Upside Down)": 0x16,
+    "Crazy Razy (Head)": 0x1D,
+    "Crazy Razy (Body)": 0x1E,
+    "Crazy Razy (Separate Head)": 0x1F,
+    "Adhering Suzy (Horizontal)": 0x21,
+    "Watcher": 0x2A,
+    "Changkey": 0x31,
+    "CWU-001": 0x3A,
+}
+
 class StartingRobotMaster(Choice):
     """
     The initial stage unlocked at the start.
@@ -58,7 +83,6 @@ class EnemyWeaknesses(Toggle):
     Randomizes the damage dealt to enemies by weapons.
     """
     display_name = "Random Enemy Weaknesses"
-    visibility = Visibility.none
 
 
 class StrictWeaknesses(Toggle):
@@ -93,7 +117,7 @@ class WeaknessPlando(OptionDict):
     """
     display_name = "Plando Weaknesses"
     schema = Schema({
-        Optional(And(str, Use(str.title), lambda s: s in bosses)): {
+        Optional(And(str, Use(str.title), lambda s: s in bosses or s in enemy_indexes)): {
             And(str, Use(str.title), lambda s: s in weapons_to_id): And(int, lambda i: i in range(-1, 15))
         }
     })
@@ -159,6 +183,7 @@ class MM1Options(PerGameCommonOptions, DeathLinkMixin):
     strict_weakness: StrictWeaknesses
     random_weakness: RandomWeaknesses
     plando_weakness: WeaknessPlando
+    enemy_weakness: EnemyWeaknesses
     consumables: Consumables
     energy_link: EnergyLink
     palette_shuffle: PaletteShuffle

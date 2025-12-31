@@ -58,6 +58,10 @@ HookPlayerControl:
     NOP
 ContinuePlayerControl:
 
+%org($B552, $06)
+CatchRefreshStandard:
+    JMP RBMRefreshEarlyHook
+
 %org($B5B8, $06)
 RerouteRBMVisual:
     LDA !unlocked_robot_master
@@ -74,9 +78,10 @@ RerouteWilyVisual:
     JSR RerouteWily
     NOP
 
-%org($B655, $06)
+%org($B6AE, $06)
 HookRBMTiles:
     JMP RBMRefreshHook
+    NOP
 
 %org($B665, $06)
 RerouteWilyVisual2:
@@ -245,13 +250,21 @@ RBMRefreshHook:
     LDA !rbm_strobe
     BNE .ReturnTrue
     ;// false code path, a real load
-    STX !PpuAddr_2006
-    JMP $B658
+    LDY #$00
+    LDX #$40
+    JMP HookRBMTiles+3
     .ReturnTrue:
     JMP StageSelectLoopHook_ReturnFrom
-    
 
-assert realbase() <= $01AB00 ;
+RBMRefreshEarlyHook:
+    ;// this one checks early if we're in a real code path
+    ;// and just removes strobe
+    ;// don't have to load A, already primed to 0
+    STA !rbm_strobe
+    STA !PpuAddr_2006
+    JMP $B555
+print hex(realbase())
+assert realbase() <= $01AB10 ;
 
 
 %org($FF00, $07)
@@ -381,9 +394,7 @@ SetBossRefight:
     STA $06C1
     LDA !current_stage
     CMP #$07
-    BEQ .Continue
-    CMP #$09
-    BNE .Return
+    BCC .Return
     .Continue:
     LDY $AC
     CPY #$06
@@ -400,4 +411,4 @@ SetBossRefight:
     .Return:
     RTS
 print hex(realbase())
-assert realbase() < $01FFF0 ;
+assert realbase() <= $01FFEC ;

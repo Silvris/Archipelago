@@ -6,7 +6,7 @@ import Utils
 
 from typing import Iterable, TYPE_CHECKING
 from worlds.Files import APProcedurePatch, APTokenMixin, APTokenTypes
-from .options import RandomMusic
+from .options import RandomMusic, enemy_indexes
 from .color import write_palette_shuffle
 
 if TYPE_CHECKING:
@@ -31,7 +31,7 @@ MM1_BOSS_WEAKNESSES = {
     8: 0x1FE3E,  # CWU 001
     9: 0x1FE46,  # Wily Machine
 }
-MM1_ENEMY_WEAKNESSES = {
+MM1_ENEMY_WEAKNESSES: dict[int, int] = {
     0: 0x1FC61,
     1: 0x1FC9C,
     2: 0x1FCD7,
@@ -72,6 +72,8 @@ def patch_rom(world: "MM1World", patch: MM1ProcedurePatch) -> None:
     patch.write_byte(wily_requirement + 1, world.options.required_weapons.value)
     patch.write_byte(energylink + 1, world.options.energy_link.value)
 
+    enemy_weaknesses: dict[str, dict[int, int]] = {}
+
     if world.options.strict_weakness or world.options.plando_weakness or world.options.random_weakness:
         # write weaknesses
         for boss, ptr in MM1_BOSS_WEAKNESSES.items():
@@ -80,8 +82,19 @@ def patch_rom(world: "MM1World", patch: MM1ProcedurePatch) -> None:
                 for weapon in range(7)
             ])
         # like boobeam, CWU is considered an enemy
-        for weapon, ptr in MM1_ENEMY_WEAKNESSES.items():
-            patch.write_byte(ptr + 0x3A, world.weapon_damage[weapon][8])
+        enemy_weaknesses["CWU-001"] = {weapon: world.weapon_damage[weapon][8] for weapon in world.weapon_damage}
+
+    if world.options.enemy_weakness:
+        for enemy in enemy_indexes:
+            if enemy == "CWU-001":
+                continue
+            enemy_weaknesses[enemy] = {weapon: world.random.randint(0, 4) * 5 for weapon in MM1_ENEMY_WEAKNESSES}
+
+    for enemy, damage_table in enemy_weaknesses.items():
+        for weapon in MM1_ENEMY_WEAKNESSES:
+            if damage_table[weapon] < 0:
+                damage_table[weapon] = 256 + damage_table[weapon]
+            patch.write_byte(MM1_ENEMY_WEAKNESSES[weapon] + enemy_indexes[enemy], damage_table[weapon])
 
     if world.options.random_music:
         if world.options.random_music == RandomMusic.option_shuffled:

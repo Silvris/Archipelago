@@ -217,7 +217,7 @@ def set_rules(world: "MM1World"):
         for location in locations:
             if "Wily" in location and boss != 8:
                 # Special case: Super Arm cannot be logical for any Wily locations
-                add_rule(world.get_location(location), lambda state, weps=tuple([wep for wep in boss_weapons if wep != "Super Arm"]): state.has_any(weps, world.player))
+                add_rule(world.get_location(location), lambda state, weps=tuple([w for w in boss_weapons if w != "Super Arm"]): state.has_any(weps, world.player))
             else:
                 add_rule(world.get_location(location), lambda state, weps=tuple(boss_weapons): state.has_any(weps, world.player))
 
