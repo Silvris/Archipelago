@@ -173,19 +173,24 @@ def get_area_quests(valid_ranks: typing.Iterable[tuple[int, int, int]], areas: t
 class MHFULocation(Location):
     game = "Monster Hunter Freedom Unite"
     monsters: list[int] | None = None
+    qid: int | None = None
 
     def can_reach(self, state: "CollectionState | MHFULogicMixin") -> bool:
         reach = super().can_reach(state)
         if self.monsters:
             mons = sorted(set(self.monsters))
             if reach:
-                for mon in mons:
-                    state.mhfu_monsters[self.player][mon] += 1
+                if self.qid and not state.mhfu_reachable_quests[self.player].get(self.qid, False):
+                    for mon in mons:
+                        state.mhfu_monsters[self.player][mon] += 1
+                    state.mhfu_reachable_quests[self.player][self.qid] = True
             else:
-                for mon in mons:
-                    state.mhfu_monsters[self.player][mon] -= 1
-                    if not state.mhfu_monsters[self.player][mon]:
-                        del state.mhfu_monsters[self.player][mon]
+                if self.qid and state.mhfu_reachable_quests[self.player].get(self.qid, False):
+                    state.mhfu_reachable_quests[self.player][self.qid] = False
+                    for mon in mons:
+                        state.mhfu_monsters[self.player][mon] -= 1
+                        if not state.mhfu_monsters[self.player][mon]:
+                            del state.mhfu_monsters[self.player][mon]
         return reach
 
 

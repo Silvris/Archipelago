@@ -15,13 +15,16 @@ if TYPE_CHECKING:
 class MHFULogicMixin(LogicMixin):
     game = "Monster Hunter Freedom Unite"
     mhfu_monsters: dict[int, Counter[int]]
+    mhfu_reachable_quests: dict[int, dict[int, bool]]
     
     def init_mixin(self, multiworld: MultiWorld):
         mhfu_players = multiworld.get_game_players(self.game)
         self.mhfu_monsters = {player: Counter() for player in mhfu_players}
+        self.mhfu_reachable_quests = {player: {} for player in mhfu_players}
 
     def copy_mixin(self, other: "MHFULogicMixin"):
         other.mhfu_monsters = deepcopy(self.mhfu_monsters)
+        other.mhfu_reachable_quests = deepcopy(self.mhfu_reachable_quests)
         return other
 
 
