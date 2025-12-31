@@ -227,7 +227,7 @@ class MM1World(World):
     def fill_slot_data(self) -> dict[str, Any]:
         return {
             "weapon_damage": self.weapon_damage,
-            "wily_5_weapons": self.wily_weapons,
+            "wily_weapons": self.wily_weapons,
             "required_weapons": self.options.required_weapons.value,
         }
 
