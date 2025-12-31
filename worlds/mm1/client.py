@@ -414,11 +414,11 @@ class MegaMan1Client(BizHawkClient):
 
         if energy_link_packet[0]:
             pickup = energy_link_packet[0]
-            if pickup in (0x02, 0x06):
+            if pickup in (0x02, 0x0A):
                 # Health pickups
                 value = pickup
                 exchange_rate = HP_EXCHANGE_RATE
-            elif pickup in (0x82, 0x86):
+            elif pickup in (0x82, 0x8A):
                 # Weapon Energy
                 value = (pickup & 0xF)
                 exchange_rate = WEAPON_EXCHANGE_RATE
