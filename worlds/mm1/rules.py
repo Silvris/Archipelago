@@ -134,7 +134,7 @@ def set_rules(world: "MM1World"):
                     if boss not in (0, 4, 5, 8) and weapon == 6:
                         # Bosses cannot take Super Arm damage
                         world.weapon_damage[weapon].append(-1)
-                    elif boss in (6, 8) and weapon == 3:
+                    elif boss in (6, 9) and weapon == 3:
                         # Bosses cannot take Hyper Bomb damage
                         world.weapon_damage[weapon].append(-1)
                     else:

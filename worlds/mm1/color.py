@@ -209,5 +209,5 @@ def write_palette_shuffle(world: "MM1World", rom: "MM1ProcedurePatch") -> None:
 
             if character == "Mega Buster":
                 # why did they hard code the respawn palette?
-                rom.write_byte(0x12CAB, palettes_to_write[character][0])
-                rom.write_byte(0x12CB0, palettes_to_write[character][1])
+                rom.write_byte(0x1C2AB, palettes_to_write[character][0])
+                rom.write_byte(0x1C2B0, palettes_to_write[character][1])
