@@ -7,13 +7,13 @@ if TYPE_CHECKING:
     from . import MM1World
 
 weapon_damage: dict[int, list[int]] = {
-    0: [3,  1,  2,  2,  1,  2,  2,  1,  2,  1],  # Mega Buster
-    1: [1,  2,  2,  2,  10, 1,  2,  1,  2,  1],  # Rolling Cutter
-    2: [0,  0,  0,  4,  0,  0,  0,  0,  0,  1],  # Ice Slasher
-    3: [2,  4,  1,  1,  2,  10, 0,  2,  7,  0],  # Hyper Bomb
-    4: [3,  1,  4,  1,  1,  2,  2,  2,  2,  4],  # Fire Storm
-    5: [1,  10, 2,  1,  1,  1,  4,  2,  4,  1],  # Thunder Beam
-    6: [14, -1, -1, -1, 4,  1,  -1, -1, 20, -1],  # Super Arm
+    0: [3,  1,  2,  2,  1,  2,  2,  1,  2,  1,  1],  # Mega Buster
+    1: [1,  2,  2,  2,  10, 1,  2,  1,  2,  1,  1],  # Rolling Cutter
+    2: [0,  0,  0,  4,  0,  0,  0,  0,  0,  1,  0],  # Ice Slasher
+    3: [2,  4,  1,  1,  2,  10, 0,  2,  7,  0,  0],  # Hyper Bomb
+    4: [3,  1,  4,  1,  1,  2,  2,  2,  2,  4,  1],  # Fire Storm
+    5: [1,  10, 2,  1,  1,  1,  4,  2,  4,  1,  1],  # Thunder Beam
+    6: [14, -1, -1, -1, 4,  1,  -1, -1, 20, -1, -1],  # Super Arm
 }
 
 weapons_to_name = {
@@ -107,6 +107,7 @@ boss_locations = {
     7: ["Copy Robot - Defeated", "Wily Stage 2 - Complete"],
     8: ["CWU-01P - Defeated", "Wily Stage 3 - Complete"],
     9: ["Wily Machine - Defeated"],
+    10: ["Wily Machine - Defeated"],
 }
 
 
@@ -115,7 +116,7 @@ def set_rules(world: "MM1World"):
     # or rules variable on settings
     if (hasattr(world.multiworld, "re_gen_passthrough")
             and "Mega Man" in getattr(world.multiworld, "re_gen_passthrough")):
-        slot_data = getattr(world.multiworld, "re_gen_passthrough")["Mega Man 2"]
+        slot_data = getattr(world.multiworld, "re_gen_passthrough")["Mega Man"]
         world.weapon_damage = slot_data["weapon_damage"]
         world.wily_weapons = slot_data["wily_weapons"]
     else:
@@ -126,15 +127,15 @@ def set_rules(world: "MM1World"):
                 world.weapon_damage[i] = weapon_tables.pop()
             for boss in (0, 4, 5, 8):
                 # valid Super Arm damage
-                world.weapon_damage[6][boss] = min(14, max(-1, int(world.random.normalvariate(3, 3))))
+                world.weapon_damage[6][boss] = min(14, max(-1, int(world.random.normalvariate(9, 3))))
         elif world.options.random_weakness == RandomWeaknesses.option_randomized:
             world.weapon_damage = {i: [] for i in range(7)}
-            for boss in range(10):
+            for boss in range(11):
                 for weapon in world.weapon_damage:
                     if boss not in (0, 4, 5, 8) and weapon == 6:
                         # Bosses cannot take Super Arm damage
                         world.weapon_damage[weapon].append(-1)
-                    elif boss in (6, 9) and weapon == 3:
+                    elif boss in (6, 9, 10) and weapon == 3:
                         # Bosses cannot take Hyper Bomb damage
                         world.weapon_damage[weapon].append(-1)
                     else:
@@ -152,7 +153,7 @@ def set_rules(world: "MM1World"):
 
         if world.options.strict_weakness:
             for weapon in weapon_damage:
-                for i in range(10):
+                for i in range(11):
                     if weapon == 0:
                         world.weapon_damage[weapon][i] = 0
                     elif i == 7 and not world.options.random_weakness:
@@ -165,17 +166,18 @@ def set_rules(world: "MM1World"):
                         world.weapon_damage[weapon][i] = 0
 
         for p_boss in world.options.plando_weakness:
-            boss = bosses[p_boss]
-            for p_weapon in world.options.plando_weakness[p_boss]:
-                weapon = weapons_to_id[p_weapon]
-                if world.options.plando_weakness[p_boss][p_weapon] < minimum_weakness_requirement[weapon] \
-                        and not any(w != weapon
-                                    and world.weapon_damage[w][boss] >= minimum_weakness_requirement[w]
-                                    for w in world.weapon_damage):
-                    # we need to replace this weakness
-                    weakness = world.random.choice([key for key in world.weapon_damage if key != weapon])
-                    world.weapon_damage[weakness][boss] = minimum_weakness_requirement[weakness]
-                world.weapon_damage[weapon][boss] = world.options.plando_weakness[p_boss][p_weapon]
+            if p_boss in bosses:
+                boss = bosses[p_boss]
+                for p_weapon in world.options.plando_weakness[p_boss]:
+                    weapon = weapons_to_id[p_weapon]
+                    if world.options.plando_weakness[p_boss][p_weapon] < minimum_weakness_requirement[weapon] \
+                            and not any(w != weapon
+                                        and world.weapon_damage[w][boss] >= minimum_weakness_requirement[w]
+                                        for w in world.weapon_damage):
+                        # we need to replace this weakness
+                        weakness = world.random.choice([key for key in world.weapon_damage if key != weapon])
+                        world.weapon_damage[weakness][boss] = minimum_weakness_requirement[weakness]
+                    world.weapon_damage[weapon][boss] = world.options.plando_weakness[p_boss][p_weapon]
 
         # handle special cases
         for boss in (0, 4, 5, 8):
@@ -186,7 +188,7 @@ def set_rules(world: "MM1World"):
                 weakness = world.random.choice(range(1, 6))
                 world.weapon_damage[weakness][boss] = minimum_weakness_requirement[weakness]
 
-        for boss in (6, 8):
+        for boss in (6, 9, 10):
             if (world.weapon_damage[2][boss] >= minimum_weakness_requirement[1] and
                     not any(world.weapon_damage[i][boss] >= minimum_weakness_requirement[i]
                             for i in range(6) if i != 3)):
@@ -200,7 +202,7 @@ def set_rules(world: "MM1World"):
                 weapon_damage[0][world.options.starting_robot_master.value]
 
 
-        world.wily_weapons = validate_fights(world, (1, 2, 3, 5, 9))
+        world.wily_weapons = validate_fights(world, (1, 2, 3, 5, 9, 10))
 
     #static rules
     for boss, locations in boss_locations.items():
@@ -215,8 +217,9 @@ def set_rules(world: "MM1World"):
         if not boss_weapons:
             raise Exception(f"Attempted to have boss {boss} with no weakness! Seed: {world.multiworld.seed}")
         for location in locations:
-            if "Wily" in location and boss != 8:
+            if "Wily" in location:
                 # Special case: Super Arm cannot be logical for any Wily locations
+                # This includes CWU-001, since there aren't enough guts blocks without cloning
                 add_rule(world.get_location(location), lambda state, weps=tuple([w for w in boss_weapons if w != "Super Arm"]): state.has_any(weps, world.player))
             else:
                 add_rule(world.get_location(location), lambda state, weps=tuple(boss_weapons): state.has_any(weps, world.player))

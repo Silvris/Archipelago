@@ -17,7 +17,8 @@ bosses = {
     "Yellow Devil": 6,
     "Copy Robot": 7,
     "CWU-01P": 8,
-    "Wily Machine": 9,
+    "Wily Machine Phase 1": 9,
+    "Wily Machine Phase 2": 10,
 }
 
 weapons_to_id: dict[str, int] = {
@@ -51,7 +52,7 @@ enemy_indexes: dict[str, int] = {
     "Adhering Suzy (Horizontal)": 0x21,
     "Watcher": 0x2A,
     "Changkey": 0x31,
-    "CWU-001": 0x3A,
+    "CWU-01P": 0x3A,
 }
 
 class StartingRobotMaster(Choice):

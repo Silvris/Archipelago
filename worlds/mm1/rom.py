@@ -6,7 +6,7 @@ import Utils
 
 from typing import Iterable, TYPE_CHECKING
 from worlds.Files import APProcedurePatch, APTokenMixin, APTokenTypes
-from .options import RandomMusic, enemy_indexes
+from .options import RandomMusic, enemy_indexes, weapons_to_id
 from .color import write_palette_shuffle
 
 if TYPE_CHECKING:
@@ -29,7 +29,8 @@ MM1_BOSS_WEAKNESSES = {
     6: 0x1FE2E,  # Yellow Devil
     7: 0x1FE36,  # Copy Robot
     8: 0x1FE3E,  # CWU 001
-    9: 0x1FE46,  # Wily Machine
+    9: 0x1FE46,  # Wily Machine Phase 1
+    10: 0x1FE4E, # Wily Machine Phase 2
 }
 MM1_ENEMY_WEAKNESSES: dict[int, int] = {
     0: 0x1FC61,
@@ -82,13 +83,21 @@ def patch_rom(world: "MM1World", patch: MM1ProcedurePatch) -> None:
                 for weapon in range(7)
             ])
         # like boobeam, CWU is considered an enemy
-        enemy_weaknesses["CWU-001"] = {weapon: world.weapon_damage[weapon][8] for weapon in world.weapon_damage}
+        enemy_weaknesses["CWU-01P"] = {weapon: world.weapon_damage[weapon][8] for weapon in world.weapon_damage}
 
     if world.options.enemy_weakness:
         for enemy in enemy_indexes:
-            if enemy == "CWU-001":
+            if enemy == "CWU-01P":
                 continue
             enemy_weaknesses[enemy] = {weapon: world.random.randint(0, 4) * 5 for weapon in MM1_ENEMY_WEAKNESSES}
+            if enemy in ("Adhering Suzy (Vertical)", "Pickelman"):
+                # you can *technically* get around these
+                # but with no items it requires a damage boost
+                # might not even be possible for pickelman
+                enemy_weaknesses[enemy][0] = max(5, enemy_weaknesses[enemy][0])
+            if enemy in world.options.plando_weakness:
+                for p_weapon, value in world.options.plando_weakness[enemy].value.items():
+                    enemy_weaknesses[enemy][weapons_to_id[p_weapon]] = value
 
     for enemy, damage_table in enemy_weaknesses.items():
         for weapon in MM1_ENEMY_WEAKNESSES:
