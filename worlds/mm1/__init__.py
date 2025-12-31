@@ -229,6 +229,7 @@ class MM1World(World):
             "weapon_damage": self.weapon_damage,
             "wily_weapons": self.wily_weapons,
             "required_weapons": self.options.required_weapons.value,
+            "consumables": self.options.consumables.value,
         }
 
     @staticmethod
