@@ -3,7 +3,6 @@ import logging
 import os
 import settings
 import threading
-import Utils
 from worlds.AutoWorld import World, WebWorld
 from BaseClasses import ItemClassification, Item, Location, Tutorial, MultiWorld
 from copy import deepcopy
@@ -81,6 +80,7 @@ class MM1World(World):
     settings: ClassVar[MM1Settings]
     web = MM1WebWorld()
     weapon_damage: dict[int, list[int]]
+    ut_can_generate_without_yaml: bool = True
 
     def __init__(self, multiworld: MultiWorld, player: int) -> None:
         super().__init__(multiworld, player)
@@ -94,6 +94,13 @@ class MM1World(World):
             logging.warning(f"Player {self.player} ({self.player_name}): "
                             f"Required weapons too high for singleplayer game, reducing to 3.")
             self.options.required_weapons.value = 3
+
+        if hasattr(self.multiworld, "re_gen_passthrough"):
+            slot_data = getattr(self.multiworld, "re_gen_passthrough")
+            if "Mega Man" in slot_data:
+                # UT support
+                self.options.consumables.value = True
+                self.options.required_weapons.value = slot_data["Mega Man"]["required_weapons"]
 
     def create_item(self, name: str) -> MM1Item:
         item_data = all_items.get(name, None)
@@ -188,9 +195,9 @@ class MM1World(World):
                 # we need to find a weakness for this boss
                 weaknesses = [weapon for weapon in range(1, 6)
                                 if self.weapon_damage[weapon][target] >= minimum_weakness_requirement[weapon]]
-                weapons = list(map(lambda s: weapons_to_name[s], weaknesses))
+                weakness_names = list(map(lambda s: weapons_to_name[s], weaknesses))
                 valid_weapons = [item for item in progitempool
-                                 if item.name in weapons
+                                 if item.name in weakness_names
                                  and item.player == self.player
                                  and not item.location]
                 if not valid_weapons:
@@ -216,6 +223,23 @@ class MM1World(World):
             raise
         finally:
             self.rom_name_available_event.set()  # make sure threading continues and errors are collected
+
+    def fill_slot_data(self) -> dict[str, Any]:
+        return {
+            "weapon_damage": self.weapon_damage,
+            "wily_5_weapons": self.wily_weapons,
+            "required_weapons": self.options.required_weapons.value,
+        }
+
+    @staticmethod
+    def interpret_slot_data(slot_data: dict[str, Any]) -> dict[str, Any]:
+        local_weapon = {int(key): value for key, value in slot_data["weapon_damage"].items()}
+        local_wily = {int(key): value for key, value in slot_data["wily_weapons"].items()}
+        return {
+            "weapon_damage": local_weapon,
+            "wily_weapons": local_wily,
+            "required_weapons": slot_data["required_weapons"]
+        }
 
     def modify_multidata(self, multidata: dict[str, Any]) -> None:
         # wait for self.rom_name to be available.

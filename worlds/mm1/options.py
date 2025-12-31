@@ -22,6 +22,7 @@ bosses = {
 }
 
 weapons_to_id: dict[str, int] = {
+    "Mega Buster": 0,
     "Rolling Cutter": 1,
     "Ice Slasher": 2,
     "Hyper Bomb": 3,
@@ -111,7 +112,7 @@ class RandomWeaknesses(Choice):
 
 class WeaknessPlando(OptionDict):
     """
-    Specify specific damage numbers for boss damage. Can be used even without strict/random weaknesses.
+    Specify specific damage numbers for enemy/boss damage. Can be used even without strict/random/enemy weaknesses.
     plando_weakness:
         Robot Master:
             Weapon: Damage
@@ -119,7 +120,7 @@ class WeaknessPlando(OptionDict):
     display_name = "Plando Weaknesses"
     schema = Schema({
         Optional(And(str, Use(str.title), lambda s: s in bosses or s in enemy_indexes)): {
-            And(str, Use(str.title), lambda s: s in weapons_to_id): And(int, lambda i: i in range(-1, 15))
+            And(str, Use(str.title), lambda s: s in weapons_to_id): And(int, lambda i: i in range(-1, 21))
         }
     })
     default = {}

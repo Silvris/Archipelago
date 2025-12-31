@@ -4,7 +4,8 @@ import pkgutil
 import settings
 import Utils
 
-from typing import Iterable, TYPE_CHECKING
+from typing import Iterable, TYPE_CHECKING, DefaultDict
+from collections import defaultdict
 from worlds.Files import APProcedurePatch, APTokenMixin, APTokenTypes
 from .options import RandomMusic, enemy_indexes, weapons_to_id
 from .color import write_palette_shuffle
@@ -73,7 +74,7 @@ def patch_rom(world: "MM1World", patch: MM1ProcedurePatch) -> None:
     patch.write_byte(wily_requirement + 1, world.options.required_weapons.value)
     patch.write_byte(energylink + 1, world.options.energy_link.value)
 
-    enemy_weaknesses: dict[str, dict[int, int]] = {}
+    enemy_weaknesses: DefaultDict[str, dict[int, int]] = defaultdict(dict)
 
     if world.options.strict_weakness or world.options.plando_weakness or world.options.random_weakness:
         # write weaknesses
@@ -85,8 +86,8 @@ def patch_rom(world: "MM1World", patch: MM1ProcedurePatch) -> None:
         # like boobeam, CWU is considered an enemy
         enemy_weaknesses["CWU-01P"] = {weapon: world.weapon_damage[weapon][8] for weapon in world.weapon_damage}
 
-    if world.options.enemy_weakness:
-        for enemy in enemy_indexes:
+    for enemy in enemy_indexes:
+        if world.options.enemy_weakness:
             if enemy == "CWU-01P":
                 continue
             enemy_weaknesses[enemy] = {weapon: world.random.randint(0, 4) * 5 for weapon in MM1_ENEMY_WEAKNESSES}
@@ -95,12 +96,12 @@ def patch_rom(world: "MM1World", patch: MM1ProcedurePatch) -> None:
                 # but with no items it requires a damage boost
                 # might not even be possible for pickelman
                 enemy_weaknesses[enemy][0] = max(5, enemy_weaknesses[enemy][0])
-            if enemy in world.options.plando_weakness:
-                for p_weapon, value in world.options.plando_weakness[enemy].value.items():
-                    enemy_weaknesses[enemy][weapons_to_id[p_weapon]] = value
+        if enemy in world.options.plando_weakness:
+            for p_weapon, value in world.options.plando_weakness[enemy].items():
+                enemy_weaknesses[enemy][weapons_to_id[p_weapon]] = value
 
     for enemy, damage_table in enemy_weaknesses.items():
-        for weapon in MM1_ENEMY_WEAKNESSES:
+        for weapon in damage_table:
             if damage_table[weapon] < 0:
                 damage_table[weapon] = 256 + damage_table[weapon]
             patch.write_byte(MM1_ENEMY_WEAKNESSES[weapon] + enemy_indexes[enemy], damage_table[weapon])

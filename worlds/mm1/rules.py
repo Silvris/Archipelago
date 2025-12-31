@@ -169,7 +169,7 @@ def set_rules(world: "MM1World"):
             if p_boss in bosses:
                 boss = bosses[p_boss]
                 for p_weapon in world.options.plando_weakness[p_boss]:
-                    weapon = weapons_to_id[p_weapon]
+                    weapon = min(14, weapons_to_id[p_weapon])
                     if world.options.plando_weakness[p_boss][p_weapon] < minimum_weakness_requirement[weapon] \
                             and not any(w != weapon
                                         and world.weapon_damage[w][boss] >= minimum_weakness_requirement[w]
