@@ -9,7 +9,7 @@ from worlds.LauncherComponents import launch_subprocess, components, Component, 
 from .quests import create_ranks, location_name_to_id, base_id, goal_quests, \
     get_quest_by_id, goal_ranks, hub_rank_max, rank_sort, SlotQuestInfo
 from .items import MHFUItem, item_table, filler_item_table, filler_weights, item_name_to_id, weapons, item_name_groups
-from .options import MHFUOptions
+from .options import MHFUOptions, Awards
 from .rules import set_rules, MHFULogicMixin
 from .data.trap_link import local_trap_to_type
 
@@ -30,6 +30,7 @@ class MHFUSettings(settings.Group):
 
     ppsspp_exe: PPSSPPExe = PPSSPPExe("C:/Program Files/PPSSPP/PPSSPPWindows64.exe")
     auto_start: bool = True
+    allow_grindy: bool = False
 
 
 class MHFUWebWorld(WebWorld):
@@ -52,15 +53,14 @@ class MHFUWorld(World):
     """
     game = "Monster Hunter Freedom Unite"
     web = MHFUWebWorld()
-    data_version = 0
     options_dataclass = MHFUOptions
     options: MHFUOptions
     settings: ClassVar[MHFUSettings]
+    origin_region_name = "Pokke Village"
 
     item_name_to_id = item_name_to_id
     location_name_to_id = location_name_to_id
     item_name_groups = item_name_groups
-    create_regions = create_ranks
 
     def __init__(self, multiworld: MultiWorld, player: int):
         super().__init__(multiworld, player)
@@ -68,6 +68,16 @@ class MHFUWorld(World):
         self.rank_requirements: dict[tuple[int, int, int], int] = {}
         self.quest_info: dict[str, SlotQuestInfo] = {}
         self.required_keys: int = 0
+
+    def create_item(self, name: str, force_non_progression: bool = False) -> MHFUItem:
+        item = item_table[name]
+        classification = ItemClassification.filler
+        if item.progression and not force_non_progression:
+            classification = ItemClassification.progression_skip_balancing \
+                if item.skip_balancing else ItemClassification.progression
+        elif item.trap:
+            classification = ItemClassification.trap
+        return MHFUItem(name, classification, item.code, self.player)
 
     def generate_early(self) -> None:
         # there's an impossible set of options, so we just need to block it
@@ -83,15 +93,14 @@ class MHFUWorld(World):
             logging.warning(f"{self.player_name}) Village Depth too low for goal, increasing to "
                             f"{self.options.village_depth.get_option_name(goal_rank[1] + 1)}")
 
-    def create_item(self, name: str, force_non_progression: bool = False) -> MHFUItem:
-        item = item_table[name]
-        classification = ItemClassification.filler
-        if item.progression and not force_non_progression:
-            classification = ItemClassification.progression_skip_balancing \
-                if item.skip_balancing else ItemClassification.progression
-        elif item.trap:
-            classification = ItemClassification.trap
-        return MHFUItem(name, classification, item.code, self.player)
+        # check for grindy
+        if self.options.guild_card_awards.value == Awards.option_on and not self.settings.allow_grindy:
+            raise OptionError(f"MHFU ({self.player_name}): Attempted to include grindy Guild Card awards "
+                              f"when they are disabled.")
+
+    def create_regions(self) -> None:
+        create_ranks(self)
+        # create_awards(self)
 
     def create_items(self) -> None:
         itempool = []

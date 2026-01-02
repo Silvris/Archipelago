@@ -1,4 +1,4 @@
-monster_ids = {
+monster_ids: dict[str, int] = {
     "Rathian": 1,
     "Fatalis": 2,
     "Yian Kut-Ku": 6,
@@ -63,7 +63,7 @@ monster_ids = {
 
 monster_lookup = {idx: monster for monster, idx in monster_ids.items()}
 
-elder_dragons = {
+elder_dragons: dict[str, int] = {
     "Fatalis": 2,
     "Lao-Shan Lung": 7,
     "Kirin": 33,

@@ -136,6 +136,20 @@ class TrapWeights(OptionCounter):
     }
 
 
+class Awards(Choice):
+    """
+    Include Guild Card awards as checks. Only awards accessible to your available ranks will be checks.
+    Off: no Guild Card awards are checks
+    Exclude Grindy: excludes crowns, most farm awards, Guild Point,
+    On: all Guild Card awards are checks. This setting may be overrided with a host setting.
+    """
+    display_name = "Guild Card Awards"
+    default = 0
+    option_off = 0
+    option_exclude_grindy = 1
+    option_on = 2
+
+
 class Weapons(Choice):
     """
     Individual: Each individual weapon tree rank can be received separately, not in sequence.
@@ -201,6 +215,7 @@ class MHFUOptions(PerGameCommonOptions):
     village_depth: VillageQuestDepth
     training_quests: TrainingQuests
     treasure_quests: TreasureQuests
+    guild_card_awards: Awards
     max_keys: TotalKeyQuests
     required_keys: RequiredKeyQuests
     filler_percentage: FillerPercentage

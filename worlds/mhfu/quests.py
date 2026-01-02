@@ -199,7 +199,7 @@ class MHFURegion(Region):
 
 
 def create_ranks(world: "MHFUWorld") -> None:
-    menu_region = Region("Menu", world.player, world.multiworld)
+    menu_region = Region(world.origin_region_name, world.player, world.multiworld)
     world.multiworld.regions.append(menu_region)
     # we only write 0 into rank requirements, since we need to know how many quests we have access to
     # we properly fill them in create_items, then apply in set_rules
@@ -307,7 +307,9 @@ def create_ranks(world: "MHFUWorld") -> None:
 
                 world.quest_info[quest.qid[1:]] = quest_info
                 if quest.rank != 4:
-                    world.get_location(quest.proper_name).monsters = quest_info["monsters"].copy()
+                    loc = world.get_location(quest.proper_name)
+                    loc.monsters = quest_info["monsters"].copy()
+                    loc.qid = int(quest.qid[1:])
         else:
             # only need monsters for the resulting quest info
             for quest in valid_quests:
@@ -316,7 +318,9 @@ def create_ranks(world: "MHFUWorld") -> None:
                                                    "mon_num": len(quest.monsters),
                                                    "targets": []}
                 if quest.rank != 4:
-                    world.get_location(quest.proper_name).monsters = quest.monsters.copy()
+                    loc = world.get_location(quest.proper_name)
+                    loc.monsters = quest.monsters.copy()
+                    loc.qid = int(quest.qid[1:])
 
         world.multiworld.regions.append(region)
     for hub, rank, star in world.rank_requirements:
