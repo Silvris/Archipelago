@@ -32,6 +32,13 @@ def can_complete_quest(state: CollectionState, qid: str, player: int) -> bool:
     return state.can_reach_location(get_quest_by_id(qid).proper_name, player)
 
 
+def can_complete_any_quest(state: CollectionState, qids: list[str], player: int) -> bool:
+    for qid in qids:
+        if not can_complete_quest(state, qid, player):
+            return False
+    return True
+
+
 def can_complete_all_quests(state: CollectionState, qids: list[str], player: int) -> bool:
     for qid in qids:
         if not can_complete_quest(state, qid, player):
@@ -61,6 +68,10 @@ def can_hunt_all_monsters(state: CollectionState | MHFULogicMixin, monsters: lis
     if set(relevant_mons).intersection(state.mhfu_monsters[player].keys()) == set(relevant_mons):
         return True
     return False
+
+
+def can_reach_rank(state: CollectionState, player: int, hub: int, rank: int, star: int):
+    return state.can_reach_region(get_star_name(hub, rank, star), player)
 
 
 def set_rules(world: "MHFUWorld") -> None:

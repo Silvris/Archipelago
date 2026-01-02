@@ -1,10 +1,13 @@
 import typing
 from .data.monsters import monster_ids, elder_dragons
-from .quests import get_quest_by_id, get_area_quests, location_name_to_id, MHFURegion, MHFULocation
+from .quests import get_quest_by_id, get_area_quests, location_name_to_id, MHFURegion, MHFULocation, hub_rank_max
 from .options import VillageQuestDepth, GuildQuestDepth, Awards
+from .rules import can_reach_rank, can_hunt_all_monsters, can_complete_all_quests, can_complete_any_quest
+
+from worlds.generic.Rules import add_rule
 
 if typing.TYPE_CHECKING:
-    from . import MHFUWorld
+    from . import MHFUWorld, hub_rank_max
     from .rules import MHFULogicMixin
 
 award_start = max(location_name_to_id.values())
@@ -84,42 +87,56 @@ guild_card_awards: dict[str, GuildCardAward] = {
     "Warrior's Medal": GuildCardAward(award_start + 39, guild=3, training=True),
     "Guardian's Award": GuildCardAward(award_start + 40, area=[1, 12], grindy=True),
     "Flower Bouquet from the Guild": GuildCardAward(award_start + 41, grindy=True),
-    "Adventurer's Helm": GuildCardAward(award_start + 42, treasure=True),
+    "Adventurer's Helm": GuildCardAward(award_start + 42, guild=3, treasure=True),
     "Trenya's Flag": GuildCardAward(award_start + 43, grindy=True),
     "The Ultimate Catnip": GuildCardAward(award_start + 44, grindy=True),
     "Letter to my Fearless Leader": GuildCardAward(award_start + 45, grindy=True),
     "Member's Card": GuildCardAward(award_start + 46, guild=3),
     "Wyverian Artisan's Mitten": GuildCardAward(award_start + 47, guild=3, grindy=True),
     "Hunter's Miracle": GuildCardAward(award_start + 48, area=[26, 27, 28, 29, 30, 31]),
-
-
-
-
 }
 
 def create_awards(world: "MHFUWorld"):
     menu = world.get_region(world.origin_region_name)
     guild_card = MHFURegion("Guild Card", world.player, world.multiworld, "a great achievement")
+    menu.connect(guild_card)
+    world.multiworld.regions.append(guild_card)
     monster_set = set()
     area_set = set()
     for location in world.get_locations():
         if location.monsters:
             monster_set.update(location.monsters)
-        quest_info = get_quest_by_id(f"m{location.qid}")
-        area_set.add(quest_info.stage)
+        if location.qid:
+            quest_info = get_quest_by_id(f"m{location.qid:05}")
+            area_set.add(quest_info.stage)
     for name, award in guild_card_awards.items():
         # quickly just run through our checks
         if award.grindy and world.options.guild_card_awards.value < Awards.option_on:
             continue
-        if award.guild < world.options.guild_depth.value:
+        if award.guild > world.options.guild_depth.value:
             continue
-        if award.village < world.options.village_depth.value:
+        if award.village > world.options.village_depth.value:
             continue
         if award.training and not world.options.training_quests:
             continue
         if award.treasure and not world.options.treasure_quests:
             continue
-        if not monster_set.issuperset(award.monster):
+        if award.monster and not monster_set.issuperset(award.monster):
             continue
-        if not area_set.issuperset(award.area):
+        if award.area and not area_set.issuperset(award.area):
             continue
+        # pass all of these? its a valid location
+        guild_card.add_locations({name: award.id}, MHFULocation)
+        loc = world.get_location(name)
+        # now set the rule as given
+        # for ranks, assume that the max rank is required for this
+        if award.village:
+            add_rule(loc, lambda state, rank=award.village: can_reach_rank(state, world.player, 1, rank - 1, hub_rank_max[1, rank - 1] - 1))
+        if award.guild:
+            add_rule(loc, lambda state, rank=award.guild: can_reach_rank(state, world.player, 0, rank, hub_rank_max[0, rank] - 1))
+        if award.monster:
+            add_rule(loc, lambda state, mons=tuple(award.monster): can_hunt_all_monsters(state, mons, world.player))
+        if award.area:
+            for area in award.area:
+                quests = [q.qid for q in get_area_quests(world.rank_requirements.keys(), (area,))]
+                add_rule(loc, lambda state, qids=tuple(quests): can_complete_any_quest(state, qids, world.player))

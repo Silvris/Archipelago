@@ -6,6 +6,7 @@ from BaseClasses import Tutorial, ItemClassification, MultiWorld, CollectionStat
 from Options import OptionError
 from worlds.AutoWorld import WebWorld, World
 from worlds.LauncherComponents import launch_subprocess, components, Component, Type
+from .guild_card_awards import create_awards
 from .quests import create_ranks, location_name_to_id, base_id, goal_quests, \
     get_quest_by_id, goal_ranks, hub_rank_max, rank_sort, SlotQuestInfo
 from .items import MHFUItem, item_table, filler_item_table, filler_weights, item_name_to_id, weapons, item_name_groups
@@ -100,7 +101,8 @@ class MHFUWorld(World):
 
     def create_regions(self) -> None:
         create_ranks(self)
-        # create_awards(self)
+        if self.options.guild_card_awards:
+            create_awards(self)
 
     def create_items(self) -> None:
         itempool = []
@@ -141,6 +143,8 @@ class MHFUWorld(World):
         non_required = free_items - self.required_keys
         filler_items = int(non_required * (self.options.filler_percentage / 100))
         non_required -= filler_items
+        if self.options.guild_card_awards:
+            filler_items += len(self.get_region("Guild Card").locations)
         trap_amount = math.floor(filler_items * (self.options.trap_percentage / 100.0))
         filler_items -= trap_amount
         # notes about the special cases

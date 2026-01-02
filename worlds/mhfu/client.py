@@ -26,7 +26,7 @@ from .data.monsters import elder_dragons, monster_lookup
 from .data.trap_link import trap_link_matches, local_trap_to_type
 from .items import item_name_groups
 from .quests import (quest_data, base_id, goal_quests, get_quest_by_id,
-                     get_proper_name, location_name_to_id, SlotQuestInfo)
+                     location_name_to_id, SlotQuestInfo)
 
 if TYPE_CHECKING:
     import argparse
@@ -1109,16 +1109,21 @@ async def game_watcher(ctx: MHFUContext) -> None:
                                                                63, "QUEST_COMPLETE")
                 quest_completion = bytearray(base64.b64decode(completion_bytes["base64"]))
                 for idx, quest in enumerate(quest_data):
-                    flag = quest["flag"]
-                    mask = quest["mask"]
+                    flag = quest.flag
+                    mask = quest.mask
                     if flag >= 0 and mask >= 0:
                         if quest_completion[flag] & (1 << mask):
                             if base_id + idx not in ctx.checked_locations \
                                     and base_id + idx not in ctx.locations_checked:
                                 new_checks.append(idx + base_id)
-                            if quest["qid"] == ctx.goal_quest and not ctx.finished_game:
-                                await ctx.send_msgs([{"cmd": "StatusUpdate", "status": ClientStatus.CLIENT_GOAL}])
-                                ctx.finished_game = True
+                            if quest.qid == ctx.goal_quest and not ctx.finished_game:
+                                if ctx.unlocked_keys < ctx.required_keys:
+                                    # we reject the completion itself
+                                    quest_changed = True
+                                    quest_completion[flag] &= ((1 << mask) ^ 0b11111111)
+                                else:
+                                    await ctx.send_msgs([{"cmd": "StatusUpdate", "status": ClientStatus.CLIENT_GOAL}])
+                                    ctx.finished_game = True
                         elif base_id + idx in ctx.checked_locations:
                             quest_changed = True
                             quest_completion[flag] |= (1 << mask)
@@ -1134,7 +1139,7 @@ async def game_watcher(ctx: MHFUContext) -> None:
                 for score, t_quest in zip(treasure_score, (f"m0400{i}" for i in range(1, 8))):
                     silver, gold = TREASURE_SCORES[t_quest]
                     if score >= silver:
-                        quest_name = get_proper_name(get_quest_by_id(t_quest))
+                        quest_name = get_quest_by_id(t_quest).proper_name
                         silver_id = location_name_to_id[f"{quest_name} - Silver Crown"]
                         if silver_id not in ctx.checked_locations:
                             new_checks.append(silver_id)
