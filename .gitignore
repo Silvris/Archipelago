@@ -1,19 +1,16 @@
 .idea
 .vscode
 
+# Output Files
 *_Spoiler.txt
 *.bmbp
-*.apbp
-*.apcivvi
-*.apl2ac
-*.apm3
-*.apmc
-*.apz5
-*.aptloz
-*.aptww
-*.apemerald
+*.ap*
 *.pyc
 *.pyd
+*.archipelago
+*.apsave
+
+# User Files
 *.sfc
 *.z64
 *.n64
@@ -23,14 +20,16 @@
 *.gb
 *.gbc
 *.gba
+*.nds
+*.3ds
+*.iso
 *.wixobj
 *.lck
 *.db3
+*.BIN
 *multidata
 *multisave
-*.archipelago
-*.apsave
-*.BIN
+
 *.puml
 
 setups
