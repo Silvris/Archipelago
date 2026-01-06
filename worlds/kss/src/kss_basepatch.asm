@@ -1372,6 +1372,7 @@ subgame_requirement_visual:
 dyna_clear:
     LDA #$0001
     LDX $02
+    BEQ .Loop
     DEX
     .Loop:
     BEQ .Continue
