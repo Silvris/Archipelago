@@ -198,9 +198,6 @@ def set_rules(world: "MHFUWorld") -> None:
                 add_rule(world.get_location(get_quest_by_id(quest).proper_name),
                          lambda state: can_complete_all_quests(state, ["m02214", "m02215", "m02124", "m02228",
                                                                        "m02229"], world.player))
-            add_rule(world.get_location(get_quest_by_id("m01124").proper_name),
-                     lambda state: can_complete_all_quests(state, ["m01009", "m01106", "m01112", "m01114"],
-                                                           world.player))
             # special case here, this is actually the end of HR urgents. We can effectively duplicate the rules for it
             add_rule(world.get_location(get_quest_by_id("m02225").proper_name),
                      lambda state: state.has("Key Quest", world.player, world.rank_requirements[0, 2, 2]))
