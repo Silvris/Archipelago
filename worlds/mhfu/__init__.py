@@ -11,7 +11,7 @@ from .quests import create_ranks, location_name_to_id, base_id, goal_quests, \
     get_quest_by_id, goal_ranks, hub_rank_max, rank_sort, SlotQuestInfo
 from .items import MHFUItem, item_table, filler_item_table, filler_weights, item_name_to_id, weapons, item_name_groups
 from .options import MHFUOptions, Awards
-from .rules import set_rules, MHFULogicMixin
+from .rules import set_rules
 from .data.trap_link import local_trap_to_type
 
 

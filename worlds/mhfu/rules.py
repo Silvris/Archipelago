@@ -1,31 +1,12 @@
 from .quests import get_quest_by_id, get_star_name, goal_quests, hub_rank_max, get_area_quests
 from .data.monsters import flying_wyverns, piscene_wyverns, bird_wyverns, monster_ids
 from .options import VillageQuestDepth, GuildQuestDepth
-from BaseClasses import CollectionState, MultiWorld
-from collections import Counter
-from copy import deepcopy
+from BaseClasses import CollectionState
 from typing import TYPE_CHECKING
-from worlds.AutoWorld import LogicMixin
 from worlds.generic.Rules import add_rule
 
 if TYPE_CHECKING:
     from . import MHFUWorld
-
-
-class MHFULogicMixin(LogicMixin):
-    game = "Monster Hunter Freedom Unite"
-    mhfu_monsters: dict[int, Counter[int]]
-    mhfu_reachable_quests: dict[int, dict[int, bool]]
-    
-    def init_mixin(self, multiworld: MultiWorld):
-        mhfu_players = multiworld.get_game_players(self.game)
-        self.mhfu_monsters = {player: Counter() for player in mhfu_players}
-        self.mhfu_reachable_quests = {player: {} for player in mhfu_players}
-
-    def copy_mixin(self, other: "MHFULogicMixin"):
-        other.mhfu_monsters = deepcopy(self.mhfu_monsters)
-        other.mhfu_reachable_quests = deepcopy(self.mhfu_reachable_quests)
-        return other
 
 
 def can_complete_quest(state: CollectionState, qid: str, player: int) -> bool:
@@ -34,9 +15,9 @@ def can_complete_quest(state: CollectionState, qid: str, player: int) -> bool:
 
 def can_complete_any_quest(state: CollectionState, qids: list[str], player: int) -> bool:
     for qid in qids:
-        if not can_complete_quest(state, qid, player):
-            return False
-    return True
+        if can_complete_quest(state, qid, player):
+            return True
+    return False
 
 
 def can_complete_all_quests(state: CollectionState, qids: list[str], player: int) -> bool:
@@ -56,18 +37,12 @@ def can_reach_area(state: CollectionState, areas: tuple[int],
     return False
 
 
-def can_hunt_any_monster(state: CollectionState | MHFULogicMixin, monsters: list[str], player: int) -> bool:
-    relevant_mons = [monster_ids[monster] for monster in monsters]
-    if set(relevant_mons).intersection(state.mhfu_monsters[player].keys()):
-        return True
-    return False
+def can_hunt_any_monster(state: CollectionState, monsters: list[str], player: int) -> bool:
+    return state.has_any(monsters, player)
 
 
-def can_hunt_all_monsters(state: CollectionState | MHFULogicMixin, monsters: list[str], player: int) -> bool:
-    relevant_mons = [monster_ids[monster] for monster in monsters]
-    if set(relevant_mons).intersection(state.mhfu_monsters[player].keys()) == set(relevant_mons):
-        return True
-    return False
+def can_hunt_all_monsters(state: CollectionState, monsters: list[str], player: int) -> bool:
+    return state.has_all(monsters, player)
 
 
 def can_reach_rank(state: CollectionState, player: int, hub: int, rank: int, star: int):
@@ -291,3 +266,16 @@ def set_rules(world: "MHFUWorld") -> None:
                          lambda state: can_complete_quest(state, "m03110", world.player))
                 add_rule(world.get_location(get_quest_by_id("m21023").proper_name),
                          lambda state: can_complete_quest(state, "m03212", world.player))
+
+    # Monster handling
+    monster_access = world.get_region("Monsters")
+    for location in monster_access.get_locations():
+        relevant_quests = []
+        for loc in world.get_locations():
+            mons = getattr(loc, "monsters")
+            qid = getattr(loc, "qid")
+            if mons and qid:
+                if monster_ids[location.name] in mons:
+                    relevant_quests.append(f"m{qid:05}")
+        add_rule(location, lambda state, qids=tuple(relevant_quests): can_complete_any_quest(state, qids, world.player))
+        location.quests = relevant_quests

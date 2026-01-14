@@ -38,7 +38,7 @@ subspecies = [
 class GuildCardAward(typing.NamedTuple):
     id: int
     village: tuple[int, int] = (0, 0)
-    guild: tuple[int, int] = (0, 0)
+    guild: tuple[int, int] = (-1, 0)
     training: bool = False
     treasure: bool = False
     monster: list[str] | None = None
@@ -119,6 +119,8 @@ def create_awards(world: "MHFUWorld"):
             continue
         if award.guild[0] > world.options.guild_depth.value:
             continue
+        if award.guild[0] == 0 and not world.options.guild_depth.value:
+            continue
         if award.village[0] + 1 > world.options.village_depth.value:
             continue
         if award.training and not world.options.training_quests:
@@ -140,7 +142,7 @@ def create_awards(world: "MHFUWorld"):
         if award.village:
             add_rule(loc, lambda state, rank=award.village[0], star=award.village[1]:
             can_reach_rank(state, world.player, 1, rank, star))
-        if award.guild:
+        if award.guild[0] >= 0:
             add_rule(loc, lambda state, rank=award.guild[0], star=award.guild[1]:
             can_reach_rank(state, world.player, 0, rank, star))
         if award.monster:
