@@ -97,6 +97,9 @@ guild_card_awards: dict[str, GuildCardAward] = {
     "Hunter's Miracle": GuildCardAward(award_start + 48, area=[26, 27, 28, 29, 30, 31]),
 }
 
+for award, data in guild_card_awards.items():
+    location_name_to_id[award] = data.id
+
 def create_awards(world: "MHFUWorld"):
     menu = world.get_region(world.origin_region_name)
     guild_card = MHFURegion("Guild Card", world.player, world.multiworld, "a great achievement")

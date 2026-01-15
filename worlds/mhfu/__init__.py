@@ -199,10 +199,12 @@ class MHFUWorld(World):
                                   for key, value in self.options.trap_weights.items() if value > 0])
         slot_info["allowed_traps"] = allowed_traps
         slot_info["required_keys"] = self.required_keys
+        slot_info["guild_card_awards"] = bool(self.options.guild_card_awards) # we don't need to specify 1 and 2
         rank_requirements = {}
         for rank in self.rank_requirements:
             rank_requirements[f"{rank[0]},{rank[1]},{rank[2]}"] = self.rank_requirements[rank]
         slot_info["rank_requirements"] = rank_requirements
         slot_info["quest_info"] = self.quest_info if self.options.quest_randomization else {}
         slot_info["set_cutscene"] = not self.options.village_depth.value == 2
+        slot_info["world_version"] = self.world_version.as_simple_string()
         return slot_info

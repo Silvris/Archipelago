@@ -27,6 +27,7 @@ from .data.trap_link import trap_link_matches, local_trap_to_type
 from .items import item_name_groups
 from .quests import (quest_data, base_id, goal_quests, get_quest_by_id,
                      location_name_to_id, SlotQuestInfo)
+from .guild_card_awards import award_start
 
 if TYPE_CHECKING:
     import argparse
@@ -82,6 +83,7 @@ MHFU_POINTERS = {
         "GUNNER_UPGRADES": 0x089578AC,
         "NARGA_HYPNOC_CUTSCENE": 0x0999A2D4,
         "TREASURE_SCORE": 0x09A015A0,
+        "GUILD_CARD_AWARDS": 0x09A01640,
         "ZENNY": 0x09A03490,
         "CURRENT_OVL": 0x09A5F320,
         "RESET_ACTION": 0x090B3755,
@@ -115,6 +117,7 @@ MHFU_POINTERS = {
         "GUNNER_UPGRADES": 0x0895778C,
         "NARGA_HYPNOC_CUTSCENE": 0x0999A194,
         "TREASURE_SCORE": 0x09A01460,
+        "GUILD_CARD_AWARDS": 0x09A01500,
         "ZENNY": 0x09A03350,
         "CURRENT_OVL": 0x09A5F220,
         "RESET_ACTION": 0x090B3615,
@@ -148,6 +151,7 @@ MHFU_POINTERS = {
         "GUNNER_UPGRADES": 0x08954C88,
         "NARGA_HYPNOC_CUTSCENE": 0x09995ED4,
         "TREASURE_SCORE": 0x099FD1A0,
+        "GUILD_CARD_AWARDS": 0x099FD240, # 6 bytes, bit per award
         "ZENNY": 0x099FF090,
         "CURRENT_OVL": 0x09A5A5A0,
         "RESET_ACTION": 0x090AF355,  # byte
@@ -563,6 +567,7 @@ class MHFUContext(CommonContext):
     set_cutscene: bool | None = None
     trap_link: bool = False
     allowed_traps: list[int] = []
+    guild_card_awards: bool = False
 
     # intermittent
     randomize_quest: bool = True
@@ -972,6 +977,12 @@ class MHFUContext(CommonContext):
 
     def on_package(self, cmd: str, args: dict[str, Any]) -> None:
         if cmd == "Connected":
+            from . import MHFUWorld
+            if args["slot_data"]["world_version"] != MHFUWorld.world_version.as_simple_string():
+                logger.error(f"Client version {MHFUWorld.world_version.as_simple_string()} does not match server version"
+                             f" {args['slot_data']['world_version']}. Disconnecting, please connect with the correct client.")
+                asyncio.create_task(self.disconnect(False))
+                return
             # pick up our slot data
             self.death_link = args["slot_data"]["death_link"]
             self.goal = args["slot_data"]["goal"]
@@ -986,6 +997,7 @@ class MHFUContext(CommonContext):
                 self.tags.add("TrapLink")
             self.allowed_traps = args["slot_data"]["allowed_traps"]
             self.required_keys = args["slot_data"]["required_keys"]
+            self.guild_card_awards = args["slot_data"]["guild_card_awards"]
             for group, value in args["slot_data"]["rank_requirements"].items():
                 hub, rank, star = group.split(",")
                 self.rank_requirements[int(hub), int(rank), int(star)] = value
@@ -1147,6 +1159,16 @@ async def game_watcher(ctx: MHFUContext) -> None:
                             gold_id = location_name_to_id[f"{quest_name} - Gold Crown"]
                             if gold_id not in ctx.checked_locations:
                                 new_checks.append(gold_id)
+
+                if ctx.guild_card_awards:
+                    awards = base64.b64decode((await ctx.ppsspp_read_bytes(MHFU_POINTERS[ctx.lang]["GUILD_CARD_AWARDS"],
+                                                         6, "AWARDS"))["base64"])
+                    for i in range(48):
+                        x = i // 8 # byte offset
+                        y = i % 8  # mask
+                        if awards[x] & (1 << y) and award_start + i + 1 in ctx.missing_locations:
+                            new_checks.append(award_start + i + 1)
+
 
                 if new_checks:
                     for new_check_id in new_checks:
