@@ -1,6 +1,7 @@
 from . import KDL3TestBase
 from ..names import location_name
 from Options import PlandoConnection
+from BaseClasses import CollectionState
 import typing
 
 
@@ -37,6 +38,7 @@ class TestLocations(KDL3TestBase):
                                                             "Stone", "Ice"])
 
     def run_location_test(self, location: str, itempool: typing.List[str]) -> None:
+        self.multiworld.state = CollectionState(self.multiworld)
         items = itempool.copy()
         while len(itempool) > 0:
             self.assertFalse(self.can_reach_location(location), str(self.multiworld.seed))

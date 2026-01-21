@@ -11457,7 +11457,9 @@
                 19
             ]
         ],
-        "locations": [],
+        "locations": [
+            "Sand Canyon 6 - ROB Left Arm"
+        ],
         "spawn": [
             216,
             152
@@ -11588,7 +11590,9 @@
                 19
             ]
         ],
-        "locations": [],
+        "locations": [
+            "Sand Canyon 6 - ROB Head"
+        ],
         "spawn": [
             232,
             152
@@ -11678,7 +11682,9 @@
                 19
             ]
         ],
-        "locations": [],
+        "locations": [
+            "Sand Canyon 6 - ROB Right Arm"
+        ],
         "spawn": [
             88,
             152
@@ -12052,7 +12058,7 @@
         "enemies": [],
         "default_exits": {
             "Sand Canyon 6 - 28 Exit 0": {
-                "room": "Sand Canyon 6 - 29",
+                "room": "Sand Canyon 6 - 29-1",
                 "self-x": 7,
                 "self-y": 8,
                 "target-x": 120,
@@ -12061,7 +12067,7 @@
                 "access_rule": []
             },
             "Sand Canyon 6 - 28 Exit 1": {
-                "room": "Sand Canyon 6 - 29",
+                "room": "Sand Canyon 6 - 29-2",
                 "self-x": 11,
                 "self-y": 8,
                 "target-x": 184,
@@ -12070,7 +12076,7 @@
                 "access_rule": []
             },
             "Sand Canyon 6 - 28 Exit 2": {
-                "room": "Sand Canyon 6 - 29",
+                "room": "Sand Canyon 6 - 29-3",
                 "self-x": 15,
                 "self-y": 8,
                 "target-x": 248,
@@ -12090,7 +12096,97 @@
         "index": 192
     },
     {
-        "name": "Sand Canyon 6 - 29",
+        "name": "Sand Canyon 6 - 29-1",
+        "level": 3,
+        "stage": 6,
+        "room": 29,
+        "pointer": 2950032,
+        "animal_pointers": {},
+        "consumables": [],
+        "consumables_pointer": 0,
+        "enemies": [],
+        "default_exits": {},
+        "entity_load": [
+            [
+                19,
+                19
+            ]
+        ],
+        "locations": [],
+        "spawn": [
+            184,
+            344
+        ],
+        "music": 14,
+        "entrances": [
+            [
+                120,
+                344
+            ]
+        ],
+        "index": 193
+    },
+    {
+        "name": "Sand Canyon 6 - 29-2",
+        "level": 3,
+        "stage": 6,
+        "room": 29,
+        "pointer": 2950032,
+        "animal_pointers": {},
+        "consumables": [],
+        "consumables_pointer": 0,
+        "enemies": [],
+        "default_exits": {},
+        "entity_load": [
+            [
+                19,
+                19
+            ]
+        ],
+        "locations": [
+            "Sand Canyon 6 - ROB Base"
+        ],
+        "spawn": [
+            184,
+            344
+        ],
+        "music": 14,
+        "entrances": [],
+        "index": 193
+    },
+    {
+        "name": "Sand Canyon 6 - 29-3",
+        "level": 3,
+        "stage": 6,
+        "room": 29,
+        "pointer": 2950032,
+        "animal_pointers": {},
+        "consumables": [],
+        "consumables_pointer": 0,
+        "enemies": [],
+        "default_exits": {},
+        "entity_load": [
+            [
+                19,
+                19
+            ]
+        ],
+        "locations": [],
+        "spawn": [
+            184,
+            344
+        ],
+        "music": 14,
+        "entrances": [
+            [
+                248,
+                344
+            ]
+        ],
+        "index": 193
+    },
+    {
+        "name": "Sand Canyon 6 - 29-4",
         "level": 3,
         "stage": 6,
         "room": 29,
@@ -12122,16 +12218,7 @@
             344
         ],
         "music": 14,
-        "entrances": [
-            [
-                120,
-                344
-            ],
-            [
-                248,
-                344
-            ]
-        ],
+        "entrances": [],
         "index": 193
     },
     {
@@ -12613,7 +12700,9 @@
                 19
             ]
         ],
-        "locations": [],
+        "locations": [
+            "Sand Canyon 6 - ROB Torso"
+        ],
         "spawn": [
             184,
             200
@@ -12897,7 +12986,7 @@
         ],
         "default_exits": {
             "Sand Canyon 6 - 42 Exit 0": {
-                "room": "Sand Canyon 6 - 29",
+                "room": "Sand Canyon 6 - 29-1",
                 "self-x": 7,
                 "self-y": 8,
                 "target-x": 120,
@@ -12906,7 +12995,7 @@
                 "access_rule": []
             },
             "Sand Canyon 6 - 42 Exit 1": {
-                "room": "Sand Canyon 6 - 29",
+                "room": "Sand Canyon 6 - 29-3",
                 "self-x": 15,
                 "self-y": 8,
                 "target-x": 248,
@@ -19497,7 +19586,12 @@
                 "target-x": 72,
                 "target-y": 88,
                 "ptr": 180,
-                "access_rule": []
+                "access_rule": [
+                    "Burning",
+                    "Burning Ability",
+                    "Coo",
+                    "Coo Spawn"
+                ]
             },
             "Iceberg 4 - 13 Exit 3": {
                 "room": "Iceberg 4 - 14-1",
@@ -19506,7 +19600,14 @@
                 "target-x": 152,
                 "target-y": 136,
                 "ptr": 200,
-                "access_rule": []
+                "access_rule": [
+                    "Burning",
+                    "Burning Ability",
+                    "Coo",
+                    "Coo Spawn",
+                    "ChuChu",
+                    "ChuChu Spawn"
+                ]
             },
             "Iceberg 4 - 13 Exit 4": {
                 "room": "Iceberg 4 - 14-2",
@@ -19515,7 +19616,14 @@
                 "target-x": 280,
                 "target-y": 136,
                 "ptr": 210,
-                "access_rule": []
+                "access_rule": [
+                    "Burning",
+                    "Burning Ability",
+                    "Coo",
+                    "Coo Spawn",
+                    "ChuChu",
+                    "ChuChu Spawn"
+                ]
             }
         },
         "entity_load": [],
@@ -22171,7 +22279,9 @@
                 19
             ]
         ],
-        "locations": [],
+        "locations": [
+            "Iceberg 6 - Feather 1"
+        ],
         "spawn": [
             296,
             136
@@ -22249,7 +22359,9 @@
                 22
             ]
         ],
-        "locations": [],
+        "locations": [
+            "Iceberg 6 - Feather 2"
+        ],
         "spawn": [
             296,
             136
@@ -22327,7 +22439,9 @@
                 22
             ]
         ],
-        "locations": [],
+        "locations": [
+            "Iceberg 6 - Feather 3"
+        ],
         "spawn": [
             296,
             136
@@ -22405,7 +22519,9 @@
                 22
             ]
         ],
-        "locations": [],
+        "locations": [
+            "Iceberg 6 - Feather 4"
+        ],
         "spawn": [
             296,
             136
@@ -22485,7 +22601,9 @@
                 19
             ]
         ],
-        "locations": [],
+        "locations": [
+            "Iceberg 6 - Feather 5"
+        ],
         "spawn": [
             296,
             136
@@ -22563,7 +22681,9 @@
                 22
             ]
         ],
-        "locations": [],
+        "locations": [
+            "Iceberg 6 - Feather 6"
+        ],
         "spawn": [
             296,
             136
@@ -22641,7 +22761,9 @@
                 22
             ]
         ],
-        "locations": [],
+        "locations": [
+            "Iceberg 6 - Feather 7"
+        ],
         "spawn": [
             296,
             136
@@ -22719,7 +22841,9 @@
                 22
             ]
         ],
-        "locations": [],
+        "locations": [
+            "Iceberg 6 - Feather 8"
+        ],
         "spawn": [
             296,
             136

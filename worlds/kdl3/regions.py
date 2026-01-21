@@ -50,8 +50,21 @@ door_shuffle_events = {
     "Ripple Field 4 - 2-1": {location_name.ripple_field_4_little_toad: "Little Toad"},
     "Ripple Field 5 - 8": {location_name.ripple_field_5_wall: "Wall"},
     "Sand Canyon 4 - 6-2": {location_name.sand_canyon_4_donbe: "Donbe"},
+    "Sand Canyon 6 - 15": {location_name.sand_canyon_6_rob_left: "ROB Left Arm"},
+    "Sand Canyon 6 - 18": {location_name.sand_canyon_6_rob_head: "ROB Head"},
+    "Sand Canyon 6 - 20": {location_name.sand_canyon_6_rob_right: "ROB Right Arm"},
+    "Sand Canyon 6 - 29-2": {location_name.sand_canyon_6_rob_base: "ROB Base"},
+    "Sand Canyon 6 - 37": {location_name.sand_canyon_6_rob_torso: "ROB Torso"},
     "Cloudy Park 4 - 8": {location_name.cloudy_park_4_mikarin: "Mikarin"},
-    "Iceberg 4 - 10-1": {location_name.iceberg_4_shell: "Shell"}
+    "Iceberg 4 - 10-1": {location_name.iceberg_4_shell: "Shell"},
+    "Iceberg 6 - 8": {location_name.iceberg_6_feather_1: "Angel Feather"},
+    "Iceberg 6 - 10": {location_name.iceberg_6_feather_2: "Angel Feather"},
+    "Iceberg 6 - 12": {location_name.iceberg_6_feather_3: "Angel Feather"},
+    "Iceberg 6 - 14": {location_name.iceberg_6_feather_4: "Angel Feather"},
+    "Iceberg 6 - 16": {location_name.iceberg_6_feather_5: "Angel Feather"},
+    "Iceberg 6 - 18": {location_name.iceberg_6_feather_6: "Angel Feather"},
+    "Iceberg 6 - 20": {location_name.iceberg_6_feather_7: "Angel Feather"},
+    "Iceberg 6 - 22": {location_name.iceberg_6_feather_8: "Angel Feather"},
 }
 
 heart_star_requirement = {  # Rooms required for the current stage's heart star
@@ -115,7 +128,10 @@ heart_star_requirement = {  # Rooms required for the current stage's heart star
     "Sand Canyon 6 - 15",
     "Sand Canyon 6 - 18",
     "Sand Canyon 6 - 20",
-    "Sand Canyon 6 - 29",
+    "Sand Canyon 6 - 29-1",
+    "Sand Canyon 6 - 29-2",  # Actual requirement
+    "Sand Canyon 6 - 29-3",
+    "Sand Canyon 6 - 29-4",  # Actual requirement
     "Sand Canyon 6 - 37",
     "Sand Canyon 6 - 43",
     "Sand Canyon 6 - 44",
@@ -178,7 +194,16 @@ blocked_groups = {
     "Sand Canyon 5 - 9": [4, 7, 11]  # Kine physically cannot make this jump
 }
 
-extra_connections = {  # Connections that exist but must be split for logic
+extra_connections: dict[str, dict[str, Callable[["CollectionState", int], bool]]] = {  # Connections that exist but must be split for logic
+    "Sand Canyon 6 - 29-1": {
+        "Sand Canyon 6 - 29-4": lambda state, player: True
+    },
+    "Sand Canyon 6 - 29-2": {
+        "Sand Canyon 6 - 29-4": lambda state, player: True
+    },
+    "Sand Canyon 6 - 29-3": {
+        "Sand Canyon 6 - 29-4": lambda state, player: True
+    },
     "Iceberg 4 - 15-1": {
         "Iceberg 4 - 15-2": lambda state, player: state.has_all(["Parasol", "Parasol Ability"], player),
         "Iceberg 4 - 15-3": lambda state, player: state.has_all(["Clean", "Clean Ability"], player),
@@ -201,6 +226,7 @@ linked_rooms = {
     "Sand Canyon 2 - 5-1": ["Sand Canyon 2 - 5-2", "Sand Canyon 2 - 5-3", "Sand Canyon 2 - 5-4"],
     "Sand Canyon 3 - 1-1": ["Sand Canyon 3 - 1-2", "Sand Canyon 3 - 1-3"],
     "Sand Canyon 4 - 6-1": ["Sand Canyon 4 - 6-2", "Sand Canyon 4 - 6-3"],
+    "Sand Canyon 6 - 29-1": ["Sand Canyon 6 - 29-2", "Sand Canyon 6 - 29-3", "Sand Canyon 6 - 29-4"],
     "Cloudy Park 6 - 4-1": ["Cloudy Park 6 - 4-2", "Cloudy Park 6 - 4-3", "Cloudy Park 6 - 4-4", "Cloudy Park 6 - 4-5"],
     "Cloudy Park 6 - 10-1": ["Cloudy Park 6 - 10-2", "Cloudy Park 6 - 10-3", "Cloudy Park 6 - 10-4", "Cloudy Park 6 - 10-5"],
     "Iceberg 4 - 10-1": ["Iceberg 4 - 10-2"],
@@ -235,6 +261,10 @@ split_rooms = {
     "Sand Canyon 4 - 6-1",
     "Sand Canyon 4 - 6-3",
     "Sand Canyon 4 - 6-2",
+    "Sand Canyon 6 - 29-1",
+    "Sand Canyon 6 - 29-2",
+    "Sand Canyon 6 - 29-3",
+    "Sand Canyon 6 - 29-4",
     "Cloudy Park 6 - 4-1",
     "Cloudy Park 6 - 4-1",
     "Cloudy Park 6 - 4-2",
@@ -318,6 +348,10 @@ def generate_rooms(world: "KDL3World", level_regions: Dict[int, Region]) -> None
                 required_items = tuple(def_exit["access_rule"])
                 access_rule = lambda state, rule=required_items: state.has_all(rule, world.player)
             room.connect(rooms[target], exit_name, access_rule)
+        if name in extra_connections:
+            room.add_exits(extra_connections[name].keys(),
+                           {x: lambda state, n=name: extra_connections[n][x](state, world.player)
+                            for x in extra_connections[name].keys()})
         if world.options.open_world:
             if any("Complete" in location.name for location in room.locations):
                 room.add_locations({f"{level_names[room.level]} {room.stage} - Stage Completion": None},

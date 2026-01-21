@@ -179,7 +179,7 @@ required_set = {
         "Sand Canyon 6 - 15",
         "Sand Canyon 6 - 18",
         "Sand Canyon 6 - 20",
-        "Sand Canyon 6 - 29",
+        "Sand Canyon 6 - 29-2",
         "Sand Canyon 6 - 37",
     },
     18: {

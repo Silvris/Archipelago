@@ -90,8 +90,14 @@ event_item_table = {
     "Little Toad": ItemData(None, True),
     "Wall": ItemData(None, True),
     "Donbe": ItemData(None, True),
+    "ROB Base": ItemData(None, True),
+    "ROB Torso": ItemData(None, True),
+    "ROB Left Arm": ItemData(None, True),
+    "ROB Right Arm": ItemData(None, True),
+    "ROB Head": ItemData(None, True),
     "Mikarin": ItemData(None, True),
     "Shell": ItemData(None, True),
+    "Angel Feather": ItemData(None, True),
 }
 
 total_filler_weights = {
