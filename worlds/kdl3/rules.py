@@ -322,7 +322,7 @@ def set_rules(world: "KDL3World") -> None:
 
     # animal friend rules
     set_rule(world.get_location(animal_friend_spawns.iceberg_4_a2),
-             lambda state: can_reach_coo(state, world.player) and can_reach_burning(state, world.player))
+             lambda state: can_reach_chuchu(state, world.player) and can_reach_burning(state, world.player))
     set_rule(world.get_location(animal_friend_spawns.iceberg_4_a3),
              lambda state: can_reach_chuchu(state, world.player) and can_reach_coo(state, world.player)
                            and can_reach_burning(state, world.player))

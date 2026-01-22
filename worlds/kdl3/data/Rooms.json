@@ -19586,12 +19586,7 @@
                 "target-x": 72,
                 "target-y": 88,
                 "ptr": 180,
-                "access_rule": [
-                    "Burning",
-                    "Burning Ability",
-                    "Coo",
-                    "Coo Spawn"
-                ]
+                "access_rule": []
             },
             "Iceberg 4 - 13 Exit 3": {
                 "room": "Iceberg 4 - 14-1",
