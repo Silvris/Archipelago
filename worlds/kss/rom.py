@@ -3,7 +3,8 @@ import pkgutil
 import Utils
 import hashlib
 import settings
-from worlds.Files import APProcedurePatch, APTokenMixin, APTokenTypes
+import bsdiff4
+from worlds.Files import APProcedurePatch, APTokenMixin, APTokenTypes, APPatchExtension
 from typing import Iterable, TYPE_CHECKING, Optional
 from struct import pack
 from .options import subgame_mapping, KirbyFlavorPreset
@@ -27,6 +28,17 @@ mww_mode = 0xAFD84
 
 slot_data = 0x3FD00
 
+class KSSPatchExtensions(APPatchExtension):
+    game = "Kirby Super Star"
+    @staticmethod
+    def apply_basepatch(_: APProcedurePatch, rom: bytes):
+        return bsdiff4.patch(rom, pkgutil.get_data(__name__, os.path.join("data", "kss_basepatch.bsdiff4")))
+
+    # back compat, remove in ~3 versions
+    @staticmethod
+    def apply_bsdiff4(caller: APProcedurePatch, rom: bytes, patch: str) -> bytes:
+        return KSSPatchExtensions.apply_basepatch(caller, rom)
+
 
 class KSSProcedurePatch(APProcedurePatch, APTokenMixin):
     hash = [KSS_UHASH, KSS_VCHASH]
@@ -35,7 +47,7 @@ class KSSProcedurePatch(APProcedurePatch, APTokenMixin):
     result_file_ending = ".sfc"
     name: bytearray
     procedure = [
-        ("apply_bsdiff4", ["kss_basepatch.bsdiff4"]),
+        ("apply_basepatch", []),
         ("apply_tokens", ["token_patch.bin"]),
         ("calc_snes_crc", [])
     ]
@@ -53,8 +65,6 @@ class KSSProcedurePatch(APProcedurePatch, APTokenMixin):
 
 
 def patch_rom(world: "KSSWorld", patch: KSSProcedurePatch) -> None:
-    patch.write_file("kss_basepatch.bsdiff4", pkgutil.get_data(__name__, os.path.join("data", "kss_basepatch.bsdiff4")))
-
     patch.write_byte(starting_stage + 1, 1 << world.options.starting_subgame.value)
     patch.write_byte(goal_numeric + 1, world.options.required_subgame_completions.value)
 
