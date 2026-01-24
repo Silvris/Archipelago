@@ -3,13 +3,6 @@
 
 .open "Kirby 64 - The Crystal Shards (USA).z64", "K64Basepatch.z64", 0x0
 
-//; NOP CRC checks
-.org 0x63C
-nop
-
-.org 0x648
-nop
-
 .headersize 0x80000400 - 0x1000 //;ovl0
 
 .org 0x80005400
@@ -915,5 +908,5 @@ FriendPlayedSFXFlag: //; this is sketchy as hell, but we need it loaded in this 
 .notice "Slot Data: " + orga(SlotData)
 .notice "Level Index: " + orga(LevelIndex)
 .notice "Stage Index: " + orga(StageIndex) 
-
+//*/
 .close
