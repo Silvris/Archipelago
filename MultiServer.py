@@ -1861,7 +1861,6 @@ def get_missing_checks(ctx: Context, team: int, slot: int) -> typing.List[int]:
 def get_client_points(ctx: Context, client: Client) -> int:
     checked_locations = sum(len(ctx.location_checks[client.team, slot]) for slot in ctx.slot_info)
     total_locations = sum(len(ctx.locations[slot]) for slot in ctx.slot_info)
-    print(math.floor((checked_locations / total_locations) * 100))
     return (ctx.location_check_points * len(ctx.location_checks[client.team, client.slot]) +
             (math.floor(ctx.additional_hints[client.team, client.slot]) * ctx.get_hint_cost(client.slot)) +
             (math.floor(((checked_locations / total_locations) * 100) * ctx.bonus_hint_percent)) -
@@ -1873,7 +1872,7 @@ def get_slot_points(ctx: Context, team: int, slot: int) -> int:
     total_locations = sum(len(ctx.locations[target_slot]) for target_slot in ctx.slot_info)
     return (ctx.location_check_points * len(ctx.location_checks[team, slot]) +
             (math.floor(ctx.additional_hints[team, slot]) * ctx.get_hint_cost(slot)) +
-            (math.floor((checked_locations // total_locations) * ctx.bonus_hint_percent)) -
+            (math.floor(((checked_locations // total_locations) * 100) * ctx.bonus_hint_percent)) -
             ctx.get_hint_cost(slot) * ctx.hints_used[team, slot])
 
 
