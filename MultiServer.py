@@ -287,6 +287,7 @@ class Context:
         self.hints_used = collections.defaultdict(int)
         self.hints: typing.Dict[team_slot, typing.Set[Hint]] = collections.defaultdict(set)
         self.additional_hints : typing.Dict[team_slot, float] = collections.defaultdict(float)
+        self.release_mode: str = release_mode
         self.remaining_mode: str = remaining_mode
         self.collect_mode: str = collect_mode
         self.countdown_mode: str = countdown_mode
