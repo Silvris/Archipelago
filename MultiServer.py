@@ -1143,12 +1143,12 @@ def send_items_to(ctx: Context, team: int, target_slot: int, *items: NetworkItem
 
 def update_additional_hints(ctx: Context, players: typing.List[team_slot]):
     for team, player in players:
-        free_hints = 0
+        free_hints = 0.0
         hint_items = [item for item in get_received_items(ctx, team, player, True) if item.item in (-2, -3)]
         if hint_items:
             full_hints = sum(item.item == -2 for item in hint_items)
             half_hints = sum(item.item == -3 for item in hint_items)
-            free_hints += full_hints + (half_hints >> 1)
+            free_hints += full_hints + (half_hints / 2)
         ctx.additional_hints[team, player] = free_hints
 
 def register_location_checks(ctx: Context, team: int, slot: int, locations: typing.Iterable[int],
