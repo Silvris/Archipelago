@@ -254,7 +254,7 @@ class K64Client(BizHawkClient):
             return
 
         if ctx.slot is None:
-            await ctx.send_connect(name=ctx.auth)
+            return
 
         if ctx.slot_data is None:
             return
