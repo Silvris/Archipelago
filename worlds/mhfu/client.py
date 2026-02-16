@@ -151,7 +151,7 @@ MHFU_POINTERS = {
         "GUNNER_UPGRADES": 0x08954C88,
         "NARGA_HYPNOC_CUTSCENE": 0x09995ED4,
         "TREASURE_SCORE": 0x099FD1A0,
-        "GUILD_CARD_AWARDS": 0x099FD240, # 6 bytes, bit per award
+        "GUILD_CARD_AWARDS": 0x099FD240,  # 6 bytes, bit per award
         "ZENNY": 0x099FF090,
         "CURRENT_OVL": 0x09A5A5A0,
         "RESET_ACTION": 0x090AF355,  # byte
@@ -206,8 +206,8 @@ MHFU_BREAKPOINT_ARGS = {
 ACTIONS = {
     -1: 0x0003,  # Kill Player
     10: 0x7200,  # Farcaster
-    11: 0x1502,  # Sleep
-    13: 0x1602,  # Paralysis
+    11: 0x1602,  # Paralysis
+    13: 0x1502,  # Sleep
     14: 0x1B02,  # Snowman
     15: 0x1900,  # Use Item
     16: 0x0202,  # Knockback
@@ -842,7 +842,7 @@ class MHFUContext(CommonContext):
     async def pop_trap(self) -> None:
         if self.trap_queue:
             trap = self.trap_queue.pop()
-            if trap == 13:
+            if trap == 12:
                 # Poison
                 await self.ppsspp_write_unsigned(MHFU_POINTERS[self.lang]["POISON_TIMER"], 60, "POISON", 16)
             else:
@@ -1107,6 +1107,7 @@ async def game_watcher(ctx: MHFUContext) -> None:
                                                                 "RESET_DEATH")
                                 await ctx.ppsspp_write_unsigned(MHFU_POINTERS[ctx.lang]["SET_ACTION"],
                                                                 ACTIONS[-1], "SET_DEATH", 16)
+                                ctx.death_state = DeathState.dead
                             else:
                                 ctx.death_state = DeathState.alive
                         await ctx.pop_trap()
