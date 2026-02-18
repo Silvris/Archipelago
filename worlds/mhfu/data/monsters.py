@@ -61,7 +61,7 @@ monster_ids: dict[str, int] = {
     "Furious Rajang": 89
 }
 
-monster_lookup = {idx: monster for monster, idx in monster_ids.items()}
+monster_lookup: dict[int, str] = {idx: monster for monster, idx in monster_ids.items()}
 
 elder_dragons: dict[str, int] = {
     "Fatalis": 2,
@@ -81,7 +81,7 @@ elder_dragons: dict[str, int] = {
     "Ukanlos": 88,
 }
 
-flying_wyverns = {
+flying_wyverns: dict[str, int] = {
     "Rathian": 1,
     "Rathalos": 11,
     "Diablos": 14,
@@ -105,13 +105,13 @@ flying_wyverns = {
     "Ukanlos": 88,
 }
 
-piscene_wyverns = {
+piscene_wyverns: dict[str, int] = {
     "Plesioth": 21,
     "Green Plesioth": 46,
     "Lavasioth": 83,
 }
 
-bird_wyverns = {
+bird_wyverns: dict[str, int] = {
     "Yian Kut-Ku": 6,
     "Gypceros": 20,
     "Velocidrome": 27,

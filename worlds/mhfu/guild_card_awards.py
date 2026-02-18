@@ -1,14 +1,13 @@
 import typing
 from .data.monsters import monster_ids, elder_dragons
-from .quests import get_quest_by_id, get_area_quests, location_name_to_id, MHFURegion, MHFULocation, hub_rank_max
-from .options import VillageQuestDepth, GuildQuestDepth, Awards
+from .quests import get_quest_by_id, get_area_quests, location_name_to_id, MHFURegion, MHFULocation
+from .options import Awards
 from .rules import can_reach_rank, can_hunt_all_monsters, can_complete_all_quests, can_complete_any_quest
 
 from worlds.generic.Rules import add_rule
 
 if typing.TYPE_CHECKING:
-    from . import MHFUWorld, hub_rank_max
-    from .rules import MHFULogicMixin
+    from . import MHFUWorld
 
 award_start = max(location_name_to_id.values())
 
@@ -97,10 +96,11 @@ guild_card_awards: dict[str, GuildCardAward] = {
     "Hunter's Miracle": GuildCardAward(award_start + 48, area=[26, 27, 28, 29, 30, 31]),
 }
 
-for award, data in guild_card_awards.items():
-    location_name_to_id[award] = data.id
+for aw, data in guild_card_awards.items():
+    location_name_to_id[aw] = data.id
 
-def create_awards(world: "MHFUWorld"):
+
+def create_awards(world: "MHFUWorld") -> None:
     menu = world.get_region(world.origin_region_name)
     guild_card = MHFURegion("Guild Card", world.player, world.multiworld, "a great achievement")
     menu.connect(guild_card)
@@ -109,13 +109,14 @@ def create_awards(world: "MHFUWorld"):
     area_set = set()
     quest_names = set()
     for location in world.get_locations():
+        assert isinstance(location, MHFULocation)
         if location.monsters:
             monster_set.update(location.monsters)
         if location.qid:
-            qid = f"m{location.qid:05}"
-            quest_info = get_quest_by_id(qid)
+            qid_str = f"m{location.qid:05}"
+            quest_info = get_quest_by_id(qid_str)
             area_set.add(quest_info.stage)
-            quest_names.add(qid)
+            quest_names.add(qid_str)
     for name, award in guild_card_awards.items():
         # quickly just run through our checks
         if award.grindy and world.options.guild_card_awards.value < Awards.option_on:

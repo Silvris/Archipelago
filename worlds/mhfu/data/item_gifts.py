@@ -1,4 +1,4 @@
-item_gifts = {
+item_gifts: dict[str, dict[int, int]] = {
     # Idea here is to just make a set of "good items" with a name
     # We could probably expand each of these into a separate item, but goal is something functional first
     # flavor later
@@ -38,7 +38,7 @@ item_gifts = {
     }
 }
 
-decoration_gifts = {
+decoration_gifts: dict[str, dict[int, int]] = {
     "blademaster decorations": {
         968: 5,  # Grinder Jewel
         964: 5,  # Razor Jewel

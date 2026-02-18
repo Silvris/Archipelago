@@ -2,7 +2,7 @@ import logging
 import math
 from typing import Any, ClassVar
 import settings
-from BaseClasses import Tutorial, ItemClassification, MultiWorld, CollectionState, Item
+from BaseClasses import Tutorial, ItemClassification, MultiWorld
 from Options import OptionError
 from worlds.AutoWorld import WebWorld, World
 from worlds.LauncherComponents import launch_subprocess, components, Component, Type
@@ -199,7 +199,7 @@ class MHFUWorld(World):
                                   for key, value in self.options.trap_weights.items() if value > 0])
         slot_info["allowed_traps"] = allowed_traps
         slot_info["required_keys"] = self.required_keys
-        slot_info["guild_card_awards"] = bool(self.options.guild_card_awards) # we don't need to specify 1 and 2
+        slot_info["guild_card_awards"] = bool(self.options.guild_card_awards)  # we don't need to specify 1 and 2
         rank_requirements = {}
         for rank in self.rank_requirements:
             rank_requirements[f"{rank[0]},{rank[1]},{rank[2]}"] = self.rank_requirements[rank]

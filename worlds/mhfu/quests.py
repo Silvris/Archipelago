@@ -12,19 +12,19 @@ from .options import VillageQuestDepth, GuildQuestDepth
 if typing.TYPE_CHECKING:
     from . import MHFUWorld
 
-hubs = {
+hubs: dict[int, str] = {
     0: "Guild",
     1: "Village",
     2: "Training"
 }
-ranks = {
+ranks: dict[int, str] = {
     0: "Unrank",
     1: "Low",
     2: "High",
     3: "G",
     4: "Treasure"
 }
-hub_rank_start = {
+hub_rank_start: dict[tuple[int, int], int] = {
     (0, 0): 0,
     (0, 1): 2,
     (0, 2): 5,
@@ -36,12 +36,12 @@ hub_rank_start = {
     (2, 1): 0,
     (2, 2): 0,
 }
-hub_max = {
+hub_max: dict[int, int] = {
     0: 5,
     1: 2,
     2: 3
 }
-hub_rank_max = {
+hub_rank_max: dict[tuple[int, int], int] = {
     (0, 0): 2,
     (0, 1): 3,
     (0, 2): 3,
@@ -53,7 +53,8 @@ hub_rank_max = {
     (2, 1): 1,
     (2, 2): 1,
 }
-goal_quests = {
+
+goal_quests: dict[int, str] = {
     0: "m10509",
     1: "m11225",
     2: "m11226",
@@ -64,7 +65,8 @@ goal_quests = {
     7: "m03231",
     8: "m03232"
 }
-goal_ranks = {
+
+goal_ranks: dict[int, tuple[int, int, int]] = {
     0: (1, 0, 5),
     1: (1, 1, 2),
     2: (1, 1, 2),
@@ -76,7 +78,7 @@ goal_ranks = {
     8: (0, 3, 2),
 }
 
-rank_sort = defaultdict(lambda: 99, {
+rank_sort: typing.DefaultDict[tuple[int, int, int], int] = defaultdict(lambda: 99, {
     (0, 0, 0): 0,
     (0, 0, 1): 1,
     (0, 0, 2): 2,
@@ -114,12 +116,12 @@ class QuestInfo:
     monsters: list[int]
     max_mon: int
 
-    def __init__(self, dct: dict[str, typing.Any]):
+    def __init__(self, dct: dict[str, typing.Any]) -> None:
         for key, val in dct.items():
             setattr(self, key, val)
 
     @property
-    def proper_name(self):
+    def proper_name(self) -> str:
         base_name = self.name
         hub = hubs[self.hub]
         rank = ranks[self.rank + (1 if hub != "Guild" else 0)]
@@ -135,11 +137,12 @@ class SlotQuestInfo(typing.TypedDict):
     mon_num: int
     targets: list[int]
 
+
 def get_star_name(hub: int, rank: int, star: int) -> str:
-    return f"{hubs[hub]} {ranks[rank]} {hub_rank_start[(hub, rank)] + star + 1}"
+    return f"{hubs[hub]} {ranks[rank + (1 if hub == 1 else 0)]} {hub_rank_start[(hub, rank)] + star + 1}"
 
 
-def get_location_ids():
+def get_location_ids() -> dict[str, int]:
     # filter out treasure
     location_names = {info.proper_name: base_id + idx for idx, info in enumerate(quest_data)
                       if (info.hub, info.rank) != (0, 4)}
@@ -226,7 +229,8 @@ def create_ranks(world: "MHFUWorld") -> None:
         # cause kut-ku is valid
         # apparently can't pop on dromes
         if world.options.quest_randomization:
-            areas = get_quest_areas([rank for rank in world.rank_requirements.keys() if rank[0] != 2 and (rank[0], rank[1]) != (0, 4)])
+            areas = get_quest_areas([rank for rank in world.rank_requirements.keys() if rank[0] != 2
+                                     and (rank[0], rank[1]) != (0, 4)])
             max_mons = set()
             for area in areas:
                 max_mons.update([monster_lookup[mon] for mon in monster_habitats[area]])
@@ -273,7 +277,7 @@ def create_ranks(world: "MHFUWorld") -> None:
             # namely, guild required
             if not world.options.guild_depth:
                 valid_quests = [quest for quest in valid_quests if quest.qid not in ("m22002", "m22003", "m22004",
-                                                                                        "m22005", "m22006")]
+                                                                                     "m22005", "m22006")]
             elif world.options.guild_depth == GuildQuestDepth.option_low_rank:
                 valid_quests = [quest for quest in valid_quests if quest.qid not in ("m22005", "m22006")]
             elif world.options.guild_depth == GuildQuestDepth.option_high_rank:
@@ -310,6 +314,7 @@ def create_ranks(world: "MHFUWorld") -> None:
                 world.quest_info[quest.qid[1:]] = quest_info
                 if quest.rank != 4:
                     loc = world.get_location(quest.proper_name)
+                    assert isinstance(loc, MHFULocation)
                     loc.monsters = quest_info["monsters"].copy()
                     loc.qid = int(quest.qid[1:])
         else:
@@ -321,6 +326,7 @@ def create_ranks(world: "MHFUWorld") -> None:
                                                    "targets": []}
                 if quest.rank != 4:
                     loc = world.get_location(quest.proper_name)
+                    assert isinstance(loc, MHFULocation)
                     loc.monsters = quest.monsters.copy()
                     loc.qid = int(quest.qid[1:])
 

@@ -652,7 +652,7 @@ class MHFUContext(CommonContext):
     async def set_equipment_status(self) -> None:
         equip_group: str
         length: int
-        remap: dict[int, int]
+        remap: dict[int, tuple[int, int]] | dict[int, int]
         equipment_type: int
         weapon_type: int
         equip_rarity: int
@@ -864,7 +864,7 @@ class MHFUContext(CommonContext):
                 await self.send_trap_link(item)
             self.trap_queue.append(item.item - 24700500)
 
-    async def check_equipment(self):
+    async def check_equipment(self) -> None:
         # might be a smarter route for this, but this works
         self.weapon_status = {
             0: set(),  # Great Sword
@@ -979,8 +979,9 @@ class MHFUContext(CommonContext):
         if cmd == "Connected":
             from . import MHFUWorld
             if args["slot_data"]["world_version"] != MHFUWorld.world_version.as_simple_string():
-                logger.error(f"Client version {MHFUWorld.world_version.as_simple_string()} does not match server version"
-                             f" {args['slot_data']['world_version']}. Disconnecting, please connect with the correct client.")
+                logger.error(f"Client version {MHFUWorld.world_version.as_simple_string()} does not match "
+                             f"server version {args['slot_data']['world_version']}. "
+                             f"Disconnecting, please connect with the correct client.")
                 asyncio.create_task(self.disconnect(False))
                 return
             # pick up our slot data
@@ -1163,13 +1164,12 @@ async def game_watcher(ctx: MHFUContext) -> None:
 
                 if ctx.guild_card_awards:
                     awards = base64.b64decode((await ctx.ppsspp_read_bytes(MHFU_POINTERS[ctx.lang]["GUILD_CARD_AWARDS"],
-                                                         6, "AWARDS"))["base64"])
+                                               6, "AWARDS"))["base64"])
                     for i in range(48):
-                        x = i // 8 # byte offset
+                        x = i // 8  # byte offset
                         y = i % 8  # mask
                         if awards[x] & (1 << y) and award_start + i + 1 in ctx.missing_locations:
                             new_checks.append(award_start + i + 1)
-
 
                 if new_checks:
                     for new_check_id in new_checks:
@@ -1202,7 +1202,7 @@ async def main(args: "argparse.Namespace") -> None:
     await ctx.shutdown()
 
 
-async def _launch_ppsspp():
+async def _launch_ppsspp() -> None:
     import os
     import subprocess
     from settings import get_settings

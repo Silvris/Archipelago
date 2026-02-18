@@ -45,7 +45,7 @@ def can_hunt_all_monsters(state: CollectionState, monsters: list[str], player: i
     return state.has_all(monsters, player)
 
 
-def can_reach_rank(state: CollectionState, player: int, hub: int, rank: int, star: int):
+def can_reach_rank(state: CollectionState, player: int, hub: int, rank: int, star: int) -> bool:
     return state.can_reach_region(get_star_name(hub, rank, star), player)
 
 
