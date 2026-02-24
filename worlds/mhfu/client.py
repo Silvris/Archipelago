@@ -213,7 +213,7 @@ ACTIONS = {
     16: 0x0202,  # Knockback
     17: 0x0402,  # Blowback
     18: 0x1902,  # Roar
-    19: 0x0502,  # Trip
+    19: 0x0002,  # Trip
 }
 
 KEY_OFFSETS = {
