@@ -43,7 +43,7 @@ def set_rules(world: "PokemonBW2World"):
     set_rule(world.multiworld.get_entrance("Undella Bay -> Seaside Cave", world.player),
              lambda state: state.has("HM03 Surf", world.player))
 
-    set_rule(world.multiworld.get_entrance("Undella Bay -> Abyssal Ruins", world.player),
+    set_rule(world.multiworld.get_entrance("Undella Bay -> Abyssal Ruins (1F)", world.player),
              lambda state: state.has_all(["HM03 Surf", "HM06 Dive"], world.player))
 
     set_rule(world.multiworld.get_entrance("Seaside Cave -> Plasma Frigate (Route 21)", world.player),

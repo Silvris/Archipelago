@@ -9,7 +9,7 @@ from .Regions import create_regions, location_data
 from .Client import PokemonBW2Client
 from .Options import PokemonBW2Options
 from .Rules import set_rules
-from .Rom import patch_rom, get_base_rom_path, PokemonBlack2DeltaPatch, PokemonWhite2DeltaPatch, RomData
+from .Rom import patch_rom, get_base_rom_path, PokemonBlack2ProcedurePatch, PokemonWhite2ProcedurePatch
 from typing import Dict, TextIO, Optional, List
 import os
 import math
@@ -22,15 +22,15 @@ logger = logging.getLogger("Pokemon Black 2 and White 2")
 
 class PokemonBW2Settings(settings.Group):
     class BlackRomFile(settings.UserFilePath):
-        """File name of the Pokemon Black 2 EN rom"""
-        description = "Pokemon Black 2 ROM File"
-        copy_to = "Pokemon Black 2.nds"
+        """File name of the Pokémon Black 2 EN rom"""
+        description = "Pokémon Black 2 ROM File"
+        copy_to = "Pokémon Black 2.nds"
         md5s = []
 
     class WhiteRomFile(settings.UserFilePath):
-        """File name of the Pokemon White 2 EN rom"""
-        description = "Pokemon White 2 ROM File"
-        copy_to = "Pokemon White 2.nds"
+        """File name of the Pokémon White 2 EN rom"""
+        description = "Pokémon White 2 ROM File"
+        copy_to = "Pokémon White 2.nds"
         md5s = []
 
     black_2_rom_file: BlackRomFile = BlackRomFile(BlackRomFile.copy_to)
@@ -54,8 +54,8 @@ class PokemonBW2WebWorld(WebWorld):
 
 class PokemonBW2World(World):
     """
-    Set 2 years after the first game, a new Pokemon adventure begins in the Unova region. Gather the gym badges, defeat
-    the evil Team Plasma, encounter over 600 unique Pokemon, and become the Unova League champion!
+    Set 2 years after the first game, a new Pokémon adventure begins in the Unova region. Gather the gym badges, defeat
+    the evil Team Plasma, encounter over 600 unique Pokémon, and become the Unova League champion!
     """
 
     game = "Pokemon Black 2 and White 2"
@@ -64,7 +64,6 @@ class PokemonBW2World(World):
     item_name_to_id = {item: all_items[item].code for item in all_items}
     location_name_to_id = {location: location_data[location]["idx"] for location in location_data}
     item_name_groups = item_groups
-    data_version = 0
     web = PokemonBW2WebWorld()
     settings: typing.ClassVar[PokemonBW2Settings]
 
@@ -95,31 +94,24 @@ class PokemonBW2World(World):
 
     set_rules = set_rules
 
-    #def generate_output(self, output_directory: str):
-        #pass
-    """
+    def generate_output(self, output_directory: str):
         rom_path = ""
         try:
             world = self.multiworld
             player = self.player
 
-            rom = RomData(get_base_rom_path())
-            patch_rom(self, self.player, rom)
+            if self.options.version == 1:
+                patch = PokemonWhite2ProcedurePatch(player=self.player, player_name=self.player_name)
+            else:
+                patch = PokemonBlack2ProcedurePatch(player=self.player, player_name=self.player_name)
+            patch_rom(self, patch)
 
-            rom_path = os.path.join(output_directory, f"{self.multiworld.get_out_file_name_base(self.player)}.nds")
-            rom.write_to_file(rom_path)
-            self.rom_name = rom.name
-
-            patch = PokemonWhite2DeltaPatch(os.path.splitext(rom_path)[0] + PokemonWhite2DeltaPatch.patch_file_ending, player=player,
-                                   player_name=world.player_name[player], patched_path=rom_path)
-            patch.write()
-        except Exception:
-            raise
+            patch_path = os.path.join(output_directory, f"{self.multiworld.get_out_file_name_base(self.player)}{patch.patch_file_ending}")
+            patch.write(patch_path)
         finally:
             self.rom_name_available_event.set()  # make sure threading continues and errors are collected
             if os.path.exists(rom_path):
                 os.unlink(rom_path)
-                """
 
     #def modify_multidata(self, multidata: dict):
     #    # wait for self.rom_name to be available.

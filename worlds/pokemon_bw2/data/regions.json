@@ -4,7 +4,7 @@
       {
         "name": "Pokedex from Bianca",
         "default": "Pokedex",
-        "tags": [["IGNORE", "KEY"]]
+        "tags": ["IGNORE", "KEY"]
       },
       {
         "name": "Town Map from Hugh's Sister",
@@ -1201,7 +1201,7 @@
     "locations": [],
     "connections": [
       "Undella Town",
-      "Abyssal Ruins",
+      "Abyssal Ruins (1F)",
       "Seaside Cave"
     ]
   },
