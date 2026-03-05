@@ -14,18 +14,16 @@ def can_fight_wind(state: "CollectionState", player: int) -> bool:
 
 
 def set_dyna_blade_rules(world: "KSSWorld") -> None:
-    set_rule(world.get_location(location_names.db_switch_1), lambda state: state.has_any([item_names.mirror,
-                                                                                          item_names.beam,
-                                                                                          item_names.plasma],
-                                                                                         world.player))
+    set_rule(world.get_location(location_names.db_switch_1),
+             lambda state: state.has_any([item_names.mirror, item_names.beam], world.player) or
+                           (state.has(item_names.plasma, world.player)
+                            and state.has_any_count({item_names.dyna_blade_ex1: 1,
+                                                     item_names.progressive_dyna_blade: 2}, world.player)))
 
-    if world.options.essences or "Maxim Tomato" in world.options.consumables:
-        # They always need this, but these regions don't have locations if not on essence/maxim
-        # so we set the item to useful
-        set_rule(world.get_entrance("Mallow Castle -> Dyna Blade Bonus 1"),
-                 lambda state: state.has(item_names.dyna_blade_ex1, world.player))
-        set_rule(world.get_entrance("Candy Mountain -> Dyna Blade Bonus 2"),
-                 lambda state: state.has(item_names.dyna_blade_ex2, world.player))
+    set_rule(world.get_entrance("Mallow Castle -> Dyna Blade Bonus 1"),
+             lambda state: state.has(item_names.dyna_blade_ex1, world.player))
+    set_rule(world.get_entrance("Candy Mountain -> Dyna Blade Bonus 2"),
+             lambda state: state.has(item_names.dyna_blade_ex2, world.player))
 
     if "Maxim Tomato" in world.options.consumables:
         set_rule(world.get_location(location_names.db_pp_maxim_3),
@@ -35,14 +33,20 @@ def set_dyna_blade_rules(world: "KSSWorld") -> None:
 
     if "1-Up" in world.options.consumables:
         set_rule(world.get_location(location_names.db_pp_1up_1), lambda state: state.has(item_names.beam, world.player))
-        set_rule(world.get_location(location_names.db_mc_1up_1), lambda state: state.has_any([item_names.cutter,
-                                                                                              item_names.beam,
-                                                                                              item_names.bomb,
-                                                                                              item_names.parasol],
-                                                                                             world.player))
+        set_rule(world.get_location(location_names.db_mc_1up_1),
+                 lambda state: (state.has_any([item_names.cutter, item_names.beam, item_names.bomb,
+                                              item_names.parasol, item_names.mirror, item_names.hammer,
+                                               item_names.sword], world.player))
+                                or (state.has_any([item_names.yoyo, item_names.stone])
+                                    and state.has(item_names.progressive_dyna_blade, world.player, 2))
+                                or (state.has(item_names.ninja, world.player)
+                                    and state.has(item_names.dyna_blade_ex1, world.player))
+                 )
         for location in (location_names.db_mc_1up_3, location_names.db_mc_1up_4, location_names.db_mc_1up_5):
-            set_rule(world.get_location(location), lambda state: state.has_any([item_names.hammer, item_names.stone],
-                                                                               world.player))
+            set_rule(world.get_location(location),
+                     lambda state: state.has(item_names.hammer, world.player)
+                                   or (state.has(item_names.stone, world.player) and
+                                       state.has(item_names.progressive_dyna_blade, world.player, 2)))
         set_rule(world.get_location(location_names.db_cc_1up_2), lambda state: state.has_any([item_names.beam,
                                                                                               item_names.stone,
                                                                                               item_names.mirror,

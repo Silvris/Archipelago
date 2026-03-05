@@ -153,10 +153,7 @@ class KSSWorld(World):
         treasure_value = 0
 
         if "Dyna Blade" in self.options.included_subgames:
-            force = None
-            if not self.options.essences and "Maxim Tomato" not in self.options.consumables:
-                force = ItemClassification.useful
-            itempool.extend([self.create_item(name, force if "Extra" in name else None)
+            itempool.extend([self.create_item(name)
                              for name, data in dyna_items.items()
                              for _num in range(data.num)
                              ])
