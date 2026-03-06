@@ -276,9 +276,9 @@ def patch_rom(world: "K64World", player: int, patch: K64ProcedurePatch):
     patch.write_byte(slot_data + 1, world.options.death_link.value)
     patch.write_byte(slot_data + 2, world.options.goal_speed.value)
     consumable_val = 0
-    if "1-Ups" in world.options.consumables:
-        consumable_val |= 1
     if "Food" in world.options.consumables:
+        consumable_val |= 1
+    if "1-Ups" in world.options.consumables:
         consumable_val |= 2
     if "Stars" in world.options.consumables:
         consumable_val |= 4
