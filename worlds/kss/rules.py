@@ -37,7 +37,7 @@ def set_dyna_blade_rules(world: "KSSWorld") -> None:
                  lambda state: (state.has_any([item_names.cutter, item_names.beam, item_names.bomb,
                                               item_names.parasol, item_names.mirror, item_names.hammer,
                                                item_names.sword], world.player))
-                                or (state.has_any([item_names.yoyo, item_names.stone])
+                                or (state.has_any([item_names.yoyo, item_names.stone], world.player)
                                     and state.has(item_names.progressive_dyna_blade, world.player, 2))
                                 or (state.has(item_names.ninja, world.player)
                                     and state.has(item_names.dyna_blade_ex1, world.player))
