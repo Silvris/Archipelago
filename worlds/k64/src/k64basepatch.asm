@@ -243,16 +243,17 @@ lw      s2, 0x6C80 (at)
 li      t5, 0x01010100
 bne     s2, t5, @@SetFalse
 li      s2, 0x0001
+sw      s2, 0x6C78 (at)
 @@Set:
 sw      s2, 0x6B94 (at)
-sw      s2, 0x6C78 (at)
 jr      ra
 nop
 @@SetFalse:
 li      s2, 6
 sw      s2, 0x6B90 (at)
 li      s2, 0x0004
-beqz    s2, @@Set
+bnez    s2, @@Set
+nop
 
 RedirectStage:
 lw      t5, 0xE500 (at)
