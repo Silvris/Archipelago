@@ -256,9 +256,6 @@ class K64Client(BizHawkClient):
         if ctx.slot is None:
             return
 
-        if ctx.slot_data is None:
-            return
-
         if not self.current_level_storage_key:
             self.current_level_storage_key = f"k64_current_level_{ctx.team}_{ctx.slot}"
             ctx.set_notify(self.current_level_storage_key)
