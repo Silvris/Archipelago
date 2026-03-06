@@ -170,7 +170,7 @@ class KSSSNIClient(SNIClient):
                             {"operation": "replace", "value": tracker_val}
                         ]
                     }])
-            print(ctx.stored_data.get(self.tracker_key, None))
+            # print(ctx.stored_data.get(self.tracker_key, None))
 
         save_abilities = 0
         i = 0
