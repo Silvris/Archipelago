@@ -175,7 +175,7 @@ class KSSSNIClient(SNIClient):
         save_abilities = 0
         i = 0
         non_mww = 0
-        for i, ability in enumerate([item for item in ctx.items_received if item.item & 0x100]):
+        for i, ability in enumerate([item for item in ctx.items_received if item.item & 0x100 and item.item > 0]):
             save_abilities |= (1 << ((ability.item & 0xFF) - 1))
             if ability.item & 0xFF > 0x13:
                 non_mww += 1
@@ -187,7 +187,7 @@ class KSSSNIClient(SNIClient):
         known_value = int.from_bytes(await snes_read(ctx, KSS_TGC0_GOLD, 4), "little")
         treasure_data = 0
         treasure_value = 0
-        for treasure in [item for item in ctx.items_received if item.item & 0x200]:
+        for treasure in [item for item in ctx.items_received if item.item & 0x200 and item.item > 0]:
             treasure_info = treasures[ctx.item_names.lookup_in_game(treasure.item)]
             treasure_value += treasure_info.value
             treasure_data |= (1 << ((treasure.item & 0xFF) - 1))
@@ -196,7 +196,7 @@ class KSSSNIClient(SNIClient):
             snes_buffered_write(ctx, KSS_TGC0_GOLD, treasure_value.to_bytes(4, "little"))
 
         unlocked_planets = int.from_bytes(await snes_read(ctx, KSS_RECEIVED_PLANETS, 2), "little")
-        for planet_item in [item for item in ctx.items_received if item.item & 0x400]:
+        for planet_item in [item for item in ctx.items_received if item.item & 0x400 and item.item > 0]:
             planet = planet_item.item & 0xFF
             unlocked_planets |= (1 << planet)
         snes_buffered_write(ctx, KSS_RECEIVED_PLANETS, unlocked_planets.to_bytes(2, "little"))
@@ -208,7 +208,8 @@ class KSSSNIClient(SNIClient):
 
 
         unlocked_switches = int.from_bytes(await snes_read(ctx, KSS_DYNA_SWITCHES, 1), "little")
-        for switch_item in [item for item in ctx.items_received if (item.item & 0x803) in (0x800, 0x801)]:
+        for switch_item in [item for item in ctx.items_received if (item.item & 0x803) in (0x800, 0x801)
+                                                                   and item.item > 0]:
             switch = switch_item.item & 0xFF
             unlocked_switches |= (1 << switch)
         snes_buffered_write(ctx, KSS_DYNA_SWITCHES, unlocked_switches.to_bytes(1, "little"))
@@ -230,7 +231,10 @@ class KSSSNIClient(SNIClient):
                 color(ctx.player_names[item.player], 'yellow'),
                 ctx.location_names.lookup_in_slot(item.location, item.player), recv_count, len(ctx.items_received)))
             snes_buffered_write(ctx, KSS_RECEIVED_ITEMS, recv_count.to_bytes(2, "little"))
-            if item.item & 0xFF00 == 0:
+            if item.item < 0:
+                # Core item, we just want to pass here
+                snes_buffered_write(ctx, KSS_PLAY_SFX, int.to_bytes(0x2C, 2, "little"))
+            elif item.item & 0xFF00 == 0:
                 # Subgame
                 unlocked_subgames = int.from_bytes(await snes_read(ctx, KSS_RECEIVED_SUBGAMES, 2), "little")
                 unlocked_subgames |= (1 << (item.item & 0xFF))
