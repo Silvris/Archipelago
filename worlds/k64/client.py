@@ -98,7 +98,6 @@ stage_to_byte = {
     6: [30, 31, 32],
 }
 
-K64_IS_DEMO = 0x3387B2
 K64_GAME_STATE = 0xBE4F0
 K64_CURRENT_LEVEL = 0xBE500
 K64_CURRENT_STAGE = 0xBE504
@@ -293,12 +292,11 @@ class K64Client(BizHawkClient):
             ]))
             self.boss_requirements = boss_requirements[0]
 
-        (halken, is_demo, game_state, stage_array, boss_crystals, crystal_array,
+        (halken, game_state, stage_array, boss_crystals, crystal_array,
          copy_ability, crystals, recv_index, health, health_visual,
          lives, lives_visual, current_level, current_stage,
          menu_level, consumable_checks, star_count) = await read(ctx.bizhawk_ctx, [
             (K64_SAVE_ADDRESS, 16, "RDRAM"),
-            (K64_IS_DEMO, 4, "RDRAM"),
             (K64_GAME_STATE, 4, "RDRAM"),
             (K64_STAGE_STATUSES, 42, "RDRAM"),
             (K64_BOSS_CRYSTALS, 8, "RDRAM"),
@@ -323,6 +321,8 @@ class K64Client(BizHawkClient):
         game_state_val = int.from_bytes(game_state, "big")
         if game_state_val in range(11):
             # 0x0 - 0xA are main menu states
+            # 0x04 is the demo
+            # 0x05 is controller can't be found
             # 0xB is the world select
             return
 

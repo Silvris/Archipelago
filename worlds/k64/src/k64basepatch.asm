@@ -244,7 +244,6 @@ li      t5, 0x01010100
 bne     s2, t5, @@SetFalse
 li      s2, 0x0001
 sw      s2, 0x6C78 (at)
-@@Set:
 sw      s2, 0x6B94 (at)
 jr      ra
 nop
@@ -252,7 +251,9 @@ nop
 li      s2, 6
 sw      s2, 0x6B90 (at)
 li      s2, 0x0004
-bnez    s2, @@Set
+sw      s2, 0x6B94 (at)
+li      s2, 0x0001
+jr      ra
 nop
 
 RedirectStage:
