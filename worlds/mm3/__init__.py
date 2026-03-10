@@ -113,8 +113,7 @@ class MM3World(World):
                              lambda state, req=tuple(region.required_items): state.has_all(req, self.player))
             else:
                 old_stage = self.get_region(region.parent)
-                old_stage.connect(stage, f"To {name}",
-                                  lambda state, req=tuple(region.required_items): state.has_all(req, self.player))
+                old_stage.connect(stage, f"To {name}")
             stage.add_locations({loc: data.location_id for loc, data in region.locations.items()
                                  if (not data.energy or self.options.consumables.value in (Consumables.option_weapon_health, Consumables.option_all))
                                  and (not data.oneup_tank or self.options.consumables.value in (Consumables.option_1up_etank, Consumables.option_all))})
