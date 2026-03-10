@@ -362,6 +362,8 @@ def set_rules(world: "MM3World") -> None:
 
             world.wily_4_weapons = {boss: sorted(weapons) for boss, weapons in used_weapons.items()}
 
+    location_rules: dict[str, Rule] = {}
+
     for i, boss_locations in zip(range(22), [
         get_boss_locations("Needle Man Stage"),
         get_boss_locations("Magnet Man Stage"),
@@ -401,9 +403,13 @@ def set_rules(world: "MM3World") -> None:
             if i in (20, 21):
                 # multi-phase fights, get all potential weaknesses
                 # we should probably do this smarter, but this works for now
-                world.set_rule(world.get_location(location), static_rule & HasAll(*weapons))
+                location_rules[location] = static_rule & HasAll(*weapons)
             else:
-                world.set_rule(world.get_location(location), static_rule & HasAny(*weapons))
+                location_rules[location] = static_rule & HasAny(*weapons)
+
+    for location in STATIC_LOCATION_RULES:
+        if location not in location_rules:
+            location_rules[location] = STATIC_LOCATION_RULES[location]
 
     # Handle entrance rules
     for region, info in mm3_regions.items():
@@ -415,9 +421,12 @@ def set_rules(world: "MM3World") -> None:
     if world.options.consumables in (world.options.consumables.option_1up_etank,
                                      world.options.consumables.option_all):
         for location in STATIC_1UP_RULES:
-            world.set_rule(world.get_location(location), STATIC_1UP_RULES[location])
+            location_rules[location] = STATIC_1UP_RULES[location]
 
     if world.options.consumables in (world.options.consumables.option_weapon_health,
                                      world.options.consumables.option_all):
         for location in STATIC_ENERGY_RULES:
-            world.set_rule(world.get_location(location), STATIC_ENERGY_RULES[location])
+            location_rules[location] = STATIC_ENERGY_RULES[location]
+
+    for location, rule in location_rules.items():
+        world.set_rule(world.get_location(location), rule)
