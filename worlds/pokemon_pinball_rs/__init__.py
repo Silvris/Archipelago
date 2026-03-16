@@ -12,6 +12,7 @@ from .names import RUBY_BOARD, SAPPHIRE_BOARD, AREAS
 from .options import PokemonPinballRSOptions, StartingBoard
 from .regions import create_regions, location_lookup
 from .rom import PinballRSProcedurePatch, patch_rom
+from .rules import set_rules
 
 
 class PokemonPinballRSSettings(Group):
@@ -88,6 +89,8 @@ class PokemonPinballRSWorld(World):
         itempool += [Item("Nothing", ItemClassification.filler, -1, self.player) for _ in range(unfilled)]
 
         self.multiworld.itempool += itempool
+
+    set_rules = set_rules
 
     def generate_output(self, output_directory: str) -> None:
         try:

@@ -315,3 +315,8 @@ rare_encounters: list[int] = [
     151,  # Absol
     160,  # Wobbuffet
 ]
+
+bonus_catches: dict[int, list[int]] = {
+    0: [198, 199],  # Ruby: Groudon and Rayquaza
+    1: [197, 199]   # Sapphire: Kyogre and Rayquaza
+}

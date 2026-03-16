@@ -215,6 +215,13 @@ DX_MODE = "eReader Card - DX Mode"  # Not going to use, we want to hijack it for
 RUINS_AREA_CARD = "eReader Card - Ruins Area"
 RUBY_BOARD = "Ruby Board"
 SAPPHIRE_BOARD = "Sapphire Board"
+EVO_ARROW = "Evo Arrow"
+GET_ARROW = "Get Arrow"
+HATCH_MODE = "Hatch Mode"
+CHIKORITA_DEX = "Chikorita Pokédex Entry"
+CYNDAQUIL_DEX = "Cyndaquil Pokédex Entry"
+TOTODILE_DEX = "Totodile Pokédex Entry"
+AERODACTYL_DEX = "Aerodactyl Pokédex Entry"
 # Areas
 FOREST_RUBY = "Forest (Ruby)"
 VOLCANO_RUBY = "Volcano (Ruby)"
