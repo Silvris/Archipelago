@@ -47,7 +47,7 @@ class PinballRSPatchExtension(APPatchExtension):
 class PinballRSProcedurePatch(APProcedurePatch, APTokenMixin):
     hash = PINBALLRSHASH
     game = "Pokemon Pinball Ruby & Sapphire"
-    patch_file_ending = ".appprs"
+    patch_file_ending = ".appbrs"
     result_file_ending = ".gba"
     name: bytearray
     procedure = [
@@ -74,6 +74,28 @@ def patch_rom(world: "PokemonPinballRSWorld", patch: PinballRSProcedurePatch) ->
     patch.write_bytes(0x6BC000, patch.name)
     patch.write_bytes(0x6BC020, world.world_version)
 
+    goal_value = 0
+    for val in world.options.goal.value:
+        if val == "Pokedex":
+            goal_value |= 1
+        elif val == "Score":
+            goal_value |= 2
+        elif val == "Targets":
+            goal_value |= 4
+
+    targets = bytearray([0] * 26)
+
+    for target in world.options.pokemon_targets.value:
+        dexnum = names.POKEDEX[target]
+        idx = dexnum // 8
+        mask = dexnum % 8
+        targets[idx] |= (1 << mask)
+
+    patch.write_byte(0x6BC030, goal_value)
+    patch.write_byte(0x6BC031, world.options.pokedex_requirement.value)
+    patch.write_bytes(0x6BC032, int.to_bytes(world.options.score_requirement.value, 4, "big"))
+    patch.write_bytes(0x6BC036, targets)
+
     patch.write_file("token_patch.bin", patch.get_token_binary())
 
 
@@ -85,7 +107,7 @@ def get_base_rom_bytes(file_name: str = "") -> bytes:
 
         basemd5 = hashlib.md5()
         basemd5.update(base_rom_bytes)
-        if basemd5.hexdigest() == PINBALLRSHASH:
+        if basemd5.hexdigest() != PINBALLRSHASH:
             print(basemd5.hexdigest())
             raise Exception("Supplied Base Rom does not match known MD5 for US, LC, or US VC release. "
                             "Get the correct game and version, then dump it")

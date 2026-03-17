@@ -7,11 +7,12 @@ from Options import OptionError
 from settings import Group, UserFilePath
 from typing import Any, ClassVar
 
+from .client import PinballRSClient
 from .items import PinballRSItem, ALL_ITEMS, item_lookup, MAIN_ITEMS, AREA_ITEMS
 from .names import RUBY_BOARD, SAPPHIRE_BOARD, AREAS
 from .options import PokemonPinballRSOptions, StartingBoard
 from .regions import create_regions, location_lookup
-from .rom import PinballRSProcedurePatch, patch_rom
+from .rom import PinballRSProcedurePatch, patch_rom, PINBALLRSHASH
 from .rules import set_rules
 
 
@@ -20,7 +21,7 @@ class PokemonPinballRSSettings(Group):
         """File name of the Pokemon Pinball RS EN rom"""
         description = "Pokemon Pinball Ruby & Sapphire ROM File"
         copy_to: str | None = "Pokemon Pinball RS.gba"
-        md5s = []
+        md5s = [PINBALLRSHASH]
 
     rom_file: RomFile = RomFile(RomFile.copy_to)
 

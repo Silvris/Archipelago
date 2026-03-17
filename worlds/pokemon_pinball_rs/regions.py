@@ -16,7 +16,7 @@ class PinballRSLocation(Location):
 
 
 location_lookup: dict[str, int] = {
-    **POKEDEX,
+    **{f"Pokedex - {mon}": idx + 1 for mon, idx in POKEDEX.items()},
 }
 
 
@@ -35,7 +35,7 @@ def create_regions(world: "PokemonPinballRSWorld") -> None:
     world.multiworld.regions.extend([ruby, sapphire, pokedex, menu])
 
     # Create the Pokédex, real checks
-    pokedex.add_locations({f"Pokédex - {mon}": idx for mon, idx in POKEDEX.items()})
+    pokedex.add_locations({f"Pokédex - {mon}": idx + 1 for mon, idx in POKEDEX.items()})
 
     # Create board locations
     for i, board in enumerate((ruby, sapphire)):
