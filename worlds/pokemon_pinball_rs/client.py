@@ -6,6 +6,8 @@ from typing import TYPE_CHECKING, Any
 from NetUtils import ClientStatus, color, NetworkItem
 from worlds._bizhawk.client import BizHawkClient
 
+from .data.pokemon import egg_groups
+
 if TYPE_CHECKING:
     from worlds._bizhawk.context import BizHawkClientContext, BizHawkClientCommandProcessor
 
@@ -32,6 +34,7 @@ PINBALL_EVO = PINBALL_AP_START + 9
 PINBALL_HATCH = PINBALL_AP_START + 10
 PINBALL_RECEIVED = PINBALL_AP_START + 11
 PINBALL_STAGES = PINBALL_AP_START + 0x10
+PINBALL_EGGS = PINBALL_AP_START + 0x20
 
 PINBALL_NAME = 0x6BC000
 PINBALL_VERSION = 0x6BC020
@@ -62,7 +65,7 @@ def cmd_request(self: "BizHawkClientCommandProcessor", amount: str, target: str)
         return
 
 
-def cmd_autoheal(self) -> None:
+def cmd_autoheal(self: "BizHawkClientCommandProcessor") -> None:
     """Enable auto heal from EnergyLink."""
     if self.ctx.game != "Mega Man 2":
         logger.warning("This command can only be used when playing Mega Man 2.")
@@ -161,7 +164,7 @@ class PinballRSClient(BizHawkClient):
 
         # get our relevant bytes
         (local_dex, high_scores, starting_lives, starting_coins, starting_ball, pichu_upgrade,
-            boards, get_arrows, evo_arrows, hatch_mode, stages, items_received,
+            boards, get_arrows, evo_arrows, hatch_mode, stages, items_received, local_eggs,
          goal, dex_req, score_req, target_req) = await read(ctx.bizhawk_ctx, [
                 (PINBALL_POKEDEX, 205, "System Bus"),
                 (PINBALL_HIGH_SCORES, 0x180, "System Bus"),
@@ -175,6 +178,7 @@ class PinballRSClient(BizHawkClient):
                 (PINBALL_HATCH, 1, "System Bus"),
                 (PINBALL_STAGES, 14, "System Bus"),
                 (PINBALL_RECEIVED, 2, "System Bus"),
+                (PINBALL_EGGS, 4, "System Bus"),
                 (PINBALL_GOAL, 1, "ROM"),
                 (PINBALL_DEX_REQ, 1, "ROM"),
                 (PINBALL_SCORE_REQ, 4, "ROM"),
@@ -276,25 +280,30 @@ class PinballRSClient(BizHawkClient):
         if evo_arrows[0] != remote_evo:
             writes.append((PINBALL_EVO, remote_evo.to_bytes(1, "big"), "System Bus"))
 
-        remote_hatch = int(any(item.item == 12 for item in ctx.items_received))
-        if hatch_mode[0] != remote_hatch:
-            writes.append((PINBALL_HATCH, remote_hatch.to_bytes(1, "big"), "System Bus"))
-
         for item in [item for item in ctx.items_received if item.item in range(13, 17)]:
             if local_dex[item.item - 13 + 200] < 3:
                 writing_dex = True
                 write_local_dex[item.item - 13 + 200] = 3
 
+        remote_eggs = 0
+        for item in [item for item in ctx.items_received if item.item in range(17, 23)]:
+            egg_group = item.item - 16
+            for mon in egg_groups[egg_group]:
+                remote_eggs |= (1 << mon)
+        if remote_eggs and int.from_bytes(local_eggs, "little") != remote_eggs:
+            writes.append((PINBALL_EGGS, remote_eggs.to_bytes(4, "big"), "System Bus"))
+            writes.append((PINBALL_HATCH, int.to_bytes(1, 1, "big"), "System Bus"))
+
         new_checks = []
         # check for locations
 
         for i in range(205):
-            if local_dex[i] == 4 and i not in ctx.locations_checked:
-                new_checks.append(i)
-            elif local_dex[i] != 4 and i in ctx.checked_locations:
-                # collect, maybe push out to an option?
-                writing_dex = True
-                write_local_dex[i] = 4
+            if local_dex[i] == 4 and (i+1) not in ctx.locations_checked:
+                new_checks.append(i+1)
+            # elif local_dex[i] != 4 and (i+1) in ctx.checked_locations:
+            #    # collect, maybe push out to an option?
+            #    writing_dex = True
+            #    write_local_dex[i] = 4
 
         if writing_dex:
             writes.append((PINBALL_POKEDEX, bytes(write_local_dex), "System Bus"))

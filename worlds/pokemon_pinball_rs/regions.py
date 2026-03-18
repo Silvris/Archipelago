@@ -16,7 +16,7 @@ class PinballRSLocation(Location):
 
 
 location_lookup: dict[str, int] = {
-    **{f"Pokedex - {mon}": idx + 1 for mon, idx in POKEDEX.items()},
+    **{f"Pokédex - {mon}": idx + 1 for mon, idx in POKEDEX.items()},
 }
 
 

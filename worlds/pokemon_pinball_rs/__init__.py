@@ -68,7 +68,7 @@ class PokemonPinballRSWorld(World):
         return PinballRSItem(name, data.classification, data.idx, self.player)
 
     def create_items(self) -> None:
-        itempool = [self.create_item(name) for name, data in MAIN_ITEMS.items() for _ in range(data.count)]
+        itempool = [self.create_item(name) for name, data in MAIN_ITEMS.items() for _ in range(data.num)]
         if self.options.starting_board == StartingBoard.option_ruby:
             board_name = RUBY_BOARD
         else:

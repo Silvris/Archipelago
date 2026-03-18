@@ -320,3 +320,46 @@ bonus_catches: dict[int, list[int]] = {
     0: [198, 199],  # Ruby: Groudon and Rayquaza
     1: [197, 199]   # Sapphire: Kyogre and Rayquaza
 }
+
+eggs: list[int] = [
+        13,  # Wurmple
+        18,  # Lotad
+        21,  # Seedot
+        28,  # Ralts
+        31,  # Surskit
+        33,  # Shroomish
+        44,  # Whismur
+        53,  # Azurill
+        60,  # Skitty
+        62,  # Zubat
+        69,  # Aron
+        79,  # Plusle
+        80,  # Minun
+        87,  # Oddish
+        94,  # Gulpin
+        109,  # Spoink
+        111,  # Sandshrew
+        113,  # Spinda
+        115,  # Trapinch
+        136,  # Igglybuff
+        145,  # Shuppet
+        150,  # Chimecho
+        159,  # Wynaut
+        161,  # Natu
+        164,  # Phanpy
+        170,  # Snorunt
+        172,  # Spheal
+        179,  # Corsola
+        180,  # Chinchou
+        183,  # Horsea
+        186,  # Bagon
+    ]
+
+egg_groups: dict[int, list[int]] = {
+    1: [0, 3, 6, 9, 10],
+    2: [13, 15, 20, 21, 23],
+    3: [16, 17, 18, 24],
+    4: [25, 26, 27, 29, 30],
+    5: [2, 5, 8, 11, 12, 22],  # Ruby exclusives
+    6: [1, 4, 7, 14, 19, 28],  # Sapphire exclusives
+}

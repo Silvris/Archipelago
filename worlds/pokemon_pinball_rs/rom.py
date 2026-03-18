@@ -40,7 +40,7 @@ class PinballRSPatchExtension(APPatchExtension):
     game = "Pokemon Pinball Ruby & Sapphire"
 
     @staticmethod
-    def apply_basepatch(_: APProcedurePatch, rom: bytes):
+    def apply_basepatch(_: APProcedurePatch, rom: bytes) -> bytes:
         return bsdiff4.patch(rom, pkgutil.get_data(__name__, os.path.join("data", "pinballrs_basepatch.bsdiff4")))
 
 

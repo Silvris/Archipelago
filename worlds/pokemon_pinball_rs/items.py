@@ -1,7 +1,8 @@
 from BaseClasses import Item, ItemClassification
 from .names import (RUBY_BOARD, SAPPHIRE_BOARD, AREAS, EXTRA_STARTING_LIFE, STARTING_COINS, STARTING_BALL_MODIFIER,
-                    PICHU_UPGRADE, SPECIAL_GUESTS, ENCOUNTER_RATE_UP, RUINS_AREA_CARD, GET_ARROW, EVO_ARROW, HATCH_MODE,
-                    CHIKORITA_DEX, CYNDAQUIL_DEX, TOTODILE_DEX, AERODACTYL_DEX)
+                    PICHU_UPGRADE, SPECIAL_GUESTS, ENCOUNTER_RATE_UP, RUINS_AREA_CARD, GET_ARROW, EVO_ARROW,
+                    CHIKORITA_DEX, CYNDAQUIL_DEX, TOTODILE_DEX, AERODACTYL_DEX, EGG_BUNCH_1, EGG_BUNCH_2, EGG_BUNCH_3,
+                    EGG_BUNCH_4, EGG_BUNCH_RUBY, EGG_BUNCH_SAPPHIRE)
 from typing import NamedTuple
 
 
@@ -12,26 +13,32 @@ class PinballRSItem(Item):
 class ItemData(NamedTuple):
     idx: int
     classification: ItemClassification
-    count: int = 1
+    num: int = 1
 
 
 MAIN_ITEMS: dict[str, ItemData] = {
     RUBY_BOARD: ItemData(1, ItemClassification.progression | ItemClassification.useful),
     SAPPHIRE_BOARD: ItemData(2, ItemClassification.progression | ItemClassification.useful),
-    EXTRA_STARTING_LIFE: ItemData(3, ItemClassification.progression, count=9),
-    STARTING_COINS: ItemData(4, ItemClassification.progression, count=9),
-    STARTING_BALL_MODIFIER: ItemData(5, ItemClassification.useful, count=3),
+    EXTRA_STARTING_LIFE: ItemData(3, ItemClassification.progression, num=9),
+    STARTING_COINS: ItemData(4, ItemClassification.progression, num=9),
+    STARTING_BALL_MODIFIER: ItemData(5, ItemClassification.useful, num=3),
     PICHU_UPGRADE: ItemData(6, ItemClassification.progression),
     SPECIAL_GUESTS: ItemData(7, ItemClassification.progression),
     ENCOUNTER_RATE_UP: ItemData(8, ItemClassification.progression),
     RUINS_AREA_CARD: ItemData(9, ItemClassification.progression),
     GET_ARROW: ItemData(10, ItemClassification.progression),
-    EVO_ARROW: ItemData(11, ItemClassification.progression, count=3),
-    HATCH_MODE: ItemData(12, ItemClassification.progression),
+    EVO_ARROW: ItemData(11, ItemClassification.progression, num=3),
+    # HATCH_MODE: ItemData(12, ItemClassification.progression),
     CHIKORITA_DEX: ItemData(13, ItemClassification.progression),
     CYNDAQUIL_DEX: ItemData(14, ItemClassification.progression),
     TOTODILE_DEX: ItemData(15, ItemClassification.progression),
     AERODACTYL_DEX: ItemData(16, ItemClassification.progression),
+    EGG_BUNCH_1: ItemData(17, ItemClassification.progression),
+    EGG_BUNCH_2: ItemData(18, ItemClassification.progression),
+    EGG_BUNCH_3: ItemData(19, ItemClassification.progression),
+    EGG_BUNCH_4: ItemData(20, ItemClassification.progression),
+    EGG_BUNCH_RUBY: ItemData(21, ItemClassification.progression),
+    EGG_BUNCH_SAPPHIRE: ItemData(22, ItemClassification.progression),
 }
 
 AREA_ITEMS: dict[str, ItemData] = {

@@ -71,6 +71,23 @@
     .thumb
     bl          HandleRuinsNatural
 
+//; catch_hatch_picker
+.org BuildSpeciesWeightsForCatchEmMode+0x110
+    .thumb
+    bl          ClampearlCheck
+
+.org BuildSpeciesWeightsForCatchEmMode+0x162
+    .thumb
+    bl          WeightsCheckEvo
+
+.org BuildSpeciesWeightsForEggMode+0x92
+    .thumb
+    bl          EggsCheckEvo
+
+.org BuildSpeciesWeightsForEggMode+0x102
+    .thumb
+    bl          EggGroups
+
 //; board_process2
 .org sub_4E2F8+0x136 //; Preserve Pichu on fail
     .thumb
@@ -462,7 +479,7 @@ HatchLockSapphireAP:
 GetArrows:
     push        {r2, lr}
     cmp         r0, #2
-    ble         @@True
+    ble         @@Set
     nop
     @@Get1:
     GetValue    r2, @@Get1, GetArrowsAP
@@ -499,6 +516,114 @@ EvoArrows:
 
 EvoArrowsAP:
     .word 0x2033000
+
+WeightsCheckEvo:
+    push        {r2}
+    ldrb        r6, [r0, #0x15]
+    @@Get1:
+    GetValue    r2, @@Get1, WeightsCheckEvoAP
+    ldrb        r2, [r2, #9]
+    cmp         r2, #3
+    bge         @@Return
+    mov         r6, #0xCD
+    @@Return:
+    pop         {r2}
+    add         r0, r6, #0
+    bx          lr
+
+WeightsCheckEvoAP:
+    .word 0x2033000
+
+ClampearlCheck:
+    //; clampearl is a special little baby
+    push        {r0-r2}
+    nop
+    @@Get1:
+    GetValue    r2, @@Get1, ClampearlCheckAP
+    ldrb        r2, [r2, #0]
+    cmp         r2, #3
+    bge         @@Return
+    mov         r0, #0xBA
+    add         lr, r0
+    @@Return:
+    pop         {r0-r2}
+    lsl         r2, r2, #0x10
+    asr         r0, r2, #0x10
+    bx          lr
+
+ClampearlCheckAP:
+    .word 0x2033000
+
+EggsCheckEvo:
+    push        {r2}
+    ldrb        r5, [r0, #0x15]
+    @@Get1:
+    GetValue    r2, @@Get1, EggsCheckEvoAP
+    ldrb        r2, [r2, #9]
+    cmp         r2, #3
+    bge         @@Return
+    mov         r5, #0xCD
+    @@Return:
+    pop         {r2}
+    add         r0, r5, #0
+    bx          lr
+
+EggsCheckEvoAP:
+    .word 0x2033000
+
+EggGroups:
+    //; r0- current species, r4 - gCurrentPinballGame, r12 - gMain, r8 - species index shifted 0x10 left
+    lsl         r0, r5, #0x10
+    asr         r0, r0, #0x10
+    push        {r0}
+    nop
+    @@Get1:
+    GetValue    r2, @@Get1, EggGroupsTable
+    mov         r0, r12
+    ldrb        r0, [r0, #4]
+    cmp         r0, #0
+    beq         @@LoadMask
+    add         r2, #32
+    @@LoadMask:
+    mov         r0, r8
+    asr         r0, r0, #0x10
+    ldrb        r2, [r2, r0]
+    mov         r0, #1
+    lsl         r0, r2
+    nop
+    @@Get2:
+    GetValue    r2, @@Get2, EggGroupsAP
+    ldr         r2, [r2, #0x20]
+    and         r2, r0
+    pop         {r0}
+    cmp         r2, #0
+    bne         @@Return
+    mov         r1, r0
+    @@Return:
+    bx          lr
+
+EggGroupsTable:
+    .word EggTableRuby | 0x8000000
+
+EggGroupsAP:
+    .word 0x2033000
+
 .endarea
+
+.org 0x6BC000
+.byte "ARCHIPELAGO_DATA"
+.fill 16
+//; world version
+.byte 0x00, 0x00, 0x00
+//; basepatch version (if i remember to update it lol)
+.byte 0x00, 0x01, 0x00
+//; slot data at 0x6BC030
+.org 0x6BC040
+EggTableRuby:
+.byte 0x00, 0x02, 0x03, 0x05, 0x06, 0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0F, 0x10, 0x11, 0x12, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1A, 0x1B, 0x1D, 0x1E, 0x1F
+.align 32
+EggTableSapphire:
+.byte 0x00, 0x01, 0x03, 0x04, 0x06, 0x07, 0x09, 0x0A, 0x0D, 0x0E, 0x0F, 0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x17, 0x18, 0x19, 0x1A, 0x1B, 0x1C, 0x1D, 0x1E, 0x1F
+.align 32
 
 .close
