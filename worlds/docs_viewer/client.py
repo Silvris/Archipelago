@@ -60,7 +60,7 @@ class DocumentView(MDScreen):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.scroll.layout.spacing = 10
+        self.scroll.layout.spacing = 25
         self.scroll.layout.padding = (5, 10)
 
     def load_document(self, document: str):
