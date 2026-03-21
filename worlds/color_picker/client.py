@@ -2,9 +2,9 @@ import os
 
 import Utils
 import typing
+import pkgutil
 from kvui import ContainerLayout, MainLayout, KivyJSONtoTextParser, ThemedApp
 from kivy.lang.parser import Parser
-from kivy.core.window import Window
 from kivymd.uix.button import MDButton, MDButtonText
 from kivy.uix.colorpicker import ColorPicker
 from kivymd.uix.boxlayout import MDBoxLayout
@@ -109,7 +109,7 @@ class ColorPickerApp(ThemedApp):
     def build(self) -> Widget:
         self.set_colors()
         self.theme_cls.theme_style_switch_animation = False
-        self.container = Builder.load_file(Utils.local_path("data/colorpicker.kv"))
+        self.container = Builder.load_string(pkgutil.get_data(__name__, "colorpicker_kv.kv").decode('utf-8'))
         self.grid = self.container.grid
         self.color_picker = self.container.color_picker
         self.color_picker.color = get_color_from_hex(self.text_colors[self.current_color])
@@ -299,5 +299,10 @@ class ColorPickerApp(ThemedApp):
         super().on_stop()
 
 
-if __name__ == '__main__':
+def launch():
     ColorPickerApp().run()
+
+
+if __name__ == "__main__":
+    Utils.init_logging("ColorPicker")
+    launch()
