@@ -41,7 +41,7 @@ PINBALL_VERSION = 0x6BC020
 PINBALL_GOAL = 0x6BC030
 PINBALL_DEX_REQ = 0x6BC031
 PINBALL_SCORE_REQ = 0x6BC032
-PINBALL_TARGET_REQ = 0x6BC036
+PINBALL_TARGET_REQ = 0x6BC03A
 
 
 def cmd_pool(self: "BizHawkClientCommandProcessor") -> None:
@@ -181,7 +181,7 @@ class PinballRSClient(BizHawkClient):
                 (PINBALL_EGGS, 4, "System Bus"),
                 (PINBALL_GOAL, 1, "ROM"),
                 (PINBALL_DEX_REQ, 1, "ROM"),
-                (PINBALL_SCORE_REQ, 4, "ROM"),
+                (PINBALL_SCORE_REQ, 8, "ROM"),
                 (PINBALL_TARGET_REQ, 26, "ROM"),
             ])
 
