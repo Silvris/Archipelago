@@ -10,7 +10,7 @@ from .items import item_table, item_names, copy_ability_table, animal_friend_tab
 from .locations import location_table, KDL3Location, level_consumables, consumable_locations, star_locations
 from .names.animal_friend_spawns import animal_friend_spawns, problematic_sets
 from .names.enemy_abilities import vanilla_enemies, enemy_mapping, enemy_restrictive
-from .regions import create_levels, default_levels, shuffle_doors, door_shuffle_events
+from .regions import create_levels, default_levels, shuffle_doors, door_shuffle_events, post_connect
 from .options import KDL3Options, kdl3_option_groups
 from .presets import kdl3_options_presets
 from .names import location_name
@@ -337,6 +337,7 @@ class KDL3World(World):
                 self.copy_abilities[enemy] = self.random.choice(valid_abilities)
         if self.options.door_shuffle:
             shuffle_doors(self)
+        post_connect(self)
 
     def modify_multidata(self, multidata: Dict[str, Any]) -> None:
         # wait for self.rom_name to be available.

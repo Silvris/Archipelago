@@ -6,10 +6,11 @@ from pkgutil import get_data
 from copy import deepcopy
 
 from typing import TYPE_CHECKING, List, Dict, Optional, Union, Callable
-from BaseClasses import Region, CollectionState
-from worlds.generic.Rules import add_item_rule
+from BaseClasses import Region, CollectionState, Entrance
+from rule_builder.rules import Has, HasAll, True_, Rule
+from worlds.generic.Rules import add_item_rule, add_rule
 from .locations import KDL3Location, stage_locations, heart_star_locations, boss_locations
-from .items import copy_ability_access_table
+from .items import animal_friend_table
 from .names import location_name
 from .options import BossShuffle
 from .room import KDL3Room, final_iceberg_rooms, required_paths, required_set, KDL3Door
@@ -194,25 +195,25 @@ blocked_groups = {
     "Sand Canyon 5 - 9": [4, 7, 11]  # Kine physically cannot make this jump
 }
 
-extra_connections: dict[str, dict[str, Callable[["CollectionState", int], bool]]] = {  # Connections that exist but must be split for logic
+extra_connections: dict[str, dict[str, Rule]] = {  # Connections that exist but must be split for logic
     "Sand Canyon 6 - 29-1": {
-        "Sand Canyon 6 - 29-4": lambda state, player: True
+        "Sand Canyon 6 - 29-4": True_()
     },
     "Sand Canyon 6 - 29-2": {
-        "Sand Canyon 6 - 29-4": lambda state, player: True
+        "Sand Canyon 6 - 29-4": True_()
     },
     "Sand Canyon 6 - 29-3": {
-        "Sand Canyon 6 - 29-4": lambda state, player: True
+        "Sand Canyon 6 - 29-4": True_()
     },
     "Iceberg 4 - 15-1": {
-        "Iceberg 4 - 15-2": lambda state, player: state.has_all(["Parasol", "Parasol Ability"], player),
-        "Iceberg 4 - 15-3": lambda state, player: state.has_all(["Clean", "Clean Ability"], player),
+        "Iceberg 4 - 15-2": HasAll("Parasol", "Parasol Ability"),
+        "Iceberg 4 - 15-3": HasAll("Clean", "Clean Ability"),
     },
     "Iceberg 4 - 15-2": {
-        "Iceberg 4 - 15-1": lambda state, player: state.has_all(["Parasol", "Parasol Ability"], player),
+        "Iceberg 4 - 15-1": HasAll("Parasol", "Parasol Ability"),
     },
     "Iceberg 4 - 15-3": {
-        "Iceberg 4 - 15-1": lambda state, player: state.has_all(["Clean", "Clean Ability"], player),
+        "Iceberg 4 - 15-1": HasAll("Clean", "Clean Ability"),
     },
 }
 
@@ -346,12 +347,11 @@ def generate_rooms(world: "KDL3World", level_regions: Dict[int, Region]) -> None
             access_rule = None
             if def_exit["access_rule"]:
                 required_items = tuple(def_exit["access_rule"])
-                access_rule = lambda state, rule=required_items: state.has_all(rule, world.player)
+                access_rule = HasAll(*required_items)
             room.connect(rooms[target], exit_name, access_rule)
         if name in extra_connections:
             room.add_exits(extra_connections[name].keys(),
-                           {x: lambda state, n=name: extra_connections[n][x](state, world.player)
-                            for x in extra_connections[name].keys()})
+                           {x: extra_connections[name][x] for x in extra_connections[name].keys()})
         if world.options.open_world:
             if any("Complete" in location.name for location in room.locations):
                 room.add_locations({f"{level_names[room.level]} {room.stage} - Stage Completion": None},
@@ -704,6 +704,39 @@ def shuffle_doors(world: "KDL3World"):
 
     # visualize_regions(world.multiworld.get_region("Menu", world.player), "kdl3_doors.puml", show_locations=False)
     # raise NotImplementedError
+
+
+def post_connect(world: "KDL3World"):
+    wall_region = world.get_region("Ripple Field 5 - 7")
+    # We have to apply the wall to any rule past this point that requires a friend
+    regions_to_visit: set[Region] = {ex.connected_region for ex in wall_region.get_exits()}
+    while regions_to_visit:
+        region = regions_to_visit.pop()
+        for location in region.locations:
+            if isinstance(location.access_rule, Rule.Resolved):
+                if hasattr(location.access_rule, "item_names"):
+                    if set(getattr(location.access_rule, "item_names")).intersection(animal_friend_table.keys()):
+                        add_rule(location, Has("Wall").resolve(world))
+            else:
+                if not location.access_rule == KDL3Location.access_rule:
+                    add_rule(location, Has("Wall").resolve(world))
+
+        if not world.options.open_world and region.name == "Ripple Field 5 - 9":
+            # not open world means each level is chained, so we need to manually catch the end of the stage
+            # door shuffle is not supported on non-open world
+            continue
+
+        for ex in region.get_exits():
+            if isinstance(ex.access_rule, Rule.Resolved):
+                if hasattr(ex.access_rule, "item_names"):
+                    if set(getattr(ex.access_rule, "item_names")).intersection(animal_friend_table.keys()):
+                        add_rule(ex, Has("Wall").resolve(world))
+            else:
+                if not ex.access_rule == Entrance.access_rule:
+                    # take the safe route and add anyways
+                    add_rule(ex, Has("Wall").resolve(world))
+
+
 
 
 def create_levels(world: "KDL3World") -> None:

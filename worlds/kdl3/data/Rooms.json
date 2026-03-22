@@ -5892,7 +5892,8 @@
             "Ripple Field 5 - Star 47",
             "Ripple Field 5 - Star 48",
             "Ripple Field 5 - Star 49",
-            "Ripple Field 5 - Maxim Tomato (Exit)"
+            "Ripple Field 5 - Maxim Tomato (Exit)",
+            "Ripple Field 5 - Wall"
         ],
         "spawn": [
             120,
@@ -5932,7 +5933,6 @@
         },
         "entity_load": [],
         "locations": [
-            "Ripple Field 5 - Wall",
             "Ripple Field 5 - Animal 2"
         ],
         "spawn": [

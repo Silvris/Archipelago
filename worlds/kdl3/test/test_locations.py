@@ -28,6 +28,7 @@ class TestLocations(KDL3TestBase):
         self.run_location_test(location_name.sand_canyon_rob, ["Stone", "Kine", "Coo", "Parasol", "Spark", "Needle"])
         self.run_location_test(location_name.sand_canyon_rob, ["Stone", "Kine", "Coo", "Parasol", "Clean", "Needle"])
         self.run_location_test(location_name.cloudy_park_hibanamodoki, ["Coo", "Clean"])
+        self.run_location_test(location_name.cloudy_park_hibanamodoki, ["Rick", "Clean"])
         self.run_location_test(location_name.cloudy_park_piyokeko, ["Needle"])
         self.run_location_test(location_name.cloudy_park_mikarin, ["Coo"])
         self.run_location_test(location_name.cloudy_park_pick, ["Rick"])
