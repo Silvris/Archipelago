@@ -86,7 +86,7 @@ class KDL3World(World):
 
     def generate_early(self) -> None:
         if self.options.door_shuffle and not self.options.open_world:
-            self.options.open_world = True
+            self.options.open_world.value = True
             logger.warning(f"Kirby's Dream Land 3 ({self.player_name}): Door Shuffle requires Open World, enabling")
 
     def create_item(self, name: str, force_non_progression: bool = False) -> KDL3Item:
