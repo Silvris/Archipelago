@@ -7,6 +7,9 @@ import logging
 import random
 import struct
 import traceback
+
+import websockets
+
 import Utils
 
 from enum import IntEnum
@@ -394,13 +397,14 @@ async def handle_logs(ctx: MHFUContext) -> None:
                     if MHFU_BREAKPOINTS[ctx.lang][bp][3]:
                         # this break point stops emulation, we need to restart it
                         await send_without_receive(ctx, json.dumps({"event": "cpu.resume", "ticket": "RESTART"}))
+        except websockets.exceptions.ConnectionClosed:
+            continue  # we check debugger status in the loop, so just jump out of current iteration
         except Exception as ex:
             Utils.messagebox("Error", str(ex), True)
             logger.error(traceback.format_exc())
 
 
 async def receive_all(ctx: MHFUContext) -> None:
-    import websockets
     while not ctx.exit_event.is_set():
         try:
             try:
@@ -412,13 +416,15 @@ async def receive_all(ctx: MHFUContext) -> None:
                 continue
             try:
                 new_message = await ctx.debugger.recv()
-            except websockets.exceptions.ConnectionClosedError:
+            except websockets.exceptions.ConnectionClosed:
                 continue
             event = json.loads(new_message)
             if event["event"] == "log":
                 ctx.breakpoint_queue.append(event)
             elif "ticket" in event:
                 ctx.outgoing_tickets[event["ticket"]] = event
+        except websockets.exceptions.ConnectionClosed:
+            continue  # we check debugger status in the loop, so just jump out of current iteration
         except Exception as ex:
             Utils.messagebox("Error", str(ex), True)
             logger.error(traceback.format_exc())
@@ -429,18 +435,25 @@ async def send_and_receive(ctx: MHFUContext, message: str, ticket: str) -> dict[
     # we can just wait until we receive the one we're looking for
     if not ticket:
         raise Exception("Cannot perform read/write without valid ticket.")
-    if ctx.debugger:
-        await ctx.debugger.send(message)
-        while ticket not in ctx.outgoing_tickets:
-            await asyncio.sleep(0.125)
-        return ctx.outgoing_tickets.pop(ticket)
+    if ctx.debugger and not ctx.debugger.closed:
+        try:
+            await ctx.debugger.send(message)
+            while ticket not in ctx.outgoing_tickets:
+                await asyncio.sleep(0.125)
+            return ctx.outgoing_tickets.pop(ticket)
+        except websockets.exceptions.ConnectionClosed:
+            return {}
+
     return {}
 
 
 async def send_without_receive(ctx: MHFUContext, message: str) -> None:
     # cpu actions do not return tickets
     if ctx.debugger:
-        await ctx.debugger.send(message)
+        try:
+            await ctx.debugger.send(message)
+        except websockets.exceptions.ConnectionClosed:
+            pass
 
 
 async def connect_psp(ctx: MHFUContext, target: int | None = None) -> None:
@@ -469,14 +482,23 @@ async def connect_psp(ctx: MHFUContext, target: int | None = None) -> None:
         ctx.debugger = await client.connect(f"ws://{psp['ip']}:{psp['p']}/debugger",
                                             subprotocols=[Subprotocol(PPSSPP_DEBUG)])
     except ConnectionRefusedError:
-        ppsspp_logger.error("Unknown error occurred, please try again.")
+        ppsspp_logger.error("Connection refused, ensure PPSSPP is running and try again.")
+        del ctx.debugger
+        ctx.debugger = None
         return
     except TimeoutError:
         ppsspp_logger.error("Connection timed out, please try again.")
+        del ctx.debugger
+        ctx.debugger = None
         return
 
     hello = await send_and_receive(ctx, json.dumps(PPSSPP_HELLO), "AP_HELLO")
     game_status = await send_and_receive(ctx, json.dumps(PPSSPP_STATUS), "AP_STATUS")
+    if not hello or not game_status:
+        ppsspp_logger.error("Connection failed, please try again.")
+        del ctx.debugger
+        ctx.debugger = None
+        return
     if not game_status["game"] or game_status["game"]["id"] not in SERIAL_TO_LANG:
         ppsspp_logger.error("Connected to PPSSPP but MHFU is not currently being played. Please run /psp when MHFU is"
                             " loaded.")
@@ -744,6 +766,8 @@ class MHFUContext(CommonContext):
                     # equipment/key binary we'll miss another update
                     await self.get_key_binary()
                     await self.set_equipment_status()
+            except websockets.exceptions.ConnectionClosed:
+                continue
             except Exception as ex:
                 Utils.messagebox("Error", str(ex), True)
                 logger.error(traceback.format_exc())
@@ -1041,7 +1065,7 @@ async def game_watcher(ctx: MHFUContext) -> None:
                 await ctx.update_death_link(ctx.death_link > 0)
 
             game_status = await send_and_receive(ctx, json.dumps(PPSSPP_STATUS), "AP_STATUS")
-            if not game_status["game"] or game_status["game"]["id"] not in (MHFU_SERIAL, MHP2G_SERIAL):
+            if not game_status["game"] or game_status["game"]["id"] not in SERIAL_TO_LANG:
                 ppsspp_logger.error(
                     "Connected to PPSSPP but MHFU is not currently being played. Please run /psp when MHFU is"
                     " loaded.")
@@ -1179,6 +1203,8 @@ async def game_watcher(ctx: MHFUContext) -> None:
                             f'New Check: {location} ({len(ctx.locations_checked)}/'
                             f'{len(ctx.missing_locations) + len(ctx.checked_locations)})')
                     await ctx.check_locations(new_checks)
+        except websockets.exceptions.ConnectionClosed:
+            continue  # we check debugger status in the loop, so just jump out of current iteration
         except Exception as ex:
             Utils.messagebox("Error", str(ex), True)
             logger.error(traceback.format_exc())
@@ -1205,10 +1231,10 @@ async def main(args: "argparse.Namespace") -> None:
 async def _launch_ppsspp() -> None:
     import os
     import subprocess
-    from settings import get_settings
-    ppsspp = get_settings().mhfu_options.ppsspp_exe
+    from . import MHFUWorld
+    ppsspp = MHFUWorld.settings.ppsspp_exe
 
-    if os.path.exists(ppsspp) and get_settings().mhfu_options.auto_start:
+    if os.path.exists(ppsspp) and MHFUWorld.settings.auto_start:
         subprocess.Popen(
             [
                 ppsspp
