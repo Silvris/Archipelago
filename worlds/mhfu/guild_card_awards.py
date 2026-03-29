@@ -1,10 +1,8 @@
 import typing
 from .data.monsters import monster_ids, elder_dragons
-from .quests import get_quest_by_id, get_area_quests, location_name_to_id, MHFURegion, MHFULocation
+from .quests import get_quest_by_id, location_name_to_id, MHFURegion, MHFULocation
 from .options import Awards
-from .rules import can_reach_rank, can_hunt_all_monsters, can_complete_all_quests, can_complete_any_quest
-
-from worlds.generic.Rules import add_rule
+from .rules import can_reach_rank, can_hunt_all_monsters, can_complete_all_quests, can_reach_area
 
 if typing.TYPE_CHECKING:
     from . import MHFUWorld
@@ -158,18 +156,13 @@ def create_awards(world: "MHFUWorld") -> None:
         # now set the rule as given
         # for ranks, assume that the max rank is required for this
         if award.village:
-            add_rule(loc, lambda state, rank=award.village[0], star=award.village[1]:
-            can_reach_rank(state, world.player, 1, rank, star))
+            world.set_rule(loc, can_reach_rank(1, award.village[0], award.village[1]))
         if award.guild[0] >= 0:
-            add_rule(loc, lambda state, rank=award.guild[0], star=award.guild[1]:
-            can_reach_rank(state, world.player, 0, rank, star))
+            world.set_rule(loc, can_reach_rank(0, award.guild[0], award.guild[1]))
         if award.monster:
-            add_rule(loc, lambda state, mons=tuple(award.monster): can_hunt_all_monsters(state, mons, world.player))
+            world.set_rule(loc, can_hunt_all_monsters(award.monster))
         if award.area:
-            for area in award.area:
-                quests = [q.qid for q in get_area_quests(
-                    sorted(set(world.rank_requirements.keys()) - {(0, 4, 0), (2, 0, 0), (2, 1, 0), (2, 2, 0)}),
-                    (area,))]
-                add_rule(loc, lambda state, qids=tuple(quests): can_complete_any_quest(state, qids, world.player))
+            ranks = sorted(set(world.rank_requirements.keys()) - {(0, 4, 0), (2, 0, 0), (2, 1, 0), (2, 2, 0)})
+            world.set_rule(loc, can_reach_area(award.area, ranks))
         if award.quests:
-            add_rule(loc, lambda state, qids=tuple(award.quests): can_complete_all_quests(state, qids, world.player))
+            world.set_rule(loc, can_complete_all_quests(award.quests))

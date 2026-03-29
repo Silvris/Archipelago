@@ -1,271 +1,257 @@
 from .quests import get_quest_by_id, get_star_name, goal_quests, hub_rank_max, get_area_quests
 from .data.monsters import flying_wyverns, piscene_wyverns, bird_wyverns, monster_ids
 from .options import VillageQuestDepth, GuildQuestDepth
-from BaseClasses import CollectionState
-from typing import TYPE_CHECKING
-from worlds.generic.Rules import add_rule
+from BaseClasses import Collection
+from typing import TYPE_CHECKING, Iterable
+from rule_builder.rules import CanReachLocation, Rule, True_, False_, Has, HasAny, HasAll, CanReachRegion
 
 if TYPE_CHECKING:
     from . import MHFUWorld
 
 
-def can_complete_quest(state: CollectionState, qid: str, player: int) -> bool:
-    return state.can_reach_location(get_quest_by_id(qid).proper_name, player)
+def can_complete_quest(qid: str) -> Rule:
+    return CanReachLocation(get_quest_by_id(qid).proper_name)
 
 
-def can_complete_any_quest(state: CollectionState, qids: list[str], player: int) -> bool:
+def can_complete_any_quest(qids: list[str]) -> Rule:
+    rule = False_()
     for qid in qids:
-        if can_complete_quest(state, qid, player):
-            return True
-    return False
+        rule |= can_complete_quest(qid)
+    return rule
 
 
-def can_complete_all_quests(state: CollectionState, qids: list[str], player: int) -> bool:
+def can_complete_all_quests(qids: list[str]) -> Rule:
+    rule = True_()
     for qid in qids:
-        if not can_complete_quest(state, qid, player):
-            return False
-    return True
+        rule &= can_complete_quest(qid)
+    return rule
 
 
-def can_reach_area(state: CollectionState, areas: tuple[int],
-                   rank_requirements: dict[tuple[int, int, int], int], player: int) -> bool:
+def can_reach_area(areas: Iterable[int],
+                   rank_requirements: Iterable[tuple[int, int, int]]) -> Rule:
     # this can be very slow
-    possible_quests = get_area_quests(rank_requirements.keys(), areas)
-    for quest in possible_quests:
-        if state.can_reach_location(quest.proper_name, player):
-            return True
-    return False
+    possible_quests = get_area_quests(rank_requirements, areas)
+    return can_complete_any_quest([quest.qid for quest in possible_quests])
 
 
-def can_hunt_any_monster(state: CollectionState, monsters: list[str], player: int) -> bool:
-    return state.has_any(monsters, player)
+def can_hunt_any_monster(monsters: list[str]) -> Rule:
+    return HasAny(*monsters)
 
 
-def can_hunt_all_monsters(state: CollectionState, monsters: list[str], player: int) -> bool:
-    return state.has_all(monsters, player)
+def can_hunt_all_monsters(monsters: list[str]) -> Rule:
+    return HasAll(*monsters)
 
 
-def can_reach_rank(state: CollectionState, player: int, hub: int, rank: int, star: int) -> bool:
-    return state.can_reach_region(get_star_name(hub, rank, star), player)
+def can_reach_rank(hub: int, rank: int, star: int) -> Rule:
+    return CanReachRegion(get_star_name(hub, rank, star))
 
 
 def set_rules(world: "MHFUWorld") -> None:
     for hub, rank, star in world.rank_requirements:
         if (hub, rank, star + 1) in world.rank_requirements:
-            add_rule(world.get_entrance(f"To {get_star_name(hub, rank, star + 1)}"),
-                     lambda state, req=world.rank_requirements[hub, rank, star]:
-                     state.has("Key Quest", world.player, req))
+            world.set_rule(world.get_entrance(f"To {get_star_name(hub, rank, star + 1)}"),
+                           Has("Key Quest", count=world.rank_requirements[hub, rank, star]))
         elif star + 1 == hub_rank_max[hub, rank] and (hub, rank + 1, 0) in world.rank_requirements \
                 and (hub, rank) != (0, 3):
-            add_rule(world.get_entrance(f"To {get_star_name(hub, rank + 1, 0)}"),
-                     lambda state, req=world.rank_requirements[hub, rank, star]:
-                     state.has("Key Quest", world.player, req))
-
-    # set goal requirement
-    add_rule(world.get_location(get_quest_by_id(goal_quests[world.options.goal.value]).proper_name),
-             lambda state: state.has("Key Quest", world.player, world.required_keys))
+            world.set_rule(world.get_entrance(f"To {get_star_name(hub, rank + 1, 0)}"),
+                           Has("Key Quest", count=world.rank_requirements[hub, rank, star]))
 
     # now additional requirements
     # Village
     if world.options.village_depth:
         # Village Low
         # some basic quest requirements
-        add_rule(world.get_location(get_quest_by_id("m10206").proper_name),
-                 lambda state: can_complete_quest(state, "m10210", world.player))
-        add_rule(world.get_location(get_quest_by_id("m10207").proper_name),
-                 lambda state: can_complete_quest(state, "m10211", world.player))
-        add_rule(world.get_location(get_quest_by_id("m10209").proper_name),
-                 lambda state: can_complete_quest(state, "m10213", world.player))
+        world.set_rule(world.get_location(get_quest_by_id("m10206").proper_name),
+                       can_complete_quest("m10210"))
+        world.set_rule(world.get_location(get_quest_by_id("m10207").proper_name),
+                       can_complete_quest("m10211"))
+        world.set_rule(world.get_location(get_quest_by_id("m10209").proper_name),
+                       can_complete_quest("m10213"))
         # needs access to Yian Kut-Ku, unlock req is 10 Kut-Ku killed
-        add_rule(world.get_location(get_quest_by_id("m10304").proper_name),
-                 lambda state: can_hunt_all_monsters(state, ["Yian Kut-Ku"], world.player))
-        add_rule(world.get_location(get_quest_by_id("m10308").proper_name),
-                 lambda state: can_complete_quest(state, "m10307", world.player))
-        add_rule(world.get_location(get_quest_by_id("m10309").proper_name),
-                 lambda state: can_complete_quest(state, "m10313", world.player))
-        add_rule(world.get_location(get_quest_by_id("m10318").proper_name),
-                 lambda state: can_complete_quest(state, "m10317", world.player))
-        add_rule(world.get_location(get_quest_by_id("m10407").proper_name),
-                 lambda state: can_complete_quest(state, "m10406", world.player))
-        add_rule(world.get_location(get_quest_by_id("m10409").proper_name),
-                 lambda state: can_complete_quest(state, "m10411", world.player))
-        add_rule(world.get_location(get_quest_by_id("m10414").proper_name),
-                 lambda state: can_complete_quest(state, "m10413", world.player))
-        add_rule(world.get_location(get_quest_by_id("m10416").proper_name),
-                 lambda state: can_complete_quest(state, "m10415", world.player))
-        add_rule(world.get_location(get_quest_by_id("m10505").proper_name),
-                 lambda state: can_complete_quest(state, "m10506", world.player))
-        add_rule(world.get_location(get_quest_by_id("m10511").proper_name),
-                 lambda state: can_complete_quest(state, "m10509", world.player))  # 6* Urgent, effectively postgame.
+        world.set_rule(world.get_location(get_quest_by_id("m10304").proper_name),
+                       can_hunt_all_monsters(["Yian Kut-Ku"]))
+        world.set_rule(world.get_location(get_quest_by_id("m10308").proper_name),
+                       can_complete_quest("m10307"))
+        world.set_rule(world.get_location(get_quest_by_id("m10309").proper_name),
+                       can_complete_quest("m10313"))
+        world.set_rule(world.get_location(get_quest_by_id("m10318").proper_name),
+                       can_complete_quest("m10317"))
+        world.set_rule(world.get_location(get_quest_by_id("m10407").proper_name),
+                       can_complete_quest("m10406"))
+        world.set_rule(world.get_location(get_quest_by_id("m10409").proper_name),
+                       can_complete_quest("m10411"))
+        world.set_rule(world.get_location(get_quest_by_id("m10414").proper_name),
+                       can_complete_quest("m10413"))
+        world.set_rule(world.get_location(get_quest_by_id("m10416").proper_name),
+                       can_complete_quest("m10415"))
+        world.set_rule(world.get_location(get_quest_by_id("m10505").proper_name),
+                       can_complete_quest("m10506"))
+        world.set_rule(world.get_location(get_quest_by_id("m10511").proper_name),
+                       can_complete_quest("m10509"))  # 6* Urgent, effectively postgame.
         # bit of a hack for this one, it needs all village low quests completed,
         # but we can just check the only quests with actual requirements
-        add_rule(world.get_location(get_quest_by_id("m10510").proper_name),
-                 lambda state: can_complete_all_quests(state, ["m10206", "m10207", "m10209", "m10304", "m10308",
-                                                               "m10309", "m10318", "m10407", "m10409", "m10414",
-                                                               "m10416", "m10505", "m10511"], world.player))
+        world.set_rule(world.get_location(get_quest_by_id("m10510").proper_name),
+                       can_complete_all_quests(["m10206", "m10207", "m10209", "m10304", "m10308",
+                                                "m10309", "m10318", "m10407", "m10409", "m10414",
+                                                "m10416", "m10505", "m10511"]))
         if world.options.village_depth.value > VillageQuestDepth.option_low_rank:
             # Village High
             # m11005 has a requirement...that will always be met because it's village 6* urgent
             for quest in ("m11116", "m11117", "m11118"):
-                add_rule(world.get_location(get_quest_by_id(quest).proper_name),
-                         lambda state: can_complete_quest(state, "m11005", world.player))
-            add_rule(world.get_location(get_quest_by_id("m11119").proper_name),
-                     lambda state: can_complete_all_quests(state, ["m11116", "m11117", "m11118"], world.player))
+                world.set_rule(world.get_location(get_quest_by_id(quest).proper_name),
+                               can_complete_quest("m11005"))
+            world.set_rule(world.get_location(get_quest_by_id("m11119").proper_name),
+                           can_complete_all_quests(["m11116", "m11117", "m11118"]))
             for quest in ("m11211", "m11212"):
-                add_rule(world.get_location(get_quest_by_id(quest).proper_name),
-                         lambda state: can_hunt_any_monster(state,
-                                                            [*list(piscene_wyverns.keys()),
-                                                             *list(flying_wyverns.keys()),
-                                                             *list(bird_wyverns.keys())], world.player))
+                world.set_rule(world.get_location(get_quest_by_id(quest).proper_name),
+                               can_hunt_any_monster(
+                                   [*list(piscene_wyverns.keys()),
+                                    *list(flying_wyverns.keys()),
+                                    *list(bird_wyverns.keys())], ))
                 # needs access to any Bird/Flying/Piscine that aren't a drome
-            add_rule(world.get_location(get_quest_by_id("m11213").proper_name),
-                     lambda state: can_complete_all_quests(state, ["m11211", "m11212"], world.player))
+            world.set_rule(world.get_location(get_quest_by_id("m11213").proper_name),
+                           can_complete_all_quests(["m11211", "m11212"]))
             for quest in ("m11220", "m11221", "m11222", "m11223"):
                 # needs all of the village high quests
-                add_rule(world.get_location(get_quest_by_id(quest).proper_name),
-                         lambda state: can_complete_all_quests(state, ["m11119", "m11213"], world.player))
+                world.set_rule(world.get_location(get_quest_by_id(quest).proper_name),
+                               can_complete_all_quests(["m11119", "m11213"]))
             # Monster Hunter needs all village low and high
-            add_rule(world.get_location(get_quest_by_id("m11226").proper_name),
-                     lambda state: can_complete_all_quests(state, ["m10510", "m11119", "m11213"], world.player))
+            world.set_rule(world.get_location(get_quest_by_id("m11226").proper_name),
+                           can_complete_all_quests(["m10510", "m11119", "m11213"]))
         if world.options.treasure_quests:
             for qtype in ("Silver Crown", "Gold Crown"):
                 for quest in ("m04002", "m04003"):
-                    add_rule(world.get_location(f"{get_quest_by_id(quest).proper_name} - {qtype}"),
-                             lambda state: can_complete_quest(state, "m10104", world.player))
+                    world.set_rule(world.get_location(f"{get_quest_by_id(quest).proper_name} - {qtype}"),
+                                   can_complete_quest("m10104"))
                 for quest in ("m04004", "m04005"):
-                    add_rule(world.get_location(f"{get_quest_by_id(quest).proper_name} - {qtype}"),
-                             lambda state: can_complete_quest(state, "m10203", world.player))
-                add_rule(world.get_location(f"{get_quest_by_id('m04006').proper_name} - {qtype}"),
-                         lambda state: can_complete_quest(state, "m10302", world.player))
+                    world.set_rule(world.get_location(f"{get_quest_by_id(quest).proper_name} - {qtype}"),
+                                   can_complete_quest("m10203"))
+                world.set_rule(world.get_location(f"{get_quest_by_id('m04006').proper_name} - {qtype}"),
+                               can_complete_quest("m10302"))
     # Guild
     if world.options.guild_depth:
         # Guild Low
-        add_rule(world.get_location(get_quest_by_id("m01009").proper_name),
-                 lambda state: can_complete_quest(state, "m01020", world.player))
-        add_rule(world.get_location(get_quest_by_id("m01106").proper_name),
-                 lambda state: can_complete_quest(state, "m01105", world.player))
-        add_rule(world.get_location(get_quest_by_id("m01112").proper_name),
-                 lambda state: can_complete_quest(state, "m01109", world.player))
-        add_rule(world.get_location(get_quest_by_id("m01114").proper_name),
-                 lambda state: can_complete_quest(state, "m01116", world.player))
-        add_rule(world.get_location(get_quest_by_id("m01124").proper_name),
-                 lambda state: can_complete_all_quests(state, ["m01009", "m01106", "m01112", "m01114"], world.player))
+        world.set_rule(world.get_location(get_quest_by_id("m01009").proper_name),
+                       can_complete_quest("m01020"))
+        world.set_rule(world.get_location(get_quest_by_id("m01106").proper_name),
+                       can_complete_quest("m01105"))
+        world.set_rule(world.get_location(get_quest_by_id("m01112").proper_name),
+                       can_complete_quest("m01109"))
+        world.set_rule(world.get_location(get_quest_by_id("m01114").proper_name),
+                       can_complete_quest("m01116"))
+        world.set_rule(world.get_location(get_quest_by_id("m01124").proper_name),
+                       can_complete_all_quests(["m01009", "m01106", "m01112", "m01114"], ))
         if world.options.guild_depth > GuildQuestDepth.option_low_rank:
             if world.options.village_depth == VillageQuestDepth.option_high_rank:
                 # only cross-hub requirements
                 # we "patch" out the requirement if village depth is lower than high
-                add_rule(world.get_location(get_quest_by_id("m02124").proper_name),
-                         lambda state: can_complete_quest(state, "m11005", world.player))
-                add_rule(world.get_location(get_quest_by_id("m02228").proper_name),
-                         lambda state: can_complete_quest(state, "m11201", world.player))
-                add_rule(world.get_location(get_quest_by_id("m02229").proper_name),
-                         lambda state: can_complete_quest(state, "m11201", world.player))
+                world.set_rule(world.get_location(get_quest_by_id("m02124").proper_name),
+                               can_complete_quest("m11005"))
+                world.set_rule(world.get_location(get_quest_by_id("m02228").proper_name),
+                               can_complete_quest("m11201"))
+                world.set_rule(world.get_location(get_quest_by_id("m02229").proper_name),
+                               can_complete_quest("m11201"))
 
             for quest in ("m02214", "m02215"):
-                add_rule(world.get_location(get_quest_by_id(quest).proper_name),
-                         lambda state: can_hunt_any_monster(state,
-                                                            sorted({*flying_wyverns.keys(),
-                                                                    *bird_wyverns.keys(),
-                                                                    *piscene_wyverns.keys()}.difference(
-                                                                ["Velocidrome", "Gendrome",
-                                                                 "Giadrome", "Iodrome"])), world.player))
+                world.set_rule(world.get_location(get_quest_by_id(quest).proper_name),
+                               can_hunt_any_monster(
+                                   sorted({*flying_wyverns.keys(),
+                                           *bird_wyverns.keys(),
+                                           *piscene_wyverns.keys()}.difference(
+                                       ["Velocidrome", "Gendrome",
+                                        "Giadrome", "Iodrome"]))))
             for quest in ("m02217", "m02218", "m02219", "m02220", "m02221", "m02222"):
-                add_rule(world.get_location(get_quest_by_id(quest).proper_name),
-                         lambda state: can_complete_all_quests(state, ["m02214", "m02215", "m02124", "m02228",
-                                                                       "m02229"], world.player))
+                world.set_rule(world.get_location(get_quest_by_id(quest).proper_name),
+                               can_complete_all_quests(["m02214", "m02215", "m02124", "m02228",
+                                                        "m02229"]))
             # special case here, this is actually the end of HR urgents. We can effectively duplicate the rules for it
-            add_rule(world.get_location(get_quest_by_id("m02225").proper_name),
-                     lambda state: state.has("Key Quest", world.player, world.rank_requirements[0, 2, 2]))
-            add_rule(world.get_location(get_quest_by_id("m02226").proper_name),
-                     lambda state: can_complete_quest(state, "m02225", world.player))
+            world.set_rule(world.get_location(get_quest_by_id("m02225").proper_name),
+                           Has("Key Quest", count=world.rank_requirements[0, 2, 2]))
+            world.set_rule(world.get_location(get_quest_by_id("m02226").proper_name),
+                           can_complete_quest("m02225"))
 
             if world.options.guild_depth.value == GuildQuestDepth.option_g_rank:
                 # Lao, needs all G1/G2. Just wanna push it back a sphere
-                add_rule(world.get_location(get_quest_by_id("m03127").proper_name),
-                         lambda state: can_complete_quest(state, "m03109", world.player))
+                world.set_rule(world.get_location(get_quest_by_id("m03127").proper_name),
+                               can_complete_quest("m03109"))
                 for quest in ("m03222", "m03223", "m03224", "m03225", "m03226", "m03227"):
-                    add_rule(world.get_location(get_quest_by_id(quest).proper_name),
-                             lambda state: can_complete_quest(state, "m03127", world.player))
+                    world.set_rule(world.get_location(get_quest_by_id(quest).proper_name),
+                                   can_complete_quest("m03127"))
                 if world.options.treasure_quests:
                     for qtype in ("Silver Crown", "Gold Crown"):
-                        add_rule(world.get_location(f"{get_quest_by_id('m04007').proper_name} - {qtype}"),
-                                 lambda state: can_complete_quest(state, "m03009", world.player))
+                        world.set_rule(world.get_location(f"{get_quest_by_id('m04007').proper_name} - {qtype}"),
+                                       can_complete_quest("m03009"))
+
+    # set goal requirement
+    world.set_rule(world.get_location(get_quest_by_id(goal_quests[world.options.goal.value]).proper_name),
+                   Has("Key Quest", count=world.required_keys))
 
     if world.options.training_quests:
         if world.options.village_depth:
             # pain and a half lmao
-            add_rule(world.get_location(get_quest_by_id("m21001").proper_name),
-                     lambda state: can_complete_quest(state, "m10110", world.player))
-            add_rule(world.get_location(get_quest_by_id("m21002").proper_name),
-                     lambda state: can_complete_quest(state, "m10111", world.player))
-            add_rule(world.get_location(get_quest_by_id("m21003").proper_name),
-                     lambda state: can_complete_quest(state, "m10203", world.player))
-            add_rule(world.get_location(get_quest_by_id("m21004").proper_name),
-                     lambda state: can_complete_quest(state, "m10210", world.player))
-            add_rule(world.get_location(get_quest_by_id("m21005").proper_name),
-                     lambda state: can_complete_quest(state, "m10302", world.player))
-            add_rule(world.get_location(get_quest_by_id("m21006").proper_name),
-                     lambda state: can_complete_quest(state, "m10304", world.player))
-            add_rule(world.get_location(get_quest_by_id("m21007").proper_name),
-                     lambda state: can_complete_quest(state, "m10401", world.player))
-            add_rule(world.get_location(get_quest_by_id("m21008").proper_name),
-                     lambda state: can_complete_quest(state, "m10406", world.player))
-            add_rule(world.get_location(get_quest_by_id("m21009").proper_name),
-                     lambda state: can_complete_quest(state, "m10411", world.player))
-            add_rule(world.get_location(get_quest_by_id("m21010").proper_name),
-                     lambda state: can_complete_quest(state, "m10402", world.player))
-            add_rule(world.get_location(get_quest_by_id("m21011").proper_name),
-                     lambda state: can_hunt_all_monsters(state, ["Cephadrome"], world.player)
-                     and can_complete_all_quests(state, ["m21001", "m21002"], world.player))
-            add_rule(world.get_location(get_quest_by_id("m21012").proper_name),
-                     lambda state: can_hunt_all_monsters(state, ["Plesioth"], world.player)
-                     and can_complete_all_quests(state, ["m21003", "m21004"], world.player))
-            add_rule(world.get_location(get_quest_by_id("m21013").proper_name),
-                     lambda state: can_hunt_all_monsters(state, ["Blangonga"], world.player)
-                     and can_complete_all_quests(state, ["m21005", "m21006"], world.player))
-            add_rule(world.get_location(get_quest_by_id("m21014").proper_name),
-                     lambda state: can_hunt_all_monsters(state, ["Rathalos"], world.player)
-                     and can_complete_all_quests(state, ["m21007", "m21008"], world.player))
-            add_rule(world.get_location(get_quest_by_id("m21015").proper_name),
-                     lambda state: can_hunt_all_monsters(state, ["Rajang"], world.player)
-                     and can_complete_all_quests(state, ["m21009", "m21010"], world.player))
+            world.set_rule(world.get_location(get_quest_by_id("m21001").proper_name),
+                           can_complete_quest("m10110"))
+            world.set_rule(world.get_location(get_quest_by_id("m21002").proper_name),
+                           can_complete_quest("m10111"))
+            world.set_rule(world.get_location(get_quest_by_id("m21003").proper_name),
+                           can_complete_quest("m10203"))
+            world.set_rule(world.get_location(get_quest_by_id("m21004").proper_name),
+                           can_complete_quest("m10210"))
+            world.set_rule(world.get_location(get_quest_by_id("m21005").proper_name),
+                           can_complete_quest("m10302"))
+            world.set_rule(world.get_location(get_quest_by_id("m21006").proper_name),
+                           can_complete_quest("m10304"))
+            world.set_rule(world.get_location(get_quest_by_id("m21007").proper_name),
+                           can_complete_quest("m10401"))
+            world.set_rule(world.get_location(get_quest_by_id("m21008").proper_name),
+                           can_complete_quest("m10406"))
+            world.set_rule(world.get_location(get_quest_by_id("m21009").proper_name),
+                           can_complete_quest("m10411"))
+            world.set_rule(world.get_location(get_quest_by_id("m21010").proper_name),
+                           can_complete_quest("m10402"))
+            world.set_rule(world.get_location(get_quest_by_id("m21011").proper_name),
+                           can_hunt_all_monsters(["Cephadrome"]) & can_complete_all_quests(["m21001", "m21002"]))
+            world.set_rule(world.get_location(get_quest_by_id("m21012").proper_name),
+                           can_hunt_all_monsters(["Plesioth"]) & can_complete_all_quests(["m21003", "m21004"]))
+            world.set_rule(world.get_location(get_quest_by_id("m21013").proper_name),
+                           can_hunt_all_monsters(["Shogun Ceanataur"]) & can_complete_all_quests(["m21005", "m21006"]))
+            world.set_rule(world.get_location(get_quest_by_id("m21014").proper_name),
+                           can_hunt_all_monsters(["Rathalos"]) & can_complete_all_quests(["m21007", "m21008"]))
+            world.set_rule(world.get_location(get_quest_by_id("m21015").proper_name),
+                           can_hunt_all_monsters(["Rajang"]) & can_complete_all_quests(["m21009", "m21010"]))
 
         if world.options.guild_depth.value > GuildQuestDepth.option_low_rank:
-            add_rule(world.get_location(get_quest_by_id("m22002").proper_name),
-                     lambda state: can_hunt_all_monsters(state, ["Cephadrome"], world.player)
-                     and can_complete_quest(state, "m01015", world.player))
-            add_rule(world.get_location(get_quest_by_id("m22003").proper_name),
-                     lambda state: can_hunt_all_monsters(state, ["Rathian"], world.player)
-                     and can_complete_quest(state, "m01209", world.player))
+            world.set_rule(world.get_location(get_quest_by_id("m22002").proper_name),
+                           can_hunt_all_monsters(["Cephadrome"], ) & can_complete_quest("m01015"))
+            world.set_rule(world.get_location(get_quest_by_id("m22003").proper_name),
+                           can_hunt_all_monsters(["Rathian"]) & can_complete_quest("m01209"))
             # This is apparently available by default, no idea on the confirmation
-            # add_rule(world.get_location(get_quest_by_id("m22004").proper_name),
-            #         lambda state: can_hunt_all_monsters(state, world.quest_info, ["Congalala"],
-            #                                             world.player, "m22004"))
-            add_rule(world.get_location(get_quest_by_id("m22005").proper_name),
-                     lambda state: can_hunt_all_monsters(state, ["Shogun Ceanataur"], world.player)
-                     and can_complete_quest(state, "m02117", world.player))
+            # world.set_rule(world.get_location(get_quest_by_id("m22004").proper_name),
+            #         can_hunt_all_monsters( world.quest_info, ["Congalala"],
+            #                                              "m22004"))
+            world.set_rule(world.get_location(get_quest_by_id("m22005").proper_name),
+                           can_hunt_all_monsters(["Shogun Ceanataur"]) & can_complete_quest("m02117"))
 
             if world.options.guild_depth.value == GuildQuestDepth.option_g_rank:
-                add_rule(world.get_location(get_quest_by_id("m22006").proper_name),
-                         lambda state: can_hunt_all_monsters(state, ["Tigrex"], world.player)
-                         and can_complete_quest(state, "m03202", world.player))
+                world.set_rule(world.get_location(get_quest_by_id("m22006").proper_name),
+                               can_hunt_all_monsters(["Tigrex"]) & can_complete_quest("m03202"))
 
-                add_rule(world.get_location(get_quest_by_id("m21016").proper_name),
-                         lambda state: can_complete_quest(state, "m03009", world.player))
-                add_rule(world.get_location(get_quest_by_id("m21017").proper_name),
-                         lambda state: can_complete_quest(state, "m03020", world.player))
-                add_rule(world.get_location(get_quest_by_id("m21018").proper_name),
-                         lambda state: can_complete_quest(state, "m03012", world.player))
-                add_rule(world.get_location(get_quest_by_id("m21019").proper_name),
-                         lambda state: can_complete_quest(state, "m03103", world.player))
-                add_rule(world.get_location(get_quest_by_id("m21020").proper_name),
-                         lambda state: can_complete_quest(state, "m03120", world.player))
-                add_rule(world.get_location(get_quest_by_id("m21021").proper_name),
-                         lambda state: can_complete_quest(state, "m03106", world.player))
-                add_rule(world.get_location(get_quest_by_id("m21022").proper_name),
-                         lambda state: can_complete_quest(state, "m03110", world.player))
-                add_rule(world.get_location(get_quest_by_id("m21023").proper_name),
-                         lambda state: can_complete_quest(state, "m03212", world.player))
+                world.set_rule(world.get_location(get_quest_by_id("m21016").proper_name),
+                               can_complete_quest("m03009"))
+                world.set_rule(world.get_location(get_quest_by_id("m21017").proper_name),
+                               can_complete_quest("m03020"))
+                world.set_rule(world.get_location(get_quest_by_id("m21018").proper_name),
+                               can_complete_quest("m03012"))
+                world.set_rule(world.get_location(get_quest_by_id("m21019").proper_name),
+                               can_complete_quest("m03103"))
+                world.set_rule(world.get_location(get_quest_by_id("m21020").proper_name),
+                               can_complete_quest("m03120"))
+                world.set_rule(world.get_location(get_quest_by_id("m21021").proper_name),
+                               can_complete_quest("m03106"))
+                world.set_rule(world.get_location(get_quest_by_id("m21022").proper_name),
+                               can_complete_quest("m03110"))
+                world.set_rule(world.get_location(get_quest_by_id("m21023").proper_name),
+                               can_complete_quest("m03212"))
 
     # Monster handling
     monster_access = world.get_region("Monsters")
@@ -277,5 +263,5 @@ def set_rules(world: "MHFUWorld") -> None:
             if mons and qid:
                 if monster_ids[location.name] in mons:
                     relevant_quests.append(f"m{qid:05}")
-        add_rule(location, lambda state, qids=tuple(relevant_quests): can_complete_any_quest(state, qids, world.player))
+        world.set_rule(location, can_complete_any_quest(relevant_quests))
         location.quests = relevant_quests

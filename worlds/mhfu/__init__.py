@@ -13,6 +13,7 @@ from .items import MHFUItem, item_table, filler_item_table, filler_weights, item
 from .options import MHFUOptions, Awards
 from .rules import set_rules
 from .data.trap_link import local_trap_to_type
+from rule_builder.cached_world import CachedRuleBuilderWorld
 
 
 def launch_client(*args: str) -> None:
