@@ -244,6 +244,7 @@ class PinballRSClient(BizHawkClient):
             idx = item.item & 0xF
 
         # handle most items state based
+        item: NetworkItem
         remote_boards = ((any(item.item == 2 for item in ctx.items_received) << 1)
                          + any(item.item == 1 for item in ctx.items_received))
         if boards[0] & remote_boards != remote_boards:
