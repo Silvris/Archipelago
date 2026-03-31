@@ -228,6 +228,16 @@ def set_rules(world: "MM1World"):
     set_rule(world.get_location("Elec Man Stage - Magnet Beam"),
              lambda state: state.has_any(["Thunder Beam", "Super Arm"], world.player))
 
+    # fire man weapon energy 1+2
+    set_rule(world.get_location("Fire Man Stage - Weapon Energy 1"),
+             lambda state: state.has_any(["Magnet Beam", "Ice Slasher"], world.player))
+    set_rule(world.get_location("Fire Man Stage - Weapon Energy 2"),
+             lambda state: state.has_any(["Magnet Beam", "Ice Slasher"], world.player))
+
+    # wily stage 1 health energy 2
+    set_rule(world.get_location("Wily Stage 1 - Health Energy 2"),
+             lambda state: state.has_all(["Magnet Beam", "Thunder Beam"], world.player))
+
     # handle the wily rule
     set_rule(world.get_entrance(f"To Wily Stage 1"),
              lambda state: state.has("Magnet Beam", world.player) and
