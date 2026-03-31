@@ -5,6 +5,7 @@ from base64 import b64encode
 from typing import TYPE_CHECKING, Any
 from NetUtils import ClientStatus, color, NetworkItem
 from worlds._bizhawk.client import BizHawkClient
+from MultiServer import mark_raw
 
 from .data.pokemon import egg_groups
 
@@ -15,6 +16,7 @@ gba_logger = logging.getLogger("GBA")
 logger = logging.getLogger("Client")
 
 PINBALL_MAIN = 0x200B0C0
+PINBALL_EREADER = PINBALL_MAIN + 0x7  # size 0x05
 PINBALL_POKEDEX = PINBALL_MAIN + 0x74  # Size 0xCD
 PINBALL_HIGH_SCORES = PINBALL_MAIN + 0x158  # Size 0x17F
 
@@ -44,36 +46,32 @@ PINBALL_SCORE_REQ = 0x6BC032
 PINBALL_TARGET_REQ = 0x6BC03A
 
 
-def cmd_pool(self: "BizHawkClientCommandProcessor") -> None:
+EREADER_MAP: dict[str, tuple[int, int]] = {
+    "Special Guests": (0, 7),
+    "Encounter Rate Up": (1, 8),
+    "Ruins Area": (3, 9),
+}
+
+@mark_raw
+def cmd_ereader(self: "BizHawkClientCommandProcessor", card: str) -> None:
     """Check the current pool of EnergyLink, and requestable refills from it."""
-    if self.ctx.game != "Mega Man 2":
-        logger.warning("This command can only be used when playing Mega Man 2.")
-        return
-    if not self.ctx.server or not self.ctx.slot:
-        logger.warning("You must be connected to a server to use this command.")
-        return
-
-
-def cmd_request(self: "BizHawkClientCommandProcessor", amount: str, target: str) -> None:
-    """Request a refill from EnergyLink."""
     from worlds._bizhawk.context import BizHawkClientContext
-    if self.ctx.game != "Mega Man 2":
-        logger.warning("This command can only be used when playing Mega Man 2.")
+    if self.ctx.game != "Pokemon Pinball Ruby & Sapphire":
+        logger.warning("This command can only be used when playing Pokemon Pinball Ruby & Sapphire.")
         return
     if not self.ctx.server or not self.ctx.slot:
         logger.warning("You must be connected to a server to use this command.")
         return
+    assert isinstance(self.ctx, BizHawkClientContext)
+    assert isinstance(self.ctx.client_handler, PinballRSClient)
+    client: PinballRSClient = self.ctx.client_handler
 
-
-def cmd_autoheal(self: "BizHawkClientCommandProcessor") -> None:
-    """Enable auto heal from EnergyLink."""
-    if self.ctx.game != "Mega Man 2":
-        logger.warning("This command can only be used when playing Mega Man 2.")
+    if card not in EREADER_MAP:
+        logger.warning(f"{card} is not a valid E-Reader card.")
         return
-    if not self.ctx.server or not self.ctx.slot:
-        logger.warning("You must be connected to a server to use this command.")
-        return
-
+    if not client.has_item(self.ctx, EREADER_MAP[card][1]):
+        logger.warning(f"You have not received the {card} E-Reader card.")
+    client.active_ereader = EREADER_MAP[card][0]
 
 def get_sfx_write(sfx: int) -> tuple[int, bytes, str]:
     return PINBALL_SFX, sfx.to_bytes(2, 'big'), "System Bus"
@@ -85,6 +83,7 @@ class PinballRSClient(BizHawkClient):
     patch_suffix = ".appbrs"
     item_queue: list[NetworkItem] = []
     rom: bytes | None = None
+    active_ereader: int = -1
 
     async def validate_rom(self, ctx: "BizHawkClientContext") -> bool:
         from worlds._bizhawk import RequestFailedError, read, get_memory_size
@@ -92,12 +91,8 @@ class PinballRSClient(BizHawkClient):
 
         try:
             if (await get_memory_size(ctx.bizhawk_ctx, "ROM")) < 0x700000:
-                if "pool" in ctx.command_processor.commands:
-                    ctx.command_processor.commands.pop("pool")
-                if "request" in ctx.command_processor.commands:
-                    ctx.command_processor.commands.pop("request")
-                if "autoheal" in ctx.command_processor.commands:
-                    ctx.command_processor.commands.pop("autoheal")
+                if "ereader" in ctx.command_processor.commands:
+                    ctx.command_processor.commands.pop("ereader")
                 return False
 
             game_name, version = (await read(ctx.bizhawk_ctx, [(0x6BC000, 32, "ROM"),
@@ -110,12 +105,8 @@ class PinballRSClient(BizHawkClient):
                                    f"of the apworld. Please use that version to connect instead.\n"
                                    f"Patch version: ({older_version})\n"
                                    f"Client version: ({'.'.join([str(i) for i in PokemonPinballRSWorld.world_version])})")
-                if "pool" in ctx.command_processor.commands:
-                    ctx.command_processor.commands.pop("pool")
-                if "request" in ctx.command_processor.commands:
-                    ctx.command_processor.commands.pop("request")
-                if "autoheal" in ctx.command_processor.commands:
-                    ctx.command_processor.commands.pop("autoheal")
+                if "ereader" in ctx.command_processor.commands:
+                    ctx.command_processor.commands.pop("ereader")
                 return False
         except UnicodeDecodeError:
             return False
@@ -127,13 +118,8 @@ class PinballRSClient(BizHawkClient):
         ctx.items_handling = 0b111
         ctx.want_slot_data = False
 
-        if True:
-            if "pool" not in ctx.command_processor.commands:
-                ctx.command_processor.commands["pool"] = cmd_pool
-            if "request" not in ctx.command_processor.commands:
-                ctx.command_processor.commands["request"] = cmd_request
-            if "autoheal" not in ctx.command_processor.commands:
-                ctx.command_processor.commands["autoheal"] = cmd_autoheal
+        if "ereader" not in ctx.command_processor.commands:
+            ctx.command_processor.commands["ereader"] = cmd_ereader
 
         return True
 
@@ -153,6 +139,10 @@ class PinballRSClient(BizHawkClient):
         ctx.last_death_link = time.time()
         self.pending_death_link = True
 
+    @staticmethod
+    def has_item(ctx: "BizHawkClientContext", idx: int):
+        return any(item.item == idx for item in ctx.items_received)
+
     async def game_watcher(self, ctx: "BizHawkClientContext") -> None:
         from worlds._bizhawk import read, write
 
@@ -164,7 +154,7 @@ class PinballRSClient(BizHawkClient):
 
         # get our relevant bytes
         (local_dex, high_scores, starting_lives, starting_coins, starting_ball, pichu_upgrade,
-            boards, get_arrows, evo_arrows, hatch_mode, stages, items_received, local_eggs,
+            boards, get_arrows, evo_arrows, hatch_mode, stages, items_received, local_eggs, e_reader,
          goal, dex_req, score_req, target_req) = await read(ctx.bizhawk_ctx, [
                 (PINBALL_POKEDEX, 205, "System Bus"),
                 (PINBALL_HIGH_SCORES, 0x180, "System Bus"),
@@ -179,6 +169,7 @@ class PinballRSClient(BizHawkClient):
                 (PINBALL_STAGES, 14, "System Bus"),
                 (PINBALL_RECEIVED, 2, "System Bus"),
                 (PINBALL_EGGS, 4, "System Bus"),
+                (PINBALL_EREADER, 5, "System Bus"),
                 (PINBALL_GOAL, 1, "ROM"),
                 (PINBALL_DEX_REQ, 1, "ROM"),
                 (PINBALL_SCORE_REQ, 8, "ROM"),
@@ -222,6 +213,13 @@ class PinballRSClient(BizHawkClient):
 
         write_local_dex = bytearray(local_dex)
         writing_dex = False
+
+        local_ereader = bytearray(e_reader)
+        if self.active_ereader:
+            local_ereader[self.active_ereader] = 1
+
+        if bytes(local_ereader) != e_reader:
+            writes.append((PINBALL_EREADER, bytes(local_ereader), "System Bus"))
 
         # handle receiving items
         recv_amount = int.from_bytes(items_received, "big")

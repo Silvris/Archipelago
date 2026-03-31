@@ -45,9 +45,9 @@ SPECIAL_ENCOUNTER_RULES: dict[str, Rule] = {
     SPECIES_CYNDAQUIL: (CanPlayLongPinball & (Has(SPECIES_RAYQUAZA) | Has(ENCOUNTER_RATE_UP))
                         & Has(CYNDAQUIL_DEX)) | Has(SPECIAL_GUESTS),
     SPECIES_TOTODILE: (CanPlayLongPinball & (Has(SPECIES_RAYQUAZA) | Has(ENCOUNTER_RATE_UP))
-                        & Has(TOTODILE_DEX)) | Has(SPECIAL_GUESTS),
+                       & Has(TOTODILE_DEX)) | Has(SPECIAL_GUESTS),
     SPECIES_AERODACTYL: (CanPlayLongPinball & (Has(SPECIES_RAYQUAZA) | Has(ENCOUNTER_RATE_UP))
-                        & Has(AERODACTYL_DEX)) | Has(SPECIAL_GUESTS),
+                         & Has(AERODACTYL_DEX)) | Has(SPECIAL_GUESTS),
 }
 
 
