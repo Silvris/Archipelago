@@ -189,7 +189,7 @@ def set_rules(world: "MM1World"):
                 world.weapon_damage[weakness][boss] = minimum_weakness_requirement[weakness]
 
         for boss in (6, 9, 10):
-            if (world.weapon_damage[2][boss] >= minimum_weakness_requirement[1] and
+            if (world.weapon_damage[3][boss] >= minimum_weakness_requirement[3] and
                     not any(world.weapon_damage[i][boss] >= minimum_weakness_requirement[i]
                             for i in range(6) if i != 3)):
                 # Hyper Bomb cannot be Wily or Yellow Devil's only weakness
