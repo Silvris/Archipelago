@@ -51,7 +51,8 @@ class MHFUWebWorld(WebWorld):
 
 class MHFUWorld(World):
     """
-    Monster Hunter Freedom Unite description goes here.
+    As the hunter of Pokke Village, gather materials and craft equipment in order to protect the village from various
+    monsters that threaten its existence.
     """
     game = "Monster Hunter Freedom Unite"
     web = MHFUWebWorld()

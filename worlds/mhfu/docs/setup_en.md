@@ -9,7 +9,6 @@
 
 1. Download and install Archipelago from the link above, making sure to install the most recent version.
    **The installer file is located in the assets section at the bottom of the version information**.
-    - During generation/patching, you will be asked to locate your base ROM file. This is your Kirby's Dream Land 3 ROM file.
 
 2. Download and setup PPSSPP from the link above. In PPSSPP's settings, navigate to Tools -> Developer tools and enable "Allow remote debugger".
 You may get a firewall prompt here, allow PPSSPP.
@@ -30,6 +29,7 @@ guide: [Basic Multiworld Setup Guide](/tutorial/Archipelago/setup/en)
 
 The [Player Options](/games/Monster%20Hunter%20Freedom%20Unite/player-options) page on the website allows you to configure
 your personal options and export a config file from them.
+You can also create a config file using the Options Creator found within the Archipelago Launcher.
 
 ### Verifying your config file
 
@@ -54,7 +54,7 @@ the host will provide you with the link to the room. From there, just follow ste
 
 ## Hosting a MultiWorld game
 
-The recommended way to host a game is to use our [hosting service](/generate). The process is relatively simple:
+The recommended way to host a game is to use Archipelago's [hosting service](/generate). The process is relatively simple:
 
 1. Collect config files from your players.
 2. Create a zip file containing your players' config files.
