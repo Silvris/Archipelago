@@ -43,7 +43,8 @@ class PokemonPinballRSWebWorld(WebWorld):
 
 class PokemonPinballRSWorld(World):
     """
-    Pinball
+    Pokémon Pinball Ruby & Sapphire combines traditional fast pinball gameplay with a Pokémon twist! Catch over 200
+    Pokémon across two separate boards and aim for a high score!
     """
 
     game = "Pokemon Pinball Ruby & Sapphire"
