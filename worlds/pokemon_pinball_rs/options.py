@@ -27,7 +27,7 @@ class PokedexRequirement(Range):
     """On Pokédex goal, the amount of Pokémon registered required to goal."""
     display_name = "Pokédex Requirement"
     default = 125
-    range_start = 50
+    range_start = 1
     range_end = 205
 
 

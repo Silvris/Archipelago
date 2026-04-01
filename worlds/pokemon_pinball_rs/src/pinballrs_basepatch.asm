@@ -633,9 +633,9 @@ SetBonusComplete:
     @@Get:
     GetValue    r3, @@Get, SetBonusCompleteAP
     lsl         r2, r0
-    ldrb        r4, [r3, #0xC]
+    ldrb        r4, [r3, #0xD]
     orr         r2, r4
-    strb        r2, [r3, #0xC]
+    strb        r2, [r3, #0xD]
     pop         {r2-r4}
     bx          lr
     .align      4

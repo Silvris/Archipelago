@@ -93,7 +93,7 @@ def patch_rom(world: "PokemonPinballRSWorld", patch: PinballRSProcedurePatch) ->
 
     patch.write_byte(0x6BC030, goal_value)
     patch.write_byte(0x6BC031, world.options.pokedex_requirement.value)
-    patch.write_bytes(0x6BC032, int.to_bytes(world.options.score_requirement.value, 8, "big"))
+    patch.write_bytes(0x6BC032, int.to_bytes(world.options.score_requirement.value, 8, "little"))
     patch.write_bytes(0x6BC03A, targets)
 
     patch.write_file("token_patch.bin", patch.get_token_binary())
