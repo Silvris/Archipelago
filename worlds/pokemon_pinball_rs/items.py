@@ -2,7 +2,7 @@ from BaseClasses import Item, ItemClassification
 from .names import (RUBY_BOARD, SAPPHIRE_BOARD, AREAS, EXTRA_STARTING_LIFE, STARTING_COINS, STARTING_BALL_MODIFIER,
                     PICHU_UPGRADE, SPECIAL_GUESTS, ENCOUNTER_RATE_UP, RUINS_AREA_CARD, GET_ARROW, EVO_ARROW,
                     CHIKORITA_DEX, CYNDAQUIL_DEX, TOTODILE_DEX, AERODACTYL_DEX, EGG_BUNCH_1, EGG_BUNCH_2, EGG_BUNCH_3,
-                    EGG_BUNCH_4, EGG_BUNCH_RUBY, EGG_BUNCH_SAPPHIRE)
+                    EGG_BUNCH_4, EGG_BUNCH_RUBY, EGG_BUNCH_SAPPHIRE, BIG, SMALL, BALL_SAVER, EXTRA_BALL)
 from typing import NamedTuple
 
 
@@ -45,9 +45,24 @@ AREA_ITEMS: dict[str, ItemData] = {
     area: ItemData(0x100 + idx, ItemClassification.progression) for idx, area in AREAS.items()
 }
 
+FILLER_ITEMS: dict[str, ItemData] = {
+    EXTRA_BALL: ItemData(0x200, ItemClassification.filler),
+    BIG: ItemData(0x201, ItemClassification.filler),
+    SMALL: ItemData(0x202, ItemClassification.filler),
+    BALL_SAVER: ItemData(0x203, ItemClassification.filler),
+}
+
+FILLER_ITEM_WEIGHTS: dict[str, int] = {
+    EXTRA_BALL: 3,
+    BIG: 10,
+    SMALL: 15,
+    BALL_SAVER: 10,
+}
+
 ALL_ITEMS: dict[str, ItemData] = {
     **MAIN_ITEMS,
     **AREA_ITEMS,
+    **FILLER_ITEMS,
 }
 
 item_lookup: dict[str, int] = {

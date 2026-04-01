@@ -505,7 +505,7 @@
 .definelabel DuskullPhase_ProcessGraphics, 0x0340ec
 .definelabel DusclopsPhase_ProcessEntityLogicAndGraphics, 0x034450
 .definelabel FadeToMainBoard, 0x0350f0
-.definelabel ProceessBonusBannerAndScoring, 0x0351a8
+.definelabel ProcessBonusBannerAndScoring, 0x0351a8
 .definelabel sub_356A0, 0x0356a0
 .definelabel sub_357B8, 0x0357b8
 .definelabel KecleonBoardProcess_3A_35860, 0x035860

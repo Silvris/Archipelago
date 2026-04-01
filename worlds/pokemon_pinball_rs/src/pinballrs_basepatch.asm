@@ -44,7 +44,7 @@
 
 .org sub_1642C+0x796
     .thumb
-    bl          GetArrows
+    bl          GetArrowsSapphire
 
 .org sub_31498+0x6A
     .thumb
@@ -87,6 +87,18 @@
 .org BuildSpeciesWeightsForEggMode+0x102
     .thumb
     bl          EggGroups
+
+.org PickSpeciesForEggMode+0x16
+    .thumb
+    bne         thumb_8032604  //; fix Pichu bug
+
+.org 0x32604
+thumb_8032604:
+
+//; bonus_complete_scoring_transition
+.org ProcessBonusBannerAndScoring+0x3A
+    .thumb
+    bl          SetBonusComplete
 
 //; board_process2
 .org sub_4E2F8+0x136 //; Preserve Pichu on fail
@@ -399,10 +411,10 @@ MainLoopHook:
     @@GetSound:
     GetValue    r1, @@GetSound, MainLoopAP
     ldrh        r0, [r1, #6]
-    mov         r2, #0
-    strh        r2, [r1, #6]
     cmp         r0, #0
     beq         @@Return
+    mov         r2, #0
+    strh        r2, [r1, #6]
     bl          m4aSongNumStart
     @@Return:
     pop         {r0-r7, lr}
@@ -475,6 +487,10 @@ HatchLockSapphire:
 
 HatchLockSapphireAP:
     .word 0x2033000
+
+GetArrowsSapphire:
+    add         r0, #1
+    nop
 
 GetArrows:
     push        {r2, lr}
@@ -608,6 +624,26 @@ EggGroupsTable:
 EggGroupsAP:
     .word 0x2033000
 
+SetBonusComplete:
+    push        {r2-r4}
+    ldrb        r0, [r1, #0x04]
+    sub         r0, #2
+    //; r0 is return value here, but it's still useful
+    mov         r2, #1
+    @@Get:
+    GetValue    r3, @@Get, SetBonusCompleteAP
+    lsl         r2, r0
+    ldrb        r4, [r3, #0xC]
+    orr         r2, r4
+    strb        r2, [r3, #0xC]
+    pop         {r2-r4}
+    bx          lr
+    .align      4
+
+
+SetBonusCompleteAP:
+    .word 0x2033000
+
 .endarea
 
 .org 0x6BC000
@@ -616,7 +652,7 @@ EggGroupsAP:
 //; world version
 .byte 0x00, 0x00, 0x00
 //; basepatch version (if i remember to update it lol)
-.byte 0x00, 0x01, 0x00
+.byte 0x00, 0x01, 0x01
 //; slot data at 0x6BC030
 .org 0x6BC040
 EggTableRuby:

@@ -7,7 +7,8 @@ from .names import (POKEDEX, POKEDEX_INVERSE, AREAS, RUBY_BOARD, SAPPHIRE_BOARD,
                     GET_ARROW, EVO_ARROW, CHIKORITA_DEX, CYNDAQUIL_DEX, TOTODILE_DEX, AERODACTYL_DEX,
                     SPECIES_LATIOS, SPECIES_LATIAS, SPECIES_CHIKORITA, SPECIES_CYNDAQUIL, SPECIES_TOTODILE,
                     SPECIES_AERODACTYL, SPECIES_PICHU, EGG_BUNCH_1, EGG_BUNCH_2, EGG_BUNCH_3, EGG_BUNCH_4,
-                    EGG_BUNCH_RUBY, EGG_BUNCH_SAPPHIRE)
+                    EGG_BUNCH_RUBY, EGG_BUNCH_SAPPHIRE, RUINS_RUBY, RUINS_SAPPHIRE, RUINS_AREA_CARD, BONUS_DUSCLOPS,
+                    BONUS_KECLEON, BONUS_KYOGRE, BONUS_GROUDON, BONUS_RAYQUAZA)
 
 if TYPE_CHECKING:
     from . import PokemonPinballRSWorld
@@ -35,19 +36,19 @@ CanPlayLongPinball = HasAllCounts({
     PICHU_UPGRADE: 1,
 })
 
+CanCatchSpecialEncounter = (CanPlayLongPinball & (Has(SPECIES_RAYQUAZA) | Has(ENCOUNTER_RATE_UP)) &
+                            HasFromListUnique(*POKEDEX.keys(), count=100))
+
 SPECIAL_ENCOUNTER_RULES: dict[str, Rule] = {
-    SPECIES_LATIOS: CanPlayLongPinball & (Has(SPECIES_RAYQUAZA) | Has(ENCOUNTER_RATE_UP)),
-    SPECIES_LATIAS: CanPlayLongPinball & (Has(SPECIES_RAYQUAZA) | Has(ENCOUNTER_RATE_UP)),
+    # Pichu does not require 100 caught, he's just rare
+    SPECIES_LATIOS: CanCatchSpecialEncounter,
+    SPECIES_LATIAS: CanCatchSpecialEncounter,
     SPECIES_PICHU: HasAny(EGG_BUNCH_RUBY, EGG_BUNCH_SAPPHIRE, EGG_BUNCH_1, EGG_BUNCH_2, EGG_BUNCH_3,
                           EGG_BUNCH_4) & CanPlayLongPinball & (Has(SPECIES_RAYQUAZA) | Has(ENCOUNTER_RATE_UP)),
-    SPECIES_CHIKORITA: (CanPlayLongPinball & (Has(SPECIES_RAYQUAZA) | Has(ENCOUNTER_RATE_UP))
-                        & Has(CHIKORITA_DEX)) | Has(SPECIAL_GUESTS),
-    SPECIES_CYNDAQUIL: (CanPlayLongPinball & (Has(SPECIES_RAYQUAZA) | Has(ENCOUNTER_RATE_UP))
-                        & Has(CYNDAQUIL_DEX)) | Has(SPECIAL_GUESTS),
-    SPECIES_TOTODILE: (CanPlayLongPinball & (Has(SPECIES_RAYQUAZA) | Has(ENCOUNTER_RATE_UP))
-                       & Has(TOTODILE_DEX)) | Has(SPECIAL_GUESTS),
-    SPECIES_AERODACTYL: (CanPlayLongPinball & (Has(SPECIES_RAYQUAZA) | Has(ENCOUNTER_RATE_UP))
-                         & Has(AERODACTYL_DEX)) | Has(SPECIAL_GUESTS),
+    SPECIES_CHIKORITA: (CanCatchSpecialEncounter & Has(CHIKORITA_DEX)) | Has(SPECIAL_GUESTS),
+    SPECIES_CYNDAQUIL: (CanCatchSpecialEncounter & Has(CYNDAQUIL_DEX)) | Has(SPECIAL_GUESTS),
+    SPECIES_TOTODILE: (CanCatchSpecialEncounter & Has(TOTODILE_DEX)) | Has(SPECIAL_GUESTS),
+    SPECIES_AERODACTYL: (CanCatchSpecialEncounter & Has(AERODACTYL_DEX)) | Has(SPECIAL_GUESTS),
 }
 
 
@@ -58,7 +59,10 @@ def set_rules(world: "PokemonPinballRSWorld") -> None:
 
     # now for each board, set the rules for areas
     for i, area in AREAS.items():
-        world.set_rule(world.get_entrance(f"To {area}"), Has(area))
+        area_rule = Has(area)
+        if area in (RUINS_RUBY, RUINS_SAPPHIRE):
+            area_rule &= (Has(RUINS_AREA_CARD) | CanPlayModeratePinball)
+        world.set_rule(world.get_entrance(f"To {area}"), area_rule)
 
         for mon, arrows in habitats[i].items():
             rule: Rule = True_()
@@ -84,12 +88,14 @@ def set_rules(world: "PokemonPinballRSWorld") -> None:
                                Has(EGG_GROUP_ITEMS[idx]))
 
         for mon in special_encounters:
+            if (i == 0 and mon == 196) or (i == 1 and mon == 195):
+                continue
             world.set_rule(world.get_location(f"{board} - {POKEDEX_INVERSE[mon]}"),
                            SPECIAL_ENCOUNTER_RULES.get(POKEDEX_INVERSE[mon]))
 
         for mon in bonus_catches[i]:
             if mon == 199:
-                rule = CanPlayLongPinball
+                rule = CanPlayLongPinball | (CanPlayBasicPinball & Has(RUINS_AREA_CARD))
             else:
                 rule = CanPlayBasicPinball
             world.set_rule(world.get_location(f"{board} - {POKEDEX_INVERSE[mon]}"), rule)
@@ -109,6 +115,13 @@ def set_rules(world: "PokemonPinballRSWorld") -> None:
     # Now have every Pokemon location check its event item for accessibility
     for mon in POKEDEX:
         world.set_rule(world.get_location(f"Pokédex - {mon}"), Has(mon))
+
+    # Bonus Stages
+    world.set_rule(world.get_location(BONUS_DUSCLOPS), Has(SAPPHIRE_BOARD))
+    world.set_rule(world.get_location(BONUS_KECLEON), Has(RUBY_BOARD))
+    world.set_rule(world.get_location(BONUS_KYOGRE), Has(SAPPHIRE_BOARD))
+    world.set_rule(world.get_location(BONUS_GROUDON), Has(RUBY_BOARD))
+    world.set_rule(world.get_location(BONUS_RAYQUAZA), CanPlayModeratePinball)
 
     goal = True_()
 

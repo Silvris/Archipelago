@@ -1,4 +1,5 @@
 import logging
+import random
 import time
 from enum import IntEnum
 from base64 import b64encode
@@ -20,8 +21,10 @@ PINBALL_EREADER = PINBALL_MAIN + 0x7  # size 0x05
 PINBALL_POKEDEX = PINBALL_MAIN + 0x74  # Size 0xCD
 PINBALL_HIGH_SCORES = PINBALL_MAIN + 0x158  # Size 0x17F
 
-
 PINBALL_CURRENT = 0x2000000  # It can technically be different, but in reality it never is
+PINBALL_LIVES = PINBALL_CURRENT + 0x30
+PINBALL_SCORE = PINBALL_CURRENT + 0x38  # size 4 + 4 (see score info for goaling)
+PINBALL_SAVER = PINBALL_CURRENT + 0x724  # size 2
 
 PINBALL_AP_START = 0x2033000
 PINBALL_STARTING_LIVES = PINBALL_AP_START
@@ -30,11 +33,12 @@ PINBALL_STARTING_BALL = PINBALL_AP_START + 2
 PINBALL_PICHU_UPGRADE = PINBALL_AP_START + 3
 # PINBALL_COIN_MODIFIER = PINBALL_AP_START + 4
 PINBALL_BOARDS = PINBALL_AP_START + 5
-PINBALL_SFX = PINBALL_AP_START + 6
+PINBALL_SFX = PINBALL_AP_START + 6  # size 2
 PINBALL_GET = PINBALL_AP_START + 8
 PINBALL_EVO = PINBALL_AP_START + 9
 PINBALL_HATCH = PINBALL_AP_START + 10
 PINBALL_RECEIVED = PINBALL_AP_START + 11
+PINBALL_BONUS = PINBALL_AP_START + 12
 PINBALL_STAGES = PINBALL_AP_START + 0x10
 PINBALL_EGGS = PINBALL_AP_START + 0x20
 
@@ -50,6 +54,10 @@ EREADER_MAP: dict[str, tuple[int, int]] = {
     "Special Guests": (0, 7),
     "Encounter Rate Up": (1, 8),
     "Ruins Area": (3, 9),
+}
+
+EREADER_MAP_INVERSE: dict[int, str] = {
+    data[0]: card for card, data in EREADER_MAP.items()
 }
 
 @mark_raw
@@ -155,7 +163,7 @@ class PinballRSClient(BizHawkClient):
         # get our relevant bytes
         (local_dex, high_scores, starting_lives, starting_coins, starting_ball, pichu_upgrade,
             boards, get_arrows, evo_arrows, hatch_mode, stages, items_received, local_eggs, e_reader,
-         goal, dex_req, score_req, target_req) = await read(ctx.bizhawk_ctx, [
+            current_score, current_balls, goal, dex_req, score_req, target_req) = await read(ctx.bizhawk_ctx, [
                 (PINBALL_POKEDEX, 205, "System Bus"),
                 (PINBALL_HIGH_SCORES, 0x180, "System Bus"),
                 (PINBALL_STARTING_LIVES, 1, "System Bus"),
@@ -170,6 +178,8 @@ class PinballRSClient(BizHawkClient):
                 (PINBALL_RECEIVED, 2, "System Bus"),
                 (PINBALL_EGGS, 4, "System Bus"),
                 (PINBALL_EREADER, 5, "System Bus"),
+                (PINBALL_SCORE, 8, "System Bus"),
+                (PINBALL_LIVES, 1, "System Bus"),
                 (PINBALL_GOAL, 1, "ROM"),
                 (PINBALL_DEX_REQ, 1, "ROM"),
                 (PINBALL_SCORE_REQ, 8, "ROM"),
@@ -216,7 +226,10 @@ class PinballRSClient(BizHawkClient):
 
         local_ereader = bytearray(e_reader)
         if self.active_ereader:
-            local_ereader[self.active_ereader] = 1
+            local_ereader[self.active_ereader] = 0 if local_ereader[self.active_ereader] else 1
+            logger.warning(f"{EREADER_MAP_INVERSE[self.active_ereader]} has been "
+                           f"{'activated' if local_ereader[self.active_ereader] else 'deactivated'}.")
+            self.active_ereader = -1
 
         if bytes(local_ereader) != e_reader:
             writes.append((PINBALL_EREADER, bytes(local_ereader), "System Bus"))
@@ -236,10 +249,37 @@ class PinballRSClient(BizHawkClient):
                 writes.append(get_sfx_write(0xB2))
             else:
                 writes.append(get_sfx_write(0xD8))
+            if item.item & 0x200:
+                self.item_queue.append(item)
 
         if len(self.item_queue):
             item = self.item_queue.pop(0)
             idx = item.item & 0xF
+            if idx == 0:
+                balls = int.from_bytes(current_balls, "big")
+                writes.append((PINBALL_LIVES, int.to_bytes(balls + 1, 1, "big"), "System Bus"))
+            elif idx in (1, 2):
+                if idx == 2:
+                    score = random.randint(1000000, 9000000)
+                else:
+                    score = random.randint(100, 900)
+                # detranslate the score
+                score_lo = int.from_bytes(current_score[:4], "big")
+                score_hi = int.from_bytes(current_score[4:], "big")
+                score += min(score_lo, 99999999) + (score_hi * 100000000)
+                # translate back down
+                if score > 99999999:
+                    score -= 99999999
+                    score_low = 99999999
+                    score_high = score // 100000000
+                else:
+                    score_low = score
+                    score_high = 0
+                score_write = bytearray(int.to_bytes(score_low, 4, "big")) + int.to_bytes(score_high, 4, "big")
+                writes.append((PINBALL_SCORE, score_write, "System Bus"))
+            elif idx == 3:
+                writes.append((PINBALL_SAVER, int.to_bytes(1800, 2, "big"), "System Bus"))
+
 
         # handle most items state based
         item: NetworkItem
@@ -264,6 +304,7 @@ class PinballRSClient(BizHawkClient):
             writes.append((PINBALL_STARTING_LIVES, remote_lives.to_bytes(1, "big"), "System Bus"))
 
         remote_coins = sum(item.item == 4 for item in ctx.items_received)
+        remote_coins = min(remote_coins * 10, 99)
         if starting_coins[0] != remote_coins:
             writes.append((PINBALL_STARTING_COINS, remote_coins.to_bytes(1, "big"), "System Bus"))
 

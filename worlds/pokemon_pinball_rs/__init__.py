@@ -8,7 +8,7 @@ from settings import Group, UserFilePath
 from typing import Any, ClassVar
 
 from .client import PinballRSClient
-from .items import PinballRSItem, ALL_ITEMS, item_lookup, MAIN_ITEMS, AREA_ITEMS
+from .items import PinballRSItem, ALL_ITEMS, item_lookup, MAIN_ITEMS, AREA_ITEMS, FILLER_ITEM_WEIGHTS
 from .names import RUBY_BOARD, SAPPHIRE_BOARD, AREAS
 from .options import PokemonPinballRSOptions, StartingBoard
 from .regions import create_regions, location_lookup
@@ -47,6 +47,7 @@ class PokemonPinballRSWorld(World):
     """
 
     game = "Pokemon Pinball Ruby & Sapphire"
+    web = PokemonPinballRSWebWorld()
     settings: ClassVar[PokemonPinballRSSettings]
     options_dataclass = PokemonPinballRSOptions
     options: PokemonPinballRSOptions
@@ -87,7 +88,9 @@ class PokemonPinballRSWorld(World):
                 itempool.append(self.create_item(area))
 
         unfilled = len(self.multiworld.get_unfilled_locations(self.player)) - len(itempool)
-        itempool += [Item("Nothing", ItemClassification.filler, -1, self.player) for _ in range(unfilled)]
+        itempool += [self.create_item(filler)
+                     for filler in self.random.choices(
+                list(FILLER_ITEM_WEIGHTS.keys()), weights=list(FILLER_ITEM_WEIGHTS.values()), k=unfilled)]
 
         self.multiworld.itempool += itempool
 

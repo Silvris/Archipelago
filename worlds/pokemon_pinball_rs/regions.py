@@ -17,6 +17,7 @@ class PinballRSLocation(Location):
 
 location_lookup: dict[str, int] = {
     **{f"Pokédex - {mon}": idx + 1 for mon, idx in POKEDEX.items()},
+    **{stage: 0x100 + idx for idx, stage in BONUS_STAGES.items()},
 }
 
 
@@ -26,13 +27,15 @@ def create_regions(world: "PokemonPinballRSWorld") -> None:
     sapphire = PinballRSRegion(SAPPHIRE_BOARD, world.player, world.multiworld)
     pokedex = PinballRSRegion("Pokédex", world.player, world.multiworld)
     evos = PinballRSRegion("Evolutions", world.player, world.multiworld)
+    bonuses = PinballRSRegion("Bonus Stages", world.player, world.multiworld)
 
     menu.connect(ruby, f"To {ruby.name}")
     menu.connect(sapphire, f"To {sapphire.name}")
     menu.connect(pokedex, f"To {pokedex.name}")
     menu.connect(evos, f"To {evos.name}")
+    menu.connect(bonuses, f"To {bonuses.name}")
 
-    world.multiworld.regions.extend([ruby, sapphire, pokedex, menu])
+    world.multiworld.regions.extend([ruby, sapphire, pokedex, menu, bonuses])
 
     # Create the Pokédex, real checks
     pokedex.add_locations({f"Pokédex - {mon}": idx + 1 for mon, idx in POKEDEX.items()})
@@ -64,6 +67,8 @@ def create_regions(world: "PokemonPinballRSWorld") -> None:
                             item_type=PinballRSItem, show_in_spoiler=False)
 
         for mon in special_encounters:
+            if (i == 0 and mon == 196) or (i == 1 and mon == 195):
+                continue
             board.add_event(f"{board.name} - {POKEDEX_INVERSE[mon]}", POKEDEX_INVERSE[mon],
                             location_type=PinballRSLocation,
                             item_type=PinballRSItem, show_in_spoiler=False)
@@ -73,3 +78,6 @@ def create_regions(world: "PokemonPinballRSWorld") -> None:
         evos.add_event(f"Evolve - {POKEDEX_INVERSE[prevo]} -> {POKEDEX_INVERSE[mon]}", POKEDEX_INVERSE[mon],
                        location_type=PinballRSLocation,
                        item_type=PinballRSItem, show_in_spoiler=False)
+
+    # Bonus Stages
+    bonuses.add_locations({stage: 0x100 + idx for idx, stage in BONUS_STAGES.items()})

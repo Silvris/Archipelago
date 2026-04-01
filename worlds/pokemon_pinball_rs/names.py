@@ -204,6 +204,13 @@ SPECIES_CYNDAQUIL = "Cyndaquil"
 SPECIES_TOTODILE = "Totodile"
 SPECIES_AERODACTYL = "Aerodactyl"
 
+# Bonus Stage Clears
+BONUS_DUSCLOPS = "Dusclops Bonus Stage - Complete"
+BONUS_KECLEON = "Kecleon Bonus Stage - Complete"
+BONUS_KYOGRE = "Kyogre Bonus Stage - Complete"
+BONUS_GROUDON = "Groudon Bonus Stage - Complete"
+BONUS_RAYQUAZA = "Rayquaza Bonus Stage - Complete"
+
 # Items
 EXTRA_STARTING_LIFE = "Extra Starting Ball"
 STARTING_BALL_MODIFIER = "Progressive Starting Ball Modifier"
@@ -243,6 +250,11 @@ WILDERNESS_SAPPHIRE = "Wilderness (Sapphire)"
 OCEAN_SAPPHIRE = "Ocean (Sapphire)"
 CAVE_SAPPHIRE = "Cave (Sapphire)"
 RUINS_SAPPHIRE = "Ruins (Sapphire)"
+# Filler
+EXTRA_BALL = "Extra Ball"
+BIG = "BIG"
+SMALL = "Small"
+BALL_SAVER = "30 Sec. Ball Saver"
 
 POKEDEX: dict[str, int] = {
     SPECIES_TREECKO: 0,
@@ -467,6 +479,14 @@ AREAS: dict[int, str] = {
     11: WILDERNESS_SAPPHIRE,
     12: CAVE_SAPPHIRE,
     13: RUINS_SAPPHIRE,
+}
+
+BONUS_STAGES: dict[int, str] = {
+    0: BONUS_DUSCLOPS,
+    1: BONUS_KECLEON,
+    2: BONUS_KYOGRE,
+    3: BONUS_GROUDON,
+    4: BONUS_RAYQUAZA,
 }
 
 POKEDEX_INVERSE: dict[int, str] = {val: key for key, val in POKEDEX.items()}
