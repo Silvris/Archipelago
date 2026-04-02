@@ -227,7 +227,7 @@ class PinballRSClient(BizHawkClient):
         writing_dex = False
 
         local_ereader = bytearray(e_reader)
-        if self.active_ereader > 0:
+        if self.active_ereader > -1:
             local_ereader[self.active_ereader] = 0 if local_ereader[self.active_ereader] else 1
             logger.warning(f"{EREADER_MAP_INVERSE[self.active_ereader]} has been "
                            f"{'activated' if local_ereader[self.active_ereader] else 'deactivated'}.")
