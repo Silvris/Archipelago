@@ -315,6 +315,10 @@ class PinballRSClient(BizHawkClient):
         if starting_ball[0] != remote_ball:
             writes.append((PINBALL_STARTING_BALL, remote_ball.to_bytes(1, "little"), "System Bus"))
 
+        remote_pichu = any(item.item == 6 for item in ctx.items_received)
+        if pichu_upgrade[0] != remote_pichu:
+            writes.append((PINBALL_PICHU_UPGRADE, remote_pichu.to_bytes(1, "little"), "System Bus"))
+
         remote_get = int(any(item.item == 10 for item in ctx.items_received))
         if get_arrows[0] != remote_get:
             writes.append((PINBALL_GET, remote_get.to_bytes(1, "little"), "System Bus"))
