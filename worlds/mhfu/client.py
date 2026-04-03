@@ -1055,7 +1055,7 @@ class MHFUContext(CommonContext):
 
     def debug_print(self, string: str):
         if MHFU_DEBUG:
-            ppsspp_logger.log(string)
+            ppsspp_logger.warning(string)
 
 
 async def game_watcher(ctx: MHFUContext) -> None:
