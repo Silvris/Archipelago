@@ -63,6 +63,8 @@ PPSSPP_HELLO = {
 PPSSPP_STATUS = {"event": "game.status", "ticket": "AP_STATUS"}
 PPSSPP_CONFIG = {"event": "broadcast.config.set", "ticket": "AP_CONFIG", "disallowed": {"input": True}}
 
+MHFU_DEBUG = True
+
 MHFU_POINTERS = {
     "US": {
         "GH_VISIBLE": 0x089B1B4C,
@@ -285,11 +287,12 @@ async def handle_logs(ctx: MHFUContext) -> None:
                 if log["channel"] in ("MEMMAP", "JIT"):
                     # we hit a breakpoint
                     bp = log["message"].replace("\n", "").rsplit(" ")[-1]
-                    print(bp)
+                    ctx.debug_print(bp)
                     if bp == "QUEST_LOAD":
                         if ctx.randomize_quest:
                             quest_base = MHFU_BREAKPOINTS[ctx.lang][bp][1]
                             quest_id = (await ctx.ppsspp_read_unsigned(quest_base + 100, "LOAD_QUEST_ID", 16))["value"]
+                            ctx.debug_print(quest_id)
                             large_mon_ptr_ptr = quest_base + 0x14
                             large_mon_ptr = (await ctx.ppsspp_read_unsigned(large_mon_ptr_ptr,
                                                                             "LARGE_MON_PTR", 32))["value"]
@@ -313,6 +316,7 @@ async def handle_logs(ctx: MHFUContext) -> None:
                                 quest_str = str("%.5i" % quest_id)
                                 info_out = bytearray()
                                 quest_mons = ctx.quest_info[quest_str]["monsters"]
+                                ctx.debug_print(",".join([str(mon) for mon in quest_mons]))
                                 for mon in mons:
                                     mon_data = bytearray(base64.b64decode(mons[mon]["base64"]))
                                     if ctx.quest_randomization:
@@ -1048,6 +1052,10 @@ class MHFUContext(CommonContext):
             self.update_task.cancel()
         if self.socket_task:
             self.socket_task.cancel()
+
+    def debug_print(self, string: str):
+        if MHFU_DEBUG:
+            ppsspp_logger.log(string)
 
 
 async def game_watcher(ctx: MHFUContext) -> None:
