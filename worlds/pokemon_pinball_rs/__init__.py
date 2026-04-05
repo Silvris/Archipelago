@@ -8,7 +8,7 @@ from settings import Group, UserFilePath
 from typing import Any, ClassVar
 
 from .client import PinballRSClient
-from .items import PinballRSItem, ALL_ITEMS, item_lookup, MAIN_ITEMS, AREA_ITEMS, FILLER_ITEM_WEIGHTS
+from .items import PinballRSItem, ALL_ITEMS, item_lookup, MAIN_ITEMS, AREA_ITEMS, FILLER_ITEM_WEIGHTS, EVOLUTION_ITEMS
 from .names import RUBY_BOARD, SAPPHIRE_BOARD, AREAS
 from .options import PokemonPinballRSOptions, StartingBoard
 from .regions import create_regions, location_lookup
@@ -78,6 +78,9 @@ class PokemonPinballRSWorld(World):
         starting_board = next(item for item in itempool if item.name == board_name)
         itempool.remove(starting_board)
         self.push_precollected(starting_board)
+
+        #evo
+        itempool.extend([self.create_item(name) for name, data in EVOLUTION_ITEMS.items()])
 
         # handle areas
         ruby_start = self.random.randint(0, 5)

@@ -1,3 +1,5 @@
+from typing import Callable
+
 SPECIES_TREECKO = "Treecko"
 SPECIES_GROVYLE = "Grovyle"
 SPECIES_SCEPTILE = "Sceptile"
@@ -224,7 +226,10 @@ RUBY_BOARD = "Ruby Board"
 SAPPHIRE_BOARD = "Sapphire Board"
 EVO_ARROW = "Evo Arrow"
 GET_ARROW = "Get Arrow"
+COIN_ARROW = "Coin Arrow"
+COIN_MODIFIER = "Double Coin Modifier"
 # HATCH_MODE = "Hatch Mode"
+EVO_MODE = "Evo Mode"
 CHIKORITA_DEX = "Chikorita Pokédex Entry"
 CYNDAQUIL_DEX = "Cyndaquil Pokédex Entry"
 TOTODILE_DEX = "Totodile Pokédex Entry"
@@ -235,6 +240,18 @@ EGG_BUNCH_3 = "Egg Bunch 3"
 EGG_BUNCH_4 = "Egg Bunch 4"
 EGG_BUNCH_RUBY = "Egg Bunch (Ruby)"
 EGG_BUNCH_SAPPHIRE = "Egg Bunch (Sapphire)"
+# Evolution Items
+EXPERIENCE = "Rare Candy"
+LEAF_STONE = "Leaf Stone"
+FIRE_STONE = "Fire Stone"
+LINK_CABLE = "Link Cable"
+MOON_STONE = "Moon Stone"
+WATER_STONE = "Water Stone"
+THUNDER_STONE = "Thunder Stone"
+SUN_STONE = "Sun Stone"
+FRIENDSHIP = "Soothe Bell"
+BEAUTY = "Pokéblocks"
+SPECIAL_EVO = "SPECIAL"
 # Areas
 FOREST_RUBY = "Forest (Ruby)"
 VOLCANO_RUBY = "Volcano (Ruby)"
@@ -250,6 +267,12 @@ WILDERNESS_SAPPHIRE = "Wilderness (Sapphire)"
 OCEAN_SAPPHIRE = "Ocean (Sapphire)"
 CAVE_SAPPHIRE = "Cave (Sapphire)"
 RUINS_SAPPHIRE = "Ruins (Sapphire)"
+# Board Helpers
+HELPER_ZIGZAGOON = "Helper Zigzagoon"
+HELPER_MAKUHITA = "Helper Makuhita"
+HELPER_WHISCASH = "Helper Whiscash"
+HELPER_PELIPPER = "Helper Pelipper"
+
 # Filler
 EXTRA_BALL = "Extra Ball"
 BIG = "BIG"
@@ -487,6 +510,26 @@ BONUS_STAGES: dict[int, str] = {
     2: BONUS_KYOGRE,
     3: BONUS_GROUDON,
     4: BONUS_RAYQUAZA,
+}
+
+EVOLUTION_SPECIAL: dict[str, Callable[[str], str]] = {
+    SPECIES_GLOOM: lambda evo: LEAF_STONE if evo == SPECIES_VILEPLUME else SUN_STONE,
+    SPECIES_WURMPLE: lambda x: EXPERIENCE,
+    SPECIES_CLAMPERL: lambda x: LINK_CABLE,
+}
+
+EVOLUTION_METHODS: dict[int, str] = {
+    1: EXPERIENCE,
+    2: LEAF_STONE,
+    3: FIRE_STONE,
+    4: LINK_CABLE,
+    5: MOON_STONE,
+    6: WATER_STONE,
+    7: THUNDER_STONE,
+    8: SUN_STONE,  # Unused, technically
+    9: FRIENDSHIP,  # Use soothe bell?
+    10: BEAUTY,
+    # 11: SPECIAL_EVO,  # EVOLUTION_SPECIAL
 }
 
 POKEDEX_INVERSE: dict[int, str] = {val: key for key, val in POKEDEX.items()}

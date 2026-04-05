@@ -3,6 +3,15 @@ from Options import Choice, OptionSet, Range, PerGameCommonOptions
 from .names import POKEDEX, SPECIES_GROUDON, SPECIES_KYOGRE, SPECIES_RAYQUAZA, SPECIES_JIRACHI
 
 
+class Difficulty(Choice):
+    """Whether logic should apply additional restrictions on locations
+    Normal: All locations other than catching have additional requirements"""
+    option_normal = 0
+    option_hard = 1
+    option_expert = 2
+    option_master = 3
+
+
 class Goal(OptionSet):
     """What is considered the goal for Pokemon Pinball:
     Including multiple options will require all to have been met
@@ -49,6 +58,7 @@ class PokemonTargets(OptionSet):
 @dataclass
 class PokemonPinballRSOptions(PerGameCommonOptions):
     goal: Goal
+    difficulty: Difficulty
     starting_board: StartingBoard
     pokedex_requirement: PokedexRequirement
     score_requirement: ScoreRequirement

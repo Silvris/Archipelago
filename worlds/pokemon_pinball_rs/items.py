@@ -2,7 +2,8 @@ from BaseClasses import Item, ItemClassification
 from .names import (RUBY_BOARD, SAPPHIRE_BOARD, AREAS, EXTRA_STARTING_LIFE, STARTING_COINS, STARTING_BALL_MODIFIER,
                     PICHU_UPGRADE, SPECIAL_GUESTS, ENCOUNTER_RATE_UP, RUINS_AREA_CARD, GET_ARROW, EVO_ARROW,
                     CHIKORITA_DEX, CYNDAQUIL_DEX, TOTODILE_DEX, AERODACTYL_DEX, EGG_BUNCH_1, EGG_BUNCH_2, EGG_BUNCH_3,
-                    EGG_BUNCH_4, EGG_BUNCH_RUBY, EGG_BUNCH_SAPPHIRE, BIG, SMALL, BALL_SAVER, EXTRA_BALL)
+                    EGG_BUNCH_4, EGG_BUNCH_RUBY, EGG_BUNCH_SAPPHIRE, BIG, SMALL, BALL_SAVER, EXTRA_BALL,
+                    EVOLUTION_METHODS, EVO_MODE, HELPER_ZIGZAGOON, HELPER_MAKUHITA, HELPER_PELIPPER, HELPER_WHISCASH)
 from typing import NamedTuple
 
 
@@ -28,7 +29,7 @@ MAIN_ITEMS: dict[str, ItemData] = {
     RUINS_AREA_CARD: ItemData(9, ItemClassification.progression),
     GET_ARROW: ItemData(10, ItemClassification.progression),
     EVO_ARROW: ItemData(11, ItemClassification.progression, num=3),
-    # HATCH_MODE: ItemData(12, ItemClassification.progression),
+    EVO_MODE: ItemData(12, ItemClassification.progression),
     CHIKORITA_DEX: ItemData(13, ItemClassification.progression),
     CYNDAQUIL_DEX: ItemData(14, ItemClassification.progression),
     TOTODILE_DEX: ItemData(15, ItemClassification.progression),
@@ -43,6 +44,17 @@ MAIN_ITEMS: dict[str, ItemData] = {
 
 AREA_ITEMS: dict[str, ItemData] = {
     area: ItemData(0x100 + idx, ItemClassification.progression) for idx, area in AREAS.items()
+}
+
+EVOLUTION_ITEMS: dict[str, ItemData] = {
+    evo_item: ItemData(0x400 + idx, ItemClassification.progression) for idx, evo_item in EVOLUTION_METHODS.items()
+}
+
+HELPER_ITEMS: dict[str, ItemData] = {
+    HELPER_ZIGZAGOON: ItemData(0x800, ItemClassification.useful),
+    HELPER_MAKUHITA: ItemData(0x801, ItemClassification.progression),
+    HELPER_PELIPPER: ItemData(0x802, ItemClassification.progression),
+    HELPER_WHISCASH: ItemData(0x803, ItemClassification.progression),
 }
 
 FILLER_ITEMS: dict[str, ItemData] = {
@@ -62,6 +74,7 @@ FILLER_ITEM_WEIGHTS: dict[str, int] = {
 ALL_ITEMS: dict[str, ItemData] = {
     **MAIN_ITEMS,
     **AREA_ITEMS,
+    **EVOLUTION_ITEMS,
     **FILLER_ITEMS,
 }
 

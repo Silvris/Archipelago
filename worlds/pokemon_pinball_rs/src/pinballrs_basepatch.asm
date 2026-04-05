@@ -33,11 +33,36 @@
     .thumb
     bl          EvoArrows
 
+.org sub_153CC+0x4A8
+    .thumb
+    bl          CoinArrows
+
+.org sub_153CC+0x4BA
+    .thumb
+    bl          DoubleCoinRuby
+
 .org sub_153CC+0x680
     .thumb
     bl          GetArrows
 
+.org sub_21D78+0x30
+    .thumb
+    bl          CheckAnyMonEvoR0Shift //; this is the main one, sets the evo mode enable
+    
+
 //; Sapphire Board hooks
+.org sub_1642C+0x31C
+    .thumb
+    bl          CheckZig
+    nop
+.org sub_1642C+0x516
+    .thumb
+    bl          CoinArrows
+
+.org sub_1642C+0x52A
+    .thumb
+    bl          DoubleCoinSapphire
+
 .org sub_1642C+0x5AA
     .thumb
     bl          EvoArrows
@@ -46,9 +71,30 @@
     .thumb
     bl          GetArrowsSapphire
 
+.org sub_2F79C+0x4C2
+    .thumb
+    bl          CheckAnyMonEvoR0Shift
+
+.org sub_31144+0x114
+    .thumb
+    bl          CheckAnyMonEvoR0Shift
+
 .org sub_31498+0x6A
     .thumb
     bl          HatchLockSapphire
+
+//; Evo mode hooks
+.org sub_1B140+0x11B8
+    .thumb
+    bl          CheckIndividualMonEvo
+
+.org sub_2A354+0x44E
+    .thumb
+    bl          CheckAnyMonEvoR0Shift
+
+.org sub_29D9C+0x1F8
+    .thumb
+    bl          CheckAnyMonEvoR0Shift
 
 //; Handle areas
 .org sub_25F64+0x38
@@ -642,6 +688,184 @@ SetBonusComplete:
 
 
 SetBonusCompleteAP:
+    .word 0x2033000
+
+CheckIndividualMonEvo:
+    //; r5 contains gCurrentPinballGame
+    push        {r1-r5, lr}
+    mov         r0, #1
+    and         r0, r1
+    cmp         r0, #0
+    beq         @@Return
+    mov         r2, #0xB3
+    //; now free to handle whatever is needed
+    @@Get:
+    GetValue    r3, @@Get, CheckIndividualMonEvoAP
+    lsl         r2, #3
+    @@Get2:
+    GetValue    r1, @@Get2, CheckIndividualMonEvoSpecies
+    ldr         r5, [r5, #0]
+    ldrh        r2, [r5, r2]
+    mov         r4, #0x18
+    mul         r2, r4
+    add         r1, r2
+    ldrb        r2, [r1, #0x14]
+    mov         r1, #1
+    lsl         r1, r2
+    ldrh        r2, [r3, #0x24]
+    and         r1, r2
+    cmp         r1, #0
+    bne         @@Return
+    //; failure state, mov 0 into r0, ensure we take the branch
+    mov         r0, #0x8A
+    bl          m4aSongNumStart
+    mov         r0, #0
+    @@Return:
+    cmp         r0, #0
+    pop         {r1-r5, pc}
+    .align      4
+
+
+CheckIndividualMonEvoAP:
+    .word 0x2033000
+
+CheckIndividualMonEvoSpecies:
+    .word 0x86A3700
+
+CheckAnyMonEvo:
+//; r0 - evolvablePartySize
+//; returns 0 in r0 if no evolvable, else 1
+//; r6 - AP, r5 - currentPinballGame, r4 - gSpeciesInfo, r3 - evolvePartyIndex,  r1/r2 flex
+
+    push        {r1-r6}
+    cmp         r0, #0 //; trivial false
+    beq         @@False
+    mov         r3, #0
+    @@Get1:
+    GetValue    r5, @@Get1, CheckAnyMonEvoPinball
+    ldr         r5, [r5, #0]
+    @@Get2:
+    GetValue    r4, @@Get2, CheckAnyMonEvoSpecies
+    mov         r2, #0x9C
+    @@Get3:
+    GetValue    r6, @@Get3, CheckAnyMonEvoAP
+    lsl         r2, #2
+    add         r5, r2
+    @@Loop:
+    ldrb        r2, [r5, r3]
+    mov         r1, #0x18
+    mul         r2, r1
+    add         r1, r4, r2
+    ldrb        r2, [r1, #0x14]
+    mov         r1, #1
+    lsl         r1, r2
+    ldrh        r2, [r6, #0x24]
+    and         r1, r2
+    cmp         r1, #0
+    bne         @@True
+    add         r3, #1
+    cmp         r3, r0
+    bne         @@Loop
+    @@False:
+    mov         r0, #0
+    @@Return:
+    pop         {r1-r6}
+    bx          lr
+    @@True:
+    mov         r0, #1
+    b           @@Return
+
+    .align      4
+
+
+CheckAnyMonEvoPinball:
+    .word 0x20314E0
+
+CheckAnyMonEvoSpecies:
+    .word 0x86A3700
+
+CheckAnyMonEvoAP:
+    .word 0x2033000
+
+CheckAnyMonEvoR0Shift:
+    push        {lr}
+    asr         r0, #0x18
+    bl          CheckAnyMonEvo
+    cmp         r0, #0
+    pop         {pc}
+
+CoinArrows:
+    push        {r2, lr}
+    add         r0, #1
+    @@Get1:
+    GetValue    r2, @@Get1, CoinArrowsAP
+    ldrb        r2, [r2, #14]
+    cmp         r0, r2
+    bgt         @@Return
+    strb        r0, [r1, #0]
+    @@Return:
+    pop         {r2, lr}
+    .align 4
+
+CoinArrowsAP:
+    .word 0x2033000
+
+DoubleCoin:
+    push        {r0-r2, lr}
+    mov         r2, #0xCA
+    @@Get1:
+    GetValue    r1, @@Get1, DoubleCoinAP
+    ldrb        r1, [r1, #4]
+    cmp         r1, #0
+    beq         @@Return
+    lsl         r2, #1
+    add         r0, r2
+    ldrb        r2, [r0, #0]
+    lsl         r2, #1
+    strb        r2, [r0, #0]
+    @@Return:
+    pop         {r0-r2, pc}
+    .align      4
+
+DoubleCoinAP:
+    .word 0x2033000
+
+DoubleCoinRuby:
+    push        {lr}
+    bl          DoubleCoin
+    add         r0, r2
+    strh        r1, [r0, #0]
+    pop         {pc}
+
+DoubleCoinSapphire:
+    push        {lr}
+    bl          DoubleCoin
+    add         r0, r4
+    strh        r1, [r0, #0]
+    pop         {pc}
+
+CheckZig:
+    push        {r2, r4}
+    mov         r4, #1
+    cmp         r0, #0
+    bne         @@False
+    @@Get:
+    GetValue    r2, @@Get, CheckZigAP
+    add         r2, #0x26
+    ldrb        r2, [r2, #0]
+    and         r2, r4
+    cmp         r2, #0
+    beq         @@False
+    mov         r0, #1
+    @@Return:
+    pop         {r2, r4}
+    bx          lr
+    @@False:
+    mov         r0, #0
+    b           @@Return
+    .align      4
+
+CheckZigAP:
     .word 0x2033000
 
 .endarea
