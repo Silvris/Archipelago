@@ -189,7 +189,7 @@ def set_rules(world: "MM1World"):
                 world.weapon_damage[weakness][boss] = minimum_weakness_requirement[weakness]
 
         for boss in (6, 9, 10):
-            if (world.weapon_damage[2][boss] >= minimum_weakness_requirement[1] and
+            if (world.weapon_damage[3][boss] >= minimum_weakness_requirement[3] and
                     not any(world.weapon_damage[i][boss] >= minimum_weakness_requirement[i]
                             for i in range(6) if i != 3)):
                 # Hyper Bomb cannot be Wily or Yellow Devil's only weakness
@@ -256,6 +256,35 @@ def set_rules(world: "MM1World"):
     add_rule(world.get_location("Wily Machine - Defeated"),
              lambda state: state.can_reach_location("Wily Stage 4 - Guts Man Rematch", world.player) and
              state.has_all([weapons_to_name[wep] for wep in sorted(world.wily_weapons[9])], world.player))
+
+    if world.options.consumables:
+        # fire man weapon energy 1+2
+        set_rule(world.get_location("Fire Man Stage - Weapon Energy 1"),
+                 lambda state: state.has_any(["Magnet Beam", "Ice Slasher"], world.player))
+        set_rule(world.get_location("Fire Man Stage - Weapon Energy 2"),
+                 lambda state: state.has_any(["Magnet Beam", "Ice Slasher"], world.player))
+        # wily stage 1 health energy 2
+        set_rule(world.get_location("Wily Stage 1 - Health Energy 2"),
+                 lambda state: state.has_all(["Magnet Beam", "Thunder Beam"], world.player))
+        # wily stage 2 past cut man refight
+        set_rule(world.get_location("Wily Stage 2 - Health Energy 2"),
+             lambda state: state.can_reach_location("Wily Stage 2 - Cut Man Rematch", world.player))
+        set_rule(world.get_location("Wily Stage 2 - Weapon Energy 3"),
+             lambda state: state.can_reach_location("Wily Stage 2 - Cut Man Rematch", world.player))
+        set_rule(world.get_location("Wily Stage 2 - Weapon Energy 4"),
+             lambda state: state.can_reach_location("Wily Stage 2 - Cut Man Rematch", world.player))
+        # wily stage 2 past elec man refight
+        set_rule(world.get_location("Wily Stage 2 - Weapon Energy 5"),
+             lambda state: state.can_reach_location("Wily Stage 2 - Elec Man Rematch", world.player))
+        set_rule(world.get_location("Wily Stage 2 - Weapon Energy 6"),
+             lambda state: state.can_reach_location("Wily Stage 2 - Elec Man Rematch", world.player))
+        set_rule(world.get_location("Wily Stage 2 - Weapon Energy 7"),
+             lambda state: state.can_reach_location("Wily Stage 2 - Elec Man Rematch", world.player))
+        set_rule(world.get_location("Wily Stage 2 - 1-Up"),
+             lambda state: state.can_reach_location("Wily Stage 2 - Elec Man Rematch", world.player))
+        # wily stage 4 past all refights
+        set_rule(world.get_location("Wily Stage 4 - Weapon Energy 2"),
+             lambda state: state.can_reach_location("Wily Stage 4 - Guts Man Rematch", world.player))
 
     world.multiworld.completion_condition[world.player] = lambda state: state.has("Wily Machine - Defeated",
                                                                                   world.player)
