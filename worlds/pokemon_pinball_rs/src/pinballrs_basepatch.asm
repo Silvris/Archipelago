@@ -29,6 +29,10 @@
     .thumb
     bl          HatchLockRuby
 
+.org sub_153CC+0x1E4
+    .thumb
+    bl          UpdateBumperCount
+
 .org sub_153CC+0x406
     .thumb
     bl          EvoArrows
@@ -48,9 +52,30 @@
 .org sub_21D78+0x30
     .thumb
     bl          CheckAnyMonEvoR0Shift //; this is the main one, sets the evo mode enable
-    
+
+.org sub_1AFD4+0x14A
+    .thumb
+    bl          CheckAnyMonEvoR0Shift
+
+.org sub_1FF0C+0x220
+    .thumb
+    bl          CheckMaku
+    nop
+    nop
+
+.org RubyPond_EntityLogic+0x7CE
+    .thumb
+    bl          CheckWhiscash
+
+.org sub_4F0F0+0x74
+    .thumb
+    bl          UpdateRubyUpgrade
 
 //; Sapphire Board hooks
+.org sub_1642C+0x2C2
+    .thumb
+    bl          CheckPelipper
+    
 .org sub_1642C+0x31C
     .thumb
     bl          CheckZig
@@ -82,6 +107,10 @@
 .org sub_31498+0x6A
     .thumb
     bl          HatchLockSapphire
+
+.org sub_329F4+0x15C
+    .thumb
+    bl          CheckAnyMonEvoR0Shift
 
 //; Evo mode hooks
 .org sub_1B140+0x11B8
@@ -126,6 +155,10 @@
     .thumb
     bl          WeightsCheckEvo
 
+.org BuildSpeciesWeightsForCatchEmMode+0x216
+    .thumb
+    bl          ForceNormal
+
 .org BuildSpeciesWeightsForEggMode+0x92
     .thumb
     bl          EggsCheckEvo
@@ -134,12 +167,21 @@
     .thumb
     bl          EggGroups
 
+.org BuildSpeciesWeightsForEggMode+0x13C
+    .thumb
+    bl          ForceEgg
+
 .org PickSpeciesForEggMode+0x16
     .thumb
     bne         thumb_8032604  //; fix Pichu bug
 
 .org 0x32604
 thumb_8032604:
+
+//; spheal
+.org sub_45E90+0x17E
+    .thumb
+    bl          SetSphealCheck
 
 //; bonus_complete_scoring_transition
 .org ProcessBonusBannerAndScoring+0x3A
@@ -844,15 +886,14 @@ DoubleCoinSapphire:
     strh        r1, [r0, #0]
     pop         {pc}
 
-CheckZig:
+CheckHelper:
     push        {r2, r4}
     mov         r4, #1
-    cmp         r0, #0
-    bne         @@False
     @@Get:
-    GetValue    r2, @@Get, CheckZigAP
+    GetValue    r2, @@Get, CheckHelperAP
     add         r2, #0x26
     ldrb        r2, [r2, #0]
+    lsl         r4, r3
     and         r2, r4
     cmp         r2, #0
     beq         @@False
@@ -865,9 +906,306 @@ CheckZig:
     b           @@Return
     .align      4
 
-CheckZigAP:
+CheckHelperAP:
     .word 0x2033000
 
+CheckZig:
+    push        {r3, lr}
+    cmp         r0, #0
+    bne         @@False
+    mov         r3, #0
+    bl          CheckHelper
+    @@Return:
+    pop         {r3, pc}
+    @@False:
+    mov         r0, #0
+    b           @@Return
+
+CheckPelipper:
+    push        {r0-r3, lr}
+    mov         r3, #1
+    bl          CheckHelper
+    //; r1 is preserved here, take the chance to update our total hits on mult
+    mov         r2, #0x28
+    @@Get:
+    GetValue    r3, @@Get, CheckPelipperAP
+    strb        r0, [r1, #0]
+    ldrb        r0, [r3, r2]
+    add         r0, #1
+    strb        r0, [r3, r2]
+    pop         {r0-r3, pc}
+    .align      4
+
+CheckPelipperAP:
+    .word 0x2033000
+
+CheckMaku:
+    //; easy, just call for the value
+    push        {r3, lr}
+    cmp         r0, #0
+    bne         @@False
+    mov         r3, #2
+    bl          CheckHelper
+    @@Return:
+    pop         {r3, pc}
+    @@False:
+    mov         r0, #0
+    b           @@Return
+
+CheckWhiscash:
+    //; easy, just call for the value
+    push        {r3, lr}
+    lsl         r0, #0x10
+    lsr         r0, #0x10
+    mov         r3, #3
+    bl          CheckHelper
+    @@Return:
+    pop         {r3, pc}
+    @@False:
+    mov         r0, #0
+    b           @@Return
+    .align      4
+
+ForceNormal:
+    mov         r9, r4
+    mov         r10, r5
+    push        {r0-r5}
+    mov         r2, #0xE7
+    @@GetPinball:
+    GetValue    r4, @@GetPinball, ForceNormalPinball
+    ldr         r4, [r4, #0]
+    @@GetWild:
+    GetValue    r3, @@GetWild, ForceNormalWild
+    lsl         r2, #3
+    ldrb        r1, [r4, r2]
+    mov         r2, #0
+    cmp         r1, #3
+    bne         @@ContinueSetup
+    mov         r2, #0x10
+    @@ContinueSetup:
+    //; from here, make r3 store the current table of 8 we're referencing
+    mov         r1, #0x35
+    ldrb        r1, [r4, r1]
+    lsl         r1, #5
+    add         r3, r2
+    add         r3, r1
+    mov         r1, #0x27
+    mov         r0, #0
+    @@GetAP:
+    GetValue    r5, @@GetAP, ForceNormalAP
+    ldrb        r1, [r5, r1]
+    sub         r1, #1
+    @@ScanLoop:
+    ldrh        r2, [r3, r0]
+    cmp         r2, r1
+    beq         @@Apply
+    add         r0, #2
+    cmp         r0, #0x10
+    beq         @@Return
+    b           @@ScanLoop
+    @@Apply:
+    //; r0 has the index we need to keep
+    //; first check if we have enough coins
+    mov         r3, #0x98
+    lsl         r3, #1
+    add         r4, r3
+    mov         r2, #0x62
+    ldrb        r1, [r4, r2]
+    cmp         r1, #0x1E
+    blt         @@Return
+    sub         r1, #0x1E
+    strb        r1, [r4, r2]
+    mov         r1, #0
+    mov         r2, #0
+    @@ApplyLoop:
+    cmp         r0, r1
+    beq         @@Skip
+    strh        r2, [r4, r1]
+    @@Skip:
+    add         r1, #2
+    cmp         r1, #0x10
+    blt         @@ApplyLoop
+    @@ApplyCurrent:
+    //; we have to also update r0 with the totalWeight
+    //; and remove the value in AP
+    mov         r1, #0x27
+    strb        r2, [r5, r1]
+    sub         r4, #2
+    ldrh        r1, [r4, #0]
+    add         r4, #2
+    strh        r1, [r4, r0]
+    @@Return:
+    pop         {r0-r5}
+    bx          lr
+    .align      4
+
+ForceNormalPinball:
+    .word 0x20314E0
+
+ForceNormalWild:
+    .word 0x8055A84
+
+ForceNormalAP:
+    .word 0x2033000
+
+ForceEgg:
+    mov         r9, r4
+    mov         r10, r5
+    push        {r0-r5}
+    mov         r2, #0x4
+    @@GetMain:
+    GetValue    r1, @@GetMain, ForceEggMain
+    ldrb        r1, [r1, r2]
+    @@GetWild:
+    GetValue    r3, @@GetWild, ForceEggWild
+    mov         r2, #0
+    @@GetPinball:
+    GetValue    r4, @@GetPinball, ForceEggPinball
+    ldr         r4, [r4, #0]
+    cmp         r1, #0
+    beq         @@ContinueSetup
+    add         r3, #0x34
+    @@ContinueSetup:
+    mov         r2, #0x98
+    lsl         r2, #1
+    add         r4, r2
+    @@GetAP:
+    GetValue    r5, @@GetAP, ForceEggAP
+    mov         r1, #0x27
+    ldrb        r1, [r5, r1]
+    sub         r1, #1
+    mov         r0, #0
+    @@ScanLoop:
+    //; change compared to normal, check if we've already nulled the weight here
+    ldrh        r2, [r4, r0]
+    cmp         r2, #0
+    beq         @@NoWeight
+    ldrh        r2, [r3, r0]
+    cmp         r2, r1
+    beq         @@Apply
+    @@NoWeight:
+    add         r0, #2
+    cmp         r0, #0x32
+    beq         @@Return
+    b           @@ScanLoop
+    @@Apply:
+    //; r0 has the index we need to keep
+    //; first check if we have enough coins
+    mov         r2, #0x62
+    ldrb        r1, [r4, r2]
+    cmp         r1, #0x1E
+    blt         @@Return
+    sub         r1, #0x1E
+    strb        r1, [r4, r2]
+    mov         r1, #0
+    mov         r2, #0
+    @@ApplyLoop:
+    cmp         r0, r1
+    beq         @@Skip
+    strh        r2, [r4, r1]
+    @@Skip:
+    add         r1, #2
+    cmp         r1, #0x32
+    blt         @@ApplyLoop
+    @@ApplyCurrent:
+    //; we have to also update r0 with the totalWeight
+    //; and remove the value in AP
+    mov         r1, #0x27
+    strb        r2, [r5, r1]
+    sub         r4, #2
+    ldrh        r1, [r4, #0]
+    add         r4, #2
+    strh        r1, [r4, r0]
+    @@Return:
+    pop         {r0-r5}
+    bx          lr
+    .align      4
+
+ForceEggMain:
+    .word 0x200B0C0
+
+ForceEggWild:
+    .word 0x86A4A38
+
+ForceEggPinball:
+    .word 0x20314E0
+
+ForceEggAP:
+    .word 0x2033000
+
+SetSphealCheck:
+    //; r2 - gCurrentPinballGame
+    lsl         r0, #2
+    strh        r0, [r3, #0]
+    push        {r0-r4}
+    mov         r3, #0xA6
+    @@Get:
+    GetValue    r1, @@Get, SetSphealCheckAP
+    lsl         r3, #3
+    sub         r3, #4
+    ldrb        r0, [r2, r3]
+    add         r3, #1
+    ldrb        r3, [r2, r3]
+    mov         r4, r0
+    add         r4, r3
+    mov         r2, #0
+    cmp         r0, #5
+    blt         @@Spheals
+    add         r2, #1
+    @@Spheals:
+    cmp         r3, #5
+    blt         @@Combined
+    add         r2, #2
+    @@Combined:
+    cmp         r4, #10
+    blt         @@Return
+    add         r2, #4
+    @@Return:
+    lsl         r2, #5
+    ldrb        r0, [r1, #0xD]
+    orr         r0, r2
+    strb        r0, [r1, #0xD]
+    pop         {r0-r4}
+    bx          lr
+    .align      4
+
+SetSphealCheckAP:
+    .word 0x2033000
+
+UpdateBumperCount:
+    push        {r0-r3}
+    mov         r2, #0x28
+    @@Get:
+    GetValue    r3, @@Get, UpdateBumperCountAP
+    strb        r0, [r1, #0]
+    ldrb        r0, [r3, r2]
+    add         r0, #1
+    strb        r0, [r3, r2]
+    pop         {r0-r3}
+    add         r0, r2, #1
+    strb        r0, [r1, #0]
+    bx          lr
+    .align      4
+
+UpdateBumperCountAP:
+    .word 0x2033000
+
+UpdateRubyUpgrade:
+    push        {r0-r3}
+    mov         r2, #0x29
+    @@Get:
+    GetValue    r3, @@Get, UpdateRubyUpgradeAP
+    ldrb        r0, [r3, r2]
+    add         r0, #1
+    strb        r0, [r3, r2]
+    pop         {r0-r3}
+    mov         r0, #0
+    ldrh        r0, [r1, r0]
+    bx          lr
+    .align      4
+
+UpdateRubyUpgradeAP:
+    .word 0x2033000
 .endarea
 
 .org 0x6BC000
@@ -876,7 +1214,7 @@ CheckZigAP:
 //; world version
 .byte 0x00, 0x00, 0x00
 //; basepatch version (if i remember to update it lol)
-.byte 0x00, 0x01, 0x01
+.byte 0x00, 0x01, 0x02
 //; slot data at 0x6BC030
 .org 0x6BC040
 EggTableRuby:
