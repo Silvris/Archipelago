@@ -926,7 +926,7 @@ CheckPelipper:
     mov         r3, #1
     bl          CheckHelper
     //; r1 is preserved here, take the chance to update our total hits on mult
-    mov         r2, #0x28
+    mov         r2, #0x29
     @@Get:
     GetValue    r3, @@Get, CheckPelipperAP
     strb        r0, [r1, #0]
@@ -1198,7 +1198,7 @@ UpdateBumperCountAP:
 
 UpdateRubyUpgrade:
     push        {r0-r3}
-    mov         r2, #0x29
+    mov         r2, #0x2A
     @@Get:
     GetValue    r3, @@Get, UpdateRubyUpgradeAP
     ldrb        r0, [r3, r2]

@@ -23,6 +23,7 @@ PINBALL_HIGH_SCORES = PINBALL_MAIN + 0x158  # Size 0x17F
 
 PINBALL_CURRENT = 0x2000000  # It can technically be different, but in reality it never is
 PINBALL_LIVES = PINBALL_CURRENT + 0x30
+PINBALL_SCORE_ADD = PINBALL_CURRENT + 0x40  # size 4, used to add score
 PINBALL_SCORE = PINBALL_CURRENT + 0x44  # size 4 + 4 (see score info for goaling)
 PINBALL_SAVER = PINBALL_CURRENT + 0x724  # size 2
 
@@ -85,6 +86,21 @@ def cmd_ereader(self: "BizHawkClientCommandProcessor", card: str) -> None:
     client.active_ereader = EREADER_MAP[card][0]
 
 
+def cmd_high_scores(self: "BizHawkClientCommandProcessor"):
+    """"""
+    from worlds._bizhawk.context import BizHawkClientContext
+    if self.ctx.game != "Pokemon Pinball Ruby & Sapphire":
+        logger.warning("This command can only be used when playing Pokemon Pinball Ruby & Sapphire.")
+        return
+    if not self.ctx.server or not self.ctx.slot:
+        logger.warning("You must be connected to a server to use this command.")
+        return
+    assert isinstance(self.ctx, BizHawkClientContext)
+    assert isinstance(self.ctx.client_handler, PinballRSClient)
+    client: PinballRSClient = self.ctx.client_handler
+    client.print_scores = True
+
+
 def get_sfx_write(sfx: int) -> tuple[int, bytes, str]:
     return PINBALL_SFX, sfx.to_bytes(2, 'little'), "System Bus"
 
@@ -96,6 +112,7 @@ class PinballRSClient(BizHawkClient):
     item_queue: list[NetworkItem] = []
     rom: bytes | None = None
     active_ereader: int = -1
+    print_scores: bool = False
 
     async def validate_rom(self, ctx: "BizHawkClientContext") -> bool:
         from worlds._bizhawk import RequestFailedError, read, get_memory_size
@@ -219,6 +236,14 @@ class PinballRSClient(BizHawkClient):
                     if not local_dex[i] == 4:
                         goal_is_cleared = False
 
+        if self.print_scores:
+            for idx, i in enumerate(range(0, len(high_scores), 24)):
+                score_lo = int.from_bytes(high_scores[i+20:], "little")
+                score_hi = int.from_bytes(high_scores[i+16:i+20], "little")
+                # score_lo is capped at 99,999,999. We should be below that, but cap it if we are above
+                score = min(score_lo, 99999999) + (score_hi * 100000000)
+                logger.warning(f"Score {idx}: {score}")
+
         if not ctx.finished_game and goal_is_cleared:
             await ctx.send_msgs([{
                 "cmd": "StatusUpdate",
@@ -269,20 +294,7 @@ class PinballRSClient(BizHawkClient):
                 else:
                     score = random.randint(100, 900)
                 # detranslate the score
-                score_lo = int.from_bytes(current_score[:4], "little")
-                score_hi = int.from_bytes(current_score[4:], "little")
-                curr_score = min(score_lo, 99999999) + (score_hi * 100000000)
-                score += curr_score
-                # translate back down
-                if score > 99999999:
-                    score -= 99999999
-                    score_low = 99999999
-                    score_high = score // 100000000
-                else:
-                    score_low = score
-                    score_high = 0
-                score_write = bytearray(int.to_bytes(score_low, 4, "little")) + int.to_bytes(score_high, 4, "little")
-                writes.append((PINBALL_SCORE, score_write, "System Bus"))
+                writes.append((PINBALL_SCORE_ADD, score.to_bytes(4, "little"), "System Bus"))
             elif idx == 3:
                 writes.append((PINBALL_SAVER, int.to_bytes(1800, 2, "little"), "System Bus"))
 
