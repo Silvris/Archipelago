@@ -931,8 +931,11 @@ CheckPelipper:
     GetValue    r3, @@Get, CheckPelipperAP
     strb        r0, [r1, #0]
     ldrb        r0, [r3, r2]
+    cmp         r0, #99
+    bge         @@Return
     add         r0, #1
     strb        r0, [r3, r2]
+    @@Return:
     pop         {r0-r3, pc}
     .align      4
 
@@ -951,6 +954,7 @@ CheckMaku:
     @@False:
     mov         r0, #0
     b           @@Return
+    .align      4
 
 CheckWhiscash:
     //; easy, just call for the value
@@ -1177,10 +1181,12 @@ UpdateBumperCount:
     mov         r2, #0x28
     @@Get:
     GetValue    r3, @@Get, UpdateBumperCountAP
-    strb        r0, [r1, #0]
     ldrb        r0, [r3, r2]
+    cmp         r0, #99
+    bge         @@Return
     add         r0, #1
     strb        r0, [r3, r2]
+    @@Return:
     pop         {r0-r3}
     add         r0, r2, #1
     strb        r0, [r1, #0]
@@ -1196,8 +1202,11 @@ UpdateRubyUpgrade:
     @@Get:
     GetValue    r3, @@Get, UpdateRubyUpgradeAP
     ldrb        r0, [r3, r2]
+    cmp         r0, #99
+    bge         @@Return
     add         r0, #1
     strb        r0, [r3, r2]
+    @@Return:
     pop         {r0-r3}
     mov         r0, #0
     ldrh        r0, [r1, r0]
