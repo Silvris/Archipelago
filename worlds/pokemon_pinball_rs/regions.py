@@ -18,6 +18,10 @@ class PinballRSLocation(Location):
 location_lookup: dict[str, int] = {
     **{f"Pokédex - {mon}": idx + 1 for mon, idx in POKEDEX.items()},
     **{stage: 0x100 + idx for idx, stage in BONUS_STAGES.items()},
+    **{f"{board} - Bonus Multiplier {i}": 0x200 + (j*100) + i
+       for j, board in enumerate((RUBY_BOARD, SAPPHIRE_BOARD))
+       for i in range(1, 100)},
+    **{f"Ball Upgrade {i}": 0x300 + i for i in range(1, 100)},
 }
 
 
@@ -67,11 +71,16 @@ def create_regions(world: "PokemonPinballRSWorld") -> None:
                             item_type=PinballRSItem, show_in_spoiler=False)
 
         for mon in special_encounters:
-            if (i == 0 and mon == 196) or (i == 1 and mon == 195):
+            if (i == 0 and mon == 195) or (i == 1 and mon == 196):
                 continue
             board.add_event(f"{board.name} - {POKEDEX_INVERSE[mon]}", POKEDEX_INVERSE[mon],
                             location_type=PinballRSLocation,
                             item_type=PinballRSItem, show_in_spoiler=False)
+
+        board.add_locations({f"{board.name} - Bonus Multiplier {j}": 0x200 + (i * 100) + j
+                             for j in range(1, world.options.bonus_multiplier_checks.value + 1)})
+    menu.add_locations({f"Ball Upgrade {i}": 0x300 + i for i in range(1, world.options.ball_upgrade_checks.value + 1)})
+
 
     # Now create evolution events
     for mon, prevo in evolutions.items():

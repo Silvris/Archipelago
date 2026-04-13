@@ -2,15 +2,15 @@ import os
 import base64
 import threading
 from worlds.AutoWorld import World, WebWorld
-from BaseClasses import Item, ItemClassification, MultiWorld, Tutorial
+from BaseClasses import Item, ItemClassification, MultiWorld, Tutorial, CollectionState
 from Options import OptionError
 from settings import Group, UserFilePath
 from typing import Any, ClassVar
 
 from .client import PinballRSClient
 from .items import PinballRSItem, ALL_ITEMS, item_lookup, MAIN_ITEMS, AREA_ITEMS, FILLER_ITEM_WEIGHTS, EVOLUTION_ITEMS
-from .names import RUBY_BOARD, SAPPHIRE_BOARD, AREAS
-from .options import PokemonPinballRSOptions, StartingBoard
+from .names import RUBY_BOARD, SAPPHIRE_BOARD, AREAS, EVO_ARROW, EVO_MODE
+from .options import PokemonPinballRSOptions, StartingBoard, EvoMode
 from .regions import create_regions, location_lookup
 from .rom import PinballRSProcedurePatch, patch_rom, PINBALLRSHASH
 from .rules import set_rules
@@ -70,16 +70,24 @@ class PokemonPinballRSWorld(World):
         return PinballRSItem(name, data.classification, data.idx, self.player)
 
     def create_items(self) -> None:
-        itempool = [self.create_item(name) for name, data in MAIN_ITEMS.items() for _ in range(data.num)]
+        itempool = [self.create_item(name) for name, data in MAIN_ITEMS.items() for _ in range(data.num)
+                    if name not in (RUBY_BOARD, SAPPHIRE_BOARD, EVO_ARROW, EVO_MODE)]
         if self.options.starting_board == StartingBoard.option_ruby:
             board_name = RUBY_BOARD
+            other_board = SAPPHIRE_BOARD
         else:
             board_name = SAPPHIRE_BOARD
-        starting_board = next(item for item in itempool if item.name == board_name)
-        itempool.remove(starting_board)
-        self.push_precollected(starting_board)
+            other_board = RUBY_BOARD
+        self.push_precollected(self.create_item(board_name))
+        itempool.append(self.create_item(other_board))
 
         #evo
+        if self.options.evo_mode == EvoMode.option_arrows:
+            itempool.extend([self.create_item(EVO_ARROW) for _ in range(3)])
+        elif self.options.evo_mode == EvoMode.option_full:
+            itempool.append(self.create_item(EVO_MODE))
+        else:
+            self.push_precollected(self.create_item(EVO_MODE))
         itempool.extend([self.create_item(name) for name, data in EVOLUTION_ITEMS.items()])
 
         # handle areas
@@ -99,6 +107,23 @@ class PokemonPinballRSWorld(World):
         self.multiworld.itempool += itempool
 
     set_rules = set_rules
+
+    def collect(self, state: CollectionState, item: "Item") -> bool:
+        changed = super().collect(state, item)
+        if changed and item.name == EVO_MODE:
+            state.prog_items[self.player][EVO_ARROW] += 3
+
+        return changed
+
+    def remove(self, state: CollectionState, item: "Item") -> bool:
+        changed = super().remove(state, item)
+
+        if changed and item.name == EVO_MODE:
+            state.prog_items[self.player][EVO_ARROW] -= 3
+            if state.prog_items[self.player][EVO_ARROW] <= 0:
+                del state.prog_items[self.player][EVO_ARROW]
+
+        return changed
 
     def generate_output(self, output_directory: str) -> None:
         try:

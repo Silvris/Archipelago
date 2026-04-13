@@ -296,8 +296,8 @@ evolutions: dict[int, int] = {
 }
 
 special_encounters: list[int] = [
-    195,  # Latios
-    196,  # Latias
+    195,  # Latias
+    196,  # Latios
     154,  # Pichu
     201,  # Chikorita
     202,  # Cyndaquil

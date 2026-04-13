@@ -159,6 +159,10 @@
     .thumb
     bl          ForceNormal
 
+.org PickSpeciesForCatchEmMode+0x2C6
+    .thumb
+    bl          ClearForceSpecial
+
 .org BuildSpeciesWeightsForEggMode+0x92
     .thumb
     bl          EggsCheckEvo
@@ -174,6 +178,10 @@
 .org PickSpeciesForEggMode+0x16
     .thumb
     bne         thumb_8032604  //; fix Pichu bug
+
+.org PickSpeciesForEggMode+0xF8
+    .thumb
+    bl          ClearForcePichu
 
 .org 0x32604
 thumb_8032604:
@@ -1215,6 +1223,31 @@ UpdateRubyUpgrade:
 
 UpdateRubyUpgradeAP:
     .word 0x2033000
+
+ClearForceSpecial:
+    push        {r1, r2}
+    mov         r1, #0
+    mov         r2, #0x96
+    lsl         r2, #1
+    sub         r2, #1
+    strb        r1, [r0, r2]
+    pop         {r1, r2}
+    add         r0, r2
+    strh        r1, [r0, #0]
+    bx          lr
+
+ClearForcePichu:
+    push        {r1, r2}
+    mov         r1, #0
+    mov         r2, #0x96
+    lsl         r2, #1
+    sub         r2, #1
+    strb        r1, [r0, r2]
+    pop         {r1, r2}
+    add         r0, r4
+    strh        r1, [r0, #0]
+    bx          lr
+
 .endarea
 
 .org 0x6BC000

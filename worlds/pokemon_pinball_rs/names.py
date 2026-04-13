@@ -212,6 +212,9 @@ BONUS_KECLEON = "Kecleon Bonus Stage - Complete"
 BONUS_KYOGRE = "Kyogre Bonus Stage - Complete"
 BONUS_GROUDON = "Groudon Bonus Stage - Complete"
 BONUS_RAYQUAZA = "Rayquaza Bonus Stage - Complete"
+BONUS_SPHEAL_1 = "Spheal Bonus Stage - 5 Poké Ball Hoops"
+BONUS_SPHEAL_2 = "Spheal Bonus Stage - 5 Spheal Hoops"
+BONUS_SPHEAL_3 = "Spheal Bonus Stage - 10 Combined Hoops"
 
 # Items
 EXTRA_STARTING_LIFE = "Extra Starting Ball"
@@ -250,7 +253,7 @@ WATER_STONE = "Water Stone"
 THUNDER_STONE = "Thunder Stone"
 SUN_STONE = "Sun Stone"
 FRIENDSHIP = "Soothe Bell"
-BEAUTY = "Pokéblocks"
+BEAUTY = "Dry Pokéblocks"
 SPECIAL_EVO = "SPECIAL"
 # Areas
 FOREST_RUBY = "Forest (Ruby)"
@@ -510,6 +513,9 @@ BONUS_STAGES: dict[int, str] = {
     2: BONUS_KYOGRE,
     3: BONUS_GROUDON,
     4: BONUS_RAYQUAZA,
+    5: BONUS_SPHEAL_1,
+    6: BONUS_SPHEAL_2,
+    7: BONUS_SPHEAL_3,
 }
 
 EVOLUTION_SPECIAL: dict[str, Callable[[str], str]] = {

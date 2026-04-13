@@ -73,6 +73,7 @@ def patch_rom(world: "PokemonPinballRSWorld", patch: PinballRSProcedurePatch) ->
     patch.name.extend([0] * (32 - len(patch.name)))
     patch.write_bytes(0x6BC000, patch.name)
     patch.write_bytes(0x6BC020, world.world_version)
+    patch.write_byte(0x6BC024, world.options.collect_pokedex.value)
 
     goal_value = 0
     for val in world.options.goal.value:

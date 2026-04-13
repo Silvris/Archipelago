@@ -8,7 +8,8 @@ from NetUtils import ClientStatus, color, NetworkItem
 from worlds._bizhawk.client import BizHawkClient
 from MultiServer import mark_raw
 
-from .data.pokemon import egg_groups
+from .data.pokemon import egg_groups, special_encounters
+from .names import POKEDEX, POKEDEX_INVERSE
 
 if TYPE_CHECKING:
     from worlds._bizhawk.context import BizHawkClientContext, BizHawkClientCommandProcessor
@@ -25,6 +26,9 @@ PINBALL_CURRENT = 0x2000000  # It can technically be different, but in reality i
 PINBALL_LIVES = PINBALL_CURRENT + 0x30
 PINBALL_SCORE_ADD = PINBALL_CURRENT + 0x40  # size 4, used to add score
 PINBALL_SCORE = PINBALL_CURRENT + 0x44  # size 4 + 4 (see score info for goaling)
+PINBALL_FORCE_SPECIAL = PINBALL_CURRENT + 0x12B
+PINBALL_FORCE_PICHU = PINBALL_CURRENT + 0x12C
+PINBALL_COINS = PINBALL_CURRENT + 0x192
 PINBALL_SAVER = PINBALL_CURRENT + 0x724  # size 2
 
 PINBALL_AP_START = 0x2033000
@@ -45,9 +49,14 @@ PINBALL_STAGES = PINBALL_AP_START + 0x10  # Size 14
 PINBALL_EGGS = PINBALL_AP_START + 0x20  # Size 4
 PINBALL_EVO_ITEMS = PINBALL_AP_START + 0x24
 PINBALL_HELPERS = PINBALL_AP_START + 0x26  # size 1
+PINBALL_DEXNAV = PINBALL_AP_START + 0x27
+PINBALL_RUBY_BUMPER = PINBALL_AP_START + 0x28
+PINBALL_SAPPHIRE_BUMPER = PINBALL_AP_START + 0x29
+PINBALL_NUM_BALL_UPGRADE = PINBALL_AP_START + 0x2A
 
 PINBALL_NAME = 0x6BC000
 PINBALL_VERSION = 0x6BC020
+PINBALL_COLLECT = 0x6BC024
 PINBALL_GOAL = 0x6BC030
 PINBALL_DEX_REQ = 0x6BC031
 PINBALL_SCORE_REQ = 0x6BC032
@@ -63,6 +72,8 @@ EREADER_MAP: dict[str, tuple[int, int]] = {
 EREADER_MAP_INVERSE: dict[int, str] = {
     data[0]: card for card, data in EREADER_MAP.items()
 }
+
+DEBUG = True  # Debug flag
 
 @mark_raw
 def cmd_ereader(self: "BizHawkClientCommandProcessor", card: str) -> None:
@@ -101,6 +112,21 @@ def cmd_high_scores(self: "BizHawkClientCommandProcessor"):
     client.print_scores = True
 
 
+def cmd_dexnav(self: "BizHawkClientCommandProcessor", pokemon: str):
+    from worlds._bizhawk.context import BizHawkClientContext
+    if self.ctx.game != "Pokemon Pinball Ruby & Sapphire":
+        logger.warning("This command can only be used when playing Pokemon Pinball Ruby & Sapphire.")
+        return
+    if not self.ctx.server or not self.ctx.slot:
+        logger.warning("You must be connected to a server to use this command.")
+        return
+    assert isinstance(self.ctx, BizHawkClientContext)
+    assert isinstance(self.ctx.client_handler, PinballRSClient)
+    client: PinballRSClient = self.ctx.client_handler
+
+    client.dexnav = POKEDEX.get(pokemon, -1)
+
+
 def get_sfx_write(sfx: int) -> tuple[int, bytes, str]:
     return PINBALL_SFX, sfx.to_bytes(2, 'little'), "System Bus"
 
@@ -113,6 +139,7 @@ class PinballRSClient(BizHawkClient):
     rom: bytes | None = None
     active_ereader: int = -1
     print_scores: bool = False
+    dexnav: int | None = None
 
     async def validate_rom(self, ctx: "BizHawkClientContext") -> bool:
         from worlds._bizhawk import RequestFailedError, read, get_memory_size
@@ -122,6 +149,10 @@ class PinballRSClient(BizHawkClient):
             if (await get_memory_size(ctx.bizhawk_ctx, "ROM")) < 0x700000:
                 if "ereader" in ctx.command_processor.commands:
                     ctx.command_processor.commands.pop("ereader")
+                if "high_scores" in ctx.command_processor.commands:
+                    ctx.command_processor.commands.pop("high_scores")
+                if "dexnav" in ctx.command_processor.commands:
+                    ctx.command_processor.commands.pop("dexnav")
                 return False
 
             game_name, version = (await read(ctx.bizhawk_ctx, [(0x6BC000, 32, "ROM"),
@@ -136,6 +167,10 @@ class PinballRSClient(BizHawkClient):
                                    f"Client version: ({'.'.join([str(i) for i in PokemonPinballRSWorld.world_version])})")
                 if "ereader" in ctx.command_processor.commands:
                     ctx.command_processor.commands.pop("ereader")
+                if "high_scores" in ctx.command_processor.commands:
+                    ctx.command_processor.commands.pop("high_scores")
+                if "dexnav" in ctx.command_processor.commands:
+                    ctx.command_processor.commands.pop("dexnav")
                 return False
         except UnicodeDecodeError:
             return False
@@ -149,6 +184,10 @@ class PinballRSClient(BizHawkClient):
 
         if "ereader" not in ctx.command_processor.commands:
             ctx.command_processor.commands["ereader"] = cmd_ereader
+        if DEBUG and "high_score" not in ctx.command_processor.commands:
+            ctx.command_processor.commands["high_score"] = cmd_high_scores
+        if "dexnav" not in ctx.command_processor.commands:
+            ctx.command_processor.commands["dexnav"] = cmd_dexnav
 
         return True
 
@@ -182,19 +221,23 @@ class PinballRSClient(BizHawkClient):
             return
 
         # get our relevant bytes
-        (local_dex, high_scores, starting_lives, starting_coins, starting_ball, pichu_upgrade,
-            boards, get_arrows, evo_arrows, hatch_mode, stages, items_received, local_eggs, e_reader, bonus_stages,
-            current_score, current_balls, goal, dex_req, score_req, target_req) = await read(ctx.bizhawk_ctx, [
+        (local_dex, high_scores, starting_lives, starting_coins, starting_ball, pichu_upgrade, coins,
+            boards, get_arrows, evo_arrows, hatch_mode, coin_arrows, coin_mod, stages, items_received, local_eggs,
+            e_reader, bonus_stages, current_score, current_balls, evo_items, ruby_bumper, sapphire_bumper, ball_upgrade,
+            goal, dex_req, score_req, target_req, collect_mode) = await read(ctx.bizhawk_ctx, [
                 (PINBALL_POKEDEX, 205, "System Bus"),
                 (PINBALL_HIGH_SCORES, 0x180, "System Bus"),
                 (PINBALL_STARTING_LIVES, 1, "System Bus"),
                 (PINBALL_STARTING_COINS, 1, "System Bus"),
                 (PINBALL_STARTING_BALL, 1, "System Bus"),
                 (PINBALL_PICHU_UPGRADE, 1, "System Bus"),
+                (PINBALL_COINS, 1, "System Bus"),
                 (PINBALL_BOARDS, 1, "System Bus"),
                 (PINBALL_GET, 1, "System Bus"),
                 (PINBALL_EVO, 1, "System Bus"),
                 (PINBALL_HATCH, 1, "System Bus"),
+                (PINBALL_COIN, 1, "System Bus"),
+                (PINBALL_COIN_MODIFIER, 1, "System Bus"),
                 (PINBALL_STAGES, 14, "System Bus"),
                 (PINBALL_RECEIVED, 2, "System Bus"),
                 (PINBALL_EGGS, 4, "System Bus"),
@@ -202,10 +245,15 @@ class PinballRSClient(BizHawkClient):
                 (PINBALL_BONUS, 1, "System Bus"),
                 (PINBALL_SCORE, 8, "System Bus"),
                 (PINBALL_LIVES, 1, "System Bus"),
+                (PINBALL_EVO_ITEMS, 4, "System Bus"),
+                (PINBALL_RUBY_BUMPER, 1, "System Bus"),
+                (PINBALL_SAPPHIRE_BUMPER, 1, "System Bus"),
+                (PINBALL_NUM_BALL_UPGRADE, 1, "System Bus"),
                 (PINBALL_GOAL, 1, "ROM"),
                 (PINBALL_DEX_REQ, 1, "ROM"),
                 (PINBALL_SCORE_REQ, 8, "ROM"),
                 (PINBALL_TARGET_REQ, 26, "ROM"),
+                (PINBALL_COLLECT, 1, "ROM"),
             ])
 
         goal_is_cleared = True
@@ -238,11 +286,14 @@ class PinballRSClient(BizHawkClient):
 
         if self.print_scores:
             for idx, i in enumerate(range(0, len(high_scores), 24)):
-                score_lo = int.from_bytes(high_scores[i+20:], "little")
-                score_hi = int.from_bytes(high_scores[i+16:i+20], "little")
+                score_lo = int.from_bytes(high_scores[i+16:i+20], "little")
+                score_hi = int.from_bytes(high_scores[i+20:i+24], "little")
                 # score_lo is capped at 99,999,999. We should be below that, but cap it if we are above
                 score = min(score_lo, 99999999) + (score_hi * 100000000)
                 logger.warning(f"Score {idx}: {score}")
+            c_score = (min(int.from_bytes(current_score[:4], "little"), 99999999)
+                       + (int.from_bytes(current_score[4:8], "little") * 100000000))
+            logger.warning(f"Current score: {c_score}")
 
         if not ctx.finished_game and goal_is_cleared:
             await ctx.send_msgs([{
@@ -338,7 +389,8 @@ class PinballRSClient(BizHawkClient):
         if get_arrows[0] != remote_get:
             writes.append((PINBALL_GET, remote_get.to_bytes(1, "little"), "System Bus"))
 
-        remote_evo = sum(item.item == 11 for item in ctx.items_received)
+        remote_evo = min((sum(item.item == 11 for item in ctx.items_received) +
+                         (3 * sum(item.item == 12 for item in ctx.items_received))), 3)
         if evo_arrows[0] != remote_evo:
             writes.append((PINBALL_EVO, remote_evo.to_bytes(1, "little"), "System Bus"))
 
@@ -356,21 +408,77 @@ class PinballRSClient(BizHawkClient):
             writes.append((PINBALL_EGGS, remote_eggs.to_bytes(4, "little"), "System Bus"))
             writes.append((PINBALL_HATCH, int.to_bytes(1, 1, "little"), "System Bus"))
 
+        remote_evo_items = 0
+        for item in [item for item in ctx.items_received if item.item & 0x400 != 0]:
+            remote_evo_items |= (1 << ((item.item & 0xFF) + 1))
+        if remote_evo_items and int.from_bytes(evo_items, "little") != remote_evo_items:
+            writes.append((PINBALL_EVO_ITEMS, remote_evo_items.to_bytes(4, "little"), "System Bus"))
+
+        # Helpers
+        remote_helpers = 0
+        for item in [item for item in ctx.items_received if item.item & 0x800 != 0]:
+            remote_helpers |= (1 << (item.item & 0xFF))
+        if remote_helpers and int.from_bytes(evo_items, "little") != remote_evo_items:
+            writes.append((PINBALL_HELPERS, remote_helpers.to_bytes(1, "little"), "System Bus"))
+
+        # Check dexnav here
+        if self.dexnav is not None:
+            if self.dexnav == -1:
+                logger.warning("Unable to find a Pokémon by that name.")
+            elif self.dexnav in special_encounters:
+                # check if we have the coins here
+                coin = int.from_bytes(coins, "little")
+                caught = sum(mon == 4 for mon in local_dex)
+                if coin < 60:
+                    logger.warning("More coins are required to track this Pokémon.")
+                elif caught < 100:
+                    logger.warning("Cannot track special Pokémon until more Pokémon have been registered in the "
+                                   "Pokédex!")
+                else:
+                    writes.append((PINBALL_COINS, int.to_bytes(coin - 60, 1, "little"), "System Bus"))
+                    if self.dexnav == 154:
+                        address = PINBALL_FORCE_PICHU
+                    else:
+                        address = PINBALL_FORCE_SPECIAL
+                    writes.append((address, int.to_bytes(1, 1, "little"), "System Bus"))
+                    logger.warning(f"Attempting to track a special Pokémon!")
+            else:
+                writes.append((PINBALL_DEXNAV, int.to_bytes(self.dexnav + 1, 1, "little"), "System Bus"))
+                logger.warning(f"Attempting to track nearby {POKEDEX_INVERSE[self.dexnav]}!")
+
         new_checks = []
         # check for locations
 
         for i in range(205):
             if local_dex[i] == 4 and (i+1) not in ctx.locations_checked:
                 new_checks.append(i+1)
-            # elif local_dex[i] != 4 and (i+1) in ctx.checked_locations:
-            #    # collect, maybe push out to an option?
-            #    writing_dex = True
-            #    write_local_dex[i] = 4
+            elif collect_mode[0] and local_dex[i] != 4 and (i+1) in ctx.checked_locations:
+                # collect, maybe push out to an option?
+                writing_dex = True
+                write_local_dex[i] = 4
 
-        for i in range(5):
+        for i in range(8):
             mask = 1 << i
             if bonus_stages[0] & mask and (0x100 + i) not in ctx.locations_checked:
                 new_checks.append(0x100 + i)
+
+        ruby_bumper_hits = int.from_bytes(ruby_bumper, "little")
+        sapphire_bumper_hits = int.from_bytes(sapphire_bumper, "little")
+        ball_upgrade_hits = int.from_bytes(ball_upgrade, "little")
+
+        for loc in [loc for loc in ctx.missing_locations if loc & 0x300 == 0x200]:
+            idx = loc & 0xFF
+            if idx >= 100:
+                if (idx - 100) <= sapphire_bumper_hits:
+                    new_checks.append(loc)
+            else:
+                if idx <= ruby_bumper_hits:
+                    new_checks.append(loc)
+
+        for loc in [loc for loc in ctx.missing_locations if loc & 0x300 == 0x300]:
+            idx = loc & 0xFF
+            if idx <= ball_upgrade_hits:
+                new_checks.append(loc)
 
         if writing_dex:
             writes.append((PINBALL_POKEDEX, bytes(write_local_dex), "System Bus"))

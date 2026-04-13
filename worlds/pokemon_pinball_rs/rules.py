@@ -9,7 +9,9 @@ from .names import (POKEDEX, POKEDEX_INVERSE, AREAS, RUBY_BOARD, SAPPHIRE_BOARD,
                     SPECIES_LATIOS, SPECIES_LATIAS, SPECIES_CHIKORITA, SPECIES_CYNDAQUIL, SPECIES_TOTODILE,
                     SPECIES_AERODACTYL, SPECIES_PICHU, EGG_BUNCH_1, EGG_BUNCH_2, EGG_BUNCH_3, EGG_BUNCH_4,
                     EGG_BUNCH_RUBY, EGG_BUNCH_SAPPHIRE, RUINS_RUBY, RUINS_SAPPHIRE, RUINS_AREA_CARD, BONUS_DUSCLOPS,
-                    BONUS_KECLEON, BONUS_KYOGRE, BONUS_GROUDON, BONUS_RAYQUAZA, EVOLUTION_METHODS, EVOLUTION_SPECIAL)
+                    BONUS_KECLEON, BONUS_KYOGRE, BONUS_GROUDON, BONUS_RAYQUAZA, BONUS_SPHEAL_1, BONUS_SPHEAL_2,
+                    BONUS_SPHEAL_3, EVOLUTION_METHODS, EVOLUTION_SPECIAL, HELPER_WHISCASH, HELPER_PELIPPER,
+                    HELPER_MAKUHITA)
 from .options import Difficulty
 
 if TYPE_CHECKING:
@@ -101,7 +103,7 @@ def set_rules(world: "PokemonPinballRSWorld") -> None:
                                Has(EGG_GROUP_ITEMS[idx]))
 
         for mon in special_encounters:
-            if (i == 0 and mon == 196) or (i == 1 and mon == 195):
+            if (i == 0 and mon == 195) or (i == 1 and mon == 196):
                 continue
             world.set_rule(world.get_location(f"{board} - {POKEDEX_INVERSE[mon]}"),
                            SPECIAL_ENCOUNTER_RULES.get(POKEDEX_INVERSE[mon]))
@@ -113,7 +115,7 @@ def set_rules(world: "PokemonPinballRSWorld") -> None:
                 rule = CanPlayModeratePinball
             world.set_rule(world.get_location(f"{board} - {POKEDEX_INVERSE[mon]}"), rule)
 
-    world.set_rule(world.get_entrance("To Evolutions"), Has(EVO_ARROW, count=3) & CanPlayModeratePinball)
+    world.set_rule(world.get_entrance("To Evolutions"), Has(EVO_ARROW, count=3) & CanPlayBasicPinball)
     for mon, prevo in evolutions.items():
         # Special case for Vileplume and Bellossom
         if mon == 89:
@@ -135,7 +137,36 @@ def set_rules(world: "PokemonPinballRSWorld") -> None:
     world.set_rule(world.get_location(BONUS_KECLEON), Has(RUBY_BOARD))
     world.set_rule(world.get_location(BONUS_KYOGRE), Has(SAPPHIRE_BOARD) & CanPlayBasicPinball)
     world.set_rule(world.get_location(BONUS_GROUDON), Has(RUBY_BOARD) & CanPlayBasicPinball)
-    world.set_rule(world.get_location(BONUS_RAYQUAZA), CanPlayModeratePinball)
+    world.set_rule(world.get_location(BONUS_RAYQUAZA), CanPlayModeratePinball |
+                   (CanPlayBasicPinball & Has(RUINS_AREA_CARD)))
+    for spheal in (BONUS_SPHEAL_1, BONUS_SPHEAL_2, BONUS_SPHEAL_3):
+        world.set_rule(world.get_location(spheal),
+                       HasAll(RUBY_BOARD, HELPER_WHISCASH) |
+                       HasAll(SAPPHIRE_BOARD, HELPER_PELIPPER))
+
+    # Bumpers
+    for board in (RUBY_BOARD, SAPPHIRE_BOARD):
+        for j in range(1, world.options.bonus_multiplier_checks.value + 1):
+            if j >= 75:
+                rule = CanPlayLongPinball
+            elif j >= 25:
+                rule = CanPlayModeratePinball
+            elif j >= 10:
+                rule = CanPlayBasicPinball
+            else:
+                rule = True_()
+            world.set_rule(world.get_location(f"{board} - Bonus Multiplier {j}"), rule)
+
+    for i in range(1, world.options.ball_upgrade_checks.value + 1):
+        if i >= 75:
+            rule = CanPlayLongPinball | (CanPlayModeratePinball & HasAll(RUBY_BOARD, HELPER_MAKUHITA))
+        elif i >= 25:
+            rule = CanPlayModeratePinball | (CanPlayBasicPinball & HasAll(RUBY_BOARD, HELPER_MAKUHITA))
+        elif i >= 10:
+            rule = CanPlayBasicPinball | HasAll(RUBY_BOARD, HELPER_MAKUHITA)
+        else:
+            rule = True_()
+        world.set_rule(world.get_location(f"Ball Upgrade {i}"), rule)
 
     goal = True_()
 

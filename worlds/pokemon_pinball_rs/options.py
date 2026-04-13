@@ -1,11 +1,15 @@
 from dataclasses import dataclass
-from Options import Choice, OptionSet, Range, PerGameCommonOptions
+from Options import Choice, OptionSet, Range, Toggle, PerGameCommonOptions
 from .names import POKEDEX, SPECIES_GROUDON, SPECIES_KYOGRE, SPECIES_RAYQUAZA, SPECIES_JIRACHI
 
 
 class Difficulty(Choice):
     """Whether logic should apply additional restrictions on locations
-    Normal: All locations other than catching have additional requirements"""
+    Normal: All locations other than catching have additional requirements
+    Hard: Simple board tasks such as hatching and evolutions have no additional requirements
+    Expert: Longer board tasks such as 25+ multiplier bumper hits and catching Groudon/Kyogre have no additional requirements
+    Master: No locations have additional requirements other than what is strictly required"""
+    display_name = "Difficulty"
     option_normal = 0
     option_hard = 1
     option_expert = 2
@@ -55,6 +59,41 @@ class PokemonTargets(OptionSet):
     valid_keys = frozenset(POKEDEX.keys())
 
 
+class BonusMultChecks(Range):
+    """Number of bonus multiplier hits to include as checks per-board"""
+    display_name = "Bonus Multiplier Checks"
+    default = 0
+    range_start = 0
+    range_end = 99
+
+
+class BallUpgradeChecks(Range):
+    """Number of ball upgrades to include as checks. This includes both the ball upgrades """
+    display_name = "Ball Upgrade Checks"
+    default = 0
+    range_start = 0
+    range_end = 99
+
+
+class EvoMode(Choice):
+    """Evo Mode Behavior
+    Arrows: Each arrow of Evo mode is split up and added to the pool.
+    Full: All arrows are condensed into a single item and added to the pool.
+    Start With: Start with Evo Mode.
+    """
+    display_name = "Evo Mode"
+    default = 0
+    option_arrows = 0
+    option_full = 1
+    option_start_with = 2
+
+
+class CollectPokedex(Toggle):
+    """Whether server collects should apply to Pokédex locations. This can cause goaling if all goals are tied to
+    Pokédex locations."""
+    display_name = "Collect Pokédex"
+
+
 @dataclass
 class PokemonPinballRSOptions(PerGameCommonOptions):
     goal: Goal
@@ -63,3 +102,7 @@ class PokemonPinballRSOptions(PerGameCommonOptions):
     pokedex_requirement: PokedexRequirement
     score_requirement: ScoreRequirement
     pokemon_targets: PokemonTargets
+    bonus_multiplier_checks: BonusMultChecks
+    ball_upgrade_checks: BallUpgradeChecks
+    evo_mode: EvoMode
+    collect_pokedex: CollectPokedex
