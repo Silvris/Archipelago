@@ -224,7 +224,7 @@ class PinballRSClient(BizHawkClient):
         (local_dex, high_scores, starting_lives, starting_coins, starting_ball, pichu_upgrade, coins,
             boards, get_arrows, evo_arrows, hatch_mode, coin_arrows, coin_mod, stages, items_received, local_eggs,
             e_reader, bonus_stages, current_score, current_balls, evo_items, ruby_bumper, sapphire_bumper, ball_upgrade,
-            goal, dex_req, score_req, target_req, collect_mode) = await read(ctx.bizhawk_ctx, [
+            helpers, goal, dex_req, score_req, target_req, collect_mode) = await read(ctx.bizhawk_ctx, [
                 (PINBALL_POKEDEX, 205, "System Bus"),
                 (PINBALL_HIGH_SCORES, 0x180, "System Bus"),
                 (PINBALL_STARTING_LIVES, 1, "System Bus"),
@@ -249,6 +249,7 @@ class PinballRSClient(BizHawkClient):
                 (PINBALL_RUBY_BUMPER, 1, "System Bus"),
                 (PINBALL_SAPPHIRE_BUMPER, 1, "System Bus"),
                 (PINBALL_NUM_BALL_UPGRADE, 1, "System Bus"),
+                (PINBALL_HELPERS, 1, "System Bus"),
                 (PINBALL_GOAL, 1, "ROM"),
                 (PINBALL_DEX_REQ, 1, "ROM"),
                 (PINBALL_SCORE_REQ, 8, "ROM"),
@@ -286,14 +287,15 @@ class PinballRSClient(BizHawkClient):
 
         if self.print_scores:
             for idx, i in enumerate(range(0, len(high_scores), 24)):
-                score_lo = int.from_bytes(high_scores[i+16:i+20], "little")
-                score_hi = int.from_bytes(high_scores[i+20:i+24], "little")
+                score_lo = int.from_bytes(high_scores[i+20:], "little")
+                score_hi = int.from_bytes(high_scores[i+16:i+20], "little")
                 # score_lo is capped at 99,999,999. We should be below that, but cap it if we are above
                 score = min(score_lo, 99999999) + (score_hi * 100000000)
                 logger.warning(f"Score {idx}: {score}")
             c_score = (min(int.from_bytes(current_score[:4], "little"), 99999999)
                        + (int.from_bytes(current_score[4:8], "little") * 100000000))
             logger.warning(f"Current score: {c_score}")
+            self.print_scores = False
 
         if not ctx.finished_game and goal_is_cleared:
             await ctx.send_msgs([{
@@ -410,15 +412,15 @@ class PinballRSClient(BizHawkClient):
 
         remote_evo_items = 0
         for item in [item for item in ctx.items_received if item.item & 0x400 != 0]:
-            remote_evo_items |= (1 << ((item.item & 0xFF) + 1))
+            remote_evo_items |= (1 << (item.item & 0xFF))
         if remote_evo_items and int.from_bytes(evo_items, "little") != remote_evo_items:
-            writes.append((PINBALL_EVO_ITEMS, remote_evo_items.to_bytes(4, "little"), "System Bus"))
+            writes.append((PINBALL_EVO_ITEMS, remote_evo_items.to_bytes(2, "little"), "System Bus"))
 
         # Helpers
         remote_helpers = 0
         for item in [item for item in ctx.items_received if item.item & 0x800 != 0]:
             remote_helpers |= (1 << (item.item & 0xFF))
-        if remote_helpers and int.from_bytes(evo_items, "little") != remote_evo_items:
+        if remote_helpers and int.from_bytes(helpers, "little") != remote_helpers:
             writes.append((PINBALL_HELPERS, remote_helpers.to_bytes(1, "little"), "System Bus"))
 
         # Check dexnav here
@@ -445,6 +447,7 @@ class PinballRSClient(BizHawkClient):
             else:
                 writes.append((PINBALL_DEXNAV, int.to_bytes(self.dexnav + 1, 1, "little"), "System Bus"))
                 logger.warning(f"Attempting to track nearby {POKEDEX_INVERSE[self.dexnav]}!")
+            self.dexnav = None
 
         new_checks = []
         # check for locations
