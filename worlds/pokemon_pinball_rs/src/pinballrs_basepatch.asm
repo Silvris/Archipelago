@@ -72,7 +72,7 @@
     bl          UpdateRubyUpgrade
 
 //; Sapphire Board hooks
-.org sub_1642C+0x2C2
+.org sub_1642C+0x2C0
     .thumb
     bl          CheckPelipper
     
@@ -756,10 +756,17 @@ CheckIndividualMonEvo:
     GetValue    r1, @@Get2, CheckIndividualMonEvoSpecies
     ldr         r5, [r5, #0]
     ldrh        r2, [r5, r2]
+    cmp         r2, #88
+    beq         @@Gloom
+    cmp         r2, #175
+    beq         @@Clamperl
+    cmp         r2, #13
+    beq         @@Wurmple
     mov         r4, #0x18
     mul         r2, r4
     add         r1, r2
     ldrb        r2, [r1, #0x14]
+    @@Check:
     mov         r1, #1
     lsl         r1, r2
     ldrh        r2, [r3, #0x24]
@@ -773,6 +780,24 @@ CheckIndividualMonEvo:
     @@Return:
     cmp         r0, #0
     pop         {r1-r5, pc}
+    @@Wurmple:
+    mov         r2, #1
+    b           @@Check
+    @@Clamperl:
+    mov         r2, #3
+    b           @@Check
+    //; the complex one
+    nop
+    @@Gloom:
+    GetValue    r2, @@Gloom, CheckIndividualMonEvoMain
+    ldrb        r2, [r2, #4]
+    cmp         r2, #0
+    bne         @@Sapphire
+    mov         r2, #2
+    b           @@Check
+    @@Sapphire:
+    mov         r2, #8
+    b           @@Check
     .align      4
 
 
@@ -781,6 +806,9 @@ CheckIndividualMonEvoAP:
 
 CheckIndividualMonEvoSpecies:
     .word 0x86A3700
+
+CheckIndividualMonEvoMain:
+    .word 0x200B0C0
 
 CheckAnyMonEvo:
 //; r0 - evolvablePartySize
@@ -803,10 +831,17 @@ CheckAnyMonEvo:
     add         r5, r2
     @@Loop:
     ldrb        r2, [r5, r3]
+    cmp         r2, #88
+    beq         @@Gloom
+    cmp         r2, #175
+    beq         @@Clamperl
+    cmp         r2, #13
+    beq         @@Wurmple
     mov         r1, #0x18
     mul         r2, r1
     add         r1, r4, r2
     ldrb        r2, [r1, #0x14]
+    @@Check:
     mov         r1, #1
     lsl         r1, r2
     ldrh        r2, [r6, #0x24]
@@ -824,7 +859,23 @@ CheckAnyMonEvo:
     @@True:
     mov         r0, #1
     b           @@Return
-
+    @@Wurmple:
+    mov         r2, #1
+    b           @@Check
+    @@Clamperl:
+    mov         r2, #3
+    b           @@Check
+    @@Gloom:
+    //; the complex one
+    GetValue    r2, @@Gloom, CheckAnyMonEvoMain
+    ldrb        r2, [r2, #4]
+    cmp         r2, #0
+    bne         @@Sapphire
+    mov         r2, #2
+    b           @@Check
+    @@Sapphire:
+    mov         r2, #8
+    b           @@Check
     .align      4
 
 
@@ -836,6 +887,9 @@ CheckAnyMonEvoSpecies:
 
 CheckAnyMonEvoAP:
     .word 0x2033000
+
+CheckAnyMonEvoMain:
+    .word 0x200B0C0
 
 CheckAnyMonEvoR0Shift:
     push        {lr}
@@ -1258,7 +1312,7 @@ ClearForcePichu:
 //; basepatch version (if i remember to update it lol)
 .byte 0x00, 0x01, 0x02
 //; slot data at 0x6BC030
-.org 0x6BC040
+.org 0x6BC080
 EggTableRuby:
 .byte 0x00, 0x02, 0x03, 0x05, 0x06, 0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0F, 0x10, 0x11, 0x12, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1A, 0x1B, 0x1D, 0x1E, 0x1F
 .align 32
