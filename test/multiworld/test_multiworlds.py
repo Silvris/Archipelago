@@ -89,6 +89,10 @@ class TestSinglePlayerOutput(MultiworldTestBase):
     game: ClassVar[str]
 
     def test_single_player_game_can_generate_output(self) -> None:
+        def assert_not_all_state(*args, **kwargs):
+            self.fail(f"MultiWorld.get_all_state is incorrect following fill. Create a new CollectionState and run "
+                      f"sweep_for_advancements instead.")
+
         if self.game in ("Archipelago", "Final Fantasy"):
             self.skipTest("Cannot generate output.")
         world_type = AutoWorldRegister.world_types[self.game]
@@ -103,6 +107,8 @@ class TestSinglePlayerOutput(MultiworldTestBase):
         self.assertSteps(gen_steps)
         with self.subTest("filling multiworld", game=world_type.game, seed=self.multiworld.seed):
             distribute_items_restrictive(self.multiworld)
+            # get_all_state is unsafe following fill, assert worlds are not using it
+            self.multiworld.get_all_state = assert_not_all_state
             call_all(self.multiworld, "post_fill")
             call_all(self.multiworld, "finalize_multiworld")
             call_all(self.multiworld, "pre_output")
