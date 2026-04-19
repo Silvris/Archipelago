@@ -1,6 +1,6 @@
 import tempfile
 import unittest
-from typing import ClassVar, List, Tuple
+from typing import ClassVar, List, Tuple, Any
 from unittest import TestCase
 
 from BaseClasses import CollectionState, Location, MultiWorld
@@ -89,7 +89,7 @@ class TestSinglePlayerOutput(MultiworldTestBase):
     game: ClassVar[str]
 
     def test_single_player_game_can_generate_output(self) -> None:
-        def assert_not_all_state(*args, **kwargs):
+        def assert_not_all_state(*args: Any, **kwargs: Any):
             self.fail(f"MultiWorld.get_all_state is incorrect following fill. Create a new CollectionState and run "
                       f"sweep_for_advancements instead.")
 
