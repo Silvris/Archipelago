@@ -267,7 +267,7 @@ class PinballRSClient(BizHawkClient):
         if goal[0] & 2 and goal_is_cleared:
             # scores are kind of a pain, it's 16 bytes for **4** character names, then 8 byte score
             for i in range(0, len(high_scores), 24):
-                score_lo = int.from_bytes(high_scores[i+20:], "little")
+                score_lo = int.from_bytes(high_scores[i+20:i+24], "little")
                 score_hi = int.from_bytes(high_scores[i+16:i+20], "little")
                 # score_lo is capped at 99,999,999. We should be below that, but cap it if we are above
                 score = min(score_lo, 99999999) + (score_hi * 100000000)
@@ -287,7 +287,7 @@ class PinballRSClient(BizHawkClient):
 
         if self.print_scores:
             for idx, i in enumerate(range(0, len(high_scores), 24)):
-                score_lo = int.from_bytes(high_scores[i+20:], "little")
+                score_lo = int.from_bytes(high_scores[i+20:i+24], "little")
                 score_hi = int.from_bytes(high_scores[i+16:i+20], "little")
                 # score_lo is capped at 99,999,999. We should be below that, but cap it if we are above
                 score = min(score_lo, 99999999) + (score_hi * 100000000)
