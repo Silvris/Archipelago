@@ -16,11 +16,12 @@ class ItemData(NamedTuple):
     idx: int
     classification: ItemClassification
     num: int = 1
+    board: int = 0  # board-exclusive items, set to 1 for Ruby 2 for Sapphire
 
 
 MAIN_ITEMS: dict[str, ItemData] = {
-    RUBY_BOARD: ItemData(1, ItemClassification.progression | ItemClassification.useful),
-    SAPPHIRE_BOARD: ItemData(2, ItemClassification.progression | ItemClassification.useful),
+    RUBY_BOARD: ItemData(1, ItemClassification.progression | ItemClassification.useful, board=1),
+    SAPPHIRE_BOARD: ItemData(2, ItemClassification.progression | ItemClassification.useful, board=2),
     EXTRA_STARTING_LIFE: ItemData(3, ItemClassification.progression, num=9),
     STARTING_COINS: ItemData(4, ItemClassification.progression, num=9),
     STARTING_BALL_MODIFIER: ItemData(5, ItemClassification.useful, num=3),
@@ -39,15 +40,15 @@ MAIN_ITEMS: dict[str, ItemData] = {
     EGG_BUNCH_2: ItemData(18, ItemClassification.progression),
     EGG_BUNCH_3: ItemData(19, ItemClassification.progression),
     EGG_BUNCH_4: ItemData(20, ItemClassification.progression),
-    EGG_BUNCH_RUBY: ItemData(21, ItemClassification.progression),
-    EGG_BUNCH_SAPPHIRE: ItemData(22, ItemClassification.progression),
+    EGG_BUNCH_RUBY: ItemData(21, ItemClassification.progression, board=1),
+    EGG_BUNCH_SAPPHIRE: ItemData(22, ItemClassification.progression, board=2),
     COIN_ARROW: ItemData(23, ItemClassification.progression, num=3),
     COIN_MODIFIER: ItemData(24, ItemClassification.progression),
     # Helpers
-    HELPER_ZIGZAGOON: ItemData(0x800, ItemClassification.useful),
-    HELPER_PELIPPER: ItemData(0x801, ItemClassification.progression),
-    HELPER_MAKUHITA: ItemData(0x802, ItemClassification.progression),
-    HELPER_WHISCASH: ItemData(0x803, ItemClassification.progression),
+    HELPER_ZIGZAGOON: ItemData(0x800, ItemClassification.useful, board=2),
+    HELPER_PELIPPER: ItemData(0x801, ItemClassification.progression, board=2),
+    HELPER_MAKUHITA: ItemData(0x802, ItemClassification.progression, board=1),
+    HELPER_WHISCASH: ItemData(0x803, ItemClassification.progression, board=1),
 }
 
 AREA_ITEMS: dict[str, ItemData] = {

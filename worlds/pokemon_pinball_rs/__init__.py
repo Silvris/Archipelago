@@ -54,10 +54,12 @@ class PokemonPinballRSWorld(World):
     options: PokemonPinballRSOptions
     item_name_to_id = item_lookup
     location_name_to_id = location_lookup
+    possible_mons: set[int]
     rom_name: bytearray
 
     def __init__(self, multiworld: MultiWorld, player: int):
         super().__init__(multiworld, player)
+        self.possible_mons = set()
         self.rom_name = bytearray()
         self.rom_name_available_event = threading.Event()
 
@@ -71,7 +73,9 @@ class PokemonPinballRSWorld(World):
 
     def create_items(self) -> None:
         itempool = [self.create_item(name) for name, data in MAIN_ITEMS.items() for _ in range(data.num)
-                    if name not in (RUBY_BOARD, SAPPHIRE_BOARD, EVO_ARROW, EVO_MODE)]
+                    if name not in (RUBY_BOARD, SAPPHIRE_BOARD, EVO_ARROW, EVO_MODE) and
+                    data.board == 0 or
+                    (not self.options.single_board or data.board == (self.options.starting_board.value + 1))]
         if self.options.starting_board == StartingBoard.option_ruby:
             board_name = RUBY_BOARD
             other_board = SAPPHIRE_BOARD
@@ -79,9 +83,10 @@ class PokemonPinballRSWorld(World):
             board_name = SAPPHIRE_BOARD
             other_board = RUBY_BOARD
         self.push_precollected(self.create_item(board_name))
-        itempool.append(self.create_item(other_board))
+        if not self.options.single_board:
+            itempool.append(self.create_item(other_board))
 
-        #evo
+        # evo
         if self.options.evo_mode == EvoMode.option_arrows:
             itempool.extend([self.create_item(EVO_ARROW) for _ in range(3)])
         elif self.options.evo_mode == EvoMode.option_full:
@@ -93,7 +98,13 @@ class PokemonPinballRSWorld(World):
         # handle areas
         ruby_start = self.random.randint(0, 5)
         sapphire_start = self.random.randint(7, 12)
-        for area in AREA_ITEMS:
+        for area, data in AREA_ITEMS.items():
+            if (data.idx & 0xFF < 7 and self.options.single_board
+                    and self.options.starting_board == StartingBoard.option_sapphire):
+                continue
+            elif (data.idx & 0xFF >= 7 and self.options.single_board
+                  and self.options.starting_board == StartingBoard.option_ruby):
+                continue
             if area in (AREAS[ruby_start], AREAS[sapphire_start]):
                 self.push_precollected(self.create_item(area))
             else:

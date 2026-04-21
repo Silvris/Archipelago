@@ -36,6 +36,11 @@ class StartingBoard(Choice):
     option_sapphire = 1
 
 
+class SingleBoard(Toggle):
+    """If enabled, only items/locations associated with your starting board will be created."""
+    display_name = "Single Board Mode"
+
+
 class PokedexRequirement(Range):
     """On Pokédex goal, the amount of Pokémon registered required to goal."""
     display_name = "Pokédex Requirement"
@@ -99,6 +104,7 @@ class PokemonPinballRSOptions(PerGameCommonOptions):
     goal: Goal
     difficulty: Difficulty
     starting_board: StartingBoard
+    single_board: SingleBoard
     pokedex_requirement: PokedexRequirement
     score_requirement: ScoreRequirement
     pokemon_targets: PokemonTargets

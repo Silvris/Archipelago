@@ -12,7 +12,7 @@ from .names import (POKEDEX, POKEDEX_INVERSE, AREAS, RUBY_BOARD, SAPPHIRE_BOARD,
                     BONUS_KECLEON, BONUS_KYOGRE, BONUS_GROUDON, BONUS_RAYQUAZA, BONUS_SPHEAL_1, BONUS_SPHEAL_2,
                     BONUS_SPHEAL_3, EVOLUTION_METHODS, EVOLUTION_SPECIAL, HELPER_WHISCASH, HELPER_PELIPPER,
                     HELPER_MAKUHITA)
-from .options import Difficulty
+from .options import Difficulty, StartingBoard
 
 if TYPE_CHECKING:
     from . import PokemonPinballRSWorld
@@ -68,12 +68,22 @@ def get_evo_rule(pre: str, post: str) -> Rule:
 
 
 def set_rules(world: "PokemonPinballRSWorld") -> None:
-    # first set rules for the boards
-    world.set_rule(world.get_entrance("To Ruby Board"), Has(RUBY_BOARD))
-    world.set_rule(world.get_entrance("To Sapphire Board"), Has(SAPPHIRE_BOARD))
+    boards = {}
+    if world.options.single_board:
+        if world.options.starting_board == StartingBoard.option_ruby:
+            boards = {1: RUBY_BOARD}
+        else:
+            boards = {2: SAPPHIRE_BOARD}
+    else:
+        boards = {1: RUBY_BOARD, 2: SAPPHIRE_BOARD}
 
     # now for each board, set the rules for areas
     for i, area in AREAS.items():
+        if world.options.single_board:
+            if i < 7 and world.options.starting_board == StartingBoard.option_sapphire:
+                continue
+            elif i >= 7 and world.options.starting_board == StartingBoard.option_ruby:
+                continue
         area_rule = Has(area)
         if area in (RUINS_RUBY, RUINS_SAPPHIRE):
             area_rule &= (Has(RUINS_AREA_CARD) | CanPlayModeratePinball)
@@ -84,10 +94,11 @@ def set_rules(world: "PokemonPinballRSWorld") -> None:
             if arrows > 2:
                 rule &= Has(GET_ARROW)
             if mon in rare_encounters:
-                rule &= Has(ENCOUNTER_RATE_UP)
+                rule &= (Has(ENCOUNTER_RATE_UP) | Has(SPECIES_RAYQUAZA))
             world.set_rule(world.get_location(f"{area} - {POKEDEX_INVERSE[mon]}"), rule)
 
-    for i, board in enumerate((RUBY_BOARD, SAPPHIRE_BOARD)):
+    for i, board in boards.items():
+        world.set_rule(world.get_entrance(f"To {board}"), Has(board))
         world.set_rule(world.get_entrance(f"To Hatch Eggs ({board})"), HasAny(EGG_BUNCH_RUBY,
                                                                                EGG_BUNCH_SAPPHIRE,
                                                                                EGG_BUNCH_1,
@@ -96,14 +107,14 @@ def set_rules(world: "PokemonPinballRSWorld") -> None:
                                                                                EGG_BUNCH_4) & CanPlayBasicPinball)
 
         for idx, group in egg_groups.items():
-            if (i == 0 and idx == 6) or (i == 1 and idx == 5):
+            if (i == 1 and idx == 6) or (i == 2 and idx == 5):
                 continue
             for mon in group:
                 world.set_rule(world.get_location(f"Eggs ({board.split(' ')[0]}) - {POKEDEX_INVERSE[eggs[mon]]}"),
                                Has(EGG_GROUP_ITEMS[idx]))
 
         for mon in special_encounters:
-            if (i == 0 and mon == 195) or (i == 1 and mon == 196):
+            if (i == 1 and mon == 195) or (i == 2 and mon == 196):
                 continue
             world.set_rule(world.get_location(f"{board} - {POKEDEX_INVERSE[mon]}"),
                            SPECIAL_ENCOUNTER_RULES.get(POKEDEX_INVERSE[mon]))
@@ -117,6 +128,8 @@ def set_rules(world: "PokemonPinballRSWorld") -> None:
 
     world.set_rule(world.get_entrance("To Evolutions"), Has(EVO_ARROW, count=3) & CanPlayBasicPinball)
     for mon, prevo in evolutions.items():
+        if mon not in world.possible_mons or prevo not in world.possible_mons:
+            continue
         # Special case for Vileplume and Bellossom
         if mon == 89:
             board_rule: Rule = Has(RUBY_BOARD)
@@ -129,14 +142,19 @@ def set_rules(world: "PokemonPinballRSWorld") -> None:
                        Has(POKEDEX_INVERSE[prevo]) & board_rule & evo_rule)
 
     # Now have every Pokemon location check its event item for accessibility
-    for mon in POKEDEX:
+    for mon, idx in POKEDEX.items():
+        if idx not in world.possible_mons:
+            continue
         world.set_rule(world.get_location(f"Pokédex - {mon}"), Has(mon))
 
     # Bonus Stages
-    world.set_rule(world.get_location(BONUS_DUSCLOPS), Has(SAPPHIRE_BOARD))
-    world.set_rule(world.get_location(BONUS_KECLEON), Has(RUBY_BOARD))
-    world.set_rule(world.get_location(BONUS_KYOGRE), Has(SAPPHIRE_BOARD) & CanPlayBasicPinball)
-    world.set_rule(world.get_location(BONUS_GROUDON), Has(RUBY_BOARD) & CanPlayBasicPinball)
+    if 1 in boards:
+        world.set_rule(world.get_location(BONUS_KECLEON), Has(RUBY_BOARD))
+        world.set_rule(world.get_location(BONUS_GROUDON), Has(RUBY_BOARD) & CanPlayBasicPinball)
+    if 2 in boards:
+        world.set_rule(world.get_location(BONUS_DUSCLOPS), Has(SAPPHIRE_BOARD))
+        world.set_rule(world.get_location(BONUS_KYOGRE), Has(SAPPHIRE_BOARD) & CanPlayBasicPinball)
+
     world.set_rule(world.get_location(BONUS_RAYQUAZA), CanPlayModeratePinball |
                    (CanPlayBasicPinball & Has(RUINS_AREA_CARD)))
     for spheal in (BONUS_SPHEAL_1, BONUS_SPHEAL_2, BONUS_SPHEAL_3):
@@ -145,7 +163,7 @@ def set_rules(world: "PokemonPinballRSWorld") -> None:
                        HasAll(SAPPHIRE_BOARD, HELPER_PELIPPER))
 
     # Bumpers
-    for board in (RUBY_BOARD, SAPPHIRE_BOARD):
+    for i, board in boards.items():
         for j in range(1, world.options.bonus_multiplier_checks.value + 1):
             if j >= 75:
                 rule = CanPlayLongPinball

@@ -138,7 +138,7 @@ habitats: dict[int, dict[int, int]] = {
 }
 
 egg_by_board: dict[int, list[int]] = {
-    0: [  # Ruby
+    1: [  # Ruby
         13,  # Wurmple
         21,  # Seedot
         28,  # Ralts
@@ -165,7 +165,7 @@ egg_by_board: dict[int, list[int]] = {
         183,  # Horsea
         186,  # Bagon
     ],
-    1: [  # Sapphire
+    2: [  # Sapphire
         13,  # Wurmple
         18,  # Lotad
         28,  # Ralts
@@ -319,8 +319,8 @@ rare_encounters: list[int] = [
 ]
 
 bonus_catches: dict[int, list[int]] = {
-    0: [198, 199],  # Ruby: Groudon and Rayquaza
-    1: [197, 199]   # Sapphire: Kyogre and Rayquaza
+    1: [198, 199],  # Ruby: Groudon and Rayquaza
+    2: [197, 199]   # Sapphire: Kyogre and Rayquaza
 }
 
 eggs: list[int] = [
