@@ -52,7 +52,9 @@ PINBALL_HELPERS = PINBALL_AP_START + 0x26  # size 1
 PINBALL_DEXNAV = PINBALL_AP_START + 0x27
 PINBALL_RUBY_BUMPER = PINBALL_AP_START + 0x28
 PINBALL_SAPPHIRE_BUMPER = PINBALL_AP_START + 0x29
-PINBALL_NUM_BALL_UPGRADE = PINBALL_AP_START + 0x2A
+PINBALL_RUBY_BALL_UPGRADE = PINBALL_AP_START + 0x2A
+PINBALL_SAPPHIRE_BALL_UPGRADE = PINBALL_AP_START + 0x2A
+PINBALL_MAKUHITA_BALL_UPGRADE = PINBALL_AP_START + 0x2A
 
 PINBALL_NAME = 0x6BC000
 PINBALL_VERSION = 0x6BC020
@@ -223,7 +225,8 @@ class PinballRSClient(BizHawkClient):
         # get our relevant bytes
         (local_dex, high_scores, starting_lives, starting_coins, starting_ball, pichu_upgrade, coins,
             boards, get_arrows, evo_arrows, hatch_mode, coin_arrows, coin_mod, stages, items_received, local_eggs,
-            e_reader, bonus_stages, current_score, current_balls, evo_items, ruby_bumper, sapphire_bumper, ball_upgrade,
+            e_reader, bonus_stages, current_score, current_balls, evo_items, ruby_bumper, sapphire_bumper,
+            ruby_ball_upgrade, sapphire_ball_upgrade, maku_ball_upgrade,
             helpers, goal, dex_req, score_req, target_req, collect_mode) = await read(ctx.bizhawk_ctx, [
                 (PINBALL_POKEDEX, 205, "System Bus"),
                 (PINBALL_HIGH_SCORES, 0x180, "System Bus"),
@@ -248,7 +251,9 @@ class PinballRSClient(BizHawkClient):
                 (PINBALL_EVO_ITEMS, 4, "System Bus"),
                 (PINBALL_RUBY_BUMPER, 1, "System Bus"),
                 (PINBALL_SAPPHIRE_BUMPER, 1, "System Bus"),
-                (PINBALL_NUM_BALL_UPGRADE, 1, "System Bus"),
+                (PINBALL_RUBY_BALL_UPGRADE, 1, "System Bus"),
+                (PINBALL_SAPPHIRE_BALL_UPGRADE, 1, "System Bus"),
+                (PINBALL_MAKUHITA_BALL_UPGRADE, 1, "System Bus"),
                 (PINBALL_HELPERS, 1, "System Bus"),
                 (PINBALL_GOAL, 1, "ROM"),
                 (PINBALL_DEX_REQ, 1, "ROM"),
@@ -467,21 +472,58 @@ class PinballRSClient(BizHawkClient):
 
         ruby_bumper_hits = int.from_bytes(ruby_bumper, "little")
         sapphire_bumper_hits = int.from_bytes(sapphire_bumper, "little")
-        ball_upgrade_hits = int.from_bytes(ball_upgrade, "little")
+        ruby_ball_upgrade_hits = int.from_bytes(ruby_ball_upgrade, "little")
+        sapphire_ball_upgrade_hits = int.from_bytes(sapphire_ball_upgrade, "little")
+        maku_ball_upgrade_hits = int.from_bytes(maku_ball_upgrade, "little")
 
-        for loc in [loc for loc in ctx.missing_locations if loc & 0x300 == 0x200]:
-            idx = loc & 0xFF
-            if idx >= 100:
-                if (idx - 100) <= sapphire_bumper_hits:
-                    new_checks.append(loc)
-            else:
-                if idx <= ruby_bumper_hits:
-                    new_checks.append(loc)
+        ruby_bumper_locs = [loc for loc in ctx.missing_locations if loc & 0x700 == 0x200 and loc & 0xFF < 100]
+        sapphire_bumper_locs = [loc for loc in ctx.missing_locations if loc & 0x700 == 0x200 and loc & 0xFF >= 100]
+        ruby_upgrade_locs = [loc for loc in ctx.missing_locations if loc & 0x700 == 0x300 and loc & 0xFF < 100]
+        sapphire_upgrade_locs = [loc for loc in ctx.missing_locations if loc & 0x700 == 0x300 and loc & 0xFF >= 100]
+        maku_upgrade_locs = [loc for loc in ctx.missing_locations if loc & 0x700 == 0x400]
 
-        for loc in [loc for loc in ctx.missing_locations if loc & 0x300 == 0x300]:
+        for loc in ruby_bumper_locs:
             idx = loc & 0xFF
-            if idx <= ball_upgrade_hits:
+            if idx <= ruby_bumper_hits:
                 new_checks.append(loc)
+
+        for loc in sapphire_bumper_locs:
+            idx = (loc & 0xFF) - 100
+            if idx <= sapphire_bumper_hits:
+                new_checks.append(loc)
+
+        for loc in ruby_upgrade_locs:
+            idx = loc & 0xFF
+            if idx <= ruby_ball_upgrade_hits:
+                new_checks.append(loc)
+
+        for loc in sapphire_upgrade_locs:
+            idx = (loc & 0xFF) - 100
+            if idx <= sapphire_ball_upgrade_hits:
+                new_checks.append(loc)
+
+        for loc in maku_upgrade_locs:
+            idx = loc & 0xFF
+            if idx <= maku_ball_upgrade_hits:
+                new_checks.append(loc)
+
+        # collect behaviors here
+        min_ruby_bumper = min(ruby_bumper_locs) & 0xFF
+        min_sapphire_bumper = (min(sapphire_bumper_locs) & 0xFF) - 100
+        min_ruby_upgrade = min(ruby_upgrade_locs) & 0xFF
+        min_sapphire_upgrade = (min(sapphire_upgrade_locs) & 0xFF) - 100
+        min_maku_upgrade = min(maku_upgrade_locs) & 0xFF
+
+        if ruby_bumper_hits < min_ruby_bumper - 1:
+            writes.append((PINBALL_RUBY_BUMPER, int.to_bytes(min_ruby_bumper - 1, 1, "little"), "System Bus"))
+        if sapphire_bumper_hits < min_sapphire_bumper - 1:
+            writes.append((PINBALL_SAPPHIRE_BUMPER, int.to_bytes(min_sapphire_bumper - 1, 1, "little"), "System Bus"))
+        if ruby_ball_upgrade_hits < min_ruby_upgrade - 1:
+            writes.append((PINBALL_RUBY_BALL_UPGRADE, int.to_bytes(min_ruby_upgrade - 1, 1, "little"), "System Bus"))
+        if sapphire_ball_upgrade_hits < min_sapphire_upgrade - 1:
+            writes.append((PINBALL_SAPPHIRE_BALL_UPGRADE, int.to_bytes(min_sapphire_upgrade - 1, 1, "little"), "System Bus"))
+        if maku_ball_upgrade_hits < min_maku_upgrade - 1:
+            writes.append((PINBALL_MAKUHITA_BALL_UPGRADE, int.to_bytes(min_maku_upgrade - 1, 1, "little"), "System Bus"))
 
         if writing_dex:
             writes.append((PINBALL_POKEDEX, bytes(write_local_dex), "System Bus"))

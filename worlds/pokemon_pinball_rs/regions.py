@@ -24,7 +24,11 @@ location_lookup: dict[str, int] = {
     **{f"{board} - Bonus Multiplier {i}": 0x200 + (j*100) + i
        for j, board in enumerate((RUBY_BOARD, SAPPHIRE_BOARD))
        for i in range(1, 100)},
-    **{f"Ball Upgrade {i}": 0x300 + i for i in range(1, 100)},
+    **{f"{board} - Ball Upgrade {i}": 0x300 + (j*100) + i
+       for j, board in enumerate((RUBY_BOARD, SAPPHIRE_BOARD))
+       for i in range(1, 100)},
+    **{f"Ruby Board - Makuhita Ball Upgrade {i}": 0x400 + i
+       for i in range(1, 100)},
 }
 
 
@@ -94,9 +98,14 @@ def create_regions(world: "PokemonPinballRSWorld") -> None:
                             location_type=PinballRSLocation,
                             item_type=PinballRSItem, show_in_spoiler=False)
 
-        board.add_locations({f"{board.name} - Bonus Multiplier {j}": 0x200 + (i * 100) + j
+        board.add_locations({f"{board.name} - Bonus Multiplier {j}": 0x200 + ((i - 1) * 100) + j
                              for j in range(1, world.options.bonus_multiplier_checks.value + 1)})
-    menu.add_locations({f"Ball Upgrade {i}": 0x300 + i for i in range(1, world.options.ball_upgrade_checks.value + 1)})
+        board.add_locations({f"{board.name} - Ball Upgrade {i}": 0x300 + ((i - 1) * 100) + j
+                             for j in range(1, world.options.ball_upgrade_checks.value + 1)})
+
+        if i == 1:
+            board.add_locations({f"{board.name} - Makuhita Ball Upgrade {i}": 0x400 + j
+                                 for j in range(1, world.options.ball_upgrade_checks.value + 1)})
 
     # Now create evolution events
     for mon, prevo in evolutions.items():

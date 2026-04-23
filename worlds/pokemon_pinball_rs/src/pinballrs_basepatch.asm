@@ -45,9 +45,25 @@
     .thumb
     bl          DoubleCoinRuby
 
+.org sub_153CC+0x52E
+    .thumb
+    bl          UpdateRubyUpgrade
+
+.org sub_153CC+0x59A
+    .thumb
+    bl          UpdateRubyUpgrade
+
+.org sub_153CC+0x60A
+    .thumb
+    bl          UpdateRubyUpgrade
+
 .org sub_153CC+0x680
     .thumb
     bl          GetArrows
+
+.org sub_153CC+0x9D6
+    .thumb
+    bl          UpdateMakuUpgrade
 
 .org sub_21D78+0x30
     .thumb
@@ -66,10 +82,6 @@
 .org RubyPond_EntityLogic+0x7CE
     .thumb
     bl          CheckWhiscash
-
-.org sub_4F0F0+0x74
-    .thumb
-    bl          UpdateRubyUpgrade
 
 //; Sapphire Board hooks
 .org sub_1642C+0x2C0
@@ -91,6 +103,18 @@
 .org sub_1642C+0x5AA
     .thumb
     bl          EvoArrows
+
+.org sub_1642C+0x63A
+    .thumb
+    bl          UpdateSapphireUpgrade
+
+.org sub_1642C+0x6AE
+    .thumb
+    bl          UpdateSapphireUpgrade
+
+.org sub_1642C+0x722
+    .thumb
+    bl          UpdateSapphireUpgrade
 
 .org sub_1642C+0x796
     .thumb
@@ -124,6 +148,11 @@
 .org sub_29D9C+0x1F8
     .thumb
     bl          CheckAnyMonEvoR0Shift
+
+//; Shop hooks
+.org sub_1B140+0x656
+    .thumb
+    bl          ShopBlockHelpers
 
 //; Handle areas
 .org sub_25F64+0x38
@@ -1259,7 +1288,7 @@ UpdateBumperCountAP:
     .word 0x2033000
 
 UpdateRubyUpgrade:
-    push        {r0-r3}
+    push        {r0-r4}
     mov         r2, #0x2A
     @@Get:
     GetValue    r3, @@Get, UpdateRubyUpgradeAP
@@ -1269,13 +1298,53 @@ UpdateRubyUpgrade:
     add         r0, #1
     strb        r0, [r3, r2]
     @@Return:
-    pop         {r0-r3}
-    mov         r0, #0
-    ldrh        r0, [r1, r0]
+    pop         {r0-r4}
+    strb        r4, [r3, #0]
+    ldr         r0, [r5, #0]
     bx          lr
     .align      4
 
 UpdateRubyUpgradeAP:
+    .word 0x2033000
+
+UpdateSapphireUpgrade:
+    push        {r0-r3}
+    mov         r2, #0x2B
+    @@Get:
+    GetValue    r3, @@Get, UpdateSapphireUpgradeAP
+    ldrb        r0, [r3, r2]
+    cmp         r0, #99
+    bge         @@Return
+    add         r0, #1
+    strb        r0, [r3, r2]
+    @@Return:
+    pop         {r0-r3}
+    strb        r4, [r3, #0]
+    mov         r3, r9
+    bx          lr
+    .align      4
+
+UpdateSapphireUpgradeAP:
+    .word 0x2033000
+
+UpdateMakuUpgrade:
+    push        {r0-r3}
+    mov         r2, #0x2C
+    @@Get:
+    GetValue    r3, @@Get, UpdateMakuUpgradeAP
+    ldrb        r0, [r3, r2]
+    cmp         r0, #99
+    bge         @@Return
+    add         r0, #1
+    strb        r0, [r3, r2]
+    @@Return:
+    pop         {r0-r3}
+    add         r0, r2
+    strb        r1, [r0, #0]
+    bx          lr
+    .align      4
+
+UpdateMakuUpgradeAP:
     .word 0x2033000
 
 ClearForceSpecial:
@@ -1301,6 +1370,35 @@ ClearForcePichu:
     add         r0, r4
     strh        r1, [r0, #0]
     bx          lr
+
+ShopBlockHelpers:
+    add         r0, r1
+    ldrh        r0, [r0, #0]
+    cmp         r0, #22
+    beq         @@MainRuby
+    cmp         r0, #23
+    bne         @@ReturnQuick
+    mov         r3, #1
+    @@Main:
+    push        {lr}
+    bl          CheckHelper
+    pop         {r2}
+    cmp         r0, #1
+    bge         @@Skip
+    add         r2, #0x12
+    @@Get:
+    GetValue    r3, @@Get, ShopBlockMax
+    @@Skip:
+    bx          r2
+    @@MainRuby:
+    mov         r3, #3
+    b           @@Main
+    @@ReturnQuick:
+    bx          lr
+    .align      4
+
+ShopBlockMax:
+    .word 999
 
 .endarea
 
