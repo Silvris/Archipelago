@@ -53,8 +53,8 @@ PINBALL_DEXNAV = PINBALL_AP_START + 0x27
 PINBALL_RUBY_BUMPER = PINBALL_AP_START + 0x28
 PINBALL_SAPPHIRE_BUMPER = PINBALL_AP_START + 0x29
 PINBALL_RUBY_BALL_UPGRADE = PINBALL_AP_START + 0x2A
-PINBALL_SAPPHIRE_BALL_UPGRADE = PINBALL_AP_START + 0x2A
-PINBALL_MAKUHITA_BALL_UPGRADE = PINBALL_AP_START + 0x2A
+PINBALL_SAPPHIRE_BALL_UPGRADE = PINBALL_AP_START + 0x2B
+PINBALL_MAKUHITA_BALL_UPGRADE = PINBALL_AP_START + 0x2C
 
 PINBALL_NAME = 0x6BC000
 PINBALL_VERSION = 0x6BC020
@@ -428,6 +428,14 @@ class PinballRSClient(BizHawkClient):
         if remote_helpers and int.from_bytes(helpers, "little") != remote_helpers:
             writes.append((PINBALL_HELPERS, remote_helpers.to_bytes(1, "little"), "System Bus"))
 
+        remote_coin_arrows = sum(item.item == 23 for item in ctx.items_received)
+        if remote_coin_arrows and int.from_bytes(coin_arrows, "little") != remote_coin_arrows:
+            writes.append((PINBALL_COIN, remote_coin_arrows.to_bytes(1, "little"), "System Bus"))
+
+        remote_coin_mod = any(item.item == 5 for item in ctx.items_received)
+        if remote_coin_mod and int.from_bytes(coin_mod, "little") != 1:
+            writes.append((PINBALL_COIN_MODIFIER, int.to_bytes(1, 1, "little"), "System Bus"))
+
         # Check dexnav here
         if self.dexnav is not None:
             if self.dexnav == -1:
@@ -508,11 +516,26 @@ class PinballRSClient(BizHawkClient):
                 new_checks.append(loc)
 
         # collect behaviors here
-        min_ruby_bumper = min(ruby_bumper_locs) & 0xFF
-        min_sapphire_bumper = (min(sapphire_bumper_locs) & 0xFF) - 100
-        min_ruby_upgrade = min(ruby_upgrade_locs) & 0xFF
-        min_sapphire_upgrade = (min(sapphire_upgrade_locs) & 0xFF) - 100
-        min_maku_upgrade = min(maku_upgrade_locs) & 0xFF
+        if ruby_bumper_locs:
+            min_ruby_bumper = min(ruby_bumper_locs) & 0xFF
+        else:
+            min_ruby_bumper = 0
+        if sapphire_bumper_locs:
+            min_sapphire_bumper = (min(sapphire_bumper_locs) & 0xFF) - 100
+        else:
+            min_sapphire_bumper = 0
+        if ruby_upgrade_locs:
+            min_ruby_upgrade = min(ruby_upgrade_locs) & 0xFF
+        else:
+            min_ruby_upgrade = 0
+        if sapphire_upgrade_locs:
+            min_sapphire_upgrade = (min(sapphire_upgrade_locs) & 0xFF) - 100
+        else:
+            min_sapphire_upgrade = 0
+        if maku_upgrade_locs:
+            min_maku_upgrade = min(maku_upgrade_locs) & 0xFF
+        else:
+            min_maku_upgrade = 0
 
         if ruby_bumper_hits < min_ruby_bumper - 1:
             writes.append((PINBALL_RUBY_BUMPER, int.to_bytes(min_ruby_bumper - 1, 1, "little"), "System Bus"))

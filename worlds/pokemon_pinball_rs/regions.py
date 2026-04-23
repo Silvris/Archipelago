@@ -100,11 +100,11 @@ def create_regions(world: "PokemonPinballRSWorld") -> None:
 
         board.add_locations({f"{board.name} - Bonus Multiplier {j}": 0x200 + ((i - 1) * 100) + j
                              for j in range(1, world.options.bonus_multiplier_checks.value + 1)})
-        board.add_locations({f"{board.name} - Ball Upgrade {i}": 0x300 + ((i - 1) * 100) + j
+        board.add_locations({f"{board.name} - Ball Upgrade {j}": 0x300 + ((i - 1) * 100) + j
                              for j in range(1, world.options.ball_upgrade_checks.value + 1)})
 
         if i == 1:
-            board.add_locations({f"{board.name} - Makuhita Ball Upgrade {i}": 0x400 + j
+            board.add_locations({f"{board.name} - Makuhita Ball Upgrade {j}": 0x400 + j
                                  for j in range(1, world.options.ball_upgrade_checks.value + 1)})
 
     # Now create evolution events
@@ -132,6 +132,21 @@ def create_regions(world: "PokemonPinballRSWorld") -> None:
         logger.warning(f"Pokémon Pinball Ruby & Sapphire ({world.player_name}): Pokédex requirement greater than "
                        f"number of Pokémon available, reducing to {num_mons}.")
         world.options.pokedex_requirement.value = num_mons
+
+    if "Targets" in world.options.goal:
+        # need to check that we can find at least one target, and filter out any that we can't find
+        for target in sorted(world.options.pokemon_targets.value):
+            # this acts as a copy, so we can just immediately remove
+            if POKEDEX[target] not in possible_mons:
+                logger.warning(f"Pokémon Pinball Ruby & Sapphire ({world.player_name}): {target} cannot be "
+                               f"found in the multiworld. Removing...")
+                world.options.pokemon_targets.value.remove(target)
+        if not world.options.pokemon_targets.value:
+            # for now, we'll just add Jirachi in the edge case
+            # its guaranteed on both boards, and functionally very accessible (also interesting logically)
+            logger.warning(f"Pokémon Pinball Ruby & Sapphire ({world.player_name}): No valid targets remain. Adding "
+                           f"Jirachi as a target...")
+            world.options.pokemon_targets.value.add(SPECIES_JIRACHI)
 
     # Bonus Stages
     bonus_stages = [4, 5, 6, 7]

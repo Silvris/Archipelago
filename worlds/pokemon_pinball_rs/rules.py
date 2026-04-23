@@ -186,14 +186,15 @@ def set_rules(world: "PokemonPinballRSWorld") -> None:
                 rule = True_()
             world.set_rule(world.get_location(f"{board} - Ball Upgrade {j}"), rule)
 
-        for j in range(1, world.options.ball_upgrade_checks.value + 1):
-            if j >= 75:
-                rule = (CanPlayModeratePinball & HasAll(RUBY_BOARD, HELPER_MAKUHITA))
-            elif j >= 25:
-                rule = (CanPlayBasicPinball & HasAll(RUBY_BOARD, HELPER_MAKUHITA))
-            else:
-                rule = HasAll(RUBY_BOARD, HELPER_MAKUHITA)
-            world.set_rule(world.get_location(f"{board} - Makuhita Ball Upgrade {j}"), rule)
+        if i == 1:
+            for j in range(1, world.options.ball_upgrade_checks.value + 1):
+                if j >= 75:
+                    rule = (CanPlayModeratePinball & HasAll(RUBY_BOARD, HELPER_MAKUHITA))
+                elif j >= 25:
+                    rule = (CanPlayBasicPinball & HasAll(RUBY_BOARD, HELPER_MAKUHITA))
+                else:
+                    rule = HasAll(RUBY_BOARD, HELPER_MAKUHITA)
+                world.set_rule(world.get_location(f"{board} - Makuhita Ball Upgrade {j}"), rule)
 
     goal = True_()
 
