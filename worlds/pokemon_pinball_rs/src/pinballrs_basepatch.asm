@@ -159,6 +159,18 @@
     .thumb
     bl          HandleInitialAreaEx
 
+.org sub_260B8+0x334
+    .thumb
+    bl          CheckRuinsAndCardRoulette
+
+.org sub_260B8+0x474
+    .thumb
+    bl          CheckRuinsAndCardEx
+
+.org sub_260B8+0x494
+    .thumb
+    bl          HandleRuinsCardTravel
+
 .org sub_260B8+0x4B6
     .thumb
     bl          HandleInitialArea
@@ -395,60 +407,6 @@ HandleRemainingGameInit:
 CurrentPinballPtr:
 .word 0x5F6 //; beautifully horrible number
 
-HandleAreas:
-    push        {r0-r6}
-    nop
-    @@Get1:
-    GetValue    r6, @@Get1, HandleAreasCurrentPinball
-    ldr         r1, [r6, #0] //; gCurrentPinballGame, have to do this here for alignment purposes
-    @@Get2:
-    GetValue    r5, @@Get2, HandleAreasGMain
-    add         r1, #0x32
-    ldrb        r0, [r1, #0] //; get current stage
-    ldrb        r3, [r5, #4] //; board
-    @@Get3:
-    GetValue    r2, @@Get3, ArchipelagoStages
-    cmp         r3, #0
-    beq         @@Compare
-    add         r2, #7
-    @@Compare:
-    mov         r5, r0
-    add         r0, #1
-    mov         r3, #0
-    mov         r4, #1
-    @@Loop:
-    ldrb        r3, [r2, r0]
-    cmp         r3, #0
-    bne         @@Set
-    add         r0, #1
-    @@Check:
-    cmp         r0, r5
-    beq         @@Set
-    cmp         r0, #6
-    blt         @@Loop
-    mov         r0, 0
-    b           @@Check
-    @@Set:
-    strb        r0, [r1, r4]
-    add         r0, #1
-    add         r4, #1
-    cmp         r4, #2
-    bgt         @@Return
-    b           @@Loop
-    @@Return:
-    pop         {r0-r6}
-    bx          lr
-    .align 4
-
-HandleAreasCurrentPinball:
-.word 0x20314E0
-
-HandleAreasGMain:
-.word 0x200B0C0
-
-ArchipelagoStages:
-.word 0x2033010
-
 HandleRuinsNatural:
 //; called when the player has gone through 5 areas, overwrite the standard pick with Ruins if unlocked
 //; assume gCurrentPinballGame+0x32 in r1
@@ -492,6 +450,10 @@ HandleInitialArea:
     add         r2, #7
     @@Compare:
     add         r0, #1
+    cmp         r0, #6
+    blt         @@CompContinue
+    mov         r0, #0
+    @@CompContinue:
     mov         r3, #0
     mov         r4, #1
     @@Loop:
@@ -1399,6 +1361,175 @@ ShopBlockHelpers:
 
 ShopBlockMax:
     .word 999
+
+HandleAreas:
+    push        {r0-r6}
+    nop
+    @@Get1:
+    GetValue    r6, @@Get1, HandleAreasCurrentPinball
+    ldr         r1, [r6, #0] //; gCurrentPinballGame, have to do this here for alignment purposes
+    @@Get2:
+    GetValue    r5, @@Get2, HandleAreasGMain
+    add         r1, #0x32
+    ldrb        r0, [r1, #0] //; get current stage
+    ldrb        r3, [r5, #4] //; board
+    @@Get3:
+    GetValue    r2, @@Get3, ArchipelagoStages
+    cmp         r3, #0
+    beq         @@Compare
+    add         r2, #7
+    @@Compare:
+    mov         r5, r0
+    add         r0, #1
+    mov         r3, #0
+    mov         r4, #1
+    @@CompComp:
+    cmp         r0, #6
+    blt         @@Loop
+    mov         r0, #0
+    @@Loop:
+    ldrb        r3, [r2, r0]
+    cmp         r3, #0
+    bne         @@Set
+    add         r0, #1
+    @@Check:
+    cmp         r0, r5
+    beq         @@Set
+    cmp         r0, #6
+    blt         @@Loop
+    mov         r0, 0
+    b           @@Check
+    @@Set:
+    strb        r0, [r1, r4]
+    add         r0, #1
+    add         r4, #1
+    cmp         r4, #2
+    bgt         @@Return
+    b           @@CompComp
+    @@Return:
+    pop         {r0-r6}
+    bx          lr
+    .align 4
+
+HandleAreasCurrentPinball:
+.word 0x20314E0
+
+HandleAreasGMain:
+.word 0x200B0C0
+
+ArchipelagoStages:
+.word 0x2033010
+
+HandleRuinsCardTravel:
+    push        {r0-r6}
+    nop
+    @@Get1:
+    GetValue    r6, @@Get1, HandleRuinsCardTravelCurrentPinball
+    ldr         r1, [r6, #0] //; gCurrentPinballGame, have to do this here for alignment purposes
+    @@Get2:
+    GetValue    r5, @@Get2, HandleRuinsCardTravelGMain
+    add         r1, #0x32
+    mov         r0, #0 //; start at 0 for checking purposes
+    ldrb        r3, [r5, #4] //; board
+    @@Get3:
+    GetValue    r2, @@Get3, HandleRuinsCardTravelArchipelagoStages
+    cmp         r3, #0
+    beq         @@Compare
+    add         r2, #7
+    @@Compare:
+    mov         r5, r0
+    mov         r3, #0
+    mov         r4, #1
+    @@CompComp:
+    cmp         r0, #6
+    blt         @@Loop
+    mov         r0, #0
+    @@Loop:
+    ldrb        r3, [r2, r0]
+    cmp         r3, #0
+    bne         @@Set
+    add         r0, #1
+    @@Check:
+    cmp         r0, r5
+    beq         @@Set
+    cmp         r0, #6
+    blt         @@Loop
+    mov         r0, 0
+    b           @@Check
+    @@Set:
+    strb        r0, [r1, r4]
+    add         r0, #1
+    add         r4, #1
+    cmp         r4, #2
+    bgt         @@Return
+    b           @@CompComp
+    @@Return:
+    pop         {r0-r6}
+    bx          lr
+    .align 4
+
+HandleRuinsCardTravelCurrentPinball:
+.word 0x20314E0
+
+HandleRuinsCardTravelGMain:
+.word 0x200B0C0
+
+HandleRuinsCardTravelArchipelagoStages:
+.word 0x2033010
+
+CheckRuinsAndCard:
+//; assume r0 holds the current card status
+//; return r0 & ruins status
+    push        {r1-r3}
+    cmp         r0, #0
+    beq         @@Return
+    mov         r2, #0
+    @@GetGMain:
+    GetValue    r1, @@GetGMain, CheckRuinsAndCardGMain
+    ldrb        r1, [r1, #4]
+    @@GetAP:
+    GetValue    r3, @@GetAP, CheckRuinsAndCardArchipelagoStages
+    cmp         r1, #0
+    beq         @@Check
+    mov         r2, #7
+    @@Check:
+    add         r3, r2
+    ldrb        r1, [r3, #6]
+    and         r0, r1
+    @@Return:
+    pop         {r1-r3}
+    bx          lr
+    .align      4
+
+
+CheckRuinsAndCardGMain:
+.word 0x200B0C0
+
+CheckRuinsAndCardArchipelagoStages:
+.word 0x2033010
+
+CheckRuinsAndCardEx:
+    push        {r0, lr}
+    ldrh        r0, [r0, r1]
+    bl          CheckRuinsAndCard
+    mov         r1, r0
+    cmp         r1, #0
+    pop         {r0, pc}
+
+
+CheckRuinsAndCardRoulette:
+    push        {lr}
+    mov         r1, #4
+    strb        r1, [r0, #0]
+    mov         r0, #1 //; can only reach this codepath with card enabled
+    bl          CheckRuinsAndCard
+    pop         {r1}
+    cmp         r0, #0
+    bne         @@Return
+    add         r1, #0x22
+    @@Return:
+    bx          r1
+
 
 .endarea
 
