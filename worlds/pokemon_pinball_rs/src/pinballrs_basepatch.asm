@@ -1539,7 +1539,7 @@ CheckRuinsAndCardRoulette:
 //; world version
 .byte 0x00, 0x00, 0x00
 //; basepatch version (if i remember to update it lol)
-.byte 0x00, 0x01, 0x02
+.byte 0x00, 0x02, 0x00
 //; slot data at 0x6BC030
 .org 0x6BC080
 EggTableRuby:
