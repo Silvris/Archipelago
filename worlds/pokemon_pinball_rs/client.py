@@ -7,6 +7,7 @@ from typing import TYPE_CHECKING, Any
 from NetUtils import ClientStatus, color, NetworkItem
 from worlds._bizhawk.client import BizHawkClient
 from MultiServer import mark_raw
+from Utils import get_unique_identifier
 
 from .data.pokemon import egg_groups, special_encounters
 from .names import POKEDEX, POKEDEX_INVERSE
@@ -29,6 +30,8 @@ PINBALL_SCORE = PINBALL_CURRENT + 0x44  # size 4 + 4 (see score info for goaling
 PINBALL_FORCE_SPECIAL = PINBALL_CURRENT + 0x12B
 PINBALL_FORCE_PICHU = PINBALL_CURRENT + 0x12C
 PINBALL_COINS = PINBALL_CURRENT + 0x192
+PINBALL_COIN_AWARD = PINBALL_CURRENT + 0x194
+PINBALL_COIN_TIMER = PINBALL_CURRENT + 0x196 # size 2
 PINBALL_SAVER = PINBALL_CURRENT + 0x724  # size 2
 
 PINBALL_AP_START = 0x2033000
@@ -55,10 +58,12 @@ PINBALL_SAPPHIRE_BUMPER = PINBALL_AP_START + 0x29
 PINBALL_RUBY_BALL_UPGRADE = PINBALL_AP_START + 0x2A
 PINBALL_SAPPHIRE_BALL_UPGRADE = PINBALL_AP_START + 0x2B
 PINBALL_MAKUHITA_BALL_UPGRADE = PINBALL_AP_START + 0x2C
+PINBALL_RINGLINK_PACKET_GAIN = PINBALL_AP_START + 0x2D
+PINBALL_RINGLINK_PACKET_LOSS = PINBALL_AP_START + 0x2E
 
 PINBALL_NAME = 0x6BC000
 PINBALL_VERSION = 0x6BC020
-PINBALL_COLLECT = 0x6BC024
+PINBALL_SLOT_INFO = 0x6BC024
 PINBALL_GOAL = 0x6BC030
 PINBALL_DEX_REQ = 0x6BC031
 PINBALL_SCORE_REQ = 0x6BC032
@@ -133,6 +138,13 @@ def get_sfx_write(sfx: int) -> tuple[int, bytes, str]:
     return PINBALL_SFX, sfx.to_bytes(2, 'little'), "System Bus"
 
 
+def get_coin_give_write(coins: int) -> list[tuple[int, bytes, str]]:
+    return [
+        (PINBALL_COIN_AWARD, coins.to_bytes(1, "little"), "System Bus"),
+        (PINBALL_COIN_TIMER, int.to_bytes(0, 2, "little"), "System Bus"),
+    ]
+
+
 class PinballRSClient(BizHawkClient):
     game = "Pokemon Pinball Ruby & Sapphire"
     system = "GBA"
@@ -142,6 +154,8 @@ class PinballRSClient(BizHawkClient):
     active_ereader: int = -1
     print_scores: bool = False
     dexnav: int | None = None
+    ringlink_incoming: int = 0
+    ringlink_id: float | None = None
 
     async def validate_rom(self, ctx: "BizHawkClientContext") -> bool:
         from worlds._bizhawk import RequestFailedError, read, get_memory_size
@@ -198,7 +212,11 @@ class PinballRSClient(BizHawkClient):
             ctx.auth = b64encode(self.rom).decode()
 
     def on_package(self, ctx: "BizHawkClientContext", cmd: str, args: dict[str, Any]) -> None:
-        pass  # TODO: RingLink
+        if cmd == "Bounced":
+            if "RingLink" in args.get("tags", []):
+                data = args.get("data", {})
+                if data.get("source", 0) != self.ringlink_id:
+                    self.ringlink_incoming += data.get("amount", 0)
 
     async def send_deathlink(self, ctx: "BizHawkClientContext") -> None:
         self.sending_death_link = True
@@ -222,12 +240,15 @@ class PinballRSClient(BizHawkClient):
         if ctx.slot is None:
             return
 
+        if self.ringlink_id is None:
+            self.ringlink_id = time.time()
+
         # get our relevant bytes
         (local_dex, high_scores, starting_lives, starting_coins, starting_ball, pichu_upgrade, coins,
             boards, get_arrows, evo_arrows, hatch_mode, coin_arrows, coin_mod, stages, items_received, local_eggs,
             e_reader, bonus_stages, current_score, current_balls, evo_items, ruby_bumper, sapphire_bumper,
-            ruby_ball_upgrade, sapphire_ball_upgrade, maku_ball_upgrade,
-            helpers, goal, dex_req, score_req, target_req, collect_mode) = await read(ctx.bizhawk_ctx, [
+            ruby_ball_upgrade, sapphire_ball_upgrade, maku_ball_upgrade, coin_plus, coin_minus,
+            helpers, goal, dex_req, score_req, target_req, slot_info) = await read(ctx.bizhawk_ctx, [
                 (PINBALL_POKEDEX, 205, "System Bus"),
                 (PINBALL_HIGH_SCORES, 0x180, "System Bus"),
                 (PINBALL_STARTING_LIVES, 1, "System Bus"),
@@ -254,13 +275,18 @@ class PinballRSClient(BizHawkClient):
                 (PINBALL_RUBY_BALL_UPGRADE, 1, "System Bus"),
                 (PINBALL_SAPPHIRE_BALL_UPGRADE, 1, "System Bus"),
                 (PINBALL_MAKUHITA_BALL_UPGRADE, 1, "System Bus"),
+                (PINBALL_RINGLINK_PACKET_GAIN, 1, "System Bus"),
+                (PINBALL_RINGLINK_PACKET_LOSS, 1, "System Bus"),
                 (PINBALL_HELPERS, 1, "System Bus"),
                 (PINBALL_GOAL, 1, "ROM"),
                 (PINBALL_DEX_REQ, 1, "ROM"),
                 (PINBALL_SCORE_REQ, 8, "ROM"),
                 (PINBALL_TARGET_REQ, 26, "ROM"),
-                (PINBALL_COLLECT, 1, "ROM"),
+                (PINBALL_SLOT_INFO, 1, "ROM"),
             ])
+
+        if slot_info[0] & 0x2 and "RingLink" not in ctx.tags:
+            ctx.tags.add("RingLink")
 
         goal_is_cleared = True
 
@@ -355,7 +381,6 @@ class PinballRSClient(BizHawkClient):
                 writes.append((PINBALL_SCORE_ADD, score.to_bytes(4, "little"), "System Bus"))
             elif idx == 3:
                 writes.append((PINBALL_SAVER, int.to_bytes(1800, 2, "little"), "System Bus"))
-
 
         # handle most items state based
         item: NetworkItem
@@ -457,10 +482,54 @@ class PinballRSClient(BizHawkClient):
                         address = PINBALL_FORCE_SPECIAL
                     writes.append((address, int.to_bytes(1, 1, "little"), "System Bus"))
                     logger.warning(f"Attempting to track a special Pokémon!")
+                    if "RingLink" in ctx.tags:
+                        # process the RL event here
+                        await ctx.send_msgs([
+                            {
+                                "cmd": "Bounce",
+                                "tags": ["RingLink"],
+                                "data": {
+                                    "amount": -60,
+                                    "time": time.time(),
+                                    "source": self.ringlink_id
+                                }
+                            }
+                        ])
             else:
                 writes.append((PINBALL_DEXNAV, int.to_bytes(self.dexnav + 1, 1, "little"), "System Bus"))
                 logger.warning(f"Attempting to track nearby {POKEDEX_INVERSE[self.dexnav]}!")
             self.dexnav = None
+
+        # check ringlink here
+        if "RingLink" in ctx.tags:
+            coin_total = int.from_bytes(coin_plus, "little") - int.from_bytes(coin_minus, "little")
+            if coin_total:  # just need non-zero
+                await ctx.send_msgs([
+                    {
+                        "cmd": "Bounce",
+                        "tags": ["RingLink"],
+                        "data": {
+                            "amount": coin_total,
+                            "time": time.time(),
+                            "source": self.ringlink_id
+                        }
+                    }
+                ])
+                writes.extend([
+                    (PINBALL_RINGLINK_PACKET_GAIN, int.to_bytes(0, 1, "little"), "System Bus"),
+                    (PINBALL_RINGLINK_PACKET_LOSS, int.to_bytes(0, 1, "little"), "System Bus"),
+                ])
+
+            if self.ringlink_incoming and not self.dexnav:
+                # dexnav will cause some timing issues, we'll defer to it first and then fixup ringlink next iteration
+                if self.ringlink_incoming > 0:
+                    # just use the ingame functions
+                    writes.extend(get_coin_give_write(self.ringlink_incoming))
+                else:
+                    # gotta do it manually
+                    coin = int.from_bytes(coins, "little")
+                    writes.append((PINBALL_COINS, int.to_bytes(coin - self.ringlink_incoming,
+                                                               1, "little"), "System Bus"))
 
         new_checks = []
         # check for locations
@@ -468,7 +537,7 @@ class PinballRSClient(BizHawkClient):
         for i in range(205):
             if local_dex[i] == 4 and (i+1) not in ctx.locations_checked:
                 new_checks.append(i+1)
-            elif collect_mode[0] and local_dex[i] != 4 and (i+1) in ctx.checked_locations:
+            elif (slot_info[0] & 0x1) and local_dex[i] != 4 and (i+1) in ctx.checked_locations:
                 # collect, maybe push out to an option?
                 writing_dex = True
                 write_local_dex[i] = 4

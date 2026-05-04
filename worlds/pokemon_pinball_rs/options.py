@@ -99,6 +99,11 @@ class CollectPokedex(Toggle):
     display_name = "Collect Pokédex"
 
 
+class RingLink(Toggle):
+    """Links coin gain/loss with other players."""
+    display_name = "RingLink"
+
+
 @dataclass
 class PokemonPinballRSOptions(PerGameCommonOptions):
     goal: Goal
@@ -112,3 +117,4 @@ class PokemonPinballRSOptions(PerGameCommonOptions):
     ball_upgrade_checks: BallUpgradeChecks
     evo_mode: EvoMode
     collect_pokedex: CollectPokedex
+    ringlink: RingLink

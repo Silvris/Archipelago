@@ -136,6 +136,12 @@
     .thumb
     bl          CheckAnyMonEvoR0Shift
 
+
+//; Roulette hooks
+.org sub_2A354+0x5A4
+    .thumb
+    bl          RingLinkRoulette
+
 //; Evo mode hooks
 .org sub_1B140+0x11B8
     .thumb
@@ -153,6 +159,10 @@
 .org sub_1B140+0x656
     .thumb
     bl          ShopBlockHelpers
+
+.org sub_1B140+0x6A0
+    .thumb
+    bl          RingLinkShop
 
 //; Handle areas
 .org sub_25F64+0x38
@@ -906,20 +916,23 @@ CoinArrowsAP:
     .word 0x2033000
 
 DoubleCoin:
-    push        {r0-r2, lr}
+//; doubles as ringlink packet sender
+    push        {r0-r3, lr}
     mov         r2, #0xCA
     @@Get1:
-    GetValue    r1, @@Get1, DoubleCoinAP
-    ldrb        r1, [r1, #4]
-    cmp         r1, #0
-    beq         @@Return
+    GetValue    r3, @@Get1, DoubleCoinAP
+    ldrb        r1, [r3, #4]
     lsl         r2, #1
     add         r0, r2
     ldrb        r2, [r0, #0]
+    cmp         r1, #0
+    beq         @@Return
     lsl         r2, #1
     strb        r2, [r0, #0]
     @@Return:
-    pop         {r0-r2, pc}
+    mov         r1, #0x2D
+    strb        r2, [r3, r1]
+    pop         {r0-r3, pc}
     .align      4
 
 DoubleCoinAP:
@@ -1168,6 +1181,9 @@ ForceEgg:
     //; we have to also update r0 with the totalWeight
     //; and remove the value in AP
     mov         r1, #0x27
+    strb        r2, [r5, r1]
+    mov         r2, #0x1E
+    mov         r1, #0x2E
     strb        r2, [r5, r1]
     sub         r4, #2
     ldrh        r1, [r4, #0]
@@ -1530,6 +1546,32 @@ CheckRuinsAndCardRoulette:
     @@Return:
     bx          r1
 
+
+RingLinkRoulette:
+    add         r2, r1
+    strb        r0, [r2, #0]
+    @@Get:
+    GetValue    r2, @@Get, RingLinkRouletteAP
+    mov         r1, #0x2D
+    strb        r0, [r2, r1]
+    bx          lr
+    .align      4
+
+RingLinkRouletteAP:
+    .word 0x2033000
+
+RingLinkShop:
+    sub         r0, r3
+    strb        r0, [r1, #0]
+    @@Get:
+    GetValue    r2, @@Get, RingLinkShopAP
+    mov         r0, #0x2E
+    strb        r3, [r2, r0]
+    bx          lr
+    .align      4
+
+RingLinkShopAP:
+    .word 0x2033000
 
 .endarea
 
