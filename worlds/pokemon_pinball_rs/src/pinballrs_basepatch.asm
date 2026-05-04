@@ -631,16 +631,27 @@ EvoArrowsAP:
     .word 0x2033000
 
 WeightsCheckEvo:
-    push        {r2}
+    push        {r1-r4}
     ldrb        r6, [r0, #0x15]
     @@Get1:
-    GetValue    r2, @@Get1, WeightsCheckEvoAP
-    ldrb        r2, [r2, #9]
+    GetValue    r4, @@Get1, WeightsCheckEvoAP
+    ldrb        r2, [r4, #9]
+    cmp         r6, #0xCD
+    beq         @@Return
     cmp         r2, #3
-    bge         @@Return
+    blt         @@Fail
+    mov         r1, #1
+    ldrb        r2, [r0, #0x14]
+    lsl         r1, r2
+    mov         r3, #0x24
+    ldrh        r2, [r4, r3]
+    and         r1, r2
+    cmp         r1, #0
+    bne         @@Return
+    @@Fail:
     mov         r6, #0xCD
     @@Return:
-    pop         {r2}
+    pop         {r1-r4}
     add         r0, r6, #0
     bx          lr
 
@@ -649,17 +660,23 @@ WeightsCheckEvoAP:
 
 ClampearlCheck:
     //; clampearl is a special little baby
-    push        {r0-r2}
+    push        {r0-r3}
     nop
     @@Get1:
-    GetValue    r2, @@Get1, ClampearlCheckAP
-    ldrb        r2, [r2, #0]
+    GetValue    r3, @@Get1, ClampearlCheckAP
+    ldrb        r2, [r3, #9]
     cmp         r2, #3
     bge         @@Return
+    mov         r2, #0x24
+    ldr         r3, [r3, r2]
+    mov         r2, #0x10
+    and         r3, r2
+    cmp         r3, #0
+    bne         @@Return
     mov         r0, #0xBA
     add         lr, r0
     @@Return:
-    pop         {r0-r2}
+    pop         {r0-r3}
     lsl         r2, r2, #0x10
     asr         r0, r2, #0x10
     bx          lr
@@ -668,16 +685,27 @@ ClampearlCheckAP:
     .word 0x2033000
 
 EggsCheckEvo:
-    push        {r2}
+    push        {r1-r4}
     ldrb        r5, [r0, #0x15]
     @@Get1:
     GetValue    r2, @@Get1, EggsCheckEvoAP
     ldrb        r2, [r2, #9]
+    cmp         r5, #0xCD
+    beq         @@Return
     cmp         r2, #3
-    bge         @@Return
+    blt         @@Fail
+    mov         r1, #1
+    ldrb        r2, [r0, #0x14]
+    lsl         r1, r2
+    mov         r3, #0x24
+    ldrh        r2, [r4, r3]
+    and         r1, r2
+    cmp         r1, #0
+    bne         @@Return
+    @@Fail:
     mov         r5, #0xCD
     @@Return:
-    pop         {r2}
+    pop         {r1-r4}
     add         r0, r5, #0
     bx          lr
 
@@ -1047,6 +1075,7 @@ ForceNormal:
     @@GetWild:
     GetValue    r3, @@GetWild, ForceNormalWild
     lsl         r2, #3
+    add         r2, #5
     ldrb        r1, [r4, r2]
     mov         r2, #0
     cmp         r1, #3
@@ -1060,9 +1089,9 @@ ForceNormal:
     add         r3, r2
     add         r3, r1
     mov         r1, #0x27
-    mov         r0, #0
     @@GetAP:
     GetValue    r5, @@GetAP, ForceNormalAP
+    mov         r0, #0
     ldrb        r1, [r5, r1]
     sub         r1, #1
     @@ScanLoop:
