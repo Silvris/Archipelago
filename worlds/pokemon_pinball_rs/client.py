@@ -145,6 +145,22 @@ def get_coin_give_write(coins: int) -> list[tuple[int, bytes, str]]:
     ]
 
 
+def compress_pokedex(pokedex: bytes) -> int:
+    val = 0
+    for i in range(len(pokedex)):
+        if pokedex[i] == 4:
+            val |= 1 << i
+    return val
+
+
+def decompress_pokedex(pokedex: int) -> bytearray:
+    val = bytearray()
+    for i in range(205):
+        if pokedex & (1 << i):
+            val[i] = 4
+    return val
+
+
 class PinballRSClient(BizHawkClient):
     game = "Pokemon Pinball Ruby & Sapphire"
     system = "GBA"
@@ -156,6 +172,7 @@ class PinballRSClient(BizHawkClient):
     dexnav: int | None = None
     ringlink_incoming: int = 0
     ringlink_id: float | None = None
+    pokedex_key: str | None = None
 
     async def validate_rom(self, ctx: "BizHawkClientContext") -> bool:
         from worlds._bizhawk import RequestFailedError, read, get_memory_size
@@ -242,6 +259,10 @@ class PinballRSClient(BizHawkClient):
 
         if self.ringlink_id is None:
             self.ringlink_id = time.time()
+
+        if self.pokedex_key is None:
+            self.pokedex_key = f"PINBALLRS_POKEDEX_{ctx.team}_{ctx.slot}"
+            ctx.set_notify(self.pokedex_key)
 
         # get our relevant bytes
         (local_dex, high_scores, starting_lives, starting_coins, starting_ball, pichu_upgrade, coins,
@@ -616,6 +637,23 @@ class PinballRSClient(BizHawkClient):
             writes.append((PINBALL_SAPPHIRE_BALL_UPGRADE, int.to_bytes(min_sapphire_upgrade - 1, 1, "little"), "System Bus"))
         if maku_ball_upgrade_hits < min_maku_upgrade - 1:
             writes.append((PINBALL_MAKUHITA_BALL_UPGRADE, int.to_bytes(min_maku_upgrade - 1, 1, "little"), "System Bus"))
+
+        # handle remote dex here
+        if self.pokedex_key in ctx.stored_data:
+            compressed = compress_pokedex(write_local_dex)
+            if compressed != ctx.stored_data[self.pokedex_key]:
+                compressed |= ctx.stored_data[self.pokedex_key]
+                decompressed = decompress_pokedex(compressed)
+                for i in range(len(decompressed)):
+                    if decompressed[i] == 4 and write_local_dex[i] != 4:
+                        write_local_dex[i] = 4
+                await ctx.send_msgs([
+                    {
+                        "cmd": "Set", "key": self.pokedex_key, "operations": [
+                            {"operation": "replace", "value": compressed}
+                        ]
+                    }
+                ])
 
         if writing_dex:
             writes.append((PINBALL_POKEDEX, bytes(write_local_dex), "System Bus"))
