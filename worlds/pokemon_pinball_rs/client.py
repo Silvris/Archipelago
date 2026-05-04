@@ -31,7 +31,7 @@ PINBALL_FORCE_SPECIAL = PINBALL_CURRENT + 0x12B
 PINBALL_FORCE_PICHU = PINBALL_CURRENT + 0x12C
 PINBALL_COINS = PINBALL_CURRENT + 0x192
 PINBALL_COIN_AWARD = PINBALL_CURRENT + 0x194
-PINBALL_COIN_TIMER = PINBALL_CURRENT + 0x196 # size 2
+PINBALL_COIN_TIMER = PINBALL_CURRENT + 0x196  # size 2
 PINBALL_SAVER = PINBALL_CURRENT + 0x724  # size 2
 
 PINBALL_AP_START = 0x2033000
@@ -458,12 +458,17 @@ class PinballRSClient(BizHawkClient):
                 write_local_dex[item.item - 13 + 200] = 3
 
         remote_eggs = 0
+        valid_eggs = False
         for item in [item for item in ctx.items_received if item.item in range(17, 23)]:
             egg_group = item.item - 16
             for mon in egg_groups[egg_group]:
                 remote_eggs |= (1 << mon)
+            if egg_group < 5 or (egg_group == 5 and any(item.item == 1 for item in ctx.items_received)) or \
+                (egg_group == 6 and any(item.item == 2 for item in ctx.items_received)):
+                valid_eggs = True
         if remote_eggs and int.from_bytes(local_eggs, "little") != remote_eggs:
             writes.append((PINBALL_EGGS, remote_eggs.to_bytes(4, "little"), "System Bus"))
+        if valid_eggs and int.from_bytes(hatch_mode, "little") != 1:
             writes.append((PINBALL_HATCH, int.to_bytes(1, 1, "little"), "System Bus"))
 
         remote_evo_items = 0

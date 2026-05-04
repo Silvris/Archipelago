@@ -33,12 +33,12 @@ CanPlayBasicPinball = HasAllCounts({
 CanPlayModeratePinball = HasAllCounts({
     EXTRA_STARTING_LIFE: 3,
     STARTING_COINS: 3,
-})| OptionFilter(Difficulty, Difficulty.option_expert, "ge")
+}) | OptionFilter(Difficulty, Difficulty.option_expert, "ge")
 CanPlayLongPinball = HasAllCounts({
     EXTRA_STARTING_LIFE: 5,
     STARTING_COINS: 4,
     PICHU_UPGRADE: 1,
-})| OptionFilter(Difficulty, Difficulty.option_master, "ge")
+}) | OptionFilter(Difficulty, Difficulty.option_master, "ge")
 
 CanCatchSpecialEncounter = (CanPlayLongPinball & (Has(SPECIES_RAYQUAZA) | Has(ENCOUNTER_RATE_UP)) &
                             HasFromListUnique(*POKEDEX.keys(), count=100))
@@ -47,8 +47,10 @@ SPECIAL_ENCOUNTER_RULES: dict[str, Rule] = {
     # Pichu does not require 100 caught, he's just rare
     SPECIES_LATIOS: CanCatchSpecialEncounter,
     SPECIES_LATIAS: CanCatchSpecialEncounter,
-    SPECIES_PICHU: HasAny(EGG_BUNCH_RUBY, EGG_BUNCH_SAPPHIRE, EGG_BUNCH_1, EGG_BUNCH_2, EGG_BUNCH_3,
-                          EGG_BUNCH_4) & CanPlayLongPinball & (Has(SPECIES_RAYQUAZA) | Has(ENCOUNTER_RATE_UP)),
+    SPECIES_PICHU: (HasAny(EGG_BUNCH_1, EGG_BUNCH_2, EGG_BUNCH_3, EGG_BUNCH_4)
+                    | HasAll(RUBY_BOARD, EGG_BUNCH_RUBY)
+                    | HasAll(SAPPHIRE_BOARD, EGG_BUNCH_SAPPHIRE))
+                   & CanPlayLongPinball & (Has(SPECIES_RAYQUAZA) | Has(ENCOUNTER_RATE_UP)),
     SPECIES_CHIKORITA: (CanCatchSpecialEncounter & Has(CHIKORITA_DEX)) | Has(SPECIAL_GUESTS),
     SPECIES_CYNDAQUIL: (CanCatchSpecialEncounter & Has(CYNDAQUIL_DEX)) | Has(SPECIAL_GUESTS),
     SPECIES_TOTODILE: (CanCatchSpecialEncounter & Has(TOTODILE_DEX)) | Has(SPECIAL_GUESTS),
@@ -100,11 +102,11 @@ def set_rules(world: "PokemonPinballRSWorld") -> None:
     for i, board in boards.items():
         world.set_rule(world.get_entrance(f"To {board}"), Has(board))
         world.set_rule(world.get_entrance(f"To Hatch Eggs ({board})"), HasAny(EGG_BUNCH_RUBY,
-                                                                               EGG_BUNCH_SAPPHIRE,
-                                                                               EGG_BUNCH_1,
-                                                                               EGG_BUNCH_2,
-                                                                               EGG_BUNCH_3,
-                                                                               EGG_BUNCH_4) & CanPlayBasicPinball)
+                                                                              EGG_BUNCH_SAPPHIRE,
+                                                                              EGG_BUNCH_1,
+                                                                              EGG_BUNCH_2,
+                                                                              EGG_BUNCH_3,
+                                                                              EGG_BUNCH_4) & CanPlayBasicPinball)
 
         for idx, group in egg_groups.items():
             if (i == 1 and idx == 6) or (i == 2 and idx == 5):
