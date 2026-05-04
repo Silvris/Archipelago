@@ -154,7 +154,7 @@ def compress_pokedex(pokedex: bytes) -> int:
 
 
 def decompress_pokedex(pokedex: int) -> bytearray:
-    val = bytearray()
+    val = bytearray(205)
     for i in range(205):
         if pokedex & (1 << i):
             val[i] = 4
@@ -263,6 +263,10 @@ class PinballRSClient(BizHawkClient):
         if self.pokedex_key is None:
             self.pokedex_key = f"PINBALLRS_POKEDEX_{ctx.team}_{ctx.slot}"
             ctx.set_notify(self.pokedex_key)
+            await ctx.send_msgs([{"cmd": "Set", "key": self.pokedex_key, "operations": [
+                {"operation": "default", "value": 0}
+            ]}])
+            await ctx.send_msgs([{"cmd": "Get", "keys": [self.pokedex_key]}])
 
         # get our relevant bytes
         (local_dex, high_scores, starting_lives, starting_coins, starting_ball, pichu_upgrade, coins,
@@ -308,6 +312,7 @@ class PinballRSClient(BizHawkClient):
 
         if slot_info[0] & 0x2 and "RingLink" not in ctx.tags:
             ctx.tags.add("RingLink")
+            await ctx.send_msgs([{"cmd": "ConnectUpdate", "tags": ctx.tags}])
 
         goal_is_cleared = True
 
@@ -551,6 +556,7 @@ class PinballRSClient(BizHawkClient):
                     coin = int.from_bytes(coins, "little")
                     writes.append((PINBALL_COINS, int.to_bytes(coin - self.ringlink_incoming,
                                                                1, "little"), "System Bus"))
+                self.ringlink_incoming = 0
 
         new_checks = []
         # check for locations
@@ -642,6 +648,7 @@ class PinballRSClient(BizHawkClient):
         if self.pokedex_key in ctx.stored_data:
             compressed = compress_pokedex(write_local_dex)
             if compressed != ctx.stored_data[self.pokedex_key]:
+                writing_dex = True
                 compressed |= ctx.stored_data[self.pokedex_key]
                 decompressed = decompress_pokedex(compressed)
                 for i in range(len(decompressed)):
