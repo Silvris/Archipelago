@@ -166,22 +166,22 @@ def set_rules(world: "PokemonPinballRSWorld") -> None:
     # Bumpers
     for i, board in boards.items():
         for j in range(1, world.options.bonus_multiplier_checks.value + 1):
-            if j >= 75:
+            if j > 75:
                 rule = CanPlayLongPinball
-            elif j >= 25:
+            elif j > 25:
                 rule = CanPlayModeratePinball
-            elif j >= 10:
+            elif j > 10:
                 rule = CanPlayBasicPinball
             else:
                 rule = True_()
             world.set_rule(world.get_location(f"{board} - Bonus Multiplier {j}"), rule)
 
         for j in range(1, world.options.ball_upgrade_checks.value + 1):
-            if j >= 75:
+            if j > 75:
                 rule = CanPlayLongPinball
-            elif j >= 25:
+            elif j > 25:
                 rule = CanPlayModeratePinball
-            elif j >= 10:
+            elif j > 10:
                 rule = CanPlayBasicPinball
             else:
                 rule = True_()
@@ -189,9 +189,9 @@ def set_rules(world: "PokemonPinballRSWorld") -> None:
 
         if i == 1:
             for j in range(1, world.options.ball_upgrade_checks.value + 1):
-                if j >= 75:
+                if j > 75:
                     rule = (CanPlayModeratePinball & HasAll(RUBY_BOARD, HELPER_MAKUHITA))
-                elif j >= 25:
+                elif j > 25:
                     rule = (CanPlayBasicPinball & HasAll(RUBY_BOARD, HELPER_MAKUHITA))
                 else:
                     rule = HasAll(RUBY_BOARD, HELPER_MAKUHITA)
