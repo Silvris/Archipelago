@@ -5,7 +5,7 @@ from worlds.AutoWorld import World, WebWorld
 from BaseClasses import Item, ItemClassification, MultiWorld, Tutorial, CollectionState
 from Options import OptionError
 from settings import Group, UserFilePath
-from typing import Any, ClassVar
+from typing import Any, ClassVar, Mapping
 
 from .client import PinballRSClient
 from .items import PinballRSItem, ALL_ITEMS, item_lookup, MAIN_ITEMS, AREA_ITEMS, FILLER_ITEM_WEIGHTS, EVOLUTION_ITEMS
@@ -135,6 +135,11 @@ class PokemonPinballRSWorld(World):
                 del state.prog_items[self.player][EVO_ARROW]
 
         return changed
+
+    def fill_slot_data(self) -> Mapping[str, Any]:
+        return self.options.as_dict("goal", "difficulty", "single_board", "pokedex_requirement",
+                                    "score_requirement", "pokemon_targets", "bonus_multiplier_checks",
+                                    "ball_upgrade_checks")
 
     def generate_output(self, output_directory: str) -> None:
         try:

@@ -18,6 +18,7 @@ E-reader cards can be received and activated to skip progression usually locked 
 - +10 Starting Coins
 - Starting Ball Modifier
 - Permanent Pichu Upgrade
+- Double Coin Modifier
 - e-Reader Card - Special Guests
   - Forces the next Catch'em Mode to be one of Chikorita/Cyndaquil/Totodile/Aerodactyl
 - e-Reader Card - Encounter Rate Up
@@ -25,7 +26,9 @@ E-reader cards can be received and activated to skip progression usually locked 
 - e-Reader Card - Ruins Area
   - Start the game in the Ruins area (if unlocked), and set the first bonus stage to be Rayquaza
 - Get Arrow
-- Evo Arrow
+- Evo Arrow or Evo Mode, depending on options
+- Coin Arrow
+- Helper Makuhita/Whiscash/Zigzagoon/Pelipper
 - Egg Bunches
 - Chikorita/Cyndaquil/Totodile/Aerodactyl Pokédex Entries
 - BIG (score bonus)
@@ -36,6 +39,9 @@ E-reader cards can be received and activated to skip progression usually locked 
 ## What is considered a location check in Pokémon Pinball Ruby & Sapphire?
 - Catching a Pokémon and registering it in the Pokédex.
 - Completing a bonus stage for the first time
+- Hitting 5 Spheal/Poké Ball baskets, as well as 10 total baskets in the Spheal bonus stage.
+- If enabled, hitting the bonus multiplier bumper on each board.
+- If enabled, receiving a ball upgrade via on-board indicators (and separately, Makuhita on the Ruby Board).
 
 ## When the player receives an item, what happens?
 A sound effect will play based on the type of item received, and the effects of the item will be immediately applied.
@@ -45,3 +51,7 @@ Some items may only be applied the next time they are relevant, such as starting
 - `/ereader` Used to activate E-reader Card effects. Valid entries are `Special Guests`, `Encounter Rate Up`, and 
 `Ruins Area`. These effects are toggleable. `Encounter Rate Up` will be toggled on naturally by the game when Rayquaza 
 is defeated for the first time in a play session.
+- `/dexnav` Used to guarantee a specific Pokémon will appear. For normal Pokémon, this can be set early and will be 
+applied as soon as 30+ coins are available and the Pokémon has a chance to appear from Catch or Hatch mode. For special
+  (non-Pichu) Pokémon, 60 coins will be immediately deducted and the next Catch will be a special encounter (not a 
+specific Pokémon).

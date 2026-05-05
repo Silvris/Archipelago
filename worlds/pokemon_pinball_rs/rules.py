@@ -157,8 +157,7 @@ def set_rules(world: "PokemonPinballRSWorld") -> None:
         world.set_rule(world.get_location(BONUS_DUSCLOPS), Has(SAPPHIRE_BOARD))
         world.set_rule(world.get_location(BONUS_KYOGRE), Has(SAPPHIRE_BOARD) & CanPlayBasicPinball)
 
-    world.set_rule(world.get_location(BONUS_RAYQUAZA), CanPlayModeratePinball |
-                   (CanPlayBasicPinball & Has(RUINS_AREA_CARD)))
+    world.set_rule(world.get_location(BONUS_RAYQUAZA), CanPlayModeratePinball | Has(RUINS_AREA_CARD))
     for spheal in (BONUS_SPHEAL_1, BONUS_SPHEAL_2, BONUS_SPHEAL_3):
         world.set_rule(world.get_location(spheal),
                        HasAll(RUBY_BOARD, HELPER_WHISCASH) |
