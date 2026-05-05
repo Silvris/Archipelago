@@ -1129,14 +1129,14 @@ async def game_watcher(ctx: MHFUContext) -> None:
                     # we're on a hunt, pop traps and check deathlink
                     current_action = (await ctx.ppsspp_read_unsigned(MHFU_POINTERS[ctx.lang]["SET_ACTION"],
                                                                      "CURRENT_ACTION", 16))["value"]
-                    if current_action == 0x0300 and ctx.death_link == 1:
+                    if current_action == 0x0003 and ctx.death_link == 1:
                         if ctx.death_state == DeathState.alive:
                             await ctx.send_death(f"{ctx.player_names[ctx.slot]} carted.")
                         ctx.death_state = DeathState.dead
                     else:
                         if ctx.death_link == 1:
                             if ctx.death_state == DeathState.killing_player:
-                                await ctx.ppsspp_write_unsigned(MHFU_POINTERS[ctx.lang]["RESET_ACTION"], 1,
+                                await ctx.ppsspp_write_unsigned(MHFU_POINTERS[ctx.lang]["RESET_ACTION"], 0,
                                                                 "RESET_DEATH")
                                 await ctx.ppsspp_write_unsigned(MHFU_POINTERS[ctx.lang]["SET_ACTION"],
                                                                 ACTIONS[-1], "SET_DEATH", 16)
