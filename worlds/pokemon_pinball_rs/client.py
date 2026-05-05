@@ -488,7 +488,7 @@ class PinballRSClient(BizHawkClient):
         if remote_coin_arrows and int.from_bytes(coin_arrows, "little") != remote_coin_arrows:
             writes.append((PINBALL_COIN, remote_coin_arrows.to_bytes(1, "little"), "System Bus"))
 
-        remote_coin_mod = any(item.item == 5 for item in ctx.items_received)
+        remote_coin_mod = any(item.item == 24 for item in ctx.items_received)
         if remote_coin_mod and int.from_bytes(coin_mod, "little") != 1:
             writes.append((PINBALL_COIN_MODIFIER, int.to_bytes(1, 1, "little"), "System Bus"))
 

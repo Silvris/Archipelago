@@ -212,8 +212,8 @@ BONUS_KECLEON = "Kecleon Bonus Stage - Complete"
 BONUS_KYOGRE = "Kyogre Bonus Stage - Complete"
 BONUS_GROUDON = "Groudon Bonus Stage - Complete"
 BONUS_RAYQUAZA = "Rayquaza Bonus Stage - Complete"
-BONUS_SPHEAL_1 = "Spheal Bonus Stage - 5 Poké Ball Hoops"
-BONUS_SPHEAL_2 = "Spheal Bonus Stage - 5 Spheal Hoops"
+BONUS_SPHEAL_1 = "Spheal Bonus Stage - 5 Spheal Hoops"
+BONUS_SPHEAL_2 = "Spheal Bonus Stage - 5 Poké Ball Hoops"
 BONUS_SPHEAL_3 = "Spheal Bonus Stage - 10 Combined Hoops"
 
 # Items
