@@ -98,6 +98,7 @@ MHFU_POINTERS = {
         "QUEST_REWARD": 0x09A05F14,
         "QUEST_UNKN": 0x09A05F18,
         "QUEST_STATUS": 0x09A05F1C,
+        "QUEST_SIEGE": 0x09A05F21,
         "AP_SAVE": 0x09A00480
     },
     "EU": {
@@ -132,6 +133,7 @@ MHFU_POINTERS = {
         "QUEST_REWARD": 0x09A05DD4,
         "QUEST_UNKN": 0x09A05DD8,
         "QUEST_STATUS": 0x09A05DDC,
+        "QUEST_SIEGE": 0x09A05DE1,
         "AP_SAVE": 0x09A00340,
     },
     "JP": {
@@ -167,6 +169,7 @@ MHFU_POINTERS = {
         "QUEST_REWARD": 0x09A01B14,  # half
         "QUEST_UNKN": 0x09A01B18,  # half
         "QUEST_STATUS": 0x09A01B1C,  # half
+        "QUEST_SIEGE": 0x09A01B21,  # byte
         "AP_SAVE": 0x099FC080,  # 96th GC slot, hopefully you don't have 96 lol
         # "QUEST_VISUAL_GOAL": 0x09B1DA48,
         # "QUEST_VISUAL_MON": 0x9B1DDAE8,
@@ -183,19 +186,22 @@ MHFU_BREAKPOINTS = {
         "QUEST_LOAD": (True, 0x08A5C560, 1, True, True, True, False, False),
         "MONSTER_LOAD": (False, 0x08871C2C, 1, True, True, False, False, False),
         "QUEST_VISUAL_LOAD": (False, 0x09A88404, 1, False, True, False, False, False),
-        "QUEST_VISUAL_TYPE": (False, 0x09A88134, 1, True, True, False, False, False)
+        "QUEST_VISUAL_TYPE": (False, 0x09A88134, 1, True, True, False, False, False),
+        "QUEST_STATUS": (False, 0x0886B2E0, 1, False, True, False, False, False)
     },
     "EU": {
         "QUEST_LOAD": (True, 0x08A5C440, 1, True, True, True, False, False),
         "MONSTER_LOAD": (False, 0x08871C2C, 1, True, True, False, False, False),
         "QUEST_VISUAL_LOAD": (False, 0x09A88304, 1, False, True, False, False, False),
-        "QUEST_VISUAL_TYPE": (False, 0x09A88034, 1, True, True, False, False, False)
+        "QUEST_VISUAL_TYPE": (False, 0x09A88034, 1, True, True, False, False, False),
+        "QUEST_STATUS": (False, 0x0886B2E0, 1, False, True, False, False, True),
     },
     "JP": {
         "QUEST_LOAD": (True, 0x08A57510, 1, True, True, True, False, False),
         "MONSTER_LOAD": (False, 0x08871C24, 1, True, True, False, False, False),
         "QUEST_VISUAL_LOAD": (False, 0x09A8346C, 1, False, True, False, False, False),
-        "QUEST_VISUAL_TYPE": (False, 0x09A8319C, 1, True, True, False, False, False)
+        "QUEST_VISUAL_TYPE": (False, 0x09A8319C, 1, True, True, False, False, False),
+        "QUEST_STATUS": (False, 0x0886B2D8, 1, False, True, False, False, True),
     },
 
 }
@@ -205,7 +211,12 @@ MHFU_BREAKPOINT_ARGS = {
     # this lets us pull register info from the breakpoint
     "MONSTER_LOAD": ["{v0+0x2E4:p}"],
     "QUEST_VISUAL_TYPE": ["{v0},{v0+0x18:p}"],
-    "QUEST_VISUAL_LOAD": ["{v0-0x448},{v0-0xa8},{s4+0x20:p}"]
+    "QUEST_VISUAL_LOAD": ["{v0-0x448},{v0-0xa8},{s4+0x20:p}"],
+    "QUEST_STATUS": ["{v0},{s1+0x21:p}"],
+}
+
+MHFU_BREAKPOINT_CONDITIONS = {
+    "QUEST_STATUS": "v0 != [s1+0x1C]"
 }
 
 ACTIONS = {
@@ -397,6 +408,25 @@ async def handle_logs(ctx: MHFUContext) -> None:
                                    ctx.quest_info[quest_str]["targets"]):
                                 qtype = 0x1
                             await ctx.ppsspp_write_bytes(quest_addr, qtype.to_bytes(1, "little"), "Q_VTYPE")
+
+                    elif "QUEST_STATUS" in bp:
+                        if ctx.death_link == 2:
+                            bp, args = bp.split("|")
+                            state, qtype = args.split(",")
+                            _, quest_type = split_log_mem(qtype)
+                            quest_state = int(state)
+                            if quest_type == 1:
+                                if quest_state in range(0x7, 0x14):
+                                    if ctx.death_state == DeathState.alive:
+                                        await ctx.send_death(f"{ctx.player_names[ctx.slot]} was unable to protect the Fortress.")
+                                    ctx.death_state = DeathState.dead
+                            else:
+                                if quest_state in range(5, 15):
+                                    # this is a little leeway
+                                    # if we wanna like, map these out proper the message can be more descriptive
+                                    if ctx.death_state == DeathState.alive:
+                                        await ctx.send_death(f"{ctx.player_names[ctx.slot]} failed their quest.")
+                                    ctx.death_state = DeathState.dead
 
                     if MHFU_BREAKPOINTS[ctx.lang][bp][3]:
                         # this break point stops emulation, we need to restart it
@@ -1129,6 +1159,8 @@ async def game_watcher(ctx: MHFUContext) -> None:
                     # we're on a hunt, pop traps and check deathlink
                     current_action = (await ctx.ppsspp_read_unsigned(MHFU_POINTERS[ctx.lang]["SET_ACTION"],
                                                                      "CURRENT_ACTION", 16))["value"]
+                    quest_time = (await ctx.ppsspp_read_unsigned(MHFU_POINTERS[ctx.lang]["QUEST_TIMER"],
+                                                                 "CURRENT_TIME", 32))["value"]
                     if current_action == 0x0003 and ctx.death_link == 1:
                         if ctx.death_state == DeathState.alive:
                             await ctx.send_death(f"{ctx.player_names[ctx.slot]} carted.")
