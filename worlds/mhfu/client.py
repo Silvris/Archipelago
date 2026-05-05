@@ -182,14 +182,14 @@ MHFU_BREAKPOINTS = {
     "US": {
         "QUEST_LOAD": (True, 0x08A5C560, 1, True, True, True, False, False),
         "MONSTER_LOAD": (False, 0x08871C2C, 1, True, True, False, False, False),
-        "QUEST_VISUAL_LOAD": (False, 0x09A8826C, 1, False, True, False, False, False),
-        "QUEST_VISUAL_TYPE": (False, 0x09A87F9C, 1, True, True, False, False, False)
+        "QUEST_VISUAL_LOAD": (False, 0x09A88404, 1, False, True, False, False, False),
+        "QUEST_VISUAL_TYPE": (False, 0x09A88134, 1, True, True, False, False, False)
     },
     "EU": {
         "QUEST_LOAD": (True, 0x08A5C440, 1, True, True, True, False, False),
         "MONSTER_LOAD": (False, 0x08871C2C, 1, True, True, False, False, False),
-        "QUEST_VISUAL_LOAD": (False, 0x09A8816C, 1, False, True, False, False, False),
-        "QUEST_VISUAL_TYPE": (False, 0x09A87E9C, 1, True, True, False, False, False)
+        "QUEST_VISUAL_LOAD": (False, 0x09A88304, 1, False, True, False, False, False),
+        "QUEST_VISUAL_TYPE": (False, 0x09A88034, 1, True, True, False, False, False)
     },
     "JP": {
         "QUEST_LOAD": (True, 0x08A57510, 1, True, True, True, False, False),
