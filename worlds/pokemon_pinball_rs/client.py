@@ -80,7 +80,7 @@ EREADER_MAP_INVERSE: dict[int, str] = {
     data[0]: card for card, data in EREADER_MAP.items()
 }
 
-DEBUG = True  # Debug flag
+DEBUG = False  # Debug flag
 
 @mark_raw
 def cmd_ereader(self: "BizHawkClientCommandProcessor", card: str) -> None:
@@ -96,12 +96,12 @@ def cmd_ereader(self: "BizHawkClientCommandProcessor", card: str) -> None:
     assert isinstance(self.ctx.client_handler, PinballRSClient)
     client: PinballRSClient = self.ctx.client_handler
 
-    if card not in EREADER_MAP:
-        logger.warning(f"{card} is not a valid E-Reader card.")
+    if card.title() not in EREADER_MAP:
+        logger.warning(f"{card.title()} is not a valid E-Reader card.")
         return
-    if not client.has_item(self.ctx, EREADER_MAP[card][1]):
-        logger.warning(f"You have not received the {card} E-Reader card.")
-    client.active_ereader = EREADER_MAP[card][0]
+    if not client.has_item(self.ctx, EREADER_MAP[card.title()][1]):
+        logger.warning(f"You have not received the {card.title()} E-Reader card.")
+    client.active_ereader = EREADER_MAP[card.title()][0]
 
 
 def cmd_high_scores(self: "BizHawkClientCommandProcessor"):
@@ -131,7 +131,7 @@ def cmd_dexnav(self: "BizHawkClientCommandProcessor", pokemon: str):
     assert isinstance(self.ctx.client_handler, PinballRSClient)
     client: PinballRSClient = self.ctx.client_handler
 
-    client.dexnav = POKEDEX.get(pokemon, -1)
+    client.dexnav = POKEDEX.get(pokemon.title(), -1)
 
 
 def get_sfx_write(sfx: int) -> tuple[int, bytes, str]:
