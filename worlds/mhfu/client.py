@@ -98,7 +98,7 @@ MHFU_POINTERS = {
         "QUEST_REWARD": 0x09A05F14,
         "QUEST_UNKN": 0x09A05F18,
         "QUEST_STATUS": 0x09A05F1C,
-        "AP_SAVE": 0x099FE590
+        "AP_SAVE": 0x09A00480
     },
     "EU": {
         "GH_VISIBLE": 0x089B1A2C,
@@ -132,7 +132,7 @@ MHFU_POINTERS = {
         "QUEST_REWARD": 0x09A05DD4,
         "QUEST_UNKN": 0x09A05DD8,
         "QUEST_STATUS": 0x09A05DDC,
-        "AP_SAVE": 0x099FE450,
+        "AP_SAVE": 0x09A00340,
     },
     "JP": {
         "GH_VISIBLE": 0x089AEAF0,
