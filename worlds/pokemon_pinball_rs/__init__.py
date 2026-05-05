@@ -74,8 +74,8 @@ class PokemonPinballRSWorld(World):
     def create_items(self) -> None:
         itempool = [self.create_item(name) for name, data in MAIN_ITEMS.items() for _ in range(data.num)
                     if name not in (RUBY_BOARD, SAPPHIRE_BOARD, EVO_ARROW, EVO_MODE) and
-                    data.board == 0 or
-                    (not self.options.single_board or data.board == (self.options.starting_board.value + 1))]
+                    (data.board == 0 or
+                    (not self.options.single_board or data.board == (self.options.starting_board.value + 1)))]
         if self.options.starting_board == StartingBoard.option_ruby:
             board_name = RUBY_BOARD
             other_board = SAPPHIRE_BOARD
