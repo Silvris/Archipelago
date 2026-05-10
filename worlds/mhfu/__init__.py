@@ -120,7 +120,8 @@ class MHFUWorld(World):
             max_village = (-1, -1, -1)
         if max_guild[1] == 3:
             max_rarity = 10
-        elif max_guild[1] == 2 or max_village[1] == 1:
+        elif ((max_guild[1] == 2 or max_village[1] == 2) or
+              self.options.cash_only_equipment and (max_guild[1] >= 1 or max_village[1] >= 1)):
             max_rarity = 7
         else:
             max_rarity = 3
