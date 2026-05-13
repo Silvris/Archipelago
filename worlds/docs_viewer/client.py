@@ -156,15 +156,16 @@ class DocumentSelect(MDScreen):
                                                                  f"Game info for {world.game} "
                                                                  f"for language {lang.upper()}.","",
                                                                  lang.upper(), rel_path, True))
-            lang_count = Counter([tutorial.tutorial_name for tutorial in web.tutorials])
-            for tutorial in web.tutorials:
-                path = self.check_exists(world, tutorial.file_name)
-                if path:
-                    self.scroll.layout.add_widget(DocumentVisual(tutorial.tutorial_name, tutorial.description,
-                                                                 ", ".join(tutorial.authors), tutorial.language, path,
-                                                                 lang_count[tutorial.tutorial_name] > 1))
+            if hasattr(web, "tutorials"):
+                lang_count = Counter([tutorial.tutorial_name for tutorial in web.tutorials])
+                for tutorial in web.tutorials:
+                    path = self.check_exists(world, tutorial.file_name)
+                    if path:
+                        self.scroll.layout.add_widget(DocumentVisual(tutorial.tutorial_name, tutorial.description,
+                                                                     ", ".join(tutorial.authors), tutorial.language,
+                                                                     path, lang_count[tutorial.tutorial_name] > 1))
 
-        else:
+        if len(self.scroll.layout.children) == 0:
             self.scroll.layout.add_widget(MDLabel("No documents could be found for this game."))
 
 
