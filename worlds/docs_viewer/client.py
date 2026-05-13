@@ -10,10 +10,17 @@ from kivy.lang.builder import Builder
 from kivy.properties import StringProperty, ObjectProperty
 from kivy.uix.widget import Widget
 from kivymd.app import MDApp
+from kivy.uix.anchorlayout import AnchorLayout
 from kivymd.uix.button import MDButton, MDButtonText, MDIconButton
 from kivymd.uix.card import MDCard
 from kivymd.uix.label import MDLabel
+from kivy.uix.rst import RstDocument, RstImage
+from kivy.clock import Clock
 from kivy.core.window import Window
+from kivy.metrics import dp
+from kivy.utils import get_hex_from_color
+from mistune.renderers.rst import RSTRenderer
+from mistune import create_markdown
 from Utils import init_logging
 
 from worlds.AutoWorld import AutoWorldRegister, World, WebWorld
@@ -62,17 +69,54 @@ class DocumentView(MDScreen):
         super().__init__(*args, **kwargs)
         self.scroll.layout.spacing = 25
         self.scroll.layout.padding = (5, 10)
+        self.scroll.layout.size_hint = (1, 1)
 
-    def load_document(self, document: str):
+    def get_colors(self):
+        return {
+            "background": get_hex_from_color(self.theme_cls.backgroundColor)[1:],
+            "link": get_hex_from_color(self.theme_cls.tertiaryColor)[1:],
+            "paragraph": get_hex_from_color(self.theme_cls.onSurfaceColor)[1:],
+            "title": get_hex_from_color(self.theme_cls.onSurfaceColor)[1:],
+            "bullet": get_hex_from_color(self.theme_cls.onSurfaceColor)[1:],
+        }
+
+    def load_document(self, document: str, docs_path: str):
         self.scroll.layout.clear_widgets()
+        convert_rst = create_markdown(renderer=RSTRenderer())
+        doc = RstDocument(text=convert_rst(document))
 
-        doc_strs = document.split("\n")
+        original_load = RstDocument._load_from_text
 
-        for string in doc_strs:
-            if string:
-                self.scroll.layout.add_widget(MDLabel(text=string))
-            else:
-                self.scroll.layout.add_widget(Widget())
+        def set_size(img):
+            img.size = [
+                img.texture_size[0],
+                img.texture_size[1] + dp(10)
+            ]
+
+        def doc_load(*args):
+            original_load(doc, *args)
+            for child in doc.content.children:
+                if isinstance(child, AnchorLayout):
+                    original = child.children[0]
+                    if isinstance(original, RstImage):
+                        new = ApAsyncImage(source=docs_path + original.source)
+                        new.bind(on_load=lambda *a, n=new: set_size(n))
+                        new.bind(height=child.setter("height"))
+                        child.remove_widget(original)
+                        child.add_widget(new)
+                        original.unbind()
+
+
+
+
+        doc._load_from_text = doc_load
+        doc._trigger_load = Clock.create_trigger(doc._load_from_text, -1)
+        doc.colors = self.get_colors()
+        doc.render()
+
+
+
+        self.scroll.layout.add_widget(doc)
 
 
 
@@ -145,10 +189,17 @@ class DocsViewer(ThemedApp):
         self.game = world.game
         self.doc_select.populate(world)
 
+    def return_to_world_docs(self):
+        world = AutoWorldRegister.world_types[self.game]
+        self.doc_select.populate(world)
+        self.screen_manager.current = self.doc_select.name
+
     def display_doc(self, visual: DocumentVisual):
         world = AutoWorldRegister.world_types[self.game]
         self.screen_manager.current = self.doc_view.name
-        self.doc_view.load_document(pkgutil.get_data(world.__module__, visual.relative_path).decode("utf-8"))
+        doc_path = f"ap:{world.__module__}/docs/"
+        self.doc_view.load_document(pkgutil.get_data(world.__module__, visual.relative_path).decode("utf-8"),
+                                    doc_path)
 
 
     def build(self):

@@ -62,12 +62,18 @@
 <DocumentView>:
     scroll: scroll
     back: back
-    ScrollBox:
-        id: scroll
+    BoxLayout:
+        orientation: "vertical"
+        size_hint: 1, 1
+        MDIconButton:
+            id: back
+            icon: "arrow-left"
+            on_release: app.return_to_world_docs()
 
-    MDIconButton:
-        id: back
-        icon: "arrow-left"
+        ScrollBox:
+            id: scroll
+
+
 
 ContainerLayout:
     md_bg_color: app.theme_cls.backgroundColor
