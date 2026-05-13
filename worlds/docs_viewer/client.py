@@ -166,7 +166,7 @@ class DocumentSelect(MDScreen):
                                                                      path, lang_count[tutorial.tutorial_name] > 1))
 
         if len(self.scroll.layout.children) == 0:
-            self.scroll.layout.add_widget(MDLabel("No documents could be found for this game."))
+            self.scroll.layout.add_widget(MDLabel(text="No documents could be found for this game."))
 
 
 class DocsViewer(ThemedApp):
