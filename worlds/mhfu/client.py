@@ -368,53 +368,55 @@ async def handle_logs(ctx: MHFUContext) -> None:
 
                     elif "QUEST_VISUAL_LOAD" in bp:
                         bp, args = bp.split("|")
-                        goal, mons, qid = args.split(",")
-                        _, quest = split_log_mem(qid)
-                        quest_id = quest & 0xFFFF
-                        quest_info = ctx.quest_info[f"{quest_id:05}"]
-                        if "targets" in quest_info and quest_info["targets"]:
-                            # now we can construct the strings
-                            targets = [mon for mon in quest_info["targets"]]
-                            targets.reverse()
-                            target = targets.pop()
-                            is_slay = target in elder_dragons.values()
-                            goal_str = f"{'Slay' if is_slay else 'Hunt'} " \
-                                       f"{'the' if is_slay else ('an' if monster_lookup[target].lower()[0] in ('a', 'e', 'i', 'o', 'u') else 'a')}" \
-                                       f" {monster_lookup[target]} "
-                            if targets:
+                        if ctx.quest_randomization:
+                            goal, mons, qid = args.split(",")
+                            _, quest = split_log_mem(qid)
+                            quest_id = quest & 0xFFFF
+                            quest_info = ctx.quest_info[f"{quest_id:05}"]
+                            if "targets" in quest_info and quest_info["targets"]:
+                                # now we can construct the strings
+                                targets = [mon for mon in quest_info["targets"]]
+                                targets.reverse()
                                 target = targets.pop()
-                                is_slay_2 = target in elder_dragons.values()
-                                if is_slay != is_slay_2:
-                                    goal_str += f"and \n{'Slay' if is_slay_2 else 'Hunt'} "
-                                else:
-                                    goal_str += "and \n"
-                                goal_str += f"{'the' if is_slay_2 else ('an' if monster_lookup[target].lower()[0] in ('a', 'e', 'i', 'o', 'u') else 'a')}"
-                                goal_str += f" {monster_lookup[target]}"
-                            await ctx.ppsspp_write_bytes(int(goal, 16),
-                                                         goal_str.encode("ascii") + b"\x00", "Q_TARGET")
-                        # now monsters
-                        mons_str = f"\n".join([monster_lookup[mon] for mon in quest_info["monsters"]])
-                        await ctx.ppsspp_write_bytes(int(mons, 16), mons_str.encode("ascii") + b"\x00", "Q_MONSTERS")
+                                is_slay = target in elder_dragons.values()
+                                goal_str = f"{'Slay' if is_slay else 'Hunt'} " \
+                                           f"{'the' if is_slay else ('an' if monster_lookup[target].lower()[0] in ('a', 'e', 'i', 'o', 'u') else 'a')}" \
+                                           f" {monster_lookup[target]} "
+                                if targets:
+                                    target = targets.pop()
+                                    is_slay_2 = target in elder_dragons.values()
+                                    if is_slay != is_slay_2:
+                                        goal_str += f"and \n{'Slay' if is_slay_2 else 'Hunt'} "
+                                    else:
+                                        goal_str += "and \n"
+                                    goal_str += f"{'the' if is_slay_2 else ('an' if monster_lookup[target].lower()[0] in ('a', 'e', 'i', 'o', 'u') else 'a')}"
+                                    goal_str += f" {monster_lookup[target]}"
+                                await ctx.ppsspp_write_bytes(int(goal, 16),
+                                                             goal_str.encode("ascii") + b"\x00", "Q_TARGET")
+                            # now monsters
+                            mons_str = f"\n".join([monster_lookup[mon] for mon in quest_info["monsters"]])
+                            await ctx.ppsspp_write_bytes(int(mons, 16), mons_str.encode("ascii") + b"\x00", "Q_MONSTERS")
 
                     elif "QUEST_VISUAL_TYPE" in bp:
                         bp, args = bp.split("|")
-                        qaddr, quest_id_str = args.split(",")
-                        quest_addr = int(qaddr, 16)
-                        quest_id_addr, quest_mix = split_log_mem(quest_id_str)
-                        quest_str = str("%.5i" % (quest_mix & 0xFFFF))
-                        if "targets" in ctx.quest_info[quest_str] and ctx.quest_info[quest_str]["targets"]:
-                            qtype = 0x4
-                            if any(monster in elder_dragons.values() for monster in
-                                   ctx.quest_info[quest_str]["targets"]):
-                                qtype = 0x1
-                            await ctx.ppsspp_write_bytes(quest_addr, qtype.to_bytes(1, "little"), "Q_VTYPE")
+                        if ctx.quest_randomization:
+                            qaddr, quest_id_str = args.split(",")
+                            quest_addr = int(qaddr, 16)
+                            quest_id_addr, quest_mix = split_log_mem(quest_id_str)
+                            quest_str = str("%.5i" % (quest_mix & 0xFFFF))
+                            if "targets" in ctx.quest_info[quest_str] and ctx.quest_info[quest_str]["targets"]:
+                                qtype = 0x4
+                                if any(monster in elder_dragons.values() for monster in
+                                       ctx.quest_info[quest_str]["targets"]):
+                                    qtype = 0x1
+                                await ctx.ppsspp_write_bytes(quest_addr, qtype.to_bytes(1, "little"), "Q_VTYPE")
 
                     elif "QUEST_STATUS" in bp:
+                        bp, args = bp.split("|")
                         if ctx.death_link == 2:
-                            bp, args = bp.split("|")
                             state, qtype = args.split(",")
                             _, quest_type = split_log_mem(qtype)
-                            quest_state = int(state)
+                            quest_state = int(state, 16)
                             if quest_type == 1:
                                 if quest_state in range(0x7, 0x14):
                                     if ctx.death_state == DeathState.alive:
@@ -546,17 +548,17 @@ async def connect_psp(ctx: MHFUContext, target: int | None = None) -> None:
         if MHFU_BREAKPOINTS[ctx.lang][bp][0]:
             await send_and_receive(ctx, json.dumps(
                 dict(zip(["event", "ticket", "address", "size", "enabled",
-                          "log", "read", "write", "change", "logFormat"],
+                          "log", "read", "write", "change", "logFormat", "condition"],
                          ["memory.breakpoint.add", "MEM_BREAKPOINT", *MHFU_BREAKPOINTS[ctx.lang][bp][1:],
-                          '|'.join([bp, *MHFU_BREAKPOINT_ARGS.get(bp, list())])]
+                          '|'.join([bp, *MHFU_BREAKPOINT_ARGS.get(bp, list())]), MHFU_BREAKPOINT_CONDITIONS.get(bp, "")]
                          ))), "MEM_BREAKPOINT")
         else:
             await send_and_receive(ctx, json.dumps(
                 dict(zip(
-                    ["event", "ticket", "address", "enabled", "log", "logFormat"],
+                    ["event", "ticket", "address", "enabled", "log", "logFormat", "condition"],
                     ["cpu.breakpoint.add", "CPU_BREAKPOINT", MHFU_BREAKPOINTS[ctx.lang][bp][1],
                      MHFU_BREAKPOINTS[ctx.lang][bp][3], MHFU_BREAKPOINTS[ctx.lang][bp][4],
-                     '|'.join([bp, *MHFU_BREAKPOINT_ARGS.get(bp, list())])]
+                     '|'.join([bp, *MHFU_BREAKPOINT_ARGS.get(bp, list())]), MHFU_BREAKPOINT_CONDITIONS.get(bp, "")]
                 ))
             ), "CPU_BREAKPOINT")
     return
@@ -1175,6 +1177,12 @@ async def game_watcher(ctx: MHFUContext) -> None:
                                 ctx.death_state = DeathState.dead
                             else:
                                 ctx.death_state = DeathState.alive
+                        elif ctx.death_link == 2:
+                            if ctx.death_state == DeathState.killing_player:
+                                await ctx.ppsspp_write_unsigned(MHFU_POINTERS[ctx.lang]["QUEST_TIMER"], 1,
+                                                                "FAIL_QUEST", 32)
+                                ctx.death_state = DeathState.dead
+                                # generic lobby handler will reset back to alive
                         await ctx.pop_trap()
                 else:
                     # if we're not in a hunt, we just need to reset deathlinks
