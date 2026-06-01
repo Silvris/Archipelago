@@ -18,29 +18,32 @@ MM1NESHASH = "4de82cfceadbf1a5e693b669b1221107"
 PROTEUSHASH = "b69fff40212b80c94f19e786d1efbf61"
 
 wily_requirement = 0x1AAB4
-energylink = 0x1FF8A
+energylink = 0x1C03B
+enhanced_super_arm = 0x1C177
+enhanced_hyper_bomb = 0x1C1B1
+
 
 MM1_BOSS_WEAKNESSES = {
-    0: 0x1FDFE,  # Cut Man
-    1: 0x1FE06,  # Ice Man
-    2: 0x1FE0E,  # Bomb Man
-    3: 0x1FE16,  # Fire Man
-    4: 0x1FE1E,  # Elec Man
-    5: 0x1FE26,  # Guts Man
-    6: 0x1FE2E,  # Yellow Devil
-    7: 0x1FE36,  # Copy Robot
-    8: 0x1FE3E,  # CWU 001
-    9: 0x1FE46,  # Wily Machine Phase 1
-    10: 0x1FE4E, # Wily Machine Phase 2
+    0: 0x3FDFE,  # Cut Man
+    1: 0x3FE06,  # Ice Man
+    2: 0x3FE0E,  # Bomb Man
+    3: 0x3FE16,  # Fire Man
+    4: 0x3FE1E,  # Elec Man
+    5: 0x3FE26,  # Guts Man
+    6: 0x3FE2E,  # Yellow Devil
+    7: 0x3FE36,  # Copy Robot
+    8: 0x3FE3E,  # CWU 001
+    9: 0x3FE46,  # Wily Machine Phase 1
+    10: 0x3FE4E, # Wily Machine Phase 2
 }
 MM1_ENEMY_WEAKNESSES: dict[int, int] = {
-    0: 0x1FC61,
-    1: 0x1FC9C,
-    2: 0x1FCD7,
-    3: 0x1FD12,
-    4: 0x1FD4D,
-    5: 0x1FD88,
-    6: 0x1FDC3,
+    0: 0x3FC61,
+    1: 0x3FC9C,
+    2: 0x3FCD7,
+    3: 0x3FD12,
+    4: 0x3FD4D,
+    5: 0x3FD88,
+    6: 0x3FDC3,
 }
 
 MM1_MUSIC = 0x153A4
@@ -125,9 +128,9 @@ def patch_rom(world: "MM1World", patch: MM1ProcedurePatch) -> None:
     patch.name = bytearray(f'MM1{__version__.replace(".", "")[0:3]}_{world.player}_{world.multiworld.seed:11}\0',
                            'utf8')[:16]
     patch.name.extend([0] * (16 - len(patch.name)))
-    patch.write_bytes(0x1FFF0, patch.name)
-    patch.write_bytes(0x1FFED, world.world_version)
-    patch.write_byte(0x1FFEC, (world.options.energy_link.value << 1) + world.options.death_link.value)
+    patch.write_bytes(0x3FFF0, patch.name)
+    patch.write_bytes(0x3FFED, world.world_version)
+    patch.write_byte(0x3FFEC, (world.options.energy_link.value << 1) + world.options.death_link.value)
 
     patch.write_file("token_patch.bin", patch.get_token_binary())
 

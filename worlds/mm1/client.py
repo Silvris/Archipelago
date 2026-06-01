@@ -247,8 +247,8 @@ class MegaMan1Client(BizHawkClient):
                     ctx.command_processor.commands.pop("autoheal")
                 return False
 
-            game_name, version = (await read(ctx.bizhawk_ctx, [(0x1FFE0, 16, "PRG ROM"),
-                                                               (0x1FFDD, 3, "PRG ROM")]))
+            game_name, version = (await read(ctx.bizhawk_ctx, [(0x3FFE0, 16, "PRG ROM"),
+                                                               (0x3FFDD, 3, "PRG ROM")]))
             if game_name[:3] != b"MM1" or version != bytes(MM1World.world_version):
                 if game_name[:3] == b"MM1":
                     # I think this is an easier check than the other?
@@ -273,7 +273,7 @@ class MegaMan1Client(BizHawkClient):
         self.rom = game_name
         ctx.items_handling = 0b111
         ctx.want_slot_data = False
-        deathlink = (await read(ctx.bizhawk_ctx, [(0x1FFDC, 1, "PRG ROM")]))[0][0]
+        deathlink = (await read(ctx.bizhawk_ctx, [(0x3FFDC, 1, "PRG ROM")]))[0][0]
         if deathlink & 0x01:
             self.death_link = True
         if deathlink & 0x02:
