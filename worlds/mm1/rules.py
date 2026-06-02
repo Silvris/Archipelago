@@ -1,7 +1,8 @@
 from math import ceil
 from typing import TYPE_CHECKING
-from worlds.generic.Rules import add_rule, set_rule
-from .options import RandomWeaknesses, weapons_to_id, bosses
+from rule_builder.rules import Rule, True_, Has, HasAll, CanReachLocation, HasGroupUnique, HasAny
+from rule_builder.field_resolvers import FromOption, FromWorldAttr
+from .options import RandomWeaknesses, RequiredWeapons, weapons_to_id, bosses
 
 if TYPE_CHECKING:
     from . import MM1World
@@ -41,9 +42,16 @@ weapon_costs = {
     # Super Arm isn't available in any refight, so we have to confirm it's beatable without it
 }
 
+class ValidationException(Exception):
+    pass
 
-def validate_fights(world: "MM1World", fights: tuple[int, ...]) -> dict[int, set[int]]:
+def validate_fights(world: "MM1World", fights: tuple[int, ...], error: bool = False) -> dict[int, set[int]]:
     boss_health = {boss: 0x1C if boss != 9 else 0x1C * 2 for boss in fights}
+    costs = weapon_costs.copy()
+    min_weakness = minimum_weakness_requirement.copy()
+    if world.options.enhanced_super_arm:
+        costs[6] = 2
+        min_weakness[6] = 2
 
     weapon_energy = {key: float(0x1C) for key in weapon_costs}
     weapon_boss = {boss: {weapon: world.weapon_damage[weapon][boss] for weapon in world.weapon_damage}
@@ -77,14 +85,20 @@ def validate_fights(world: "MM1World", fights: tuple[int, ...]) -> dict[int, set
                 # we are out of weapons that can actually damage the boss
                 # so find the weapon that has the most uses, and apply that as an additional weakness
                 # it should be impossible to be out of energy
+                if error:
+                    # we should throw an exception, as we are in a testing environment
+                    raise ValidationException(f"Ran out of weapon energy to damage "
+                          f"{next(name for name in bosses if bosses[name] == boss)}\n"
+                          f"Seed: {world.multiworld.seed}\n"
+                          f"Damage Table: {weapon_damage}")
                 max_uses, wp = max((weapon_energy[weapon] // weapon_costs[weapon], weapon)
                                    for weapon in weapon_weight
                                    if weapon != 0)
-                world.weapon_damage[wp][boss] = minimum_weakness_requirement[wp]
+                world.weapon_damage[wp][boss] = min_weakness[wp]
                 used = min(int(weapon_energy[wp] // weapon_costs[wp]),
-                           ceil(boss_health[boss] / minimum_weakness_requirement[wp]))
+                           ceil(boss_health[boss] / min_weakness[wp]))
                 weapon_energy[wp] -= weapon_costs[wp] * used
-                boss_health[boss] -= int(used * minimum_weakness_requirement[wp])
+                boss_health[boss] -= int(used * min_weakness[wp])
                 weapon_weight.pop(wp)
                 used_weapons[boss].add(wp)
             else:
@@ -110,37 +124,69 @@ boss_locations = {
     10: ["Wily Machine - Defeated"],
 }
 
+STATIC_LOCATION_RULES: dict[str, Rule] = {
+    "Elec Man Stage - Magnet Beam": HasAny("Super Arm", "Thunder Beam"),
+    "Wily Stage 2 - Elec Man Rematch": CanReachLocation("Wily Stage 2 - Cut Man Rematch"),
+    "Copy Robot - Defeated": CanReachLocation("Wily Stage 2 - Elec Man Rematch"),
+    "Wily Stage 2 - Complete": CanReachLocation("Wily Stage 2 - Elec Man Rematch"),
+    "Wily Stage 4 - Fire Man Rematch": CanReachLocation("Wily Stage 4 - Bomb Man Rematch"),
+    "Wily Stage 4 - Ice Man Rematch": CanReachLocation("Wily Stage 4 - Fire Man Rematch"),
+    "Wily Stage 4 - Guts Man Rematch": CanReachLocation("Wily Stage 4 - Ice Man Rematch"),
+    "Wily Machine Defeated": CanReachLocation("Wily Stage 4 - Guts Man Rematch"),
+    "Fire Man Stage - Weapon Energy 1": HasAny("Magnet Beam", "Ice Slasher"),
+    "Fire Man Stage - Weapon Energy 2": HasAny("Magnet Beam", "Ice Slasher"),
+    "Wily Stage 2 - Health Energy 2": CanReachLocation("Wily Stage 2 - Cut Man Rematch"),
+    "Wily Stage 2 - Weapon Energy 3": CanReachLocation("Wily Stage 2 - Cut Man Rematch"),
+    "Wily Stage 2 - Weapon Energy 4": CanReachLocation("Wily Stage 2 - Cut Man Rematch"),
+    "Wily Stage 2 - Weapon Energy 5": CanReachLocation("Wily Stage 2 - Elec Man Rematch"),
+    "Wily Stage 2 - Weapon Energy 6": CanReachLocation("Wily Stage 2 - Elec Man Rematch"),
+    "Wily Stage 2 - Weapon Energy 7": CanReachLocation("Wily Stage 2 - Elec Man Rematch"),
+    "Wily Stage 2 - 1-Up": CanReachLocation("Wily Stage 2 - Elec Man Rematch"),
+    "Wily Stage 4 - Weapon Energy 2": CanReachLocation("Wily Stage 4 - Guts Man Rematch"),
+
+}
+
+STATIC_ENTRANCE_RULES: dict[str, Rule] = {
+    "To Wily Stage 1": Has("Magnet Beam") & HasAny("Super Arm", "Thunder Beam")
+                       & HasGroupUnique("Weapons",count=FromOption(RequiredWeapons)),
+
+}
 
 def set_rules(world: "MM1World"):
     # most rules are set on region, so we only worry about rules required within stage access
     # or rules variable on settings
+    min_weakness = minimum_weakness_requirement.copy()
     if (hasattr(world.multiworld, "re_gen_passthrough")
             and "Mega Man" in getattr(world.multiworld, "re_gen_passthrough")):
         slot_data = getattr(world.multiworld, "re_gen_passthrough")["Mega Man"]
         world.weapon_damage = slot_data["weapon_damage"]
         world.wily_weapons = slot_data["wily_weapons"]
     else:
+        if world.options.enhanced_super_arm:
+            min_weakness[6] = 2
+
         if world.options.random_weakness == RandomWeaknesses.option_shuffled:
             weapon_tables = [table.copy() for weapon, table in weapon_damage.items() if weapon not in (0, 6)]
             world.random.shuffle(weapon_tables)
-            for i in range(1, 6):
+            for i in range(1, 6 if not world.options.enhanced_super_arm else 7):
                 world.weapon_damage[i] = weapon_tables.pop()
-            for boss in (0, 4, 5, 8):
-                # valid Super Arm damage
-                world.weapon_damage[6][boss] = min(14, max(-1, int(world.random.normalvariate(9, 3))))
+            if not world.options.enhanced_super_arm:
+                for boss in (0, 4, 5, 8):
+                    # valid Super Arm damage
+                    world.weapon_damage[6][boss] = min(14, max(-1, int(world.random.normalvariate(9, 3))))
         elif world.options.random_weakness == RandomWeaknesses.option_randomized:
             world.weapon_damage = {i: [] for i in range(7)}
             for boss in range(11):
                 for weapon in world.weapon_damage:
-                    if boss not in (0, 4, 5, 8) and weapon == 6:
+                    if not world.options.enhanced_super_arm and boss not in (0, 4, 5, 8) and weapon == 6:
                         # Bosses cannot take Super Arm damage
                         world.weapon_damage[weapon].append(-1)
-                    elif boss in (6, 9, 10) and weapon == 3:
+                    elif not world.options.enhanced_hyper_bomb and boss in (6, 9, 10) and weapon == 3:
                         # Bosses cannot take Hyper Bomb damage
                         world.weapon_damage[weapon].append(-1)
                     else:
                         world.weapon_damage[weapon].append(min(14, max(-1, int(world.random.normalvariate(3, 3)))))
-                if not any([world.weapon_damage[weapon][boss] >= max(4, minimum_weakness_requirement[weapon])
+                if not any([world.weapon_damage[weapon][boss] >= max(4, min_weakness[weapon])
                             for weapon in range(1, 6)]):
                     # failsafe, there should be at least one defined non-Buster, non-Super Arm weakness
                     weapons = [1, 2, 4, 5]
@@ -148,7 +194,7 @@ def set_rules(world: "MM1World"):
                         weapons.append(3)
                     weapon = world.random.choice(weapons)
                     world.weapon_damage[weapon][boss] = world.random.randint(
-                        max(4, minimum_weakness_requirement[weapon]), 14)  # Force weakness
+                        max(4, min_weakness[weapon]), 14)  # Force weakness
 
 
         if world.options.strict_weakness:
@@ -170,32 +216,42 @@ def set_rules(world: "MM1World"):
                 boss = bosses[p_boss]
                 for p_weapon in world.options.plando_weakness[p_boss]:
                     weapon = min(14, weapons_to_id[p_weapon])
-                    if world.options.plando_weakness[p_boss][p_weapon] < minimum_weakness_requirement[weapon] \
+                    if world.options.plando_weakness[p_boss][p_weapon] < min_weakness[weapon] \
                             and not any(w != weapon
-                                        and world.weapon_damage[w][boss] >= minimum_weakness_requirement[w]
+                                        and world.weapon_damage[w][boss] >= min_weakness[w]
                                         for w in world.weapon_damage):
                         # we need to replace this weakness
                         weakness = world.random.choice([key for key in world.weapon_damage if key != weapon])
-                        world.weapon_damage[weakness][boss] = minimum_weakness_requirement[weakness]
+                        world.weapon_damage[weakness][boss] = min_weakness[weakness]
                     world.weapon_damage[weapon][boss] = world.options.plando_weakness[p_boss][p_weapon]
 
         # handle special cases
-        for boss in (0, 4, 5, 8):
-            if (world.weapon_damage[6][boss] >= minimum_weakness_requirement[6] and
-                    not any(world.weapon_damage[i][boss] >= minimum_weakness_requirement[i]
-                            for i in range(6))):
-                # Super Arm cannot be the only weakness
-                weakness = world.random.choice(range(1, 6))
-                world.weapon_damage[weakness][boss] = minimum_weakness_requirement[weakness]
+        if not world.options.enhanced_super_arm:
+            for boss in range(11):
+                if boss in (0, 4, 5, 8):
+                    if (world.weapon_damage[6][boss] >= min_weakness[6] and
+                            not any(world.weapon_damage[i][boss] >= min_weakness[i]
+                                    for i in range(6))):
+                        # Super Arm cannot be the only weakness
+                        weakness = world.random.choice(range(1, 6))
+                        world.weapon_damage[weakness][boss] = min_weakness[weakness]
+                else:
+                    # enforce 0 damage from super arm
+                    world.weapon_damage[6][boss] = 0
 
-        for boss in (6, 9, 10):
-            if (world.weapon_damage[2][boss] >= minimum_weakness_requirement[1] and
-                    not any(world.weapon_damage[i][boss] >= minimum_weakness_requirement[i]
-                            for i in range(6) if i != 3)):
-                # Hyper Bomb cannot be Wily or Yellow Devil's only weakness
-                world.weapon_damage[1][boss] = 0
-                weakness = world.random.choice((1, 2, 4, 5))
-                world.weapon_damage[weakness][boss] = minimum_weakness_requirement[weakness]
+        if not world.options.enhanced_hyper_bomb:
+            for boss in range(11):
+                if boss in (6, 9, 10):
+                    if (world.weapon_damage[3][boss] >= min_weakness[1] and
+                            not any(world.weapon_damage[i][boss] >= min_weakness[i]
+                                    for i in range(6) if i != 3)):
+                        # Hyper Bomb cannot be Wily or Yellow Devil's only weakness
+                        world.weapon_damage[3][boss] = 0
+                        weakness = world.random.choice((1, 2, 4, 5))
+                        world.weapon_damage[weakness][boss] = min_weakness[weakness]
+                else:
+                    # enforce 0 damage from hyper bomb
+                    world.weapon_damage[3][boss] = 0
 
         if world.weapon_damage[0][world.options.starting_robot_master.value] < 1:
             world.weapon_damage[0][world.options.starting_robot_master.value] = \
@@ -205,57 +261,60 @@ def set_rules(world: "MM1World"):
         world.wily_weapons = validate_fights(world, (1, 2, 3, 5, 9, 10))
 
     #static rules
+    location_rules: dict[str, Rule] = {}
+    entrance_rules: dict[str, Rule] = {}
+
     for boss, locations in boss_locations.items():
         if world.weapon_damage[0][boss] > 0:
             continue  # this can always be in logic
         boss_weapons: list[str] = []
         for weapon in range(1, 7):
             if world.weapon_damage[weapon][boss] > 0:
-                if world.weapon_damage[weapon][boss] < minimum_weakness_requirement[weapon]:
+                if world.weapon_damage[weapon][boss] < min_weakness[weapon]:
                     continue
                 boss_weapons.append(weapons_to_name[weapon])
         if not boss_weapons:
             raise Exception(f"Attempted to have boss {boss} with no weakness! Seed: {world.multiworld.seed}")
         for location in locations:
-            if "Wily" in location:
+            if "Wily" in location and not world.options.enhanced_super_arm:
                 # Special case: Super Arm cannot be logical for any Wily locations
                 # This includes CWU-001, since there aren't enough guts blocks without cloning
-                add_rule(world.get_location(location), lambda state, weps=tuple([w for w in boss_weapons if w != "Super Arm"]): state.has_any(weps, world.player))
+                # Side note: I think cloning can be consistent? But absolutely not worth being in logic
+                rule = HasAny(*[w for w in boss_weapons if w != "Super Arm"])
             else:
-                add_rule(world.get_location(location), lambda state, weps=tuple(boss_weapons): state.has_any(weps, world.player))
+                rule = HasAny(*boss_weapons)
+            if location in location_rules:
+                location_rules[location] &= rule
+            else:
+                location_rules[location] = rule
 
-    # magnet beam
-    set_rule(world.get_location("Elec Man Stage - Magnet Beam"),
-             lambda state: state.has_any(["Thunder Beam", "Super Arm"], world.player))
+    # wily weapon rules
+    location_rules["Wily Stage 4 - Bomb Man Rematch"] = HasAll(*[weapons_to_name[wep] for wep in sorted(world.wily_weapons[2])])
+    location_rules["Wily Stage 4 - Fire Man Rematch"] = HasAll(*[weapons_to_name[wep] for wep in sorted(world.wily_weapons[3])])
+    location_rules["Wily Stage 4 - Ice Man Rematch"] = HasAll(*[weapons_to_name[wep] for wep in sorted(world.wily_weapons[1])])
+    location_rules["Wily Stage 4 - Guts Man Rematch"] = HasAll(*[weapons_to_name[wep] for wep in sorted(world.wily_weapons[5])])
+    location_rules["Wily Machine - Defeated"] = HasAll(*[weapons_to_name[wep] for wep in sorted(world.wily_weapons[9])])
 
-    # handle the wily rule
-    set_rule(world.get_entrance(f"To Wily Stage 1"),
-             lambda state: state.has("Magnet Beam", world.player) and
-             state.has_any(["Thunder Beam", "Super Arm"], world.player)
-             and state.has_group_unique("Weapons", world.player, world.options.required_weapons.value))
+    # apply static rules
+    for location in STATIC_LOCATION_RULES:
+        if location in location_rules:
+            location_rules[location] &= STATIC_LOCATION_RULES[location]
+        else:
+            location_rules[location] = STATIC_LOCATION_RULES[location]
 
-    # boss refight chaining
-    add_rule(world.get_location("Wily Stage 2 - Elec Man Rematch"),
-             lambda state: state.can_reach_location("Wily Stage 2 - Cut Man Rematch", world.player))
-    add_rule(world.get_location("Copy Robot - Defeated"),
-             lambda state: state.can_reach_location("Wily Stage 2 - Elec Man Rematch", world.player))
-    add_rule(world.get_location("Wily Stage 2 - Complete"),
-             lambda state: state.can_reach_location("Wily Stage 2 - Elec Man Rematch", world.player))
+    for entrance in STATIC_ENTRANCE_RULES:
+        if entrance in entrance_rules:
+            entrance_rules[entrance] &= STATIC_ENTRANCE_RULES[entrance]
+        else:
+            entrance_rules[entrance] = STATIC_ENTRANCE_RULES[entrance]
 
-    add_rule(world.get_location("Wily Stage 4 - Bomb Man Rematch"),
-             lambda state: state.has_all([weapons_to_name[wep] for wep in sorted(world.wily_weapons[2])], world.player))
-    add_rule(world.get_location("Wily Stage 4 - Fire Man Rematch"),
-             lambda state: state.can_reach_location("Wily Stage 4 - Bomb Man Rematch", world.player) and
-             state.has_all([weapons_to_name[wep] for wep in sorted(world.wily_weapons[3])], world.player))
-    add_rule(world.get_location("Wily Stage 4 - Ice Man Rematch"),
-             lambda state: state.can_reach_location("Wily Stage 4 - Fire Man Rematch", world.player) and
-             state.has_all([weapons_to_name[wep] for wep in sorted(world.wily_weapons[1])], world.player))
-    add_rule(world.get_location("Wily Stage 4 - Guts Man Rematch"),
-             lambda state: state.can_reach_location("Wily Stage 4 - Ice Man Rematch", world.player) and
-             state.has_all([weapons_to_name[wep] for wep in sorted(world.wily_weapons[5])], world.player))
-    add_rule(world.get_location("Wily Machine - Defeated"),
-             lambda state: state.can_reach_location("Wily Stage 4 - Guts Man Rematch", world.player) and
-             state.has_all([weapons_to_name[wep] for wep in sorted(world.wily_weapons[9])], world.player))
+    for location in world.get_locations():
+        if location.name in location_rules:
+            world.set_rule(location, location_rules[location.name])
 
-    world.multiworld.completion_condition[world.player] = lambda state: state.has("Wily Machine - Defeated",
-                                                                                  world.player)
+    for entrance in world.get_entrances():
+        if entrance.name in entrance_rules:
+            world.set_rule(entrance, entrance_rules[entrance.name])
+
+
+    world.multiworld.completion_condition[world.player] = Has("Wily Machine - Defeated").resolve(world)
