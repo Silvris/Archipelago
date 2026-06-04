@@ -167,6 +167,8 @@ def set_rules(world: "MM1World"):
 
         if world.options.random_weakness == RandomWeaknesses.option_shuffled:
             weapon_tables = [table.copy() for weapon, table in weapon_damage.items() if weapon not in (0, 6)]
+            if world.options.enhanced_super_arm:
+                weapon_tables.append(weapon_damage[6].copy())
             world.random.shuffle(weapon_tables)
             for i in range(1, 6 if not world.options.enhanced_super_arm else 7):
                 world.weapon_damage[i] = weapon_tables.pop()
@@ -225,12 +227,17 @@ def set_rules(world: "MM1World"):
                         world.weapon_damage[weakness][boss] = min_weakness[weakness]
                     world.weapon_damage[weapon][boss] = world.options.plando_weakness[p_boss][p_weapon]
 
-        # handle special cases
         if not world.options.enhanced_super_arm:
             for boss in range(11):
-                if boss in (0, 4, 5, 8):
+                if boss in (0, 4, 5):
                     if (world.weapon_damage[6][boss] >= min_weakness[6] and
                             not any(world.weapon_damage[i][boss] >= min_weakness[i]
+                                    for i in range(6))):
+                        # Super Arm cannot be the only weakness
+                        weakness = world.random.choice(range(1, 6))
+                        world.weapon_damage[weakness][boss] = min_weakness[weakness]
+                elif boss == 8:
+                    if (not any(world.weapon_damage[i][boss] >= min_weakness[i]
                                     for i in range(6))):
                         # Super Arm cannot be the only weakness
                         weakness = world.random.choice(range(1, 6))
@@ -249,9 +256,6 @@ def set_rules(world: "MM1World"):
                         world.weapon_damage[3][boss] = 0
                         weakness = world.random.choice((1, 2, 4, 5))
                         world.weapon_damage[weakness][boss] = min_weakness[weakness]
-                else:
-                    # enforce 0 damage from hyper bomb
-                    world.weapon_damage[3][boss] = 0
 
         if world.weapon_damage[0][world.options.starting_robot_master.value] < 1:
             world.weapon_damage[0][world.options.starting_robot_master.value] = \

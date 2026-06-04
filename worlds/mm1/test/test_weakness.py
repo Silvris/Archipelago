@@ -1,3 +1,5 @@
+import typing
+
 from .bases import MMTestBase
 from ..rules import minimum_weakness_requirement, validate_fights
 
@@ -41,12 +43,18 @@ class RandomStrictWeaknessTests(WeaknessTests):
         "random_weakness": "randomized",
     }
 
+    def world_setup(self, seed: typing.Optional[int] = None) -> None:
+        super().world_setup(48191693440614706382)
+
 
 class ShuffledStrictWeaknessTests(WeaknessTests):
     options = {
         "strict_weakness": True,
         "random_weakness": "shuffled",
     }
+
+    def world_setup(self, seed: typing.Optional[int] = None) -> None:
+        super().world_setup(8198841857882385550)
 
 class StrictWeaknessTestsSuperArm(WeaknessTests):
     options = {
@@ -75,6 +83,9 @@ class RandomStrictWeaknessTestsSuperArm(WeaknessTests):
         "random_weakness": "randomized",
         "enhanced_super_arm": True,
     }
+
+    def world_setup(self, seed: typing.Optional[int] = None) -> None:
+        super().world_setup(37505858307061695899)
 
 
 class ShuffledStrictWeaknessTestsSuperArm(WeaknessTests):
