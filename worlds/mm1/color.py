@@ -90,7 +90,7 @@ palette_pointers: dict[str, list[int]] = {
     "Cut Man": [0x4DD7, 0x0DD7],
     "Ice Man": [0xCDCC, 0x4DB6],
     "Bomb Man": [0xCDC1, 0x8DB1],
-    "Fire Man": [0xCDB6, 0xCDA6],
+    "Fire Man": [0xCDB6],  # Why do they reuse Fire Man's but none of the others?
     "Elec Man": [0x4DE3, 0x10DC1],
     "Guts Man": [0xCDD7, 0x14DB6],
 }
