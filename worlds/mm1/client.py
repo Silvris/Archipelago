@@ -344,7 +344,7 @@ class MegaMan1Client(BizHawkClient):
                 (MM1_LAST_WILY, 1, "RAM"),
                 (MM1_COMPLETED_STAGES, 2, "RAM"),
                 (MM1_BOSS_REFIGHTS, 1, "RAM"),
-                (MM1_CONSUMABLE_CHECK, 3, "RAM")
+                (MM1_CONSUMABLE_CHECK, 32, "RAM")
             ])
 
         #if difficulty[0] not in (0, 1):
@@ -530,9 +530,19 @@ class MegaMan1Client(BizHawkClient):
                 writes.extend(get_sfx_writes(0x1a))
                 writes.append((MM1_HEALTH, bytes([0x1C]*8), "RAM"))
 
+        new_checks = []
+
+        for i in range(0, 30, 3):
+            consumable_tuple = (consumable_check[i], consumable_check[i+1], consumable_check[i+2])
+            if consumable_tuple != (0, 0, 0):
+                if consumable_tuple in MM1_CONSUMABLES:
+                    if MM1_CONSUMABLES[consumable_tuple] not in ctx.checked_locations:
+                        new_checks.append(MM1_CONSUMABLES[consumable_tuple])
+                writes.append((MM1_CONSUMABLE_CHECK, bytes([0]*3), "RAM"))
+
         await write(ctx.bizhawk_ctx, writes)
 
-        new_checks = []
+
         # check for locations
         for i in range(1, 7):
             flag = 1 << (i - 1)
@@ -554,10 +564,6 @@ class MegaMan1Client(BizHawkClient):
                 if boss_id not in ctx.checked_locations:
                     new_checks.append(boss_id)
 
-        consumable_tuple = (consumable_check[0], consumable_check[1], consumable_check[2])
-        if consumable_tuple in MM1_CONSUMABLES:
-            if MM1_CONSUMABLES[consumable_tuple] not in ctx.checked_locations:
-                new_checks.append(MM1_CONSUMABLES[consumable_tuple])
 
         for new_check_id in new_checks:
             ctx.locations_checked.add(new_check_id)

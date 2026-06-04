@@ -122,6 +122,12 @@ def patch_rom(world: "MM1World", patch: MM1ProcedurePatch) -> None:
         patch.write_byte(0x15340, pool[11]) # Robot Master
         patch.write_byte(0x15344, pool[12]) # Wily Boss
 
+    if world.options.enhanced_super_arm:
+        patch.write_byte(enhanced_super_arm+1, 1)
+
+    if world.options.enhanced_hyper_bomb:
+        patch.write_byte(enhanced_hyper_bomb+1, 1)
+
     write_palette_shuffle(world, patch)
 
     from Utils import __version__
