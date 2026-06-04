@@ -185,6 +185,10 @@ SetLastWily:
     AND !CONTROLLER_SELECT
     BNE .ReturnWilyRead
     PLA
+    CMP #$09
+    BCC .Set
+    LDA #$09
+    .Set:
     STX !current_stage
     SEC
     BCS .ReturnWily
@@ -354,6 +358,8 @@ SetStageClear:
     LDA !current_stage
     CMP #$06
     BCC .Return
+    CLC
+    ADC #$01
     STA !last_wily
     .Return:
     LDA $AE

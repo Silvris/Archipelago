@@ -19,8 +19,8 @@ PROTEUSHASH = "b69fff40212b80c94f19e786d1efbf61"
 
 wily_requirement = 0x1AAB4
 energylink = 0x1C03B
-enhanced_super_arm = 0x1C177
-enhanced_hyper_bomb = 0x1C1B1
+enhanced_super_arm = 0x1C17A
+enhanced_hyper_bomb = 0x1C1B4
 
 
 MM1_BOSS_WEAKNESSES = {
