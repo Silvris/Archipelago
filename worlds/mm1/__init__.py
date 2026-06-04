@@ -10,6 +10,7 @@ from hashlib import md5
 from Options import OptionError
 from typing import Any, ClassVar, Sequence
 from .client import MegaMan1Client
+from .color import check_for_known_worlds
 from .items import MM1Item, all_items, item_lookup, stage_access, weapons, item_groups
 from .locations import location_lookup, MM1Location, MM1Region, mm1_regions
 from .options import MM1Options, robot_masters
@@ -209,6 +210,9 @@ class MM1World(World):
                 weapon_location.place_locked_item(placed_weapon)
                 progitempool.remove(placed_weapon)
                 fill_locations.remove(weapon_location)
+
+    def pre_output(self):
+        check_for_known_worlds()
 
     def generate_output(self, output_directory: str) -> None:
         try:

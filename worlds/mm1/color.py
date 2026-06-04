@@ -95,24 +95,25 @@ palette_pointers: dict[str, list[int]] = {
     "Guts Man": [0xCDD7, 0x14DB6],
 }
 
-if "worlds.mm2" in sys.modules:
-    # is this the proper way to do this? who knows!
-    try:
-        mm2 = sys.modules["worlds.mm2"]
-        for item in MM1_COLORS:
-            mm2.color.add_color_to_mm2(item, MM1_COLORS[item])
-    except AttributeError:
-        # pass through if an old MM2 is found
-        pass
+def check_for_known_worlds():
+    if "worlds.mm2" in sys.modules:
+        # is this the proper way to do this? who knows!
+        try:
+            mm2 = sys.modules["worlds.mm2"]
+            for item in MM1_COLORS:
+                mm2.color.add_color_to_mm2(item, MM1_COLORS[item])
+        except AttributeError:
+            # pass through if an old MM2 is found
+            pass
 
-if "worlds.mm3" in sys.modules:
-    try:
-        mm3 = sys.modules["worlds.mm3"]
-        for item in MM1_COLORS:
-            mm3.color.add_color_to_mm3(item, MM1_COLORS[item])
-    except AttributeError:
-        # pass through if an old MM3 is found
-        pass
+    if "worlds.mm3" in sys.modules:
+        try:
+            mm3 = sys.modules["worlds.mm3"]
+            for item in MM1_COLORS:
+                mm3.color.add_color_to_mm3(item, MM1_COLORS[item])
+        except AttributeError:
+            # pass through if an old MM3 is found
+            pass
 
 def extrapolate_color(color: int) -> tuple[int, int]:
     if color > 0x1F:
