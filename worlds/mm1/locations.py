@@ -1,5 +1,5 @@
-from BaseClasses import Location, Region, CollectionState
-from typing import NamedTuple, Callable
+from BaseClasses import Location, Region
+from typing import NamedTuple
 
 
 class MM1Region(Region):
