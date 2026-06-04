@@ -12,7 +12,7 @@ class WeaknessTests(MMTestBase):
         if world.options.enhanced_super_arm:
             min_weakness[6] = 2
         for boss in range(11):
-            if not any(weapon_damage[weapon][boss] >= minimum_weakness_requirement[weapon] for weapon in range(7)):
+            if not any(weapon_damage[weapon][boss] >= min_weakness[weapon] for weapon in range(7)):
                 self.fail(f"Boss {boss} generated without weakness! Seed: {self.multiworld.seed}")
 
     def test_wily_4(self) -> None:
@@ -43,9 +43,6 @@ class RandomStrictWeaknessTests(WeaknessTests):
         "random_weakness": "randomized",
     }
 
-    def world_setup(self, seed: typing.Optional[int] = None) -> None:
-        super().world_setup(48191693440614706382)
-
 
 class ShuffledStrictWeaknessTests(WeaknessTests):
     options = {
@@ -53,8 +50,6 @@ class ShuffledStrictWeaknessTests(WeaknessTests):
         "random_weakness": "shuffled",
     }
 
-    def world_setup(self, seed: typing.Optional[int] = None) -> None:
-        super().world_setup(8198841857882385550)
 
 class StrictWeaknessTestsSuperArm(WeaknessTests):
     options = {
@@ -84,9 +79,6 @@ class RandomStrictWeaknessTestsSuperArm(WeaknessTests):
         "enhanced_super_arm": True,
     }
 
-    def world_setup(self, seed: typing.Optional[int] = None) -> None:
-        super().world_setup(37505858307061695899)
-
 
 class ShuffledStrictWeaknessTestsSuperArm(WeaknessTests):
     options = {
@@ -94,3 +86,4 @@ class ShuffledStrictWeaknessTestsSuperArm(WeaknessTests):
         "random_weakness": "shuffled",
         "enhanced_super_arm": True,
     }
+
