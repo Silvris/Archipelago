@@ -135,6 +135,7 @@ STATIC_LOCATION_RULES: dict[str, Rule] = {
     "Wily Machine Defeated": CanReachLocation("Wily Stage 4 - Guts Man Rematch"),
     "Fire Man Stage - Weapon Energy 1": HasAny("Magnet Beam", "Ice Slasher"),
     "Fire Man Stage - Weapon Energy 2": HasAny("Magnet Beam", "Ice Slasher"),
+    "Wily Stage 1 - Health Energy 2": Has("Thunder Beam"),
     "Wily Stage 2 - Health Energy 2": CanReachLocation("Wily Stage 2 - Cut Man Rematch"),
     "Wily Stage 2 - Weapon Energy 3": CanReachLocation("Wily Stage 2 - Cut Man Rematch"),
     "Wily Stage 2 - Weapon Energy 4": CanReachLocation("Wily Stage 2 - Cut Man Rematch"),

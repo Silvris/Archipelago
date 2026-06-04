@@ -73,20 +73,20 @@ MM1_COLORS: Dict[str, Tuple[int, int]] = {
 }
 
 palette_pointers: Dict[str, List[int]] = {
-    "Mega Buster": [0x1D495,
+    "Mega Buster": [0x3D495,
                     0xCF1, 0xCC1,
                     0x4CC1, 0x4CF1,
                     0x8CC1, 0x8CF1,
                     0xCCC1, 0xCCF1,
                     0x10CC1, 0x10CF1,
                     0x14CC1, 0x14CF1], # 0xCC1 might also?
-    "Rolling Cutter":  [0x1D497],
-    "Ice Slasher":  [0x1D499],
-    "Hyper Bomb":  [0x1D49B],
-    "Fire Storm":  [0x1D49D],
-    "Thunder Beam":  [0x1D49F],
-    "Super Arm":  [0x1D4A1],
-    "Magnet Beam":  [0x1D4A3],
+    "Rolling Cutter":  [0x3D497],
+    "Ice Slasher":  [0x3D499],
+    "Hyper Bomb":  [0x3D49B],
+    "Fire Storm":  [0x3D49D],
+    "Thunder Beam":  [0x3D49F],
+    "Super Arm":  [0x3D4A1],
+    "Magnet Beam":  [0x3D4A3],
     "Cut Man": [0x4DD7, 0x0DD7],
     "Ice Man": [0xCDCC, 0x4DB6],
     "Bomb Man": [0xCDC1, 0x8DB1],
