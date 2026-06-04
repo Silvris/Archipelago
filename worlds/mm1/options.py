@@ -154,7 +154,6 @@ class EnergyLink(Toggle):
     Some of the energy sent to the pool will be lost on transfer.
     """
     display_name = "EnergyLink"
-    visibility = Visibility.none
 
 
 class PaletteShuffle(TextChoice):
