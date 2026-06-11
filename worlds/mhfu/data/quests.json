@@ -3761,8 +3761,8 @@
         "rank": 4,
         "star": 0,
         "idx": 1,
-        "flag": -1,
-        "mask": -1,
+        "flag": 34,
+        "mask": 0,
         "stage": 11,
         "monsters": [
             77
@@ -3776,8 +3776,8 @@
         "rank": 4,
         "star": 0,
         "idx": 2,
-        "flag": -1,
-        "mask": -1,
+        "flag": 34,
+        "mask": 1,
         "stage": 6,
         "monsters": [
             6
@@ -3791,8 +3791,8 @@
         "rank": 4,
         "star": 0,
         "idx": 3,
-        "flag": -1,
-        "mask": -1,
+        "flag": 34,
+        "mask": 2,
         "stage": 3,
         "monsters": [
             48
@@ -3806,8 +3806,8 @@
         "rank": 4,
         "star": 0,
         "idx": 4,
-        "flag": -1,
-        "mask": -1,
+        "flag": 34,
+        "mask": 3,
         "stage": 4,
         "monsters": [
             52,
@@ -3822,8 +3822,8 @@
         "rank": 4,
         "star": 0,
         "idx": 5,
-        "flag": -1,
-        "mask": -1,
+        "flag": 34,
+        "mask": 4,
         "stage": 2,
         "monsters": [
             11,
@@ -3838,8 +3838,8 @@
         "rank": 4,
         "star": 0,
         "idx": 6,
-        "flag": -1,
-        "mask": -1,
+        "flag": 34,
+        "mask": 5,
         "stage": 5,
         "monsters": [
             17,
@@ -3854,8 +3854,8 @@
         "rank": 4,
         "star": 0,
         "idx": 7,
-        "flag": -1,
-        "mask": -1,
+        "flag": 34,
+        "mask": 6,
         "stage": 30,
         "monsters": [
             78
@@ -5190,7 +5190,7 @@
         "star": 0,
         "idx": 1,
         "flag": 46,
-        "mask": 6,
+        "mask": 7,
         "stage": 18,
         "monsters": [
             68
@@ -5204,8 +5204,8 @@
         "rank": 1,
         "star": 0,
         "idx": 2,
-        "flag": 46,
-        "mask": 7,
+        "flag": 47,
+        "mask": 0,
         "stage": 10,
         "monsters": [
             79
@@ -5220,7 +5220,7 @@
         "star": 0,
         "idx": 3,
         "flag": 47,
-        "mask": 0,
+        "mask": 1,
         "stage": 10,
         "monsters": [],
         "max_mon": 0
@@ -5233,7 +5233,7 @@
         "star": 0,
         "idx": 4,
         "flag": 47,
-        "mask": 1,
+        "mask": 2,
         "stage": 6,
         "monsters": [
             80,
@@ -5249,7 +5249,7 @@
         "star": 0,
         "idx": 5,
         "flag": 47,
-        "mask": 2,
+        "mask": 3,
         "stage": 30,
         "monsters": [
             82
@@ -5264,7 +5264,7 @@
         "star": 0,
         "idx": 6,
         "flag": 47,
-        "mask": 3,
+        "mask": 4,
         "stage": 27,
         "monsters": [
             8,
@@ -5280,7 +5280,7 @@
         "star": 0,
         "idx": 7,
         "flag": 47,
-        "mask": 4,
+        "mask": 5,
         "stage": 28,
         "monsters": [
             20
@@ -5295,7 +5295,7 @@
         "star": 0,
         "idx": 8,
         "flag": 47,
-        "mask": 5,
+        "mask": 6,
         "stage": 4,
         "monsters": [
             39,
@@ -5311,7 +5311,7 @@
         "star": 0,
         "idx": 9,
         "flag": 47,
-        "mask": 6,
+        "mask": 7,
         "stage": 28,
         "monsters": [
             22
@@ -5325,8 +5325,8 @@
         "rank": 1,
         "star": 0,
         "idx": 10,
-        "flag": 47,
-        "mask": 7,
+        "flag": 48,
+        "mask": 0,
         "stage": 26,
         "monsters": [
             15
@@ -5341,7 +5341,7 @@
         "star": 0,
         "idx": 11,
         "flag": 48,
-        "mask": 0,
+        "mask": 1,
         "stage": 11,
         "monsters": [
             45,
@@ -5357,7 +5357,7 @@
         "star": 0,
         "idx": 12,
         "flag": 48,
-        "mask": 1,
+        "mask": 2,
         "stage": 4,
         "monsters": [
             52
@@ -5372,7 +5372,7 @@
         "star": 0,
         "idx": 13,
         "flag": 48,
-        "mask": 2,
+        "mask": 3,
         "stage": 6,
         "monsters": [
             48
@@ -5387,7 +5387,7 @@
         "star": 0,
         "idx": 14,
         "flag": 48,
-        "mask": 3,
+        "mask": 4,
         "stage": 6,
         "monsters": [
             6
@@ -6668,8 +6668,8 @@
         "rank": 1,
         "star": 0,
         "idx": 1,
-        "flag": 61,
-        "mask": 3,
+        "flag": 62,
+        "mask": 2,
         "stage": 9,
         "monsters": [
             38
@@ -6683,8 +6683,8 @@
         "rank": 1,
         "star": 0,
         "idx": 2,
-        "flag": 61,
-        "mask": 4,
+        "flag": 62,
+        "mask": 3,
         "stage": 3,
         "monsters": [
             8
@@ -6698,8 +6698,8 @@
         "rank": 1,
         "star": 0,
         "idx": 3,
-        "flag": 61,
-        "mask": 5,
+        "flag": 62,
+        "mask": 4,
         "stage": 6,
         "monsters": [
             1
@@ -6713,8 +6713,8 @@
         "rank": 1,
         "star": 0,
         "idx": 4,
-        "flag": 61,
-        "mask": 6,
+        "flag": 62,
+        "mask": 5,
         "stage": 9,
         "monsters": [
             52
@@ -6728,8 +6728,8 @@
         "rank": 1,
         "star": 0,
         "idx": 5,
-        "flag": 61,
-        "mask": 7,
+        "flag": 62,
+        "mask": 6,
         "stage": 9,
         "monsters": [
             67,
@@ -6745,7 +6745,7 @@
         "star": 0,
         "idx": 6,
         "flag": 62,
-        "mask": 0,
+        "mask": 7,
         "stage": 9,
         "monsters": [
             75
