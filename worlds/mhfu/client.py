@@ -187,21 +187,21 @@ MHFU_BREAKPOINTS = {
         "MONSTER_LOAD": (False, 0x08871C2C, 1, True, True, False, False, False),
         "QUEST_VISUAL_LOAD": (False, 0x09A88404, 1, False, True, False, False, False),
         "QUEST_VISUAL_TYPE": (False, 0x09A88134, 1, True, True, False, False, False),
-        "QUEST_STATUS": (False, 0x0886B2E0, 1, False, True, False, False, False)
+        "QUEST_STATUS": (False, 0x0886F640, 1, False, True, False, False, False)
     },
     "EU": {
         "QUEST_LOAD": (True, 0x08A5C440, 1, True, True, True, False, False),
         "MONSTER_LOAD": (False, 0x08871C2C, 1, True, True, False, False, False),
         "QUEST_VISUAL_LOAD": (False, 0x09A88304, 1, False, True, False, False, False),
         "QUEST_VISUAL_TYPE": (False, 0x09A88034, 1, True, True, False, False, False),
-        "QUEST_STATUS": (False, 0x0886B2E0, 1, False, True, False, False, True),
+        "QUEST_STATUS": (False, 0x0886F640, 1, False, True, False, False, True),
     },
     "JP": {
         "QUEST_LOAD": (True, 0x08A57510, 1, True, True, True, False, False),
         "MONSTER_LOAD": (False, 0x08871C24, 1, True, True, False, False, False),
         "QUEST_VISUAL_LOAD": (False, 0x09A8346C, 1, False, True, False, False, False),
         "QUEST_VISUAL_TYPE": (False, 0x09A8319C, 1, True, True, False, False, False),
-        "QUEST_STATUS": (False, 0x0886B2D8, 1, False, True, False, False, True),
+        "QUEST_STATUS": (False, 0x0886F638, 1, False, True, False, False, True),
     },
 
 }
@@ -212,11 +212,11 @@ MHFU_BREAKPOINT_ARGS = {
     "MONSTER_LOAD": ["{v0+0x2E4:p}"],
     "QUEST_VISUAL_TYPE": ["{v0},{v0+0x18:p}"],
     "QUEST_VISUAL_LOAD": ["{v0-0x448},{v0-0xa8},{s4+0x20:p}"],
-    "QUEST_STATUS": ["{v0},{s1+0x21:p}"],
+    "QUEST_STATUS": ["{s3:p}"],
 }
 
 MHFU_BREAKPOINT_CONDITIONS = {
-    "QUEST_STATUS": "v0 != [s1+0x1C]"
+    "QUEST_STATUS": "s0 != [s2+0x1C]"
 }
 
 ACTIONS = {
@@ -414,21 +414,12 @@ async def handle_logs(ctx: MHFUContext) -> None:
                     elif "QUEST_STATUS" in bp:
                         bp, args = bp.split("|")
                         if ctx.death_link == 2:
-                            state, qtype = args.split(",")
-                            _, quest_type = split_log_mem(qtype)
-                            quest_state = int(state, 16)
-                            if quest_type == 1:
-                                if quest_state in range(0x7, 0x14):
-                                    if ctx.death_state == DeathState.alive:
-                                        await ctx.send_death(f"{ctx.player_names[ctx.slot]} was unable to protect the Fortress.")
-                                    ctx.death_state = DeathState.dead
-                            else:
-                                if quest_state in range(5, 15):
-                                    # this is a little leeway
-                                    # if we wanna like, map these out proper the message can be more descriptive
-                                    if ctx.death_state == DeathState.alive:
-                                        await ctx.send_death(f"{ctx.player_names[ctx.slot]} failed their quest.")
-                                    ctx.death_state = DeathState.dead
+                            _, quest_state = split_log_mem(args)
+                            if quest_state == 31:
+                                # we'd need more info for proper quest messages
+                                if ctx.death_state == DeathState.alive:
+                                    await ctx.send_death(f"{ctx.player_names[ctx.slot]} failed their quest.")
+                                ctx.death_state = DeathState.dead
 
                     if MHFU_BREAKPOINTS[ctx.lang][bp][3]:
                         # this break point stops emulation, we need to restart it
@@ -1023,17 +1014,17 @@ class MHFUContext(CommonContext):
         self.death_state = DeathState.killing_player
 
     def handle_bounce(self, args: dict[str, Any]) -> None:
-        assert self.slot is not None
-        if "tags" in args:
-            if "TrapLink" in args["tags"]:
-                data = args["data"]
-                source = data["source"]
-                if source != self.player_names[self.slot]:
-                    name = data["trap_name"]
-                    if name in trap_link_matches:
-                        self.trap_queue.extend([trap for trap in trap_link_matches[name]
-                                                if trap in self.allowed_traps])
-                    logger.info(f"TrapLink: Received {name} from {source}")
+        if self.slot is not None:
+            if "tags" in args:
+                if "TrapLink" in args["tags"]:
+                    data = args["data"]
+                    source = data["source"]
+                    if source != self.player_names[self.slot]:
+                        name = data["trap_name"]
+                        if name in trap_link_matches:
+                            self.trap_queue.extend([trap for trap in trap_link_matches[name]
+                                                    if trap in self.allowed_traps])
+                        logger.info(f"TrapLink: Received {name} from {source}")
 
     def on_package(self, cmd: str, args: dict[str, Any]) -> None:
         if cmd == "Connected":
@@ -1161,8 +1152,6 @@ async def game_watcher(ctx: MHFUContext) -> None:
                     # we're on a hunt, pop traps and check deathlink
                     current_action = (await ctx.ppsspp_read_unsigned(MHFU_POINTERS[ctx.lang]["SET_ACTION"],
                                                                      "CURRENT_ACTION", 16))["value"]
-                    quest_time = (await ctx.ppsspp_read_unsigned(MHFU_POINTERS[ctx.lang]["QUEST_TIMER"],
-                                                                 "CURRENT_TIME", 32))["value"]
                     if current_action == 0x0003 and ctx.death_link == 1:
                         if ctx.death_state == DeathState.alive:
                             await ctx.send_death(f"{ctx.player_names[ctx.slot]} carted.")
