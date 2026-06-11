@@ -63,7 +63,7 @@ PPSSPP_HELLO = {
 PPSSPP_STATUS = {"event": "game.status", "ticket": "AP_STATUS"}
 PPSSPP_CONFIG = {"event": "broadcast.config.set", "ticket": "AP_CONFIG", "disallowed": {"input": True}}
 
-MHFU_DEBUG = True
+MHFU_DEBUG = False
 
 MHFU_POINTERS = {
     "US": {
