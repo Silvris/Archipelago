@@ -118,29 +118,40 @@ class MHFUWorld(World):
             max_village = (1, self.options.village_depth.value, hub_rank_max[1, self.options.village_depth.value - 1])
         else:
             max_village = (-1, -1, -1)
+        extra_rarity = 0
+        extra_pool = []
         if max_guild[1] == 3:
             max_rarity = 10
-        elif ((max_guild[1] == 2 or max_village[1] == 2) or
-              self.options.cash_only_equipment and (max_guild[1] >= 1 or max_village[1] >= 1)):
+        elif max_guild[1] == 2 or max_village[1] == 2:
             max_rarity = 7
+            if self.options.cash_only_equipment:
+                extra_rarity = 10
         else:
             max_rarity = 3
+            if self.options.cash_only_equipment:
+                extra_rarity = 7
         if self.options.weapons.value in (0, 2):
             if self.options.weapons.value == 2:
                 itempool += [self.create_item(f"Weapons Rarity {x}") for x in range(1, max_rarity + 1)]
+                extra_pool += [self.create_item(f"Weapons Rarity {x}", True) for x in range(max_rarity + 1, extra_rarity + 1)]
             else:
                 for weapon in weapons:
                     itempool += [self.create_item(f"{weapon} Rarity {x}") for x in range(1, max_rarity + 1)]
+                    extra_pool += [self.create_item(f"{weapon} Rarity {x}", True) for x in range(max_rarity + 1, extra_rarity + 1)]
         else:
             if self.options.weapons.value == 3:
                 itempool += [self.create_item("Progressive Weapons") for _ in range(max_rarity)]
+                extra_pool += [self.create_item("Progressive Weapons", True) for _ in range(extra_rarity - max_rarity)]
             else:
                 for weapon in weapons:
                     itempool += [self.create_item(f"Progressive {weapon}") for _ in range(max_rarity)]
+                    extra_pool += [self.create_item(f"Progressive {weapon}", True) for _ in range(extra_rarity - max_rarity)]
         if self.options.progressive_armor:
             itempool += [self.create_item("Progressive Armor") for _ in range(max_rarity)]
+            extra_pool += [self.create_item("Progressive Armor", True) for _ in range(extra_rarity - max_rarity)]
         else:
             itempool += [self.create_item(f"Armor Rarity {i}") for i in range(1, max_rarity + 1)]
+            extra_pool += [self.create_item(f"Armor Rarity {i}", True) for i in range(max_rarity + 1, extra_rarity)]
         free_items = sum(self.location_num.values()) - len(itempool) - 1
         self.required_keys = max(len(self.location_num), int(free_items * (self.options.required_keys.value / 100)))
         non_required = free_items - self.required_keys
@@ -171,6 +182,9 @@ class MHFUWorld(World):
             accessible = running_total / all_locs
             self.rank_requirements[rank] = max(
                 math.floor(self.required_keys * accessible), i)
+        for _ in range(min(filler_items, len(extra_pool))):
+            itempool.append(extra_pool.pop())
+            filler_items -= 1
         itempool += [self.create_item("Key Quest") for _ in range(self.required_keys)]
         itempool += [self.create_item("Key Quest", True) for _ in range(non_required)]
         itempool += [self.create_item(self.get_filler_item_name()) for _ in range(filler_items)]
