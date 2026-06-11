@@ -1186,7 +1186,7 @@ async def game_watcher(ctx: MHFUContext) -> None:
                 for idx, quest in enumerate(quest_data):
                     flag = quest.flag
                     mask = quest.mask
-                    if flag >= 0 and mask >= 0:
+                    if quest.rank < 4: # ignore treasure quests, even though they have flags here
                         if quest_completion[flag] & (1 << mask):
                             if base_id + idx not in ctx.checked_locations \
                                     and base_id + idx not in ctx.locations_checked:
