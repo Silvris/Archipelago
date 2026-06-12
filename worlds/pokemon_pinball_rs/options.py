@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from Options import Choice, OptionSet, Range, Toggle, PerGameCommonOptions
+from Options import Choice, OptionSet, Range, Toggle, PerGameCommonOptions, T
 from .names import POKEDEX, SPECIES_GROUDON, SPECIES_KYOGRE, SPECIES_RAYQUAZA, SPECIES_JIRACHI
 
 
@@ -22,10 +22,11 @@ class Goal(OptionSet):
     Pokédex: a required number of Pokémon are registered within the Pokédex
     Score: a certain target score is reached on either the Ruby or Sapphire board (must be registered to the high scores)
     Targets: certain specific target Pokémon have been captured
+    Medals: receiving a certain number of Pokédex Medals from the multiworld
     """
     display_name = "Goal"
     default = frozenset({"Pokedex"})
-    valid_keys = frozenset({"Pokedex", "Score", "Targets"})
+    valid_keys = frozenset({"Pokedex", "Score", "Targets", "Medals"})
 
 
 class StartingBoard(Choice):
@@ -64,6 +65,42 @@ class PokemonTargets(OptionSet):
     valid_keys = frozenset(POKEDEX.keys())
 
 
+class TotalMedals(Range):
+    """On Medals goal, maximum number of medals to include in the pool of items.
+    The exact number may be less depending on settings.
+    """
+    display_name = "Max Medal Count"
+    range_start = 1
+    range_end = 255 # not storing this in more than a byte
+    default = 75
+
+
+class RequiredMedals(Range):
+    """Percentage of Pokédex Medals required to goal."""
+    display_name = "Required Medal Count"
+    range_start = 1
+    range_end = 100
+    default = 66
+
+
+class GoalTrigger(Choice):
+    """Defines what triggers goal once all targets have been reached.
+    Ball: goal is triggered at the end of the current ball.
+    Groudon/Kyogre: goal is triggered when Groudon or Kyogre are defeated while all goal targets have been met.
+    Rayquaza: goal is triggered when Rayquaza is defeated while all goal targets have been met.
+    """
+    display_name = "Goal Trigger"
+    option_ball = 0
+    option_groudon_kyogre = 1
+    option_rayquaza = 2
+    default = 0
+
+    def get_option_name(cls, value: T) -> str:
+        if value == 1:
+            return "Groudon/Kyogre"
+        return super().get_option_name(value)
+
+
 class BonusMultChecks(Range):
     """Number of bonus multiplier hits to include as checks per-board"""
     display_name = "Bonus Multiplier Checks"
@@ -84,7 +121,7 @@ class EvoMode(Choice):
     """Evo Mode Behavior
     Arrows: Each arrow of Evo mode is split up and added to the pool.
     Full: All arrows are condensed into a single item and added to the pool.
-    Start With: Start with Evo Mode.
+    Start With: Evo Mode is placed within your starting inventory.
     """
     display_name = "Evo Mode"
     default = 0
@@ -113,6 +150,9 @@ class PokemonPinballRSOptions(PerGameCommonOptions):
     pokedex_requirement: PokedexRequirement
     score_requirement: ScoreRequirement
     pokemon_targets: PokemonTargets
+    total_medals: TotalMedals
+    medal_requirement: RequiredMedals
+    goal_trigger: GoalTrigger
     bonus_multiplier_checks: BonusMultChecks
     ball_upgrade_checks: BallUpgradeChecks
     evo_mode: EvoMode

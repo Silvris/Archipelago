@@ -1,3 +1,4 @@
+import math
 import os
 import base64
 import threading
@@ -9,7 +10,7 @@ from typing import Any, ClassVar, Mapping
 
 from .client import PinballRSClient
 from .items import PinballRSItem, ALL_ITEMS, item_lookup, MAIN_ITEMS, AREA_ITEMS, FILLER_ITEM_WEIGHTS, EVOLUTION_ITEMS
-from .names import RUBY_BOARD, SAPPHIRE_BOARD, AREAS, EVO_ARROW, EVO_MODE
+from .names import RUBY_BOARD, SAPPHIRE_BOARD, AREAS, EVO_ARROW, EVO_MODE, POKEDEX_MEDAL
 from .options import PokemonPinballRSOptions, StartingBoard, EvoMode
 from .regions import create_regions, location_lookup
 from .rom import PinballRSProcedurePatch, patch_rom, PINBALLRSHASH
@@ -60,6 +61,7 @@ class PokemonPinballRSWorld(World):
     def __init__(self, multiworld: MultiWorld, player: int):
         super().__init__(multiworld, player)
         self.possible_mons = set()
+        self.medal_goal = 0
         self.rom_name = bytearray()
         self.rom_name_available_event = threading.Event()
 
@@ -111,6 +113,10 @@ class PokemonPinballRSWorld(World):
                 itempool.append(self.create_item(area))
 
         unfilled = len(self.multiworld.get_unfilled_locations(self.player)) - len(itempool)
+        medal_count = min(unfilled, self.options.total_medals.value)
+        unfilled = unfilled - medal_count
+        self.medal_goal = math.floor(medal_count * (self.options.medal_requirement.value / 100))
+        itempool += [self.create_item(POKEDEX_MEDAL) for _ in range(medal_count)]
         itempool += [self.create_item(filler)
                      for filler in self.random.choices(
                 list(FILLER_ITEM_WEIGHTS.keys()), weights=list(FILLER_ITEM_WEIGHTS.values()), k=unfilled)]

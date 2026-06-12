@@ -88,6 +88,8 @@ def patch_rom(world: "PokemonPinballRSWorld", patch: PinballRSProcedurePatch) ->
             goal_value |= 2
         elif val == "Targets":
             goal_value |= 4
+        elif val == "Medals":
+            goal_value |= 8
 
     targets = bytearray([0] * 26)
 
@@ -97,10 +99,14 @@ def patch_rom(world: "PokemonPinballRSWorld", patch: PinballRSProcedurePatch) ->
         mask = dexnum % 8
         targets[idx] |= (1 << mask)
 
+    score_low = world.options.score_requirement.value % 99999999
+    score_high = world.options.score_requirement.value // 99999999
+
     patch.write_byte(0x6BC030, goal_value)
     patch.write_byte(0x6BC031, world.options.pokedex_requirement.value)
     patch.write_bytes(0x6BC032, int.to_bytes(world.options.score_requirement.value, 8, "little"))
     patch.write_bytes(0x6BC03A, targets)
+    patch.write_byte(0x6BC054, world.medal_goal)
 
     patch.write_file("token_patch.bin", patch.get_token_binary())
 
