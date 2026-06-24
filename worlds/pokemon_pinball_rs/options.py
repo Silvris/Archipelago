@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from Options import Choice, OptionSet, Range, Toggle, PerGameCommonOptions, T
+from Options import Choice, OptionSet, Range, Toggle, PerGameCommonOptions
 from .names import POKEDEX, SPECIES_GROUDON, SPECIES_KYOGRE, SPECIES_RAYQUAZA, SPECIES_JIRACHI
 
 
@@ -71,7 +71,7 @@ class TotalMedals(Range):
     """
     display_name = "Max Medal Count"
     range_start = 1
-    range_end = 255 # not storing this in more than a byte
+    range_end = 255  # not storing this in more than a byte
     default = 75
 
 
@@ -95,7 +95,7 @@ class GoalTrigger(Choice):
     option_rayquaza = 2
     default = 0
 
-    def get_option_name(cls, value: T) -> str:
+    def get_option_name(cls, value: int) -> str:
         if value == 1:
             return "Groudon/Kyogre"
         return super().get_option_name(value)

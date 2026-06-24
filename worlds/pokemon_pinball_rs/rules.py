@@ -1,10 +1,11 @@
 from rule_builder.rules import Rule, True_, Has, HasAll, HasFromListUnique, HasAllCounts, HasAny, OptionFilter
+from rule_builder.field_resolvers import FromWorldAttr
 from typing import TYPE_CHECKING
 
 from .data.pokemon import (special_encounters, rare_encounters, habitats, bonus_catches, evolutions, eggs, egg_groups,
                            species_info)
 from .names import (POKEDEX, POKEDEX_INVERSE, AREAS, RUBY_BOARD, SAPPHIRE_BOARD, EXTRA_STARTING_LIFE, STARTING_COINS,
-                    PICHU_UPGRADE, SPECIES_RAYQUAZA, SPECIAL_GUESTS, ENCOUNTER_RATE_UP,
+                    PICHU_UPGRADE, SPECIES_RAYQUAZA, SPECIAL_GUESTS, ENCOUNTER_RATE_UP, POKEDEX_MEDAL,
                     GET_ARROW, EVO_ARROW, CHIKORITA_DEX, CYNDAQUIL_DEX, TOTODILE_DEX, AERODACTYL_DEX,
                     SPECIES_LATIOS, SPECIES_LATIAS, SPECIES_CHIKORITA, SPECIES_CYNDAQUIL, SPECIES_TOTODILE,
                     SPECIES_AERODACTYL, SPECIES_PICHU, EGG_BUNCH_1, EGG_BUNCH_2, EGG_BUNCH_3, EGG_BUNCH_4,
@@ -216,5 +217,8 @@ def set_rules(world: "PokemonPinballRSWorld") -> None:
 
     if "Targets" in world.options.goal:
         goal &= HasAll(*world.options.pokemon_targets.value)
+
+    if "Medals" in world.options.goal:
+        goal &= Has(POKEDEX_MEDAL, count=FromWorldAttr("medal_goal"))
 
     world.multiworld.completion_condition[world.player] = goal.resolve(world)
