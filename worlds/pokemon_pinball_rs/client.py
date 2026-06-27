@@ -384,7 +384,8 @@ class PinballRSClient(BizHawkClient):
                     if (1 << i) & targets:
                         caught = local_dex[i] == 4
                         target_strs.append(f"{POKEDEX_INVERSE}: {'Caught' if caught else 'Uncaught'}")
-                logger.warning(f"Target Requirement: {'\n'.join(target_strs)}")
+                target_str = "\n".join(target_strs)
+                logger.warning(f"Target Requirement: {target_str}")
             if goal_value & 0x8:
                 # medals
                 logger.warning(f"Medal Requirement: {int.from_bytes(medals, 'little')}/"
