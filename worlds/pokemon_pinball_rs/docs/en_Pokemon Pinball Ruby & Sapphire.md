@@ -28,9 +28,12 @@ E-reader cards can be received and activated to skip progression usually locked 
 - Get Arrow
 - Evo Arrow or Evo Mode, depending on options
 - Coin Arrow
+- Evolution Items (Rare Candy, Leaf Stone, Fire Stone, Water Stone, Thunder Stone, Moon Stone, Sun Stone, Link Cable,
+Soothe Bell, Dry Pokéblocks)
 - Helper Makuhita/Whiscash/Zigzagoon/Pelipper
 - Egg Bunches
 - Chikorita/Cyndaquil/Totodile/Aerodactyl Pokédex Entries
+- Pokédex Medal (if required for goal)
 - BIG (score bonus)
 - Small (score bonus)
 - Extra Ball
@@ -55,3 +58,4 @@ is defeated for the first time in a play session.
 applied as soon as 30+ coins are available and the Pokémon has a chance to appear from Catch or Hatch mode. For special
   (non-Pichu) Pokémon, 60 coins will be immediately deducted and the next Catch will be a special encounter (not a 
 specific Pokémon).
+- `/check_goal` Displays goal requirements as well as current progress made towards the goal.
