@@ -63,6 +63,10 @@ PINBALL_RINGLINK_PACKET_GAIN = PINBALL_AP_START + 0x2D
 PINBALL_RINGLINK_PACKET_LOSS = PINBALL_AP_START + 0x2E
 PINBALL_GOAL_CHECK = PINBALL_AP_START + 0x2F
 
+PINBALL_STR_MODE = 0x2035100
+PINBALL_STR_ITEM = PINBALL_STR_MODE + 4
+PINBALL_STR_PLAYER = PINBALL_STR_MODE + 8
+
 PINBALL_NAME = 0x6BC000
 PINBALL_VERSION = 0x6BC020
 PINBALL_SLOT_INFO = 0x6BC024
@@ -70,6 +74,8 @@ PINBALL_GOAL = 0x6BC030
 PINBALL_DEX_REQ = 0x6BC031
 PINBALL_SCORE_REQ = 0x6BC032
 PINBALL_TARGET_REQ = 0x6BC03A
+PINBALL_MEDAL_REQ = 0x6BC056
+PINBALL_TRIGGER_REQ = 0x6BC057
 
 
 EREADER_MAP: dict[str, tuple[int, int]] = {
@@ -86,7 +92,7 @@ DEBUG = False  # Debug flag
 
 @mark_raw
 def cmd_ereader(self: "BizHawkClientCommandProcessor", card: str) -> None:
-    """Check the current pool of EnergyLink, and requestable refills from it."""
+    """Activate a received e-Reader card."""
     from worlds._bizhawk.context import BizHawkClientContext
     if self.ctx.game != "Pokemon Pinball Ruby & Sapphire":
         logger.warning("This command can only be used when playing Pokemon Pinball Ruby & Sapphire.")
@@ -122,6 +128,7 @@ def cmd_high_scores(self: "BizHawkClientCommandProcessor"):
 
 
 def cmd_dexnav(self: "BizHawkClientCommandProcessor", pokemon: str):
+    """Spend 30 (60 for rare Pokémon) to guarantee a Pokémon will appear in a location it can appear."""
     from worlds._bizhawk.context import BizHawkClientContext
     if self.ctx.game != "Pokemon Pinball Ruby & Sapphire":
         logger.warning("This command can only be used when playing Pokemon Pinball Ruby & Sapphire.")
@@ -134,6 +141,21 @@ def cmd_dexnav(self: "BizHawkClientCommandProcessor", pokemon: str):
     client: PinballRSClient = self.ctx.client_handler
 
     client.dexnav = POKEDEX.get(pokemon.title(), -1)
+
+
+def cmd_check_goal(self: "BizHawkClientCommandProcessor"):
+    """Print goal requirements for Pokémon Pinball Ruby & Sapphire."""
+    from worlds._bizhawk.context import BizHawkClientContext
+    if self.ctx.game != "Pokemon Pinball Ruby & Sapphire":
+        logger.warning("This command can only be used when playing Pokemon Pinball Ruby & Sapphire.")
+        return
+    if not self.ctx.server or not self.ctx.slot:
+        logger.warning("You must be connected to a server to use this command.")
+        return
+    assert isinstance(self.ctx, BizHawkClientContext)
+    assert isinstance(self.ctx.client_handler, PinballRSClient)
+    client: PinballRSClient = self.ctx.client_handler
+    client.print_goal = True
 
 
 def get_sfx_write(sfx: int) -> tuple[int, bytes, str]:
@@ -171,10 +193,13 @@ class PinballRSClient(BizHawkClient):
     rom: bytes | None = None
     active_ereader: int = -1
     print_scores: bool = False
+    print_goal: bool = False
     dexnav: int | None = None
     ringlink_incoming: int = 0
     ringlink_id: float | None = None
     pokedex_key: str | None = None
+
+    message_queue: list[tuple[int, int]] = []
 
     async def validate_rom(self, ctx: "BizHawkClientContext") -> bool:
         from worlds._bizhawk import RequestFailedError, read, get_memory_size
@@ -271,11 +296,12 @@ class PinballRSClient(BizHawkClient):
             await ctx.send_msgs([{"cmd": "Get", "keys": [self.pokedex_key]}])
 
         # get our relevant bytes
-        (local_dex, high_scores, starting_lives, starting_coins, starting_ball, pichu_upgrade, coins,
+        (local_dex, high_scores, starting_lives, starting_coins, starting_ball, pichu_upgrade, coins, medals,
             boards, get_arrows, evo_arrows, hatch_mode, coin_arrows, coin_mod, stages, items_received, local_eggs,
             e_reader, bonus_stages, current_score, current_balls, evo_items, ruby_bumper, sapphire_bumper,
-            ruby_ball_upgrade, sapphire_ball_upgrade, maku_ball_upgrade, coin_plus, coin_minus,
-            helpers, goal, dex_req, score_req, target_req, slot_info) = await read(ctx.bizhawk_ctx, [
+            ruby_ball_upgrade, sapphire_ball_upgrade, maku_ball_upgrade, coin_plus, coin_minus, goal_check, msg_mode,
+            helpers, goal, dex_req, score_req, target_req, medal_req, trigger, slot_info) = await read(ctx.bizhawk_ctx,
+            [
                 (PINBALL_POKEDEX, 205, "System Bus"),
                 (PINBALL_HIGH_SCORES, 0x180, "System Bus"),
                 (PINBALL_STARTING_LIVES, 1, "System Bus"),
@@ -283,6 +309,7 @@ class PinballRSClient(BizHawkClient):
                 (PINBALL_STARTING_BALL, 1, "System Bus"),
                 (PINBALL_PICHU_UPGRADE, 1, "System Bus"),
                 (PINBALL_COINS, 1, "System Bus"),
+                (PINBALL_MEDALS, 1, "System Bus"),
                 (PINBALL_BOARDS, 1, "System Bus"),
                 (PINBALL_GET, 1, "System Bus"),
                 (PINBALL_EVO, 1, "System Bus"),
@@ -304,45 +331,21 @@ class PinballRSClient(BizHawkClient):
                 (PINBALL_MAKUHITA_BALL_UPGRADE, 1, "System Bus"),
                 (PINBALL_RINGLINK_PACKET_GAIN, 1, "System Bus"),
                 (PINBALL_RINGLINK_PACKET_LOSS, 1, "System Bus"),
+                (PINBALL_GOAL_CHECK, 1, "System Bus"),
+                (PINBALL_STR_MODE, 1, "System Bus"),
                 (PINBALL_HELPERS, 1, "System Bus"),
                 (PINBALL_GOAL, 1, "ROM"),
                 (PINBALL_DEX_REQ, 1, "ROM"),
                 (PINBALL_SCORE_REQ, 8, "ROM"),
                 (PINBALL_TARGET_REQ, 26, "ROM"),
+                (PINBALL_MEDAL_REQ, 1, "ROM"),
+                (PINBALL_TRIGGER_REQ, 1, "ROM"),
                 (PINBALL_SLOT_INFO, 1, "ROM"),
             ])
 
         if slot_info[0] & 0x2 and "RingLink" not in ctx.tags:
             ctx.tags.add("RingLink")
             await ctx.send_msgs([{"cmd": "ConnectUpdate", "tags": ctx.tags}])
-
-        goal_is_cleared = True
-
-        if goal[0] & 1 and goal_is_cleared:
-            caught = sum(mon == 4 for mon in local_dex)
-            if caught < int.from_bytes(dex_req, "little"):
-                goal_is_cleared = False
-
-        if goal[0] & 2 and goal_is_cleared:
-            # scores are kind of a pain, it's 16 bytes for **4** character names, then 8 byte score
-            for i in range(0, len(high_scores), 24):
-                score_lo = int.from_bytes(high_scores[i+20:i+24], "little")
-                score_hi = int.from_bytes(high_scores[i+16:i+20], "little")
-                # score_lo is capped at 99,999,999. We should be below that, but cap it if we are above
-                score = min(score_lo, 99999999) + (score_hi * 100000000)
-                if score > int.from_bytes(score_req, "little"):
-                    break
-            else:
-                goal_is_cleared = False
-
-        if goal[0] & 4 and goal_is_cleared:
-            # pretty easy, just run through all 205
-            for i in range(205):
-                idx = i // 8
-                mask = i % 8
-                if target_req[idx] & (1 << mask):
-                    if not local_dex[i] == 4:
-                        goal_is_cleared = False
 
         if self.print_scores:
             for idx, i in enumerate(range(0, len(high_scores), 24)):
@@ -356,7 +359,39 @@ class PinballRSClient(BizHawkClient):
             logger.warning(f"Current score: {c_score}")
             self.print_scores = False
 
-        if not ctx.finished_game and goal_is_cleared:
+        if self.print_goal:
+            trigger_types = {
+                0: "End of Ball",
+                1: "Groudon/Kyogre",
+                2: "Rayquaza",
+            }
+            goal_value = goal[0]
+            if goal_value & 0x1:
+                # dex num
+                caught = sum(i == 4 for i in local_dex)
+                logger.warning(f"Pokédex Requirement: {caught}/{int.from_bytes(dex_req, 'little')}")
+            if goal_value & 0x2:
+                # score
+                score_lo = int.from_bytes(score_req[:4], "little")
+                score_hi = int.from_bytes(score_req[4:], "little")
+                score = min(score_lo, 99999999) + (score_hi * 100000000)
+                logger.warning(f"Score Requirement: {score}")
+            if goal_value & 0x4:
+                # dex targets
+                targets = int.from_bytes(target_req, "little")
+                target_strs = []
+                for i in range(205):
+                    if (1 << i) & targets:
+                        caught = local_dex[i] == 4
+                        target_strs.append(f"{POKEDEX_INVERSE}: {'Caught' if caught else 'Uncaught'}")
+                logger.warning(f"Target Requirement: {'\n'.join(target_strs)}")
+            if goal_value & 0x8:
+                # medals
+                logger.warning(f"Medal Requirement: {int.from_bytes(medals, 'little')}/"
+                               f"{int.from_bytes(medal_req, 'little')}")
+            logger.warning(f"Goal Trigger: {trigger_types.get(trigger[0], 'Unknown')}")
+
+        if not ctx.finished_game and goal_check[0] != 0:
             await ctx.send_msgs([{
                 "cmd": "StatusUpdate",
                 "status": ClientStatus.CLIENT_GOAL
@@ -379,19 +414,21 @@ class PinballRSClient(BizHawkClient):
         # handle receiving items
         recv_amount = int.from_bytes(items_received, "little")
         if recv_amount < len(ctx.items_received):
-            item = ctx.items_received[recv_amount]
+            item: NetworkItem = ctx.items_received[recv_amount]
+            item_id: int = item.item
             logging.info('Received %s from %s (%s) (%d/%d in list)' % (
-                color(ctx.item_names.lookup_in_game(item.item), 'red', 'bold'),
+                color(ctx.item_names.lookup_in_game(item_id), 'red', 'bold'),
                 color(ctx.player_names[item.player], 'yellow'),
                 ctx.location_names.lookup_in_slot(item.location, item.player), recv_amount, len(ctx.items_received)))
 
             writes.append((PINBALL_RECEIVED, int.to_bytes(recv_amount+1, 2, "little"), "System Bus"))
             # for the moment, just play a standard sfx for every item
-            if item.item == 6:
+            if item_id == 6:
                 writes.append(get_sfx_write(0xB2))
             else:
                 writes.append(get_sfx_write(0xD8))
-            if item.item & 0x200:
+            self.message_queue.append((item_id, item.player))
+            if item_id & 0x200:
                 self.item_queue.append(item)
 
         if len(self.item_queue):
@@ -486,13 +523,17 @@ class PinballRSClient(BizHawkClient):
         if remote_helpers and int.from_bytes(helpers, "little") != remote_helpers:
             writes.append((PINBALL_HELPERS, remote_helpers.to_bytes(1, "little"), "System Bus"))
 
-        remote_coin_arrows = sum(item.item == 23 for item in ctx.items_received)
+        remote_coin_arrows = sum(item.item == 24 for item in ctx.items_received)
         if remote_coin_arrows and int.from_bytes(coin_arrows, "little") != remote_coin_arrows:
             writes.append((PINBALL_COIN, remote_coin_arrows.to_bytes(1, "little"), "System Bus"))
 
-        remote_coin_mod = any(item.item == 24 for item in ctx.items_received)
+        remote_coin_mod = any(item.item == 25 for item in ctx.items_received)
         if remote_coin_mod and int.from_bytes(coin_mod, "little") != 1:
             writes.append((PINBALL_COIN_MODIFIER, int.to_bytes(1, 1, "little"), "System Bus"))
+
+        remote_medals = sum(item.item == 26 for item in ctx.items_received)
+        if remote_medals and int.from_bytes(medals, "little") != remote_medals:
+            writes.append((PINBALL_MEDALS, remote_medals.to_bytes(1, "little"), "System Bus"))
 
         # Check dexnav here
         if self.dexnav is not None:
@@ -533,6 +574,15 @@ class PinballRSClient(BizHawkClient):
                 logger.warning(f"Attempting to track nearby {POKEDEX_INVERSE[self.dexnav]}!")
             self.dexnav = None
 
+        if msg_mode[0] == 0 and self.message_queue:
+            # only write if we aren't already
+            item_id, player = self.message_queue.pop(0)
+            writes.extend([
+                (PINBALL_STR_MODE, int.to_bytes(1, 1, "little"), "System Bus"),
+                (PINBALL_STR_ITEM, item_id.to_bytes(2, "little"), "System Bus"),
+                (PINBALL_STR_PLAYER, player.to_bytes(4, "little"), "System Bus"),
+            ])
+
         # check ringlink here
         if "RingLink" in ctx.tags:
             coin_total = int.from_bytes(coin_plus, "little") - int.from_bytes(coin_minus, "little")
@@ -561,7 +611,7 @@ class PinballRSClient(BizHawkClient):
                 else:
                     # gotta do it manually
                     coin = int.from_bytes(coins, "little")
-                    writes.append((PINBALL_COINS, int.to_bytes(coin - self.ringlink_incoming,
+                    writes.append((PINBALL_COINS, int.to_bytes(max(0, coin + self.ringlink_incoming),
                                                                1, "little"), "System Bus"))
                 self.ringlink_incoming = 0
 
@@ -572,7 +622,7 @@ class PinballRSClient(BizHawkClient):
             if local_dex[i] == 4 and (i+1) not in ctx.locations_checked:
                 new_checks.append(i+1)
             elif (slot_info[0] & 0x1) and local_dex[i] != 4 and (i+1) in ctx.checked_locations:
-                # collect, maybe push out to an option?
+                # collect
                 writing_dex = True
                 write_local_dex[i] = 4
 
@@ -654,9 +704,9 @@ class PinballRSClient(BizHawkClient):
         # handle remote dex here
         if self.pokedex_key in ctx.stored_data:
             compressed = compress_pokedex(write_local_dex)
-            if compressed != ctx.stored_data[self.pokedex_key]:
+            if compressed.to_bytes(26, "little") != ctx.stored_data[self.pokedex_key]:
                 writing_dex = True
-                compressed |= ctx.stored_data[self.pokedex_key]
+                compressed |= int.from_bytes(ctx.stored_data[self.pokedex_key], "little")
                 decompressed = decompress_pokedex(compressed)
                 for i in range(len(decompressed)):
                     if decompressed[i] == 4 and write_local_dex[i] != 4:
