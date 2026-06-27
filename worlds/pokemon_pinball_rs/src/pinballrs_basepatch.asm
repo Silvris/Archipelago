@@ -3,11 +3,15 @@
 
 .include "pokepinballrs_syms.asm"
 
-.open "pokepinballrs.gba", "pinballrs_basepatch.gba", 0x0
+.open "pokepinballrs.gba", "pinballrs_basepatch.gba", 0x8000000
 
-.macro GetValue, rn, current, target
-    ldr         rn, [pc, #(target-current-4)]
-.endmacro
+.definelabel gArchipelago, 0x2033000
+.definelabel gArchipelagoStrings, 0x2035000
+.definelabel gArchipelagoStringEnable, 0x2035100  //; byte
+.definelabel gArchipelagoStringTimer, 0x2035102 //; half, frames
+.definelabel gArchipelagoStringItem, 0x2035104  //; half
+.definelabel gArchipelagoStringPlayer, 0x2035108  //; half
+.definelabel gArchipelagoSlot, 0x86BC030
 
 //; Main Loop Hook
 .org MainLoopIter+0x2C
@@ -20,60 +24,60 @@
     bl          BoardSelectHook
 
 //; Block EReader
-.org sub_1157C+2
+.org CheckEReaderAccessCombo+2
     .thumb
     pop         {r4-r7, lr}
 
 //; Ruby Board hooks
-.org sub_153CC+0xA6
+.org ProcessRubyCollisionEvent+0xA6
     .thumb
     bl          HatchLockRuby
 
-.org sub_153CC+0x1E4
+.org ProcessRubyCollisionEvent+0x1E4
     .thumb
     bl          UpdateBumperCount
 
-.org sub_153CC+0x406
+.org ProcessRubyCollisionEvent+0x406
     .thumb
     bl          EvoArrows
 
-.org sub_153CC+0x4A8
+.org ProcessRubyCollisionEvent+0x4A8
     .thumb
     bl          CoinArrows
 
-.org sub_153CC+0x4BA
+.org ProcessRubyCollisionEvent+0x4BA
     .thumb
     bl          DoubleCoinRuby
 
-.org sub_153CC+0x52E
+.org ProcessRubyCollisionEvent+0x52E
     .thumb
     bl          UpdateRubyUpgrade
 
-.org sub_153CC+0x59A
+.org ProcessRubyCollisionEvent+0x59A
     .thumb
     bl          UpdateRubyUpgrade
 
-.org sub_153CC+0x60A
+.org ProcessRubyCollisionEvent+0x60A
     .thumb
     bl          UpdateRubyUpgrade
 
-.org sub_153CC+0x680
+.org ProcessRubyCollisionEvent+0x680
     .thumb
     bl          GetArrows
 
-.org sub_153CC+0x9D6
+.org ProcessRubyCollisionEvent+0x9D6
     .thumb
     bl          UpdateMakuUpgrade
 
-.org sub_21D78+0x30
+.org UpdateEvolutionShopSprite+0x30
     .thumb
     bl          CheckAnyMonEvoR0Shift //; this is the main one, sets the evo mode enable
 
-.org sub_1AFD4+0x14A
+.org AnimateRubyEvolutionShopSequence+0x14A
     .thumb
     bl          CheckAnyMonEvoR0Shift
 
-.org sub_1FF0C+0x220
+.org UpdateRubySideBumperAnimation+0x220
     .thumb
     bl          CheckMaku
     nop
@@ -84,116 +88,116 @@
     bl          CheckWhiscash
 
 //; Sapphire Board hooks
-.org sub_1642C+0x2C0
+.org ProcessSapphireCollisionEvent+0x2C0
     .thumb
     bl          CheckPelipper
     
-.org sub_1642C+0x31C
+.org ProcessSapphireCollisionEvent+0x31C
     .thumb
     bl          CheckZig
     nop
-.org sub_1642C+0x516
+.org ProcessSapphireCollisionEvent+0x516
     .thumb
     bl          CoinArrows
 
-.org sub_1642C+0x52A
+.org ProcessSapphireCollisionEvent+0x52A
     .thumb
     bl          DoubleCoinSapphire
 
-.org sub_1642C+0x5AA
+.org ProcessSapphireCollisionEvent+0x5AA
     .thumb
     bl          EvoArrows
 
-.org sub_1642C+0x63A
+.org ProcessSapphireCollisionEvent+0x63A
     .thumb
     bl          UpdateSapphireUpgrade
 
-.org sub_1642C+0x6AE
+.org ProcessSapphireCollisionEvent+0x6AE
     .thumb
     bl          UpdateSapphireUpgrade
 
-.org sub_1642C+0x722
+.org ProcessSapphireCollisionEvent+0x722
     .thumb
     bl          UpdateSapphireUpgrade
 
-.org sub_1642C+0x796
+.org ProcessSapphireCollisionEvent+0x796
     .thumb
     bl          GetArrowsSapphire
 
-.org sub_2F79C+0x4C2
+.org UpdateSapphireBumperLogic+0x4C2
     .thumb
     bl          CheckAnyMonEvoR0Shift
 
-.org sub_31144+0x114
+.org UpdateSapphireShopSignAnimation+0x114
     .thumb
     bl          CheckAnyMonEvoR0Shift
 
-.org sub_31498+0x6A
+.org UpdateSapphireEggMachine+0x6A
     .thumb
     bl          HatchLockSapphire
 
-.org sub_329F4+0x15C
+.org UpdateSapphireEvolutionShopSequence+0x15C
     .thumb
     bl          CheckAnyMonEvoR0Shift
 
 
 //; Roulette hooks
-.org sub_2A354+0x5A4
+.org GivePrize+0x5A4
     .thumb
     bl          RingLinkRoulette
 
 //; Evo mode hooks
-.org sub_1B140+0x11B8
+.org UpdateShopEntryAnimation+0x11B8
     .thumb
     bl          CheckIndividualMonEvo
 
-.org sub_2A354+0x44E
+.org GivePrize+0x44E
     .thumb
     bl          CheckAnyMonEvoR0Shift
 
-.org sub_29D9C+0x1F8
+.org InitRouletteWheel+0x1F8
     .thumb
     bl          CheckAnyMonEvoR0Shift
 
 //; Shop hooks
-.org sub_1B140+0x656
+.org UpdateShopEntryAnimation+0x656
     .thumb
     bl          ShopBlockHelpers
 
-.org sub_1B140+0x6A0
+.org UpdateShopEntryAnimation+0x6A0
     .thumb
     bl          RingLinkShop
 
 //; Handle areas
-.org sub_25F64+0x38
+.org InitBoardIntroMode+0x38
     .thumb
     bl          HandleInitialAreaEx
 
-.org sub_260B8+0x334
+.org UpdateBoardIntroMode+0x334
     .thumb
     bl          CheckRuinsAndCardRoulette
 
-.org sub_260B8+0x474
+.org UpdateBoardIntroMode+0x474
     .thumb
     bl          CheckRuinsAndCardEx
 
-.org sub_260B8+0x494
+.org UpdateBoardIntroMode+0x494
     .thumb
     bl          HandleRuinsCardTravel
 
-.org sub_260B8+0x4B6
+.org UpdateBoardIntroMode+0x4B6
     .thumb
     bl          HandleInitialArea
 
-.org sub_260B8+0x4EC
+.org UpdateBoardIntroMode+0x4EC
     .thumb
     bl          HandleAreas
 
-.org sub_26A10+0x35C
+.org UpdateTravelMode+0x35C
     .thumb
     bl          HandleAreas
 
-.org sub_26A10+0x374
+.org UpdateTravelMode+0x374
     .thumb
     bl          HandleRuinsNatural
 
@@ -234,11 +238,11 @@
     .thumb
     bl          ClearForcePichu
 
-.org 0x32604
+.org 0x8032604
 thumb_8032604:
 
 //; spheal
-.org sub_45E90+0x17E
+.org UpdateSphealResultsScreen+0x17E
     .thumb
     bl          SetSphealCheck
 
@@ -247,16 +251,21 @@ thumb_8032604:
     .thumb
     bl          SetBonusComplete
 
+//; end of ball
+.org EndOfBallSequence+0x15C
+    .thumb
+    bl          CheckGoalEndOfBall
+
 //; board_process2
-.org sub_4E2F8+0x136 //; Preserve Pichu on fail
+.org ProcessMainBoardBallDrainAndLaunch+0x136 //; Preserve Pichu on fail
     .thumb
     bl          CheckPichu
 
-.org sub_4E598+0xB6 //; Preserve full charge on fail
+.org ResetBoardStateOnDeath+0xB6 //; Preserve full charge on fail
     .thumb
     bl          CheckPichu
 
-.org sub_4E598+0x132 //; Set ball type on reset
+.org ResetBoardStateOnDeath+0x132 //; Set ball type on reset
     .thumb
     bl          GetStartingBall
     nop
@@ -276,14 +285,14 @@ thumb_8032604:
     bl          GetStartingBall
     nop
 
-.org sub_4A518+0x50
+.org InitPinballGameState+0x50
     //; Game state initialization
     //; Start by checking Pichu, he's easily the most complex of the set
     //; R5 - gCurrentPinballGame, R6 - gMain
     bl          CheckPichu
     cmp         r0, #0
     bne         @@Continue
-    bl          sub_4A518+0x114
+    bl          InitPinballGameState+0x114
     @@Continue:
     ldr         r2, [r5, #0]
     mov         r1, #0xe3
@@ -317,7 +326,7 @@ thumb_8032604:
     nop
     nop
 
-.org sub_4A518+0xCA
+.org InitPinballGameState+0xCA
     //; some PC relative stuff we need to skip over, still only relevant to a Pichu enabled setup
     nop
     nop
@@ -337,7 +346,7 @@ thumb_8032604:
     add         r1, r0, r2
     bl          GetStartingCoins
 
-.org sub_4A518+0x128
+.org InitPinballGameState+0x128
     //; No Pichu codepath, just redirect and get coins
     bl          HandleRemainingGameInit
     mov         r7, #0xC9
@@ -346,13 +355,18 @@ thumb_8032604:
     bl          GetStartingCoins
     nop
 
-.org 0x47344
+.org BonusStage_HandleModeChangeFlags+0x4
+    //; hook here to always run during main gameplay
+    .thumb
+    bl          StringHandlingMainLoop
+
+.org 0x8047344
 .area 0x1B0
 
 GetStartingLives:
     .thumb
     push        {r4}
-    GetValue    r4, GetStartingLives, ArchipelagoInfo
+    ldr         r4, =gArchipelago
     ldrb        r0, [r4, #0]
     pop         {r4}
     bx          lr
@@ -361,7 +375,7 @@ GetStartingLives:
 GetStartingCoins:
     .thumb
     push        {r4}
-    GetValue    r4, GetStartingCoins, ArchipelagoInfo
+    ldr         r4, =gArchipelago
     ldrb        r0, [r4, #1]
     pop         {r4}
     bx          lr
@@ -370,7 +384,7 @@ GetStartingCoins:
 GetStartingBall:
     .thumb
     push        {r4}
-    GetValue    r4, GetStartingBall, ArchipelagoInfo
+    ldr         r4, =gArchipelago
     ldrb        r0, [r4, #2]
     pop         {r4}
     bx          lr
@@ -379,15 +393,13 @@ GetStartingBall:
 CheckPichu:
     .thumb
     push        {r4}
-    GetValue    r4, CheckPichu, ArchipelagoInfo
+    ldr         r4, =gArchipelago
     ldrb        r0, [r4, #3]
     pop         {r4}
     bx          lr
     .align      4
 
-ArchipelagoInfo:
-    //; 0 - starting lives, 1 - starting coins, 2 - starting ball, 3 - pichu, 4 - coin modifier, 5 - allowed boards, 6/7 - play sound, 0x10 - allowed stages
-    .word 0x2033000
+.pool
 
 HandleRemainingGameInit:
     //; Just have to handle ball and lives, code paths converge on coins
@@ -398,7 +410,7 @@ HandleRemainingGameInit:
     cmp         r0, #0
     beq         @@Lives
     @@Get1:
-    GetValue    r1, @@Get1, CurrentPinballPtr
+    ldr         r1, =0x5F6
     add         r1, r1, r2
     strb        r0, [r1, #0]
     mov         r0, #0xE1
@@ -414,8 +426,7 @@ HandleRemainingGameInit:
     bx          lr
     .align      4
 
-CurrentPinballPtr:
-.word 0x5F6 //; beautifully horrible number
+.pool
 
 HandleRuinsNatural:
 //; called when the player has gone through 5 areas, overwrite the standard pick with Ruins if unlocked
@@ -423,10 +434,10 @@ HandleRuinsNatural:
     push        {r0-r3}
     mov         r0, #6
     @@Get1:
-    GetValue    r2, @@Get1, HandleRuinsNaturalGMain
+    ldr         r2, =gMain
     ldrb        r3, [r2, #4]
     @@Get2:
-    GetValue    r2, @@Get2, HandleRuinsNaturalArchipelagoStages
+    ldr         r2, =gArchipelago+0x10
     cmp         r3, #0
     beq         @@Check
     add         r2, #7
@@ -440,21 +451,17 @@ HandleRuinsNatural:
     bx          lr
     .align      4
 
-HandleRuinsNaturalGMain:
-.word 0x200B0C0
-
-HandleRuinsNaturalArchipelagoStages:
-.word 0x2033010
+.pool
 
 HandleInitialArea:
     //; r0 - return next stage
     push        {r1-r5}
     mov         r5, r0
     @@Get1:
-    GetValue    r2, @@Get1, HandleInitialNaturalGMain
+    ldr         r2, =gMain
     ldrb        r3, [r2, #4]
     @@Get2:
-    GetValue    r2, @@Get2, HandleInitialArchipelagoStages
+    ldr         r2, =gArchipelago+0x10
     cmp         r3, #0
     beq         @@Compare
     add         r2, #7
@@ -484,11 +491,7 @@ HandleInitialArea:
     bx          lr
     .align      4
 
-HandleInitialNaturalGMain:
-    .word 0x200B0C0
-
-HandleInitialArchipelagoStages:
-    .word 0x2033010
+.pool
 
 HandleInitialAreaEx:
     //; set the first entry
@@ -506,7 +509,7 @@ MainLoopHook:
     str         r0, [r1, #0x4C]
     //; free reign, r0 is immediately used for return
     @@GetSound:
-    GetValue    r1, @@GetSound, MainLoopAP
+    ldr         r1, =gArchipelago
     ldrh        r0, [r1, #6]
     cmp         r0, #0
     beq         @@Return
@@ -517,8 +520,7 @@ MainLoopHook:
     pop         {r0-r7, lr}
     .align      4
 
-MainLoopAP:
-    .word 0x2033000
+.pool
 
 BoardSelectHook:
     //; preserve r4, r2-gMain, r3-gFieldSelectInfo
@@ -529,7 +531,7 @@ BoardSelectHook:
     mov         r3, #1
     lsl         r3, r2
     @@Get1:
-    GetValue    r2, @@Get1, BoardSelectAP
+    ldr         r2, =gArchipelago
     ldrb        r2, [r2, #5]
     and         r2, r3
     bne         @@True
@@ -543,8 +545,7 @@ BoardSelectHook:
     pop         {lr}
     .align      4
 
-BoardSelectAP:
-    .word 0x2033000
+.pool
 
 HatchLockRuby:
 //; rather jank, but the alternative is digging in a bunch of collision code
@@ -552,7 +553,7 @@ HatchLockRuby:
     push        {r2, lr}
     mov         r0, #0
     @@Get1:
-    GetValue    r2, @@Get1, HatchLockRubyAP
+    ldr         r2, =gArchipelago
     ldrb        r2, [r2, #10]
     cmp         r2, #0
     beq         @@Set
@@ -562,15 +563,12 @@ HatchLockRuby:
     pop         {r2, lr}
     .align 4
 
-HatchLockRubyAP:
-    .word 0x2033000
-
 HatchLockSapphire:
 //; Sapphire is easy though, but a little hacky
     push        {r0-r2}
     ldrh        r0, [r4, r0]
     @@Get1:
-    GetValue    r2, @@Get1, HatchLockSapphireAP
+    ldr         r2, =gArchipelago
     ldrb        r2, [r2, #10]
     cmp         r2, #0
     bne         @@Set
@@ -582,8 +580,7 @@ HatchLockSapphire:
     bx          lr
     .align 4
 
-HatchLockSapphireAP:
-    .word 0x2033000
+.pool
 
 GetArrowsSapphire:
     add         r0, #1
@@ -595,7 +592,7 @@ GetArrows:
     ble         @@Set
     nop
     @@Get1:
-    GetValue    r2, @@Get1, GetArrowsAP
+    ldr         r2, =gArchipelago
     ldrb        r2, [r2, #8]
     cmp         r2, #0
     bne         @@Set
@@ -606,8 +603,7 @@ GetArrows:
     pop         {r2, lr}
     .align 4
 
-GetArrowsAP:
-    .word 0x2033000
+.pool
 
 .endarea
 
@@ -618,7 +614,7 @@ EvoArrows:
     push        {r2, lr}
     add         r0, #1
     @@Get1:
-    GetValue    r2, @@Get1, EvoArrowsAP
+    ldr         r2, =gArchipelago
     ldrb        r2, [r2, #9]
     cmp         r0, r2
     bgt         @@Return
@@ -627,14 +623,13 @@ EvoArrows:
     pop         {r2, lr}
     .align 4
 
-EvoArrowsAP:
-    .word 0x2033000
+.pool
 
 WeightsCheckEvo:
     push        {r1-r4}
     ldrb        r6, [r0, #0x15]
     @@Get1:
-    GetValue    r4, @@Get1, WeightsCheckEvoAP
+    ldr         r4, =gArchipelago
     ldrb        r2, [r4, #9]
     cmp         r6, #0xCD
     beq         @@Return
@@ -655,15 +650,14 @@ WeightsCheckEvo:
     add         r0, r6, #0
     bx          lr
 
-WeightsCheckEvoAP:
-    .word 0x2033000
+.pool
 
 ClampearlCheck:
-    //; clampearl is a special little baby
+    //; clamperl is a special little baby
     push        {r0-r3}
     nop
     @@Get1:
-    GetValue    r3, @@Get1, ClampearlCheckAP
+    ldr         r3, =gArchipelago
     ldrb        r2, [r3, #9]
     cmp         r2, #3
     bge         @@Return
@@ -681,14 +675,13 @@ ClampearlCheck:
     asr         r0, r2, #0x10
     bx          lr
 
-ClampearlCheckAP:
-    .word 0x2033000
+.pool
 
 EggsCheckEvo:
     push        {r1-r4}
     ldrb        r5, [r0, #0x15]
     @@Get1:
-    GetValue    r2, @@Get1, EggsCheckEvoAP
+    ldr         r2, =gArchipelago
     ldrb        r2, [r2, #9]
     cmp         r5, #0xCD
     beq         @@Return
@@ -709,8 +702,7 @@ EggsCheckEvo:
     add         r0, r5, #0
     bx          lr
 
-EggsCheckEvoAP:
-    .word 0x2033000
+.pool
 
 EggGroups:
     //; r0- current species, r4 - gCurrentPinballGame, r12 - gMain, r8 - species index shifted 0x10 left
@@ -719,7 +711,7 @@ EggGroups:
     push        {r0}
     nop
     @@Get1:
-    GetValue    r2, @@Get1, EggGroupsTable
+    ldr         r2, =EggTableRuby | 0x8000000
     mov         r0, r12
     ldrb        r0, [r0, #4]
     cmp         r0, #0
@@ -733,7 +725,7 @@ EggGroups:
     lsl         r0, r2
     nop
     @@Get2:
-    GetValue    r2, @@Get2, EggGroupsAP
+    ldr         r2, =gArchipelago
     ldr         r2, [r2, #0x20]
     and         r2, r0
     pop         {r0}
@@ -743,26 +735,51 @@ EggGroups:
     @@Return:
     bx          lr
 
-EggGroupsTable:
-    .word EggTableRuby | 0x8000000
-
-EggGroupsAP:
-    .word 0x2033000
+.pool
 
 SetBonusComplete:
-    push        {r2-r4}
+    push        {r2-r4, lr}
     ldrb        r0, [r1, #0x04]
     sub         r0, #2
     //; r0 is return value here, but it's still useful
     mov         r2, #1
     @@Get:
-    GetValue    r3, @@Get, SetBonusCompleteAP
+    ldr         r3, =gArchipelago
     lsl         r2, r0
     ldrb        r4, [r3, #0xD]
     orr         r2, r4
     strb        r2, [r3, #0xD]
-    pop         {r2-r4}
-    bx          lr
+    ldr         r4, =GoalTrigger
+    ldrb        r4, [r4, #0]
+    cmp         r4, #1
+    beq         @@GroudonKyogre
+    cmp         r4, #2
+    bne         @@Return
+    @@Rayquaza:
+    cmp         r0, #4
+    bne         @@Return
+    @@Check:
+    mov         r2, r0
+    bl          CheckGoal
+    cmp         r0, #0
+    beq         @@ReturnCheck
+    mov         r4, #0x2F
+    strb        r0, [r3, r4]
+    ldr         r3, =gArchipelagoStringEnable
+    mov         r4, #3
+    strb        r4, [r3, #0]
+    mov         r4, #0
+    strh        r4, [r3, #2]
+    @@ReturnCheck:
+    mov         r0, r2
+    @@Return:
+    pop         {r2-r4, pc}
+    @@GroudonKyogre:
+    cmp         r0, #2
+    beq         @@Check
+    cmp         r0, #3
+    beq         @@Check
+    b           @@Return
     .align      4
 
 
@@ -779,10 +796,10 @@ CheckIndividualMonEvo:
     mov         r2, #0xB3
     //; now free to handle whatever is needed
     @@Get:
-    GetValue    r3, @@Get, CheckIndividualMonEvoAP
+    ldr         r3, =gArchipelago
     lsl         r2, #3
     @@Get2:
-    GetValue    r1, @@Get2, CheckIndividualMonEvoSpecies
+    ldr         r1, =gSpeciesInfo
     ldr         r5, [r5, #0]
     ldrh        r2, [r5, r2]
     cmp         r2, #88
@@ -818,7 +835,7 @@ CheckIndividualMonEvo:
     //; the complex one
     nop
     @@Gloom:
-    GetValue    r2, @@Gloom, CheckIndividualMonEvoMain
+    ldr         r2, =gMain
     ldrb        r2, [r2, #4]
     cmp         r2, #0
     bne         @@Sapphire
@@ -830,14 +847,7 @@ CheckIndividualMonEvo:
     .align      4
 
 
-CheckIndividualMonEvoAP:
-    .word 0x2033000
-
-CheckIndividualMonEvoSpecies:
-    .word 0x86A3700
-
-CheckIndividualMonEvoMain:
-    .word 0x200B0C0
+.pool
 
 CheckAnyMonEvo:
 //; r0 - evolvablePartySize
@@ -849,13 +859,13 @@ CheckAnyMonEvo:
     beq         @@False
     mov         r3, #0
     @@Get1:
-    GetValue    r5, @@Get1, CheckAnyMonEvoPinball
+    ldr         r5, =gCurrentPinballGame
     ldr         r5, [r5, #0]
     @@Get2:
-    GetValue    r4, @@Get2, CheckAnyMonEvoSpecies
+    ldr         r4, =gSpeciesInfo
     mov         r2, #0x9C
     @@Get3:
-    GetValue    r6, @@Get3, CheckAnyMonEvoAP
+    ldr         r6, =gArchipelago
     lsl         r2, #2
     add         r5, r2
     @@Loop:
@@ -896,7 +906,7 @@ CheckAnyMonEvo:
     b           @@Check
     @@Gloom:
     //; the complex one
-    GetValue    r2, @@Gloom, CheckAnyMonEvoMain
+    ldr         r2, =gMain
     ldrb        r2, [r2, #4]
     cmp         r2, #0
     bne         @@Sapphire
@@ -908,17 +918,7 @@ CheckAnyMonEvo:
     .align      4
 
 
-CheckAnyMonEvoPinball:
-    .word 0x20314E0
-
-CheckAnyMonEvoSpecies:
-    .word 0x86A3700
-
-CheckAnyMonEvoAP:
-    .word 0x2033000
-
-CheckAnyMonEvoMain:
-    .word 0x200B0C0
+.pool
 
 CheckAnyMonEvoR0Shift:
     push        {lr}
@@ -931,7 +931,7 @@ CoinArrows:
     push        {r2, lr}
     add         r0, #1
     @@Get1:
-    GetValue    r2, @@Get1, CoinArrowsAP
+    ldr         r2, =gArchipelago
     ldrb        r2, [r2, #14]
     cmp         r0, r2
     bgt         @@Return
@@ -940,15 +940,14 @@ CoinArrows:
     pop         {r2, lr}
     .align 4
 
-CoinArrowsAP:
-    .word 0x2033000
+.pool
 
 DoubleCoin:
 //; doubles as ringlink packet sender
     push        {r0-r3, lr}
     mov         r2, #0xCA
     @@Get1:
-    GetValue    r3, @@Get1, DoubleCoinAP
+    ldr         r3, =gArchipelago
     ldrb        r1, [r3, #4]
     lsl         r2, #1
     add         r0, r2
@@ -963,8 +962,7 @@ DoubleCoin:
     pop         {r0-r3, pc}
     .align      4
 
-DoubleCoinAP:
-    .word 0x2033000
+.pool
 
 DoubleCoinRuby:
     push        {lr}
@@ -984,7 +982,7 @@ CheckHelper:
     push        {r2, r4}
     mov         r4, #1
     @@Get:
-    GetValue    r2, @@Get, CheckHelperAP
+    ldr         r2, =gArchipelago
     add         r2, #0x26
     ldrb        r2, [r2, #0]
     lsl         r4, r3
@@ -1000,8 +998,7 @@ CheckHelper:
     b           @@Return
     .align      4
 
-CheckHelperAP:
-    .word 0x2033000
+.pool
 
 CheckZig:
     push        {r3, lr}
@@ -1022,7 +1019,7 @@ CheckPelipper:
     //; r1 is preserved here, take the chance to update our total hits on mult
     mov         r2, #0x29
     @@Get:
-    GetValue    r3, @@Get, CheckPelipperAP
+    ldr         r3, =gArchipelago
     strb        r0, [r1, #0]
     ldrb        r0, [r3, r2]
     cmp         r0, #99
@@ -1033,8 +1030,7 @@ CheckPelipper:
     pop         {r0-r3, pc}
     .align      4
 
-CheckPelipperAP:
-    .word 0x2033000
+.pool
 
 CheckMaku:
     //; easy, just call for the value
@@ -1067,13 +1063,13 @@ CheckWhiscash:
 ForceNormal:
     mov         r9, r4
     mov         r10, r5
-    push        {r0-r5}
+    push        {r0-r5, lr}
     mov         r2, #0xE7
     @@GetPinball:
-    GetValue    r4, @@GetPinball, ForceNormalPinball
+    ldr         r4, =gCurrentPinballGame
     ldr         r4, [r4, #0]
     @@GetWild:
-    GetValue    r3, @@GetWild, ForceNormalWild
+    ldr         r3, =gWildMonLocations
     lsl         r2, #3
     add         r2, #5
     ldrb        r1, [r4, r2]
@@ -1090,7 +1086,7 @@ ForceNormal:
     add         r3, r1
     mov         r1, #0x27
     @@GetAP:
-    GetValue    r5, @@GetAP, ForceNormalAP
+    ldr         r5, =gArchipelago
     mov         r0, #0
     ldrb        r1, [r5, r1]
     sub         r1, #1
@@ -1134,18 +1130,11 @@ ForceNormal:
     add         r4, #2
     strh        r1, [r4, r0]
     @@Return:
-    pop         {r0-r5}
+    pop         {r0-r5, pc}
     bx          lr
     .align      4
 
-ForceNormalPinball:
-    .word 0x20314E0
-
-ForceNormalWild:
-    .word 0x8055A84
-
-ForceNormalAP:
-    .word 0x2033000
+.pool
 
 ForceEgg:
     mov         r9, r4
@@ -1153,13 +1142,13 @@ ForceEgg:
     push        {r0-r5}
     mov         r2, #0x4
     @@GetMain:
-    GetValue    r1, @@GetMain, ForceEggMain
+    ldr         r1, =gMain
     ldrb        r1, [r1, r2]
     @@GetWild:
-    GetValue    r3, @@GetWild, ForceEggWild
+    ldr         r3, =gEggLocations
     mov         r2, #0
     @@GetPinball:
-    GetValue    r4, @@GetPinball, ForceEggPinball
+    ldr         r4, =gCurrentPinballGame
     ldr         r4, [r4, #0]
     cmp         r1, #0
     beq         @@ContinueSetup
@@ -1169,7 +1158,7 @@ ForceEgg:
     lsl         r2, #1
     add         r4, r2
     @@GetAP:
-    GetValue    r5, @@GetAP, ForceEggAP
+    ldr         r5, =gArchipelago
     mov         r1, #0x27
     ldrb        r1, [r5, r1]
     sub         r1, #1
@@ -1223,17 +1212,7 @@ ForceEgg:
     bx          lr
     .align      4
 
-ForceEggMain:
-    .word 0x200B0C0
-
-ForceEggWild:
-    .word 0x86A4A38
-
-ForceEggPinball:
-    .word 0x20314E0
-
-ForceEggAP:
-    .word 0x2033000
+.pool
 
 SetSphealCheck:
     //; r2 - gCurrentPinballGame
@@ -1242,7 +1221,7 @@ SetSphealCheck:
     push        {r0-r4}
     mov         r3, #0xA6
     @@Get:
-    GetValue    r1, @@Get, SetSphealCheckAP
+    ldr         r1, =gArchipelago
     lsl         r3, #3
     sub         r3, #4
     ldrb        r0, [r2, r3]
@@ -1252,9 +1231,9 @@ SetSphealCheck:
     add         r4, r3
     mov         r2, #0
     cmp         r0, #5
-    blt         @@Spheals
+    blt         @@Pokeballs
     add         r2, #1
-    @@Spheals:
+    @@Pokeballs:
     cmp         r3, #5
     blt         @@Combined
     add         r2, #2
@@ -1271,14 +1250,13 @@ SetSphealCheck:
     bx          lr
     .align      4
 
-SetSphealCheckAP:
-    .word 0x2033000
+.pool
 
 UpdateBumperCount:
     push        {r0-r3}
     mov         r2, #0x28
     @@Get:
-    GetValue    r3, @@Get, UpdateBumperCountAP
+    ldr         r3, =gArchipelago
     ldrb        r0, [r3, r2]
     cmp         r0, #99
     bge         @@Return
@@ -1291,14 +1269,13 @@ UpdateBumperCount:
     bx          lr
     .align      4
 
-UpdateBumperCountAP:
-    .word 0x2033000
+.pool
 
 UpdateRubyUpgrade:
     push        {r0-r4}
     mov         r2, #0x2A
     @@Get:
-    GetValue    r3, @@Get, UpdateRubyUpgradeAP
+    ldr         r3, =gArchipelago
     ldrb        r0, [r3, r2]
     cmp         r0, #99
     bge         @@Return
@@ -1311,14 +1288,13 @@ UpdateRubyUpgrade:
     bx          lr
     .align      4
 
-UpdateRubyUpgradeAP:
-    .word 0x2033000
+.pool
 
 UpdateSapphireUpgrade:
     push        {r0-r3}
     mov         r2, #0x2B
     @@Get:
-    GetValue    r3, @@Get, UpdateSapphireUpgradeAP
+    ldr         r3, =gArchipelago
     ldrb        r0, [r3, r2]
     cmp         r0, #99
     bge         @@Return
@@ -1331,14 +1307,13 @@ UpdateSapphireUpgrade:
     bx          lr
     .align      4
 
-UpdateSapphireUpgradeAP:
-    .word 0x2033000
+.pool
 
 UpdateMakuUpgrade:
     push        {r0-r3}
     mov         r2, #0x2C
     @@Get:
-    GetValue    r3, @@Get, UpdateMakuUpgradeAP
+    ldr         r3, =gArchipelago
     ldrb        r0, [r3, r2]
     cmp         r0, #99
     bge         @@Return
@@ -1351,8 +1326,7 @@ UpdateMakuUpgrade:
     bx          lr
     .align      4
 
-UpdateMakuUpgradeAP:
-    .word 0x2033000
+.pool
 
 ClearForceSpecial:
     push        {r1, r2}
@@ -1394,7 +1368,7 @@ ShopBlockHelpers:
     bge         @@Skip
     add         r2, #0x12
     @@Get:
-    GetValue    r3, @@Get, ShopBlockMax
+    ldr         r3, =#999
     @@Skip:
     bx          r2
     @@MainRuby:
@@ -1404,22 +1378,21 @@ ShopBlockHelpers:
     bx          lr
     .align      4
 
-ShopBlockMax:
-    .word 999
+.pool
 
 HandleAreas:
     push        {r0-r6}
     nop
     @@Get1:
-    GetValue    r6, @@Get1, HandleAreasCurrentPinball
+    ldr         r6, =gCurrentPinballGame
     ldr         r1, [r6, #0] //; gCurrentPinballGame, have to do this here for alignment purposes
     @@Get2:
-    GetValue    r5, @@Get2, HandleAreasGMain
+    ldr         r5, =gMain
     add         r1, #0x32
     ldrb        r0, [r1, #0] //; get current stage
     ldrb        r3, [r5, #4] //; board
     @@Get3:
-    GetValue    r2, @@Get3, ArchipelagoStages
+    ldr         r2, =gArchipelago+0x10
     cmp         r3, #0
     beq         @@Compare
     add         r2, #7
@@ -1456,28 +1429,21 @@ HandleAreas:
     bx          lr
     .align 4
 
-HandleAreasCurrentPinball:
-.word 0x20314E0
-
-HandleAreasGMain:
-.word 0x200B0C0
-
-ArchipelagoStages:
-.word 0x2033010
+.pool
 
 HandleRuinsCardTravel:
     push        {r0-r6}
     nop
     @@Get1:
-    GetValue    r6, @@Get1, HandleRuinsCardTravelCurrentPinball
+    ldr         r6, =gCurrentPinballGame
     ldr         r1, [r6, #0] //; gCurrentPinballGame, have to do this here for alignment purposes
     @@Get2:
-    GetValue    r5, @@Get2, HandleRuinsCardTravelGMain
+    ldr         r5, =gMain
     add         r1, #0x32
     mov         r0, #0 //; start at 0 for checking purposes
     ldrb        r3, [r5, #4] //; board
     @@Get3:
-    GetValue    r2, @@Get3, HandleRuinsCardTravelArchipelagoStages
+    ldr         r2, =gArchipelago+0x10
     cmp         r3, #0
     beq         @@Compare
     add         r2, #7
@@ -1513,14 +1479,7 @@ HandleRuinsCardTravel:
     bx          lr
     .align 4
 
-HandleRuinsCardTravelCurrentPinball:
-.word 0x20314E0
-
-HandleRuinsCardTravelGMain:
-.word 0x200B0C0
-
-HandleRuinsCardTravelArchipelagoStages:
-.word 0x2033010
+.pool
 
 CheckRuinsAndCard:
 //; assume r0 holds the current card status
@@ -1529,11 +1488,9 @@ CheckRuinsAndCard:
     cmp         r0, #0
     beq         @@Return
     mov         r2, #0
-    @@GetGMain:
-    GetValue    r1, @@GetGMain, CheckRuinsAndCardGMain
+    ldr         r1, =gMain
     ldrb        r1, [r1, #4]
-    @@GetAP:
-    GetValue    r3, @@GetAP, CheckRuinsAndCardArchipelagoStages
+    ldr         r3, =gArchipelago+0x10
     cmp         r1, #0
     beq         @@Check
     mov         r2, #7
@@ -1544,14 +1501,7 @@ CheckRuinsAndCard:
     @@Return:
     pop         {r1-r3}
     bx          lr
-    .align      4
-
-
-CheckRuinsAndCardGMain:
-.word 0x200B0C0
-
-CheckRuinsAndCardArchipelagoStages:
-.word 0x2033010
+    .pool
 
 CheckRuinsAndCardEx:
     push        {r0, lr}
@@ -1575,49 +1525,620 @@ CheckRuinsAndCardRoulette:
     @@Return:
     bx          r1
 
-
 RingLinkRoulette:
     add         r2, r1
     strb        r0, [r2, #0]
-    @@Get:
-    GetValue    r2, @@Get, RingLinkRouletteAP
+    ldr         r2, =gArchipelago
     mov         r1, #0x2D
     strb        r0, [r2, r1]
     bx          lr
-    .align      4
 
-RingLinkRouletteAP:
-    .word 0x2033000
+.pool
 
 RingLinkShop:
     sub         r0, r3
     strb        r0, [r1, #0]
-    @@Get:
-    GetValue    r2, @@Get, RingLinkShopAP
+    ldr         r2, =gArchipelago
     mov         r0, #0x2E
     strb        r3, [r2, r0]
     bx          lr
+
+.pool
+
+PrepareTextDisplay:
+    push            {r0-r3}
+    ldr             r3, =gBG0TilemapBuffer
+    mov             r0, #0xA0
+    lsl             r0, #2
+    add             r1, r3, r0
+    mov             r2, #0x0
+    mov             r0, #0x20
+    @@Loop:
+    strh            r2, [r1, #0]
+    add             r1, #2
+    sub             r0, #1
+    cmp             r0, #0
+    bne             @@Loop
+    pop             {r0-r3}
+    bx              lr
+
+.pool
+
+CleanTextDisplay:
+    push            {r0-r3}
+    ldr             r3, =gBG0TilemapBuffer
+    mov             r0, #0xA0
+    lsl             r0, #2
+    add             r1, r3, r0
+    ldr             r2, =0x1FF
+    mov             r0, #0x20
+    @@Loop:
+    strh            r2, [r1, #0]
+    add             r1, #2
+    sub             r0, #1
+    cmp             r0, #0
+    bne             @@Loop
+    @@GetTilemap:
+    ldr             r1, =0x040000D4
+    str             r3, [r1, #0]
+    @@GetAddr:
+    ldr             r0, =0x6002000
+    str             r0, [r1, #4]
+    @@GetSetting:
+    ldr             r0, =0x80000400
+    str             r0, [r1, #8]
+    ldr             r0, [r1, #8]
+    pop             {r0-r3}
+    bx              lr
+
+.pool
+
+DisplayText:
+    //; reuse the debug display for this basically
+    //; assume we've already called the tilemap handling, we just want to trigger the display
+    ldr             r3, =gBG0TilemapBuffer
+    mov             r0, #0xA0
+    lsl             r0, #2
+    add             r1, r3, r0
+    mov             r2, #0xC1
+    lsl             r2, #8
+    mov             r0, #0x20
+    @@Loop:
+    ldrh            r4, [r1, #0]
+    add             r4, r2
+    strh            r4, [r1, #0]
+    add             r1, #2
+    sub             r0, #1
+    cmp             r0, #0
+    bne             @@Loop
+    @@GetTilemap:
+    ldr             r1, =0x040000D4
+    str             r3, [r1, #0]
+    @@GetAddr:
+    ldr             r0, =0x6002000
+    str             r0, [r1, #4]
+    @@GetSetting:
+    ldr             r0, =0x80000400
+    str             r0, [r1, #8]
+    ldr             r0, [r1, #8]
+    bx              lr
+    .align          4
+
+.pool
+
+DisplayTextR0:
+    push            {r1-r4, lr}
+    bl              PrepareTextDisplay
+    mov             r1, #10
+    mov             r2, #0
+    bl              DrawTextToTilemap
+    bl              DisplayText
+    pop             {r1-r4, lr}
+
+.pool
+
+PopulateItemString:
+    push            {r1-r5, lr}
+    ldr             r0, =gArchipelagoStrings
+    ldr             r1, =ReceivedItemText
+    mov             r2, #9
+    bl              memcpy
+    add             r0, #9
+    mov             r4, r0
+    ldr             r1, =gArchipelagoStringItem
+    ldrh            r0, [r1, #0]
+    mov             r2, r0
+    lsr             r2, #8
+    lsl             r2, #2
+    ldr             r1, =ItemTypeTable
+    ldr             r2, [r1, r2]
+    mov             r1, #0xFF
+    and             r0, r1
+    lsl             r0, #2
+    ldr             r1, [r2, r0]
+    mov             r5, r1
+    mov             r0, r1
+    bl              strlen
+    mov             r2, r0
+    mov             r0, r4
+    mov             r1, r5
+    add             r5, r0, r2
+    bl              memcpy
+    mov             r0, #0
+    strb            r0, [r5, #0]
+    ldr             r0, =gArchipelagoStrings
+    pop             {r1-r5, pc}
+
+.pool
+
+PopulatePlayerString:
+    push            {r1-r5, lr}
+    ldr             r0, =gArchipelagoStrings
+    ldr             r1, =FromText
+    mov             r2, #5
+    bl              memcpy
+    add             r0, #5
+    mov             r4, r0
+    ldr             r1, =gArchipelagoStringPlayer
+    ldr             r0, [r1, #0]
+    ldr             r2, =MaxPlayerString
+    ldr             r2, [r2, #0]
+    cmp             r0, r2
+    bgt             @@GenericPlayer
+    ldr             r2, =PlayerTable
+    lsl             r0, #2
+    ldr             r5, [r2, r0]
+    mov             r0, r5
+    bl              strlen
+    mov             r2, r0
+    mov             r1, r5
+    mov             r0, r4
+    add             r4, r2
+    bl              memcpy
+    mov             r1, #0
+    strb            r1, [r4, #0]
+    ldr             r0, =gArchipelagoStrings
+    b               @@Return
+    @@GenericPlayer:
+    mov             r5, r0
+    mov             r0, r4
+    ldr             r1, =PlayerTable
+    ldr             r1, [r1, #0] //; player 0 is the generic player
+    mov             r2, #7
+    bl              memcpy
+    add             r0, #7
+    mov             r1, r0
+    mov             r0, r5
+    mov             r2, #0
+    mov             r3, #1
+    bl              FormatIntToString //; returns pointer to last value of r1
+    mov             r1, #0
+    strb            r1, [r0, #1]
+    ldr             r0, =gArchipelagoStrings
+    @@Return:
+    pop             {r1-r5, pc}
+
+.pool
+
+PopulateGoalString:
+    push            {r1-r4, lr}
+    ldr             r4, =GoalClearText
+    mov             r0, r4
+    bl              strlen
+    mov             r1, r4
+    mov             r2, r0
+    ldr             r0, =gArchipelagoStrings
+    add             r4, r0, r2
+    bl              memcpy
+    mov             r0, #0
+    strb            r0, [r4, #0]
+    ldr             r0, =gArchipelagoStrings
+    pop             {r1-r4, pc}
+
+.pool
+
+StringHandlingMainLoop:
+    push            {r0-r7, lr}
+    ldr             r7, =gArchipelagoStringEnable
+    ldrb            r1, [r7, #0]
+    cmp             r1, #0
+    beq             @@Return
+    @@Item:
+    cmp             r1, #1
+    bne             @@Player
+    ldrh            r2, [r7, #2]
+    cmp             r2, #0
+    bne             @@DecrementItem
+    bl              PopulateItemString
+    bl              DisplayTextR0
+    mov             r2, #0x96
+    strh            r2, [r7, #2]
+    b               @@Return
+    @@DecrementItem:
+    sub             r2, #1
+    strh            r2, [r7, #2]
+    cmp             r2, #0
+    beq             @@MoveToPlayer
+    b               @@Return
+    @@MoveToPlayer:
+    mov             r1, #2
+    strb            r1, [r7, #0]
+    b               @@Return
+    @@Player:
+    cmp             r1, #2
+    bne             @@Goal
+    ldrh            r2, [r7, #2]
+    cmp             r2, #0
+    bne             @@DecrementPlayer
+    bl              PopulatePlayerString
+    bl              DisplayTextR0
+    mov             r2, #0x96
+    strh            r2, [r7, #2]
+    b               @@Return
+    @@DecrementPlayer:
+    sub             r2, #1
+    strh            r2, [r7, #2]
+    cmp             r2, #0
+    beq             @@ClearDisplay
+    b               @@Return
+    @@Goal:
+    cmp             r1, #3
+    bne             @@ClearDisplay
+    ldrh            r2, [r7, #2]
+    cmp             r2, #0
+    bne             @@DecrementGoal
+    bl              PopulateGoalString
+    bl              DisplayTextR0
+    mov             r2, #0x96
+    lsl             r2, #1
+    strh            r2, [r7, #2]
+    b               @@Return
+    @@DecrementGoal:
+    sub             r2, #1
+    strh            r2, [r7, #2]
+    cmp             r2, #0
+    beq             @@ClearDisplay
+    b               @@Return
+    @@ClearDisplay:
+    bl              CleanTextDisplay
+    @@ClearInfo:
+    mov             r1, #0
+    strb            r1, [r7, #0]
+    strh            r1, [r7, #2]
+    @@Return:
+    pop             {r0-r7}
+    ldr             r4, =gMain
+    ldrb            r1, [r4, #0xF]
+    pop             {pc}
+.pool
+
+CheckGoal:
+    push        {r1-r7, lr}
+    mov         r2, #1
+    @@GetGoalVal:
+    ldr         r1, =GoalValue
+    ldrh        r1, [r1, #0]
+    @@GetSavePtr1:
+    ldr         r5, =gMain
+    ldr         r6, =gCurrentPinballGame
+    ldr         r6, [r6, #0]
+    and         r2, r1
+    beq         @@Score
+    @@GetGoalDexNum:
+    ldr         r2, =GoalDexNum
+    ldrh        r2, [r2, #0]
+    mov         r7, #0
+    mov         r3, #0x74
+    add         r3, r5
+    mov         r4, #0
+    @@LoopDexNum:
+    ldrb        r0, [r3, r7]
+    cmp         r0, #4
+    bne         @@SkipDexNum
+    add         r4, #1
+    @@SkipDexNum:
+    add         r7, #1
+    cmp         r7, #0xCD
+    ble         @@LoopDexNum
+    //; now we're through, r4 has our num
+    cmp         r4, r2
+    blt         @@ReturnFalse
+    @@Score:
+    mov         r2, #2
+    and         r2, r1
+    beq         @@Targets
+    mov         r7, r1
+    @@GetGoalScore:
+    ldr         r2, =GoalScoreLow
+    ldr         r4, [r2, #4]
+    ldr         r3, [r2, #0]
+    mov         r2, #0
+    @@HighScoreLoop:
+    push        {r2-r4}
+    mov         r0, r4
+    mov         r1, r3
+    bl          GetNewHighScoreIndex
+    pop         {r2-r4}
+    cmp         r0, #0
+    beq         @@Targets //; if 0 is returned, this is higher than all reported high scores. if any other value is returned, there's a high score greater than this
+    add         r2, #1
+    cmp         r2, #2
+    blt         @@HighScoreLoop
+    @@CheckCurrentScore:
+    mov         r0, r4
+    mov         r1, r3
+    mov         r2, #0x44
+    ldr         r3, [r6, r2]
+    add         r2, #4
+    ldr         r2, [r6, r2]
+    bl          CompareScores
+    cmp         r0, #0
+    bgt         @@ReturnFalse
+    mov         r1, r7
+    @@Targets:
+    mov         r2, #4
+    and         r2, r1
+    beq         @@Medals
+    @@GetGoalDexTargets:
+    ldr         r7, =GoalDexTarget
+    push        {r1}
+    mov         r3, #0
+    mov         r4, #0x74
+    @@TargetLoop:
+    ldrb        r2, [r7, r3]
+    mov         r1, #0
+    @@TargetCheck:
+    mov         r0, #1
+    lsl         r0, r1
+    and         r0, r2
+    beq         @@TargetContinue
+    ldrb        r0, [r5, r4]
+    beq         @@ReturnFalseTarget
+    @@TargetContinue:
+    add         r4, #1
+    add         r1, #1
+    cmp         r1, #8
+    blt         @@TargetCheck
+    mov         r1, #0
+    add         r3, #1
+    cmp         r3, #26
+    blt         @@TargetLoop
+    pop         {r1}
+    b           @@Medals
+    @@ReturnFalseTarget:
+    pop         {r1}
+    b           @@ReturnFalse
+    @@Medals:
+    mov         r2, #8
+    and         r2, r1
+    beq         @@ReturnTrue
+    nop
+    @@GetGoalMedals:
+    ldr         r2, =GoalMedals
+    ldrb        r2, [r2, #0]
+    @@GetGoalAP:
+    ldr         r3, =gArchipelago
+    ldrb        r3, [r3, #0xF]
+    cmp         r3, r2
+    blt         @@ReturnFalse
+    @@ReturnTrue:
+    mov         r0, #1
+    b           @@Return
+    @@ReturnFalse:
+    mov         r0, #0
+    @@Return:
+    pop         {r1-r7, pc}
     .align      4
 
-RingLinkShopAP:
-    .word 0x2033000
+.pool
+
+CheckGoalEndOfBall:
+    push        {r0-r4, lr}
+    bl          ClearDebugTextDisplay
+    bl          CheckGoal
+    beq         @@Return
+    ldr         r1, =GoalTrigger
+    ldrb        r1, [r1, #0]
+    cmp         r1, #0
+    bne         @@Return
+    ldr         r1, =gArchipelago
+    mov         r2, #0x2F
+    strb        r0, [r1, r2]
+    ldr         r1, =gArchipelagoStringEnable
+    mov         r0, #3
+    strb        r0, [r1, #0]
+    mov         r0, #0
+    strh        r0, [r1, #2]
+    @@Return:
+    pop         {r0-r4, pc}
+
+.pool
 
 .endarea
 
-.org 0x6BC000
+.org 0x86BC000
 .byte "ARCHIPELAGO_DATA"
 .fill 16
 //; world version
 .byte 0x00, 0x00, 0x00
 //; basepatch version (if i remember to update it lol)
-.byte 0x00, 0x02, 0x00
+.byte 0x00, 0x03, 0x00
 //; slot data at 0x6BC030
-.org 0x6BC080
+.org 0x86BC030
+GoalValue:
+.hword 0x01
+GoalDexNum:
+.hword 0x01
+GoalScoreLow:
+.word 0x0
+GoalScoreHigh:
+.word 0x0
+GoalDexTarget:
+.fill 26
+GoalMedals:
+.byte 0x00
+GoalTrigger:
+.byte 0x00
+.org 0x86BC080
 EggTableRuby:
 .byte 0x00, 0x02, 0x03, 0x05, 0x06, 0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0F, 0x10, 0x11, 0x12, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1A, 0x1B, 0x1D, 0x1E, 0x1F
 .align 32
 EggTableSapphire:
 .byte 0x00, 0x01, 0x03, 0x04, 0x06, 0x07, 0x09, 0x0A, 0x0D, 0x0E, 0x0F, 0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x17, 0x18, 0x19, 0x1A, 0x1B, 0x1C, 0x1D, 0x1E, 0x1F
 .align 32
+.org 0x86BC100
+GoalClearText:
+.byte "GOAL COMPLETE!", 0x00
+ReceivedItemText:
+.byte "RECEIVED ", 0x00
+FromText:
+.byte "FROM ", 0x00
+.align 4
+ItemTypeTable:
+.word StandardItemStrTable, AreaItemStrTable, FillerItemStrTable, 0x0, EvolutionItemStrTable, 0x0, 0x0, 0x0, HelperItemStrTable, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0
+StandardItemStrTable: //; have to offset by 1 because 0 index is reserved
+.word 0x0, RubyBoard, SapphireBoard, StartingBall, StartingCoins, StartingModifier, PermPichu
+.word SpecialGuests, EncounterRate, RuinsAreaCard, GetArrow, EvoArrow, EvoMode, ChikoritaDex
+.word CyndaquilDex, TotodileDex, AerodactylDex, EggForest, EggCave, EggMountain, EggDesert, EggSea
+.word CoinArrow, CoinModifier, PokedexMedal
+AreaItemStrTable:
+.word ForestRuby, VolcanoRuby, PlainsRuby, OceanRuby, SafariZoneRuby, CaveRuby, RuinsRuby
+.word ForestSapphire, LakeSapphire, PlainsSapphire, WildernessSapphire, OceanSapphire, CaveSapphire, RuinsSapphire
+FillerItemStrTable:
+.word ExtraBall, Big, Small, BallSaver
+EvolutionItemStrTable:
+.word RareCandy, LeafStone, FireStone, LinkCable, MoonStone, WaterStone, ThunderStone, SunStone, SootheBell, DryPokeblock
+HelperItemStrTable:
+.word HelperZigzagoon, HelperPelipper, HelperMakuhita, HelperWhiscash
+StartingBall:
+.byte "+1 STARTING LIFE", 0x00
+StartingModifier:
+.byte "+1 STARTING MODIFIER", 0x00
+StartingCoins:
+.byte "+10 STARTING COINS", 0x00
+PermPichu:
+.byte "PERMANENT PICHU", 0x00
+SpecialGuests:
+.byte "SPECIAL GUESTS CARD", 0x00
+EncounterRate:
+.byte "ENCOUNTER RATE UP CARD", 0x00
+RuinsAreaCard:
+.byte "RUINS AREA CARD", 0x00
+RubyBoard:
+.byte "RUBY BOARD", 0x00
+SapphireBoard:
+.byte "SAPPHIRE BOARD", 0x00
+EvoArrow:
+.byte "EVO ARROW", 0x00
+GetArrow:
+.byte "GET ARROW", 0x00
+CoinArrow:
+.byte "COIN ARROW", 0x00
+CoinModifier:
+.byte "DOUBLE COINS", 0x00
+PokedexMedal:
+.byte "POKEDEX MEDAL ", 0x00 //; extend in code to show counts
+EvoMode:
+.byte "EVO MODE", 0x00
+ChikoritaDex:
+.byte "CHIKORITA DEX ENTRY", 0x00
+CyndaquilDex:
+.byte "CYNDAQUIL DEX ENTRY", 0x00
+TotodileDex:
+.byte "TOTODILE DEX ENTRY", 0x00
+AerodactylDex:
+.byte "AERODACTYL DEX ENTRY", 0x00
+EggForest:
+.byte "EGG BUNCH (FOREST)", 0x00
+EggCave:
+.byte "EGG BUNCH (CAVE)", 0x00
+EggMountain:
+.byte "EGG BUNCH (MOUNTAIN)", 0x00
+EggDesert:
+.byte "EGG BUNCH (DESERT)", 0x00
+EggSea:
+.byte "EGG BUNCH (SEA)", 0x00
+EggRuby:
+.byte "EGG BUNCH (RUBY)", 0x00
+EggSapphire:
+.byte "EGG BUNCH (SAPPHIRE)", 0x00
+RareCandy:
+.byte "RARE CANDY", 0x00
+LeafStone:
+.byte "LEAF STONE", 0x00
+FireStone:
+.byte "FIRE STONE", 0x00
+LinkCable:
+.byte "LINK CABLE", 0x00
+MoonStone:
+.byte "MOON STONE", 0x00
+WaterStone:
+.byte "WATER STONE", 0x00
+ThunderStone:
+.byte "THUNDER STONE", 0x00
+SunStone:
+.byte "SUN STONE", 0x00
+SootheBell:
+.byte "SOOTHE BELL", 0x00
+DryPokeblock:
+.byte "DRY POKEBLOCKS", 0x00
+ForestRuby:
+.byte "FOREST (RUBY)", 0x00
+VolcanoRuby:
+.byte "VOLCANO (RUBY)", 0x00
+PlainsRuby:
+.byte "PLAINS (RUBY)", 0x00
+OceanRuby:
+.byte "OCEAN (RUBY)", 0x00
+SafariZoneRuby:
+.byte "SAFARI ZONE (RUBY)", 0x00
+CaveRuby:
+.byte "CAVE (RUBY)", 0x00
+RuinsRuby:
+.byte "RUINS (RUBY)", 0x00
+ForestSapphire:
+.byte "FOREST (SAPPHIRE)", 0x00
+LakeSapphire:
+.byte "LAKE (SAPPHIRE)", 0x00
+PlainsSapphire:
+.byte "PLAINS (SAPPHIRE)", 0x00
+OceanSapphire:
+.byte "OCEAN (SAPPHIRE)", 0x00
+WildernessSapphire:
+.byte "WILDERNESS (SAPPHIRE)", 0x00
+CaveSapphire:
+.byte "CAVE (SAPPHIRE)", 0x00
+RuinsSapphire:
+.byte "RUINS (SAPPHIRE)", 0x00
+HelperZigzagoon:
+.byte "HELPER ZIGZAGOON", 0x00
+HelperMakuhita:
+.byte "HELPER MAKUHITA", 0x00
+HelperWhiscash:
+.byte "HELPER WHISCASH", 0x00
+HelperPelipper:
+.byte "HELPER PELIPPER", 0x00
+ExtraBall:
+.byte "EXTRA BALL", 0x00
+Big:
+.byte "BIG", 0x00
+Small:
+.byte "SMALL", 0x00
+BallSaver:
+.byte "30 SEC. BALL SAVER", 0x00
+Server:
+.byte "ARCHIPELAGO", 0x00
+Cheat:
+.byte "CHEAT CONSOLE", 0x00
+.align 4
+MaxPlayerString:
+.word 0x00
+PlayerTable:
+.word Player0
+.fill 254*4 //; this is gonna be flexible, since we have the entire rest of the rom to work with currently
+//; we allocate 255 initially, but we rewrite the entire table on generation
+Player0:
+.byte "PLAYER ", 0x00 //; generic player, manually place the number following (special case)
 
+.notice "Max Player: " + orga(MaxPlayerString)
 .close
