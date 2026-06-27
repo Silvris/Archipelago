@@ -95,6 +95,7 @@ class GoalTrigger(Choice):
     option_rayquaza = 2
     default = 0
 
+    @classmethod
     def get_option_name(cls, value: int) -> str:
         if value == 1:
             return "Groudon/Kyogre"

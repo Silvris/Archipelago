@@ -40,7 +40,7 @@ MAIN_ITEMS: dict[str, ItemData] = {
     EGG_BUNCH_CAVE: ItemData(18, ItemClassification.progression),
     EGG_BUNCH_MOUNTAIN: ItemData(19, ItemClassification.progression),
     EGG_BUNCH_DESERT: ItemData(20, ItemClassification.progression),
-    EGG_BUNCH_SEA: ItemData(20, ItemClassification.progression),
+    EGG_BUNCH_SEA: ItemData(21, ItemClassification.progression),
     EGG_BUNCH_RUBY: ItemData(22, ItemClassification.progression, board=1),
     EGG_BUNCH_SAPPHIRE: ItemData(23, ItemClassification.progression, board=2),
     COIN_ARROW: ItemData(24, ItemClassification.progression, num=3),

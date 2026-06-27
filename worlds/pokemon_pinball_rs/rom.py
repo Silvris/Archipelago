@@ -13,6 +13,8 @@ if TYPE_CHECKING:
 
 PINBALLRSHASH = "ba6d0fbff297b8937d3c8e7f2c25fa0f"
 
+PLAYER_STRING_TABLE = 7063008
+
 
 class RomData:
     def __init__(self, file: bytes, name: str = "") -> None:
@@ -109,6 +111,34 @@ def patch_rom(world: "PokemonPinballRSWorld", patch: PinballRSProcedurePatch) ->
     patch.write_bytes(0x6BC03C, targets)
     patch.write_byte(0x6BC056, world.medal_goal)
     patch.write_byte(0x6BC057, world.options.goal_trigger.value)
+
+    # write our string binary here
+    current_ptr = 8
+    players: list[tuple[int, bytes]] = []
+
+    players.append((0, "PLAYER \x00".encode("ASCII")))
+
+    for idx, player in world.multiworld.player_name.items():
+        if current_ptr + PLAYER_STRING_TABLE + (len(players) * 4) > 0x800000:
+            # we have managed to fill the rest of the rom with names
+            # pop the one that went over, then break out of the loop
+            players.pop()
+            break
+        altered_name = "".join(s for s in player.upper() if 0x20 < ord(s) < 0x5E)
+        if not altered_name:
+            # Name is entirely unicode, backup
+            altered_name = f"PLAYER {idx}"
+        altered_name += "\x00"
+        players.append((current_ptr, altered_name.encode("ASCII")))
+        current_ptr += len(altered_name)
+
+    for i, (ptr, player) in enumerate(players):
+        patch.write_bytes(PLAYER_STRING_TABLE + 4 + (4 * i), int.to_bytes((ptr + PLAYER_STRING_TABLE +
+                                                                           (4 * len(players)) + 4) | 0x8000000,
+                                                                          4, "little"))
+        patch.write_bytes(PLAYER_STRING_TABLE + 4 + (4 * len(players)) + ptr, player)
+
+    patch.write_bytes(PLAYER_STRING_TABLE, int.to_bytes(len(players) - 1, 4, "little"))
 
     patch.write_file("token_patch.bin", patch.get_token_binary())
 

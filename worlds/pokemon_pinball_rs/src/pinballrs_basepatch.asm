@@ -355,7 +355,7 @@ thumb_8032604:
     bl          GetStartingCoins
     nop
 
-.org BonusStage_HandleModeChangeFlags+0x4
+.org BonusStage_HandleModeChangeFlags+0x2
     //; hook here to always run during main gameplay
     .thumb
     bl          StringHandlingMainLoop
@@ -1685,9 +1685,17 @@ PopulatePlayerString:
     ldr             r2, [r2, #0]
     cmp             r0, r2
     bgt             @@GenericPlayer
+    //; quick special case, if player is negative it's given by server
+    ldr             r2, =#-1
+    cmp             r0, r2
+    beq             @@CheatConsole
+    ldr             r2, =#-2
+    cmp             r0, r2
+    beq             @@Server
     ldr             r2, =PlayerTable
     lsl             r0, #2
     ldr             r5, [r2, r0]
+    @@DisplaySpecific:
     mov             r0, r5
     bl              strlen
     mov             r2, r0
@@ -1699,6 +1707,13 @@ PopulatePlayerString:
     strb            r1, [r4, #0]
     ldr             r0, =gArchipelagoStrings
     b               @@Return
+    @@CheatConsole:
+    ldr             r5, =Cheat
+    b               @@DisplaySpecific
+    @@Server:
+    ldr             r5, =Server
+    b               @@DisplaySpecific
+
     @@GenericPlayer:
     mov             r5, r0
     mov             r0, r4
@@ -2000,14 +2015,14 @@ StandardItemStrTable: //; have to offset by 1 because 0 index is reserved
 .word 0x0, RubyBoard, SapphireBoard, StartingBall, StartingCoins, StartingModifier, PermPichu
 .word SpecialGuests, EncounterRate, RuinsAreaCard, GetArrow, EvoArrow, EvoMode, ChikoritaDex
 .word CyndaquilDex, TotodileDex, AerodactylDex, EggForest, EggCave, EggMountain, EggDesert, EggSea
-.word CoinArrow, CoinModifier, PokedexMedal
+.word EggRuby, EggSapphire, CoinArrow, CoinModifier, PokedexMedal
 AreaItemStrTable:
 .word ForestRuby, VolcanoRuby, PlainsRuby, OceanRuby, SafariZoneRuby, CaveRuby, RuinsRuby
 .word ForestSapphire, LakeSapphire, PlainsSapphire, WildernessSapphire, OceanSapphire, CaveSapphire, RuinsSapphire
 FillerItemStrTable:
 .word ExtraBall, Big, Small, BallSaver
 EvolutionItemStrTable:
-.word RareCandy, LeafStone, FireStone, LinkCable, MoonStone, WaterStone, ThunderStone, SunStone, SootheBell, DryPokeblock
+.word RareCandy, RareCandy, LeafStone, FireStone, LinkCable, MoonStone, WaterStone, ThunderStone, SunStone, SootheBell, DryPokeblock
 HelperItemStrTable:
 .word HelperZigzagoon, HelperPelipper, HelperMakuhita, HelperWhiscash
 StartingBall:

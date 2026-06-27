@@ -71,9 +71,9 @@ PINBALL_NAME = 0x6BC000
 PINBALL_VERSION = 0x6BC020
 PINBALL_SLOT_INFO = 0x6BC024
 PINBALL_GOAL = 0x6BC030
-PINBALL_DEX_REQ = 0x6BC031
-PINBALL_SCORE_REQ = 0x6BC032
-PINBALL_TARGET_REQ = 0x6BC03A
+PINBALL_DEX_REQ = 0x6BC032
+PINBALL_SCORE_REQ = 0x6BC034
+PINBALL_TARGET_REQ = 0x6BC03C
 PINBALL_MEDAL_REQ = 0x6BC056
 PINBALL_TRIGGER_REQ = 0x6BC057
 
@@ -231,6 +231,8 @@ class PinballRSClient(BizHawkClient):
                     ctx.command_processor.commands.pop("high_scores")
                 if "dexnav" in ctx.command_processor.commands:
                     ctx.command_processor.commands.pop("dexnav")
+                if "check_goal" in ctx.command_processor.commands:
+                    ctx.command_processor.commands.pop("check_goal")
                 return False
         except UnicodeDecodeError:
             return False
@@ -248,6 +250,8 @@ class PinballRSClient(BizHawkClient):
             ctx.command_processor.commands["high_score"] = cmd_high_scores
         if "dexnav" not in ctx.command_processor.commands:
             ctx.command_processor.commands["dexnav"] = cmd_dexnav
+        if "check_goal" not in ctx.command_processor.commands:
+            ctx.command_processor.commands["check_goal"] = cmd_check_goal
 
         return True
 
@@ -290,8 +294,8 @@ class PinballRSClient(BizHawkClient):
         if self.pokedex_key is None:
             self.pokedex_key = f"PINBALLRS_POKEDEX_{ctx.team}_{ctx.slot}"
             ctx.set_notify(self.pokedex_key)
-            await ctx.send_msgs([{"cmd": "Set", "key": self.pokedex_key, "operations": [
-                {"operation": "default", "value": 0}
+            await ctx.send_msgs([{"cmd": "Set", "key": self.pokedex_key, "default": [], "operations": [
+                {"operation": "update", "value": []}
             ]}])
             await ctx.send_msgs([{"cmd": "Get", "keys": [self.pokedex_key]}])
 
@@ -383,14 +387,15 @@ class PinballRSClient(BizHawkClient):
                 for i in range(205):
                     if (1 << i) & targets:
                         caught = local_dex[i] == 4
-                        target_strs.append(f"{POKEDEX_INVERSE}: {'Caught' if caught else 'Uncaught'}")
+                        target_strs.append(f"{POKEDEX_INVERSE[i]}: {'Caught' if caught else 'Uncaught'}")
                 target_str = "\n".join(target_strs)
-                logger.warning(f"Target Requirement: {target_str}")
+                logger.warning(f"Target Requirement:\n {target_str}")
             if goal_value & 0x8:
                 # medals
                 logger.warning(f"Medal Requirement: {int.from_bytes(medals, 'little')}/"
                                f"{int.from_bytes(medal_req, 'little')}")
             logger.warning(f"Goal Trigger: {trigger_types.get(trigger[0], 'Unknown')}")
+            self.print_goal = False
 
         if not ctx.finished_game and goal_check[0] != 0:
             await ctx.send_msgs([{
@@ -705,7 +710,7 @@ class PinballRSClient(BizHawkClient):
         # handle remote dex here
         if self.pokedex_key in ctx.stored_data:
             compressed = compress_pokedex(write_local_dex)
-            if compressed.to_bytes(26, "little") != ctx.stored_data[self.pokedex_key]:
+            if list(compressed.to_bytes(26, "little")) != ctx.stored_data[self.pokedex_key]:
                 writing_dex = True
                 compressed |= int.from_bytes(ctx.stored_data[self.pokedex_key], "little")
                 decompressed = decompress_pokedex(compressed)
@@ -715,7 +720,7 @@ class PinballRSClient(BizHawkClient):
                 await ctx.send_msgs([
                     {
                         "cmd": "Set", "key": self.pokedex_key, "operations": [
-                            {"operation": "replace", "value": compressed}
+                            {"operation": "replace", "value": list(compressed.to_bytes(26, "little"))}
                         ]
                     }
                 ])
