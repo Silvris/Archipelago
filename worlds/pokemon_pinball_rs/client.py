@@ -498,7 +498,7 @@ class PinballRSClient(BizHawkClient):
             writes.append((PINBALL_EVO, remote_evo.to_bytes(1, "little"), "System Bus"))
 
         for item in [item for item in ctx.items_received if item.item in range(13, 17)]:
-            if local_dex[item.item - 13 + 200] < 3:
+            if local_dex[item.item - 13 + 201] < 3:
                 writing_dex = True
                 write_local_dex[item.item - 13 + 200] = 3
 
