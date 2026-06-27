@@ -1017,6 +1017,10 @@ CheckPelipper:
     mov         r3, #1
     bl          CheckHelper
     //; r1 is preserved here, take the chance to update our total hits on mult
+    ldr         r2, =gTitlescreen
+    ldrb        r2, [r2, #6]
+    cmp         r2, #1
+    bne         @@Return
     mov         r2, #0x29
     @@Get:
     ldr         r3, =gArchipelago
@@ -1254,6 +1258,10 @@ SetSphealCheck:
 
 UpdateBumperCount:
     push        {r0-r3}
+    ldr         r2, =gTitlescreen
+    ldrb        r2, [r2, #6]
+    cmp         r2, #1
+    bne         @@Return
     mov         r2, #0x28
     @@Get:
     ldr         r3, =gArchipelago
@@ -1273,6 +1281,10 @@ UpdateBumperCount:
 
 UpdateRubyUpgrade:
     push        {r0-r4}
+    ldr         r2, =gTitlescreen
+    ldrb        r2, [r2, #6]
+    cmp         r2, #1
+    bne         @@Return
     mov         r2, #0x2A
     @@Get:
     ldr         r3, =gArchipelago
@@ -1292,6 +1304,10 @@ UpdateRubyUpgrade:
 
 UpdateSapphireUpgrade:
     push        {r0-r3}
+    ldr         r2, =gTitlescreen
+    ldrb        r2, [r2, #6]
+    cmp         r2, #1
+    bne         @@Return
     mov         r2, #0x2B
     @@Get:
     ldr         r3, =gArchipelago
@@ -1311,6 +1327,10 @@ UpdateSapphireUpgrade:
 
 UpdateMakuUpgrade:
     push        {r0-r3}
+    ldr         r2, =gTitlescreen
+    ldrb        r2, [r2, #6]
+    cmp         r2, #1
+    bne         @@Return
     mov         r2, #0x2C
     @@Get:
     ldr         r3, =gArchipelago
