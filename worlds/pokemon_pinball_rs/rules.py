@@ -8,21 +8,22 @@ from .names import (POKEDEX, POKEDEX_INVERSE, AREAS, RUBY_BOARD, SAPPHIRE_BOARD,
                     PICHU_UPGRADE, SPECIES_RAYQUAZA, SPECIAL_GUESTS, ENCOUNTER_RATE_UP, POKEDEX_MEDAL,
                     GET_ARROW, EVO_ARROW, CHIKORITA_DEX, CYNDAQUIL_DEX, TOTODILE_DEX, AERODACTYL_DEX,
                     SPECIES_LATIOS, SPECIES_LATIAS, SPECIES_CHIKORITA, SPECIES_CYNDAQUIL, SPECIES_TOTODILE,
-                    SPECIES_AERODACTYL, SPECIES_PICHU, EGG_BUNCH_1, EGG_BUNCH_2, EGG_BUNCH_3, EGG_BUNCH_4,
-                    EGG_BUNCH_RUBY, EGG_BUNCH_SAPPHIRE, RUINS_RUBY, RUINS_SAPPHIRE, RUINS_AREA_CARD, BONUS_DUSCLOPS,
-                    BONUS_KECLEON, BONUS_KYOGRE, BONUS_GROUDON, BONUS_RAYQUAZA, BONUS_SPHEAL_1, BONUS_SPHEAL_2,
-                    BONUS_SPHEAL_3, EVOLUTION_METHODS, EVOLUTION_SPECIAL, HELPER_WHISCASH, HELPER_PELIPPER,
-                    HELPER_MAKUHITA)
+                    SPECIES_AERODACTYL, SPECIES_PICHU, EGG_BUNCH_FOREST, EGG_BUNCH_CAVE, EGG_BUNCH_MOUNTAIN,
+                    EGG_BUNCH_DESERT, EGG_BUNCH_SEA, EGG_BUNCH_RUBY, EGG_BUNCH_SAPPHIRE, RUINS_RUBY, RUINS_SAPPHIRE,
+                    RUINS_AREA_CARD, BONUS_DUSCLOPS, BONUS_KECLEON, BONUS_KYOGRE, BONUS_GROUDON, BONUS_RAYQUAZA,
+                    BONUS_SPHEAL_1, BONUS_SPHEAL_2, BONUS_SPHEAL_3, EVOLUTION_METHODS, EVOLUTION_SPECIAL,
+                    HELPER_WHISCASH, HELPER_PELIPPER, HELPER_MAKUHITA)
 from .options import Difficulty, StartingBoard
 
 if TYPE_CHECKING:
     from . import PokemonPinballRSWorld
 
 EGG_GROUP_ITEMS: dict[int, str] = {
-    1: EGG_BUNCH_1,
-    2: EGG_BUNCH_2,
-    3: EGG_BUNCH_3,
-    4: EGG_BUNCH_4,
+    0: EGG_BUNCH_FOREST,
+    1: EGG_BUNCH_CAVE,
+    2: EGG_BUNCH_MOUNTAIN,
+    3: EGG_BUNCH_DESERT,
+    4: EGG_BUNCH_SEA,
     5: EGG_BUNCH_RUBY,
     6: EGG_BUNCH_SAPPHIRE,
 }
@@ -48,7 +49,8 @@ SPECIAL_ENCOUNTER_RULES: dict[str, Rule] = {
     # Pichu does not require 100 caught, he's just rare
     SPECIES_LATIOS: CanCatchSpecialEncounter,
     SPECIES_LATIAS: CanCatchSpecialEncounter,
-    SPECIES_PICHU: (HasAny(EGG_BUNCH_1, EGG_BUNCH_2, EGG_BUNCH_3, EGG_BUNCH_4)
+    SPECIES_PICHU: (HasAny(EGG_BUNCH_FOREST, EGG_BUNCH_CAVE, EGG_BUNCH_MOUNTAIN,
+                           EGG_BUNCH_DESERT, EGG_BUNCH_SEA)
                     | HasAll(RUBY_BOARD, EGG_BUNCH_RUBY)
                     | HasAll(SAPPHIRE_BOARD, EGG_BUNCH_SAPPHIRE))
                    & CanPlayLongPinball & (Has(SPECIES_RAYQUAZA) | Has(ENCOUNTER_RATE_UP)),
@@ -104,10 +106,11 @@ def set_rules(world: "PokemonPinballRSWorld") -> None:
         world.set_rule(world.get_entrance(f"To {board}"), Has(board))
         world.set_rule(world.get_entrance(f"To Hatch Eggs ({board})"), HasAny(EGG_BUNCH_RUBY,
                                                                               EGG_BUNCH_SAPPHIRE,
-                                                                              EGG_BUNCH_1,
-                                                                              EGG_BUNCH_2,
-                                                                              EGG_BUNCH_3,
-                                                                              EGG_BUNCH_4) & CanPlayBasicPinball)
+                                                                              EGG_BUNCH_FOREST,
+                                                                              EGG_BUNCH_CAVE,
+                                                                              EGG_BUNCH_MOUNTAIN,
+                                                                              EGG_BUNCH_DESERT,
+                                                                              EGG_BUNCH_SEA) & CanPlayBasicPinball)
 
         for idx, group in egg_groups.items():
             if (i == 1 and idx == 6) or (i == 2 and idx == 5):

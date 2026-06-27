@@ -461,8 +461,8 @@ class PinballRSClient(BizHawkClient):
 
         remote_eggs = 0
         valid_eggs = False
-        for item in [item for item in ctx.items_received if item.item in range(17, 23)]:
-            egg_group = item.item - 16
+        for item in [item for item in ctx.items_received if item.item in range(17, 24)]:
+            egg_group = item.item - 17
             for mon in egg_groups[egg_group]:
                 remote_eggs |= (1 << mon)
             if egg_group < 5 or (egg_group == 5 and any(item.item == 1 for item in ctx.items_received)) or \

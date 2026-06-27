@@ -1,10 +1,10 @@
 from BaseClasses import Item, ItemClassification
 from .names import (RUBY_BOARD, SAPPHIRE_BOARD, AREAS, EXTRA_STARTING_LIFE, STARTING_COINS, STARTING_BALL_MODIFIER,
                     PICHU_UPGRADE, SPECIAL_GUESTS, ENCOUNTER_RATE_UP, RUINS_AREA_CARD, GET_ARROW, EVO_ARROW,
-                    CHIKORITA_DEX, CYNDAQUIL_DEX, TOTODILE_DEX, AERODACTYL_DEX, EGG_BUNCH_1, EGG_BUNCH_2, EGG_BUNCH_3,
-                    EGG_BUNCH_4, EGG_BUNCH_RUBY, EGG_BUNCH_SAPPHIRE, BIG, SMALL, BALL_SAVER, EXTRA_BALL,
-                    EVOLUTION_METHODS, EVO_MODE, HELPER_ZIGZAGOON, HELPER_MAKUHITA, HELPER_PELIPPER, HELPER_WHISCASH,
-                    COIN_MODIFIER, COIN_ARROW, POKEDEX_MEDAL)
+                    CHIKORITA_DEX, CYNDAQUIL_DEX, TOTODILE_DEX, AERODACTYL_DEX, EGG_BUNCH_FOREST, EGG_BUNCH_CAVE,
+                    EGG_BUNCH_MOUNTAIN, EGG_BUNCH_DESERT, EGG_BUNCH_SEA, EGG_BUNCH_RUBY, EGG_BUNCH_SAPPHIRE, BIG, SMALL,
+                    BALL_SAVER, EXTRA_BALL, EVOLUTION_METHODS, EVO_MODE, HELPER_ZIGZAGOON, HELPER_MAKUHITA,
+                    HELPER_PELIPPER, HELPER_WHISCASH, COIN_MODIFIER, COIN_ARROW, POKEDEX_MEDAL)
 from typing import NamedTuple
 
 
@@ -36,15 +36,16 @@ MAIN_ITEMS: dict[str, ItemData] = {
     CYNDAQUIL_DEX: ItemData(14, ItemClassification.progression),
     TOTODILE_DEX: ItemData(15, ItemClassification.progression),
     AERODACTYL_DEX: ItemData(16, ItemClassification.progression),
-    EGG_BUNCH_1: ItemData(17, ItemClassification.progression),
-    EGG_BUNCH_2: ItemData(18, ItemClassification.progression),
-    EGG_BUNCH_3: ItemData(19, ItemClassification.progression),
-    EGG_BUNCH_4: ItemData(20, ItemClassification.progression),
-    EGG_BUNCH_RUBY: ItemData(21, ItemClassification.progression, board=1),
-    EGG_BUNCH_SAPPHIRE: ItemData(22, ItemClassification.progression, board=2),
-    COIN_ARROW: ItemData(23, ItemClassification.progression, num=3),
-    COIN_MODIFIER: ItemData(24, ItemClassification.progression),
-    POKEDEX_MEDAL: ItemData(25, ItemClassification.progression, num=0),
+    EGG_BUNCH_FOREST: ItemData(17, ItemClassification.progression),
+    EGG_BUNCH_CAVE: ItemData(18, ItemClassification.progression),
+    EGG_BUNCH_MOUNTAIN: ItemData(19, ItemClassification.progression),
+    EGG_BUNCH_DESERT: ItemData(20, ItemClassification.progression),
+    EGG_BUNCH_SEA: ItemData(20, ItemClassification.progression),
+    EGG_BUNCH_RUBY: ItemData(22, ItemClassification.progression, board=1),
+    EGG_BUNCH_SAPPHIRE: ItemData(23, ItemClassification.progression, board=2),
+    COIN_ARROW: ItemData(24, ItemClassification.progression, num=3),
+    COIN_MODIFIER: ItemData(25, ItemClassification.progression),
+    POKEDEX_MEDAL: ItemData(26, ItemClassification.progression, num=0),
     # Helpers
     HELPER_ZIGZAGOON: ItemData(0x800, ItemClassification.useful, board=2),
     HELPER_PELIPPER: ItemData(0x801, ItemClassification.progression, board=2),
