@@ -551,7 +551,7 @@ class PinballRSClient(BizHawkClient):
                 caught = sum(mon == 4 for mon in local_dex)
                 if coin < 60:
                     logger.warning("More coins are required to track this Pokémon.")
-                elif caught < 100:
+                elif self.dexnav != 154 and caught < 100:
                     logger.warning("Cannot track special Pokémon until more Pokémon have been registered in the "
                                    "Pokédex!")
                 else:
