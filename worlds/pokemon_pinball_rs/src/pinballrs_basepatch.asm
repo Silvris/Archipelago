@@ -204,7 +204,7 @@
 //; catch_hatch_picker
 .org BuildSpeciesWeightsForCatchEmMode+0x110
     .thumb
-    bl          ClampearlCheck
+    bl          ClamperlCheck
 
 .org BuildSpeciesWeightsForCatchEmMode+0x162
     .thumb
@@ -652,7 +652,7 @@ WeightsCheckEvo:
 
 .pool
 
-ClampearlCheck:
+ClamperlCheck:
     //; clamperl is a special little baby
     push        {r0-r3}
     nop
@@ -830,7 +830,7 @@ CheckIndividualMonEvo:
     mov         r2, #1
     b           @@Check
     @@Clamperl:
-    mov         r2, #3
+    mov         r2, #4
     b           @@Check
     //; the complex one
     nop
@@ -902,7 +902,7 @@ CheckAnyMonEvo:
     mov         r2, #1
     b           @@Check
     @@Clamperl:
-    mov         r2, #3
+    mov         r2, #4
     b           @@Check
     @@Gloom:
     //; the complex one
