@@ -109,6 +109,7 @@ def cmd_ereader(self: "BizHawkClientCommandProcessor", card: str) -> None:
         return
     if not client.has_item(self.ctx, EREADER_MAP[card.title()][1]):
         logger.warning(f"You have not received the {card.title()} E-Reader card.")
+        return
     client.active_ereader = EREADER_MAP[card.title()][0]
 
 
