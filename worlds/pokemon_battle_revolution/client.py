@@ -1,23 +1,104 @@
 import argparse
 import asyncio
+import logging
+from typing import TYPE_CHECKING
+
 import dolphin_memory_engine
+import Utils
 from CommonClient import CommonContext, ClientCommandProcessor, gui_enabled, get_base_parser, server_loop
 
+if TYPE_CHECKING:
+    import kvui
 
 BATTLE_REV_SAVE_FILE_PTR = 0x8045DE80
-BATTLE_REV_SAVE_FILE_INDEX = BATTLE_REV_SAVE_FILE_PTR + 0x50
+BATTLE_REV_SAVE_FILE_INDEX = 0x50
+BATTLE_REV_SAVE_START = 0x380
 BATTLE_REV_SAVE_SIZE = 0x6FF00  # mult by current save index to find current player
+BATTLE_REV_PARTY_OFS = 0xCC
+BATTLE_REV_BOX_OFS = 0x5F8
+BATTLE_REV_PKM_SIZE = 0x88
+BATTLE_REV_PARTY_PKM_SIZE = BATTLE_REV_PKM_SIZE + 0x54
+BATTLE_REV_BOX_SIZE = BATTLE_REV_PKM_SIZE * 30
+BATTLE_REV_ASSOC_TID = 0x124E0  # First byte is here, second byte is +7
+BATTLE_REV_COUPONS = 0x124E1  # 3-byte
+BATTLE_REV_ASSOC_SID = 0x124E5  # short
 
+
+logger = logging.getLogger("Wii")
 
 
 class PBRContext(CommonContext):
-    game = "Pokémon Battle Revolution"
+    game = "Pokemon Battle Revolution"
     tags = {"AP"}
     items_handling = 0b111
+    display_hooked = True
+
+    def make_gui(self) -> "type[kvui.GameManager]":
+        from kvui import GameManager
+
+        class PBRManager(GameManager):
+            base_title = "Archipelago Pokémon Battle Revolution Client"
+            logging_pairs = [
+                ("Client", "Archipelago"),
+                ("Wii", "Wii")
+            ]
+        return PBRManager
+
+    async def server_auth(self, password_requested: bool = False):
+        if password_requested and not self.password:
+            await super().server_auth(password_requested)
+        await self.get_username()
+        await self.send_connect()
 
 
 async def game_watcher(ctx: PBRContext) -> None:
-    pass
+    while not ctx.exit_event.is_set():
+        try:
+            try:
+                await asyncio.wait_for(ctx.watcher_event.wait(), 0.125)
+            except asyncio.TimeoutError:
+                pass
+            ctx.watcher_event.clear()
+            if not dolphin_memory_engine.is_hooked():
+                dolphin_memory_engine.hook()
+            else:
+                if not ctx.slot:
+                    continue
+                if ctx.display_hooked:
+                    logger.warning(f"Hooked.")
+                    save_base = dolphin_memory_engine.read_word(BATTLE_REV_SAVE_FILE_PTR)
+                    save_slot = dolphin_memory_engine.read_byte(save_base + BATTLE_REV_SAVE_FILE_INDEX)
+                    save_ptr = save_base + (save_slot * BATTLE_REV_SAVE_SIZE) + BATTLE_REV_SAVE_START
+                    tid_low = dolphin_memory_engine.read_byte(save_ptr + BATTLE_REV_ASSOC_TID)
+                    tid_high = dolphin_memory_engine.read_byte(save_ptr + BATTLE_REV_ASSOC_TID+7)
+                    tid = tid_high << 8 | tid_low
+                    sid = int.from_bytes(dolphin_memory_engine.read_bytes(save_ptr + BATTLE_REV_ASSOC_SID, 2), byteorder="big")
+                    coupons = int.from_bytes(dolphin_memory_engine.read_bytes(save_ptr + BATTLE_REV_COUPONS, 3), byteorder="big")
+                    logger.warning(f"TID: {tid}, SID: {sid}, Coupons: {coupons}")
+                    for pkm in range(6):
+                        species = int.from_bytes(dolphin_memory_engine.read_bytes(save_ptr + BATTLE_REV_PARTY_OFS +
+                                                                                  (pkm * BATTLE_REV_PARTY_PKM_SIZE) + 8, 2),
+                                                 byteorder="big")
+                        if species != 0:
+                            logger.warning(f"Party: species: {species}, pkm: {pkm}")
+                    for box in range(18):
+                        for pkm in range(30):
+                            species = int.from_bytes(dolphin_memory_engine.read_bytes(save_ptr +
+                                                                                      (box * BATTLE_REV_BOX_SIZE) +
+                                                                                      BATTLE_REV_BOX_OFS +
+                                                                                      (pkm * BATTLE_REV_PKM_SIZE) + 8, 2)
+                                                     , byteorder="big")
+                            if species != 0:
+                                logger.warning(f"species: {species}, pkm: {pkm}, box: {box}")
+                    ctx.display_hooked = False
+        except Exception as ex:
+            import traceback
+            Utils.messagebox("Error", str(ex), True)
+            logger.error(traceback.format_exc())
+
+
+
+
 
 
 async def main(args: "argparse.Namespace") -> None:
