@@ -9,10 +9,11 @@ from settings import Group, UserFilePath
 from typing import Any, ClassVar, Mapping
 
 from .client import PinballRSClient
-from .items import PinballRSItem, ALL_ITEMS, item_lookup, MAIN_ITEMS, AREA_ITEMS, FILLER_ITEM_WEIGHTS, EVOLUTION_ITEMS
+from .items import (PinballRSItem, ALL_ITEMS, item_lookup, MAIN_ITEMS, AREA_ITEMS, FILLER_ITEM_WEIGHTS, EVOLUTION_ITEMS,
+                    item_groups)
 from .names import RUBY_BOARD, SAPPHIRE_BOARD, AREAS, EVO_ARROW, EVO_MODE, POKEDEX_MEDAL
 from .options import PokemonPinballRSOptions, StartingBoard, EvoMode
-from .regions import create_regions, location_lookup
+from .regions import create_regions, location_lookup, location_groups
 from .rom import PinballRSProcedurePatch, patch_rom, PINBALLRSHASH
 from .rules import set_rules
 
@@ -55,6 +56,8 @@ class PokemonPinballRSWorld(World):
     options: PokemonPinballRSOptions
     item_name_to_id = item_lookup
     location_name_to_id = location_lookup
+    item_name_groups = item_groups
+    location_name_groups = location_groups
     possible_mons: set[int]
     rom_name: bytearray
 

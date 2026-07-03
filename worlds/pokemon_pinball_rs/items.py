@@ -85,3 +85,15 @@ ALL_ITEMS: dict[str, ItemData] = {
 item_lookup: dict[str, int] = {
     key: data.idx for key, data in ALL_ITEMS.items()
 }
+
+item_groups: dict[str, set[str]] = {
+    "e-Reader": {SPECIAL_GUESTS, ENCOUNTER_RATE_UP, RUINS_AREA_CARD},
+    "Evolution Items": {*EVOLUTION_ITEMS.keys()},
+    "Areas": {*AREA_ITEMS.keys()},
+    "Egg Bunches": {EGG_BUNCH_FOREST, EGG_BUNCH_CAVE, EGG_BUNCH_MOUNTAIN, EGG_BUNCH_DESERT,
+                    EGG_BUNCH_SEA, EGG_BUNCH_RUBY, EGG_BUNCH_SAPPHIRE},
+    "Helpers": {HELPER_PELIPPER, HELPER_ZIGZAGOON, HELPER_MAKUHITA, HELPER_WHISCASH},
+    "Boards": {RUBY_BOARD, SAPPHIRE_BOARD},
+    "Evolution": {EVO_MODE, EVO_ARROW},
+
+}

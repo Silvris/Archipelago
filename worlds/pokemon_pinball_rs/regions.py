@@ -10,6 +10,7 @@ if TYPE_CHECKING:
 
 logger = getLogger("Pokemon Pinball Ruby & Sapphire")
 
+
 class PinballRSRegion(Region):
     game = "Pokemon Pinball Ruby & Sapphire"
 
@@ -29,6 +30,18 @@ location_lookup: dict[str, int] = {
        for i in range(1, 100)},
     **{f"Ruby Board - Makuhita Ball Upgrade {i}": 0x400 + i
        for i in range(1, 100)},
+}
+
+location_groups: dict[str, set[str]] = {
+    "Pokedex": {f"Pokédex - {mon}" for mon in POKEDEX.keys()},
+    "Bonus Stages": {*BONUS_STAGES.keys()},
+    "Bonus Multipliers": {f"{board} - Bonus Multiplier {i}"
+                          for board in (RUBY_BOARD, SAPPHIRE_BOARD)
+                          for i in range(1, 100)},
+    "Ball Upgrades": {*[f"{board} - Ball Upgrade {i}"
+                        for board in (RUBY_BOARD, SAPPHIRE_BOARD)
+                        for i in range(1, 100)],
+                      *[f"Ruby Board - Makuhita Ball Upgrade {i}" for i in range(1, 100)]},
 }
 
 
