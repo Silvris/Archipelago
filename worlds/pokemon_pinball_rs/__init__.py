@@ -33,12 +33,12 @@ class PokemonPinballRSWebWorld(WebWorld):
     tutorials = [
 
         Tutorial(
-           "Multiworld Setup Guide",
-           "A guide to setting up the Pokemon Pinball Ruby & Sapphire randomizer connected to an Archipelago Multiworld.",
-           "English",
-           "setup_en.md",
-           "setup/en",
-           ["Silvris"]
+            "Multiworld Setup Guide",
+            "A guide to setting up the Pokemon Pinball Ruby & Sapphire randomizer connected to an Archipelago Multiworld.",
+            "English",
+            "setup_en.md",
+            "setup/en",
+            ["Silvris"]
         )
     ]
 
@@ -80,7 +80,7 @@ class PokemonPinballRSWorld(World):
         itempool = [self.create_item(name) for name, data in MAIN_ITEMS.items() for _ in range(data.num)
                     if name not in (RUBY_BOARD, SAPPHIRE_BOARD, EVO_ARROW, EVO_MODE) and
                     (data.board == 0 or
-                    (not self.options.single_board or data.board == (self.options.starting_board.value + 1)))]
+                     (not self.options.single_board or data.board == (self.options.starting_board.value + 1)))]
         if self.options.starting_board == StartingBoard.option_ruby:
             board_name = RUBY_BOARD
             other_board = SAPPHIRE_BOARD
@@ -146,9 +146,11 @@ class PokemonPinballRSWorld(World):
         return changed
 
     def fill_slot_data(self) -> Mapping[str, Any]:
-        return self.options.as_dict("goal", "difficulty", "single_board", "pokedex_requirement",
-                                    "score_requirement", "pokemon_targets", "bonus_multiplier_checks",
-                                    "ball_upgrade_checks")
+        slot_data = self.options.as_dict("goal", "difficulty", "single_board", "pokedex_requirement",
+                                         "score_requirement", "pokemon_targets", "goal_trigger",
+                                         "bonus_multiplier_checks", "ball_upgrade_checks", "collect_pokedex")
+        slot_data["medal_goal"] = self.medal_goal
+        return slot_data
 
     def generate_output(self, output_directory: str) -> None:
         try:
