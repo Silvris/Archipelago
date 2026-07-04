@@ -281,7 +281,7 @@ class PinballRSClient(BizHawkClient):
         return any(item.item == idx for item in ctx.items_received)
 
     async def game_watcher(self, ctx: "BizHawkClientContext") -> None:
-        from worlds._bizhawk import read, write
+        from worlds._bizhawk import read, write, guarded_write
 
         if ctx.server is None:
             return
@@ -501,7 +501,7 @@ class PinballRSClient(BizHawkClient):
         for item in [item for item in ctx.items_received if item.item in range(13, 17)]:
             if local_dex[item.item - 13 + 201] < 3:
                 writing_dex = True
-                write_local_dex[item.item - 13 + 200] = 3
+                write_local_dex[item.item - 13 + 201] = 3
 
         remote_eggs = 0
         valid_eggs = False
@@ -727,7 +727,8 @@ class PinballRSClient(BizHawkClient):
                 ])
 
         if writing_dex:
-            writes.append((PINBALL_POKEDEX, bytes(write_local_dex), "System Bus"))
+            await guarded_write(ctx.bizhawk_ctx, [(PINBALL_POKEDEX, bytes(write_local_dex), "System Bus")],
+                                [(PINBALL_POKEDEX, local_dex, "System Bus")])
 
         await write(ctx.bizhawk_ctx, writes)
 
