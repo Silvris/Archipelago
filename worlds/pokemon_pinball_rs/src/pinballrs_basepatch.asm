@@ -1895,7 +1895,7 @@ CheckGoal:
     bl          GetNewHighScoreIndex
     pop         {r2-r4}
     cmp         r0, #0
-    beq         @@Targets //; if 0 is returned, this is higher than all reported high scores. if any other value is returned, there's a high score greater than this
+    beq         @@TargetsRestore //; if 0 is returned, this is higher than all reported high scores. if any other value is returned, there's a high score greater than this
     add         r2, #1
     cmp         r2, #2
     blt         @@HighScoreLoop
@@ -1909,6 +1909,7 @@ CheckGoal:
     bl          CompareScores
     cmp         r0, #0
     bgt         @@ReturnFalse
+    @@TargetsRestore:
     mov         r1, r7
     @@Targets:
     mov         r2, #4
@@ -1928,7 +1929,8 @@ CheckGoal:
     and         r0, r2
     beq         @@TargetContinue
     ldrb        r0, [r5, r4]
-    beq         @@ReturnFalseTarget
+    cmp         r0, #4
+    bne         @@ReturnFalseTarget
     @@TargetContinue:
     add         r4, #1
     add         r1, #1
