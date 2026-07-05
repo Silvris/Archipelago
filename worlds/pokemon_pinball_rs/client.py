@@ -746,4 +746,3 @@ class PinballRSClient(BizHawkClient):
             from traceback import print_exc
             Utils.messagebox("Error", str(ex))
             print_exc()
-            
