@@ -34,7 +34,7 @@ location_lookup: dict[str, int] = {
 
 location_groups: dict[str, set[str]] = {
     "Pokedex": {f"Pokédex - {mon}" for mon in POKEDEX.keys()},
-    "Bonus Stages": {*BONUS_STAGES.keys()},
+    "Bonus Stages": {*BONUS_STAGES.values()},
     "Bonus Multipliers": {f"{board} - Bonus Multiplier {i}"
                           for board in (RUBY_BOARD, SAPPHIRE_BOARD)
                           for i in range(1, 100)},
