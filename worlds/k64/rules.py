@@ -1,15 +1,17 @@
-from worlds.generic.Rules import set_rule, add_rule
 from worlds.AutoWorld import LogicMixin
-from BaseClasses import MultiWorld
+from BaseClasses import MultiWorld, CollectionState
 from copy import deepcopy
-from .consumable_info import consumable_by_level
-from .locations import star_locations
+from dataclasses import dataclass
+from rule_builder.rules import Rule, Has, HasAll, Or
+from .items import copy_ability_table, power_combo_map
 from .names import LocationName, ItemName
+
+from NetUtils import JSONMessagePart
 import typing
+from typing_extensions import override
 
 if typing.TYPE_CHECKING:
     from . import K64World
-    from BaseClasses import CollectionState
 
 burn_levels = [
     "Pop Star 1",
@@ -136,7 +138,6 @@ waddle_copy_levels = {
     ]
 }
 
-
 dedede_copy_levels = {
     "Burning Ability": [
         "Aqua Star 3"
@@ -174,380 +175,561 @@ class K64LogicMixin(LogicMixin):
         return other
 
 
-def has_any_bomb(state: "CollectionState", player: int):
-    for specific, access in zip([ItemName.bomb, ItemName.bomb_bomb, ItemName.bomb_spark, ItemName.bomb_cutter,
-                                 ItemName.burn_bomb, ItemName.ice_bomb, ItemName.stone_bomb, ItemName.needle_bomb],
-                                [["Bomb Ability"], ["Bomb Ability"], ["Bomb Ability", "Spark Ability"],
-                                 ["Bomb Ability", "Cutter Ability"], ["Bomb Ability", "Burning Ability"],
-                                 ["Bomb Ability", "Ice Ability"], ["Bomb Ability", "Stone Ability"],
-                                 ["Bomb Ability", "Needle Ability"]]):
-        if state.has(specific, player) and state.has_all(access, player):
-            return True
-    return False
+ABILITY_ACCESS_TABLE: dict[str, str] = {
+    ItemName.burn: ItemName.burn_event,
+    ItemName.stone: ItemName.stone_event,
+    ItemName.ice: ItemName.ice_event,
+    ItemName.needle: ItemName.needle_event,
+    ItemName.bomb: ItemName.bomb_event,
+    ItemName.spark: ItemName.spark_event,
+    ItemName.cutter: ItemName.cutter_event,
+}
 
 
-def has_any_stone(state: "CollectionState", player: int):
-    for specific, access in zip([ItemName.stone, ItemName.stone_stone, ItemName.stone_spark, ItemName.stone_cutter,
-                                 ItemName.burn_stone, ItemName.stone_ice, ItemName.stone_bomb, ItemName.stone_needle],
-                                [["Stone Ability"], ["Stone Ability"], ["Stone Ability", "Spark Ability"],
-                                 ["Stone Ability", "Cutter Ability"], ["Stone Ability", "Burning Ability"],
-                                 ["Stone Ability", "Ice Ability"], ["Stone Ability", "Bomb Ability"],
-                                 ["Stone Ability", "Needle Ability"]]):
-        if state.has(specific, player) and state.has_all(access, player):
-            return True
-    return False
+@dataclass
+class PowerCombo(Rule["K64World"], game="Kirby 64 - The Crystal Shards"):
+    ability_a: str
+    ability_b: str
+
+    def __init__(self, ability_a: str, ability_b: str):
+        super().__init__()
+        self.ability_a = ability_a
+        self.ability_b = ability_b
+
+    @override
+    def _instantiate(self, world: "K64World") -> Rule.Resolved:
+        if world.options.split_power_combos:
+            return self.SplitResolved(ability_a=self.ability_a, ability_b=self.ability_b, player=world.player)
+        else:
+            return self.NonSplitResolved(ability_a=self.ability_a, ability_b=self.ability_b, player=world.player)
+
+    class SplitResolved(Rule.Resolved):
+        ability_a: str
+        ability_b: str
+
+        @override
+        def _evaluate(self, state: CollectionState) -> bool:
+            key = sorted([copy_ability_table[self.ability_a].code, copy_ability_table[self.ability_b].code])
+            combo = power_combo_map[tuple(key)]
+            if state.has(combo, self.player):
+                if state.has_any([self.ability_a, self.ability_b], self.player):
+                    # now check for the access
+                    return state.has_all([ABILITY_ACCESS_TABLE[self.ability_a],
+                                          ABILITY_ACCESS_TABLE[self.ability_b]], self.player)
+            return False
+
+        @override
+        def explain_str(self, state: CollectionState | None = None) -> str:
+            key = sorted([copy_ability_table[self.ability_a].code, copy_ability_table[self.ability_b].code])
+            combo = power_combo_map[tuple(key)]
+            s = (f"{combo}: {'Have' if state.has(combo, self.player) else 'Don\'t Have'}\n"
+                 f"{self.ability_a}: {'Have' if state.has(self.ability_a, self.player) else 'Don\'t Have'}\n"
+                 f"Can Reach {self.ability_a}: {state.has(ABILITY_ACCESS_TABLE[self.ability_a], self.player)}\n"
+                 f"{self.ability_b}: {'Have' if state.has(self.ability_b, self.player) else 'Don\'t Have'}\n"
+                 f"Can Reach {self.ability_b}: {state.has(ABILITY_ACCESS_TABLE[self.ability_b], self.player)}")
+            return s
+
+        @override
+        def explain_json(self, state: CollectionState | None = None) -> list[JSONMessagePart]:
+            explain_strs = self.explain_str(state).splitlines()
+            messages: list[JSONMessagePart] = [{"type": "text", "text": explain_strs[0]}]
+            return messages
+
+        @override
+        def item_dependencies(self) -> dict[str, set[int]]:
+            key = sorted([copy_ability_table[self.ability_a].code, copy_ability_table[self.ability_b].code])
+            combo = power_combo_map[tuple(key)]
+            return {
+                x: {id(self)} for x in [combo, self.ability_a, self.ability_b,
+                                        ABILITY_ACCESS_TABLE[self.ability_a], ABILITY_ACCESS_TABLE[self.ability_b]]
+            }
+
+    class NonSplitResolved(Rule.Resolved):
+        ability_a: str
+        ability_b: str
+
+        @override
+        def _evaluate(self, state: CollectionState) -> bool:
+            if state.has_all([self.ability_a, self.ability_b], self.player):
+                # now check for the access
+                return state.has_all([ABILITY_ACCESS_TABLE[self.ability_a],
+                                      ABILITY_ACCESS_TABLE[self.ability_b]], self.player)
+            return False
+
+        @override
+        def explain_str(self, state: CollectionState | None = None) -> str:
+            s = (f"{self.ability_a}: {'Have' if state.has(self.ability_a, self.player) else 'Don\'t Have'}\n"
+                 f"Can Reach {self.ability_a}: {state.has(ABILITY_ACCESS_TABLE[self.ability_a], self.player)}\n"
+                 f"{self.ability_b}: {'Have' if state.has(self.ability_b, self.player) else 'Don\'t Have'}\n"
+                 f"Can Reach {self.ability_b}: {state.has(ABILITY_ACCESS_TABLE[self.ability_b], self.player)}")
+            return s
+
+        @override
+        def explain_json(self, state: CollectionState | None = None) -> list[JSONMessagePart]:
+            explain_strs = self.explain_str(state).splitlines()
+            messages: list[JSONMessagePart] = [{"type": "text", "text": explain_strs[0]}]
+            return messages
+
+        @override
+        def item_dependencies(self) -> dict[str, set[int]]:
+            return {
+                x: {id(self)} for x in [self.ability_a, self.ability_b,
+                                        ABILITY_ACCESS_TABLE[self.ability_a], ABILITY_ACCESS_TABLE[self.ability_b]]
+            }
 
 
-def has_any_needle(state: "CollectionState", player: int):
-    for specific, access in zip([ItemName.needle, ItemName.needle_needle, ItemName.needle_spark, ItemName.needle_cutter,
-                                 ItemName.burn_needle, ItemName.ice_needle, ItemName.needle_bomb,
-                                 ItemName.stone_needle],
-                                [["Needle Ability"], ["Needle Ability"], ["Needle Ability", "Spark Ability"],
-                                 ["Needle Ability", "Cutter Ability"], ["Needle Ability", "Burning Ability"],
-                                 ["Needle Ability", "Ice Ability"], ["Bomb Ability", "Needle Ability"],
-                                 ["Stone Ability", "Needle Ability"]]):
-        if state.has(specific, player) and state.has_all(access, player):
-            return True
-    return False
+HasBasicBurning = HasAll(ItemName.burn, ItemName.burn_event)
+HasBasicStone = HasAll(ItemName.stone, ItemName.stone_event)
+HasBasicIce = HasAll(ItemName.ice, ItemName.ice_event)
+HasBasicNeedle = HasAll(ItemName.needle, ItemName.needle_event)
+HasBasicBomb = HasAll(ItemName.bomb, ItemName.bomb_event)
+HasBasicSpark = HasAll(ItemName.spark, ItemName.spark_event)
+HasBasicCutter = HasAll(ItemName.cutter, ItemName.cutter_event)
 
 
-def has_any_ice(state: "CollectionState", player: int):
-    # Used once, Refrigerator does not qualify
-    for specific, access in zip([ItemName.ice, ItemName.ice_ice, ItemName.ice_cutter,
-                                 ItemName.burn_ice, ItemName.ice_needle, ItemName.ice_bomb, ItemName.stone_ice],
-                                [["Ice Ability"], ["Ice Ability"],
-                                 ["Ice Ability", "Cutter Ability"], ["Ice Ability", "Burning Ability"],
-                                 ["Needle Ability", "Ice Ability"], ["Bomb Ability", "Ice Ability"],
-                                 ["Stone Ability", "Ice Ability"]]):
-        if state.has(specific, player) and state.has_all(access, player):
-            return True
-    return False
+HasAnyBurning = HasBasicBurning | Or(*[PowerCombo(ItemName.burn, x) for x in [ItemName.burn, ItemName.stone,
+                                                                              ItemName.ice, ItemName.needle,
+                                                                              ItemName.bomb, ItemName.spark,
+                                                                              ItemName.cutter]])
+HasAnyStone = HasBasicStone | Or(*[PowerCombo(ItemName.stone, x) for x in [ItemName.burn, ItemName.stone,
+                                                                              ItemName.ice, ItemName.needle,
+                                                                              ItemName.bomb, ItemName.spark,
+                                                                              ItemName.cutter]])
+HasAnyIce = HasBasicIce | Or(*[PowerCombo(ItemName.ice, x) for x in [ItemName.burn, ItemName.stone,
+                                                                              ItemName.ice, ItemName.needle,
+                                                                              ItemName.bomb,
+                                                                              ItemName.cutter]])
+HasAnyNeedle = HasBasicNeedle | Or(*[PowerCombo(ItemName.needle, x) for x in [ItemName.burn, ItemName.stone,
+                                                                              ItemName.ice, ItemName.needle,
+                                                                              ItemName.bomb, ItemName.spark,
+                                                                              ItemName.cutter]])
+HasAnyBomb = HasBasicBomb | Or(*[PowerCombo(ItemName.bomb, x) for x in [ItemName.burn, ItemName.stone,
+                                                                              ItemName.ice, ItemName.needle,
+                                                                              ItemName.bomb, ItemName.spark,
+                                                                              ItemName.cutter]])
+HasAnySpark = HasBasicSpark | Or(*[PowerCombo(ItemName.spark, x) for x in [ItemName.burn, ItemName.stone,
+                                                                              ItemName.ice, ItemName.needle,
+                                                                              ItemName.bomb, ItemName.spark,
+                                                                              ItemName.cutter]])
+HasAnyCutter = HasBasicCutter | Or(*[PowerCombo(ItemName.cutter, x) for x in [ItemName.burn, ItemName.stone,
+                                                                              ItemName.ice, ItemName.needle,
+                                                                              ItemName.bomb, ItemName.spark,
+                                                                              ItemName.cutter]])
 
+HasGreatCutter = PowerCombo(ItemName.cutter, ItemName.cutter)
+HasGeokinesis = PowerCombo(ItemName.stone, ItemName.spark)
+HasLightbulb = PowerCombo(ItemName.bomb, ItemName.spark)
+HasExplodingSnowman = PowerCombo(ItemName.ice, ItemName.bomb)
+HasVolcano = PowerCombo(ItemName.burn, ItemName.stone)
+HasShurikens = PowerCombo(ItemName.bomb, ItemName.cutter)
+HasStoneFriends = PowerCombo(ItemName.stone, ItemName.cutter)
+HasDynamite = PowerCombo(ItemName.stone, ItemName.bomb)
+HasLightningRod = PowerCombo(ItemName.needle, ItemName.spark)
+HasDrill = PowerCombo(ItemName.stone, ItemName.needle)
+HasLightsaber = PowerCombo(ItemName.spark, ItemName.cutter)
+HasExplodingGordo = PowerCombo(ItemName.needle, ItemName.bomb)
+HasFireArrows = PowerCombo(ItemName.burn, ItemName.needle)
 
-def has_any_burn(state: "CollectionState", player: int):
-    for specific, access in zip([ItemName.burn, ItemName.burn_burn, ItemName.burn_spark, ItemName.burn_cutter,
-                                 ItemName.burn_ice, ItemName.burn_needle, ItemName.burn_bomb, ItemName.burn_stone],
-                                [["Burning Ability"], ["Burning Ability"], ["Burning Ability", "Spark Ability"],
-                                 ["Burning Ability", "Cutter Ability"], ["Ice Ability", "Burning Ability"],
-                                 ["Needle Ability", "Burning Ability"], ["Bomb Ability", "Burning Ability"],
-                                 ["Stone Ability", "Burning Ability"]]):
-        if state.has(specific, player) and state.has_all(access, player):
-            return True
-    return False
+HasWaddleDee = Has(ItemName.waddle_dee)
+HasAdeleine = Has(ItemName.adeleine)
+HasKingDedede = Has(ItemName.king_dedede)
 
+ONEUP_RULES: dict[str, Rule] = {
+    LocationName.neo_star_2_u1: HasWaddleDee,
+    LocationName.neo_star_2_u2: HasWaddleDee,
+    LocationName.aqua_star_3_u1: HasKingDedede & HasStoneFriends,
+    LocationName.neo_star_4_u1: HasKingDedede,
+    LocationName.ripple_star_2_u1: HasKingDedede,
+    LocationName.ripple_star_2_u2: HasKingDedede & HasAnySpark,
+}
 
-def has_any_spark(state: "CollectionState", player: int):
-    for specific, access in zip([ItemName.spark, ItemName.spark_spark, ItemName.burn_spark, ItemName.spark_cutter,
-                                 ItemName.ice_spark, ItemName.needle_spark, ItemName.bomb_spark, ItemName.stone_spark],
-                                [["Spark Ability"], ["Spark Ability"], ["Burning Ability", "Spark Ability"],
-                                 ["Spark Ability", "Cutter Ability"], ["Ice Ability", "Spark Ability"],
-                                 ["Needle Ability", "Spark Ability"], ["Bomb Ability", "Spark Ability"],
-                                 ["Stone Ability", "Spark Ability"]]):
-        if state.has(specific, player) and state.has_all(access, player):
-            return True
-    return False
+FOOD_RULES: dict[str, Rule] = {
+    LocationName.rock_star_1_f5: HasWaddleDee,
+    LocationName.aqua_star_2_f4: HasWaddleDee,
+    LocationName.aqua_star_2_f5: HasWaddleDee,
+    LocationName.aqua_star_2_f6: HasWaddleDee,
+    LocationName.aqua_star_2_f7: HasWaddleDee,
+    LocationName.aqua_star_2_f8: HasWaddleDee,
+    LocationName.aqua_star_2_f9: HasWaddleDee,
+    LocationName.aqua_star_2_f10: HasWaddleDee,
+    LocationName.aqua_star_2_f11: HasWaddleDee,
+    LocationName.neo_star_2_f2: HasWaddleDee,
+    LocationName.neo_star_2_f3: HasWaddleDee,
+    LocationName.neo_star_2_f4: HasWaddleDee,
+    LocationName.neo_star_2_f5: HasWaddleDee,
+    LocationName.neo_star_2_f6: HasWaddleDee,
+    LocationName.neo_star_2_f7: HasWaddleDee,
+    LocationName.neo_star_2_f8: HasWaddleDee,
+    LocationName.neo_star_2_f9: HasWaddleDee,
+    LocationName.neo_star_2_f10: HasWaddleDee,
+    LocationName.shiver_star_1_f4: HasWaddleDee,
+    LocationName.shiver_star_1_f5: HasWaddleDee,
+    LocationName.shiver_star_1_f6: HasWaddleDee,
+    LocationName.shiver_star_1_f7: HasWaddleDee,
+    LocationName.shiver_star_1_f8: HasWaddleDee,
+    LocationName.shiver_star_1_f9: HasWaddleDee,
+    LocationName.shiver_star_1_f10: HasWaddleDee,
+    LocationName.shiver_star_1_f11: HasWaddleDee,
+    LocationName.shiver_star_1_f12: HasWaddleDee,
+    LocationName.rock_star_2_f7: HasKingDedede,
+    LocationName.rock_star_2_f8: HasKingDedede,
+    LocationName.rock_star_2_f9: HasKingDedede,
+    LocationName.rock_star_2_f10: HasKingDedede,
+    LocationName.aqua_star_3_f3: HasKingDedede,
+    LocationName.neo_star_4_f3: HasKingDedede,
+    LocationName.neo_star_4_f4: HasKingDedede,
+    LocationName.neo_star_4_f5: HasKingDedede,
+    LocationName.neo_star_4_f6: HasKingDedede,
+    LocationName.neo_star_4_f7: HasKingDedede,
+    LocationName.neo_star_4_f8: HasKingDedede,
+    LocationName.neo_star_4_f9: HasKingDedede,
+    LocationName.neo_star_4_f10: HasKingDedede,
+    LocationName.neo_star_4_f11: HasKingDedede,
+    LocationName.neo_star_4_f12: HasKingDedede,
+    LocationName.neo_star_4_f13: HasKingDedede,
+    LocationName.neo_star_4_f14: HasKingDedede,
+    LocationName.shiver_star_4_f3: HasKingDedede,
+    LocationName.shiver_star_4_f4: HasKingDedede,
+    LocationName.shiver_star_4_f5: HasKingDedede,
+    LocationName.shiver_star_4_f6: HasKingDedede,
+    LocationName.shiver_star_4_f7: HasKingDedede,
+    LocationName.shiver_star_4_f8: HasKingDedede,
+    LocationName.shiver_star_4_f9: HasKingDedede,
+    LocationName.shiver_star_4_f10: HasKingDedede,
+    LocationName.shiver_star_4_f11: HasKingDedede,
+    LocationName.shiver_star_4_f12: HasKingDedede,
+    LocationName.shiver_star_4_f13: HasKingDedede,
+    LocationName.shiver_star_4_f14: HasKingDedede,
+    LocationName.ripple_star_2_f3: HasKingDedede,
+    LocationName.ripple_star_2_f4: HasKingDedede,
+    LocationName.ripple_star_2_f5: HasKingDedede,
+    LocationName.ripple_star_2_f6: HasKingDedede,
+    LocationName.ripple_star_2_f7: HasKingDedede,
+    LocationName.ripple_star_2_f8: HasKingDedede,
+    LocationName.ripple_star_2_f9: HasKingDedede,
+    LocationName.ripple_star_2_f10: HasKingDedede & HasAnyIce,
+    LocationName.ripple_star_2_f11: HasKingDedede & HasAnyNeedle,
+    LocationName.pop_star_3_f3: HasAdeleine,
+    LocationName.aqua_star_1_f8: HasAdeleine,
+    LocationName.dark_star_adeleine: HasAdeleine,
+}
 
+STAR_RULES: dict[str, Rule] = {
+    LocationName.rock_star_1_t12: HasWaddleDee,
+    LocationName.rock_star_1_t13: HasWaddleDee,
+    LocationName.rock_star_1_t14: HasWaddleDee,
+    LocationName.rock_star_1_t15: HasWaddleDee,
+    LocationName.rock_star_1_t16: HasWaddleDee,
+    LocationName.rock_star_2_t30: HasKingDedede,
+    LocationName.rock_star_2_t31: HasKingDedede,
+    LocationName.rock_star_2_t32: HasKingDedede,
+    LocationName.rock_star_2_t33: HasKingDedede,
+    LocationName.rock_star_2_t34: HasKingDedede,
+    LocationName.rock_star_2_t35: HasKingDedede,
+    LocationName.rock_star_2_t36: HasKingDedede,
+    LocationName.rock_star_2_t37: HasKingDedede,
+    LocationName.rock_star_2_t38: HasKingDedede,
+    LocationName.aqua_star_1_t35: HasExplodingSnowman,
+    LocationName.aqua_star_1_t36: HasExplodingSnowman,
+    LocationName.aqua_star_1_t37: HasExplodingSnowman,
+    LocationName.aqua_star_1_t38: HasExplodingSnowman,
+    LocationName.aqua_star_2_t8: HasWaddleDee,
+    LocationName.aqua_star_2_t9: HasWaddleDee,
+    LocationName.aqua_star_2_t10: HasWaddleDee,
+    LocationName.aqua_star_2_t11: HasWaddleDee,
+    LocationName.aqua_star_2_t12: HasWaddleDee,
+    LocationName.aqua_star_2_t13: HasWaddleDee,
+    LocationName.aqua_star_2_t14: HasWaddleDee,
+    LocationName.aqua_star_2_t15: HasWaddleDee,
+    LocationName.aqua_star_2_t16: HasWaddleDee,
+    LocationName.aqua_star_2_t17: HasWaddleDee,
+    LocationName.aqua_star_2_t18: HasWaddleDee,
+    LocationName.aqua_star_2_t19: HasWaddleDee,
+    LocationName.aqua_star_2_t20: HasWaddleDee,
+    LocationName.aqua_star_2_t21: HasWaddleDee,
+    LocationName.aqua_star_2_t22: HasWaddleDee,
+    LocationName.aqua_star_2_t23: HasWaddleDee,
+    LocationName.aqua_star_2_t24: HasWaddleDee,
+    LocationName.aqua_star_2_t25: HasWaddleDee,
+    LocationName.aqua_star_2_t26: HasWaddleDee,
+    LocationName.aqua_star_2_t27: HasWaddleDee,
+    LocationName.aqua_star_2_t28: HasWaddleDee,
+    LocationName.aqua_star_2_t29: HasWaddleDee,
+    LocationName.aqua_star_2_t30: HasWaddleDee,
+    LocationName.aqua_star_2_t31: HasWaddleDee,
+    LocationName.aqua_star_2_t32: HasWaddleDee,
+    LocationName.aqua_star_2_t33: HasWaddleDee,
+    LocationName.aqua_star_2_t34: HasWaddleDee,
+    LocationName.aqua_star_2_t35: HasWaddleDee,
+    LocationName.aqua_star_2_t36: HasWaddleDee,
+    LocationName.aqua_star_2_t37: HasWaddleDee,
+    LocationName.aqua_star_2_t38: HasWaddleDee,
+    LocationName.aqua_star_2_t39: HasWaddleDee,
+    LocationName.aqua_star_2_t40: HasWaddleDee,
+    LocationName.aqua_star_2_t41: HasWaddleDee,
+    LocationName.aqua_star_2_t42: HasWaddleDee,
+    LocationName.aqua_star_2_t43: HasWaddleDee,
+    LocationName.aqua_star_2_t44: HasWaddleDee,
+    LocationName.aqua_star_2_t45: HasWaddleDee,
+    LocationName.aqua_star_2_t46: HasWaddleDee,
+    LocationName.aqua_star_2_t47: HasWaddleDee,
+    LocationName.aqua_star_2_t48: HasWaddleDee,
+    LocationName.aqua_star_2_t49: HasWaddleDee,
+    LocationName.aqua_star_3_t15: HasKingDedede,
+    LocationName.aqua_star_3_t16: HasKingDedede,
+    LocationName.aqua_star_3_t17: HasKingDedede,
+    LocationName.aqua_star_3_t18: HasKingDedede,
+    LocationName.aqua_star_3_t19: HasKingDedede,
+    LocationName.aqua_star_3_t20: HasKingDedede,
+    LocationName.aqua_star_3_t21: HasKingDedede,
+    LocationName.aqua_star_3_t22: HasKingDedede,
+    LocationName.aqua_star_3_t23: HasKingDedede,
+    LocationName.aqua_star_3_t24: HasKingDedede,
+    LocationName.aqua_star_3_t25: HasKingDedede,
+    LocationName.aqua_star_3_t26: HasKingDedede,
+    LocationName.neo_star_2_t17: HasWaddleDee,
+    LocationName.neo_star_2_t18: HasWaddleDee,
+    LocationName.neo_star_2_t19: HasWaddleDee,
+    LocationName.neo_star_2_t20: HasWaddleDee,
+    LocationName.neo_star_2_t21: HasWaddleDee,
+    LocationName.neo_star_2_t22: HasWaddleDee,
+    LocationName.neo_star_2_t23: HasWaddleDee,
+    LocationName.neo_star_2_t24: HasWaddleDee,
+    LocationName.neo_star_2_t25: HasWaddleDee,
+    LocationName.neo_star_2_t26: HasWaddleDee,
+    LocationName.neo_star_2_t27: HasWaddleDee,
+    LocationName.neo_star_2_t28: HasWaddleDee,
+    LocationName.neo_star_2_t29: HasWaddleDee,
+    LocationName.neo_star_2_t30: HasWaddleDee,
+    LocationName.neo_star_2_t31: HasWaddleDee,
+    LocationName.neo_star_2_t32: HasWaddleDee,
+    LocationName.neo_star_2_t33: HasWaddleDee,
+    LocationName.neo_star_2_t34: HasWaddleDee,
+    LocationName.neo_star_2_t35: HasWaddleDee,
+    LocationName.neo_star_2_t36: HasWaddleDee,
+    LocationName.neo_star_2_t37: HasWaddleDee,
+    LocationName.neo_star_2_t38: HasWaddleDee,
+    LocationName.neo_star_2_t39: HasWaddleDee,
+    LocationName.neo_star_2_t40: HasWaddleDee,
+    LocationName.neo_star_2_t41: HasWaddleDee,
+    LocationName.neo_star_2_t42: HasWaddleDee,
+    LocationName.neo_star_2_t43: HasWaddleDee,
+    LocationName.neo_star_2_t44: HasWaddleDee,
+    LocationName.neo_star_2_t45: HasWaddleDee,
+    LocationName.neo_star_2_t46: HasWaddleDee,
+    LocationName.neo_star_2_t47: HasWaddleDee,
+    LocationName.neo_star_2_t48: HasWaddleDee,
+    LocationName.neo_star_2_t49: HasWaddleDee,
+    LocationName.neo_star_2_t50: HasWaddleDee,
+    LocationName.neo_star_2_t51: HasWaddleDee,
+    LocationName.neo_star_2_t52: HasWaddleDee,
+    LocationName.neo_star_2_t53: HasWaddleDee,
+    LocationName.neo_star_2_t54: HasWaddleDee,
+    LocationName.neo_star_2_t55: HasWaddleDee,
+    LocationName.neo_star_2_t56: HasWaddleDee,
+    LocationName.neo_star_2_t57: HasWaddleDee,
+    LocationName.neo_star_2_t58: HasWaddleDee,
+    LocationName.neo_star_2_t59: HasWaddleDee,
+    LocationName.neo_star_2_t60: HasWaddleDee,
+    LocationName.neo_star_4_t4: HasKingDedede,
+    LocationName.neo_star_4_t5: HasKingDedede,
+    LocationName.neo_star_4_t6: HasKingDedede,
+    LocationName.neo_star_4_t7: HasKingDedede,
+    LocationName.neo_star_4_t8: HasKingDedede,
+    LocationName.neo_star_4_t9: HasKingDedede,
+    LocationName.neo_star_4_t10: HasKingDedede,
+    LocationName.neo_star_4_t11: HasKingDedede,
+    LocationName.neo_star_4_t12: HasKingDedede,
+    LocationName.neo_star_4_t13: HasKingDedede,
+    LocationName.neo_star_4_t14: HasKingDedede,
+    LocationName.neo_star_4_t15: HasKingDedede,
+    LocationName.neo_star_4_t16: HasKingDedede,
+    LocationName.neo_star_4_t17: HasKingDedede,
+    LocationName.neo_star_4_t18: HasKingDedede,
+    LocationName.neo_star_4_t19: HasKingDedede,
+    LocationName.neo_star_4_t20: HasKingDedede,
+    LocationName.neo_star_4_t21: HasKingDedede,
+    LocationName.neo_star_4_t22: HasKingDedede,
+    LocationName.neo_star_4_t23: HasKingDedede,
+    LocationName.neo_star_4_t24: HasKingDedede,
+    LocationName.neo_star_4_t25: HasKingDedede,
+    LocationName.shiver_star_1_t18: HasWaddleDee,
+    LocationName.shiver_star_1_t19: HasWaddleDee,
+    LocationName.shiver_star_1_t20: HasWaddleDee,
+    LocationName.shiver_star_1_t21: HasWaddleDee,
+    LocationName.shiver_star_1_t22: HasWaddleDee,
+    LocationName.shiver_star_1_t23: HasWaddleDee,
+    LocationName.shiver_star_1_t24: HasWaddleDee,
+    LocationName.shiver_star_1_t25: HasWaddleDee,
+    LocationName.shiver_star_1_t26: HasWaddleDee,
+    LocationName.shiver_star_1_t27: HasWaddleDee,
+    LocationName.shiver_star_1_t28: HasWaddleDee,
+    LocationName.shiver_star_1_t29: HasWaddleDee,
+    LocationName.shiver_star_1_t30: HasWaddleDee,
+    LocationName.shiver_star_1_t31: HasWaddleDee,
+    LocationName.shiver_star_1_t32: HasWaddleDee,
+    LocationName.shiver_star_1_t33: HasWaddleDee,
+    LocationName.shiver_star_1_t34: HasWaddleDee,
+    LocationName.shiver_star_1_t35: HasWaddleDee,
+    LocationName.shiver_star_1_t36: HasWaddleDee,
+    LocationName.shiver_star_1_t37: HasWaddleDee,
+    LocationName.shiver_star_1_t38: HasWaddleDee,
+    LocationName.shiver_star_1_t39: HasWaddleDee,
+    LocationName.shiver_star_1_t40: HasWaddleDee,
+    LocationName.shiver_star_1_t41: HasWaddleDee,
+    LocationName.shiver_star_1_t42: HasWaddleDee,
+    LocationName.shiver_star_1_t43: HasWaddleDee,
+    LocationName.shiver_star_1_t44: HasWaddleDee,
+    LocationName.shiver_star_1_t45: HasWaddleDee,
+    LocationName.shiver_star_1_t46: HasWaddleDee,
+    LocationName.shiver_star_1_t47: HasWaddleDee,
+    LocationName.shiver_star_1_t48: HasWaddleDee,
+    LocationName.shiver_star_1_t49: HasWaddleDee,
+    LocationName.shiver_star_1_t50: HasWaddleDee,
+    LocationName.shiver_star_1_t51: HasWaddleDee,
+    LocationName.shiver_star_1_t52: HasWaddleDee,
+    LocationName.shiver_star_1_t53: HasWaddleDee,
+    LocationName.shiver_star_1_t54: HasWaddleDee,
+    LocationName.shiver_star_1_t55: HasWaddleDee,
+    LocationName.shiver_star_1_t56: HasWaddleDee,
+    LocationName.shiver_star_1_t57: HasWaddleDee,
+    LocationName.shiver_star_1_t58: HasWaddleDee,
+    LocationName.shiver_star_1_t59: HasWaddleDee,
+    LocationName.shiver_star_1_t60: HasWaddleDee,
+    LocationName.shiver_star_1_t61: HasWaddleDee,
+    LocationName.shiver_star_1_t62: HasWaddleDee,
+    LocationName.shiver_star_1_t63: HasWaddleDee,
+    LocationName.shiver_star_1_t64: HasWaddleDee,
+    LocationName.shiver_star_4_t6: HasDrill,
+    LocationName.shiver_star_4_t7: HasDrill,
+    LocationName.shiver_star_4_t8: HasKingDedede,
+    LocationName.shiver_star_4_t9: HasKingDedede,
+    LocationName.shiver_star_4_t10: HasKingDedede,
+    LocationName.shiver_star_4_t11: HasKingDedede,
+    LocationName.shiver_star_4_t12: HasKingDedede,
+    LocationName.shiver_star_4_t13: HasKingDedede,
+    LocationName.shiver_star_4_t14: HasKingDedede,
+    LocationName.shiver_star_4_t15: HasKingDedede,
+    LocationName.shiver_star_4_t16: HasKingDedede,
+    LocationName.shiver_star_4_t17: HasKingDedede,
+    LocationName.shiver_star_4_t18: HasKingDedede,
+    LocationName.shiver_star_4_t19: HasKingDedede,
+    LocationName.shiver_star_4_t20: HasKingDedede,
+    LocationName.shiver_star_4_t21: HasKingDedede,
+    LocationName.shiver_star_4_t22: HasKingDedede,
+    LocationName.shiver_star_4_t23: HasKingDedede,
+    LocationName.shiver_star_4_t24: HasKingDedede,
+    LocationName.shiver_star_4_t25: HasKingDedede,
+    LocationName.shiver_star_4_t26: HasKingDedede,
+    LocationName.shiver_star_4_t27: HasKingDedede,
+    LocationName.shiver_star_4_t28: HasKingDedede,
+    LocationName.shiver_star_4_t29: HasKingDedede,
+    LocationName.shiver_star_4_t30: HasKingDedede,
+    LocationName.shiver_star_4_t31: HasKingDedede,
+    LocationName.shiver_star_4_t32: HasKingDedede,
+    LocationName.shiver_star_4_t33: HasKingDedede,
+    LocationName.shiver_star_4_t34: HasKingDedede,
+    LocationName.shiver_star_4_t35: HasKingDedede,
+    LocationName.shiver_star_4_t36: HasKingDedede,
+    LocationName.shiver_star_4_t37: HasKingDedede,
+    LocationName.shiver_star_4_t38: HasKingDedede,
+    LocationName.shiver_star_4_t39: HasKingDedede,
+    LocationName.shiver_star_4_t40: HasKingDedede,
+    LocationName.shiver_star_4_t41: HasKingDedede,
+    LocationName.shiver_star_4_t42: HasKingDedede,
+    LocationName.shiver_star_4_t43: HasKingDedede,
+    LocationName.shiver_star_4_t44: HasKingDedede,
+    LocationName.shiver_star_4_t45: HasKingDedede,
+    LocationName.shiver_star_4_t46: HasKingDedede,
+    LocationName.shiver_star_4_t47: HasKingDedede,
+    LocationName.shiver_star_4_t48: HasKingDedede,
+    LocationName.shiver_star_4_t49: HasKingDedede,
+    LocationName.shiver_star_4_t50: HasKingDedede,
+    LocationName.shiver_star_4_t51: HasKingDedede,
+    LocationName.ripple_star_2_t8: HasKingDedede,
+    LocationName.ripple_star_2_t9: HasKingDedede,
+    LocationName.ripple_star_2_t10: HasKingDedede,
+    LocationName.ripple_star_2_t11: HasKingDedede,
+    LocationName.ripple_star_2_t12: HasKingDedede,
+    LocationName.ripple_star_2_t13: HasKingDedede,
+    LocationName.ripple_star_2_t14: HasKingDedede,
+    LocationName.ripple_star_2_t15: HasKingDedede,
+    LocationName.ripple_star_2_t16: HasKingDedede,
+}
 
-def has_any_cutter(state: "CollectionState", player: int):
-    for specific, access in zip([ItemName.cutter, ItemName.cutter_cutter, ItemName.spark_cutter, ItemName.burn_cutter,
-                                 ItemName.ice_cutter, ItemName.needle_cutter, ItemName.bomb_cutter,
-                                 ItemName.stone_cutter],
-                                [["Cutter Ability"], ["Cutter Ability"], ["Cutter Ability", "Spark Ability"],
-                                 ["Cutter Ability", "Burning Ability"], ["Ice Ability", "Cutter Ability"],
-                                 ["Needle Ability", "Cutter Ability"], ["Bomb Ability", "Cutter Ability"],
-                                 ["Stone Ability", "Cutter Ability"]]):
-        if state.has(specific, player) and state.has_all(access, player):
-            return True
-    return False
+STANDARD_RULES: dict[str, Rule] = {
+    LocationName.pop_star_1_s2: HasAnyBomb,
+    LocationName.pop_star_3_s1: HasGreatCutter,
 
+    LocationName.rock_star_1: HasWaddleDee,
+    LocationName.rock_star_1_s3: HasWaddleDee & HasGeokinesis,
+    LocationName.rock_star_2: HasKingDedede,
+    LocationName.rock_star_2_s3: HasKingDedede,
+    LocationName.rock_star_3_s3: HasAnyStone,
+    LocationName.rock_star_4_s2: HasLightbulb,
 
-def has_great_cutter(state: "CollectionState", player: int, specific_ability: int):
-    if not state.has("Cutter Ability", player):
-        return False
-    if specific_ability:
-        return state.has(ItemName.cutter_cutter, player)
-    else:
-        return state.has(ItemName.cutter, player)
+    LocationName.aqua_star_1_s3: HasExplodingSnowman,
+    LocationName.aqua_star_2: HasWaddleDee,
+    LocationName.aqua_star_2_s1: HasVolcano,
+    LocationName.aqua_star_2_s2: HasWaddleDee,
+    LocationName.aqua_star_2_s3: HasWaddleDee,
+    LocationName.aqua_star_3: HasKingDedede,
+    LocationName.aqua_star_3_s1: HasShurikens,
+    LocationName.aqua_star_3_s2: HasKingDedede,
+    LocationName.aqua_star_3_s3: HasKingDedede & HasStoneFriends,
 
+    LocationName.neo_star_2: HasWaddleDee,
+    LocationName.neo_star_2_s2: HasWaddleDee,
+    LocationName.neo_star_2_s3: HasWaddleDee & HasDynamite,
+    LocationName.neo_star_3_s1: HasAnyNeedle,
+    LocationName.neo_star_3_s2: HasAdeleine,
+    LocationName.neo_star_4: HasKingDedede,
+    LocationName.neo_star_4_s1: HasKingDedede,
+    LocationName.neo_star_4_s2: HasKingDedede & HasAnyIce,
+    LocationName.neo_star_4_s3: HasKingDedede,
 
-def has_geokinesis(state: "CollectionState", player: int, specific_ability: int):
-    if not state.has_all(["Stone Ability", "Spark Ability"], player):
-        return False
-    if specific_ability:
-        return state.has(ItemName.stone_spark, player) and state.has_any({ItemName.stone, ItemName.spark}, player)
-    else:
-        return state.has_all({ItemName.stone, ItemName.spark}, player)
+    LocationName.shiver_star_1: HasWaddleDee,
+    LocationName.shiver_star_1_s1: HasWaddleDee,
+    LocationName.shiver_star_1_s2: HasWaddleDee & HasAnyBurning,
+    LocationName.shiver_star_1_s3: HasWaddleDee,
+    LocationName.shiver_star_2_s3: HasLightningRod,
+    LocationName.shiver_star_3_s3: HasAdeleine,
+    LocationName.shiver_star_4: HasKingDedede,
+    LocationName.shiver_star_4_s1: HasDrill,
+    LocationName.shiver_star_4_s2: HasKingDedede & HasLightsaber,
+    LocationName.shiver_star_4_s3: HasKingDedede,
 
-
-def has_lightbulb(state: "CollectionState", player: int, specific_ability: int):
-    if not state.has_all(["Bomb Ability", "Spark Ability"], player):
-        return False
-    if specific_ability:
-        return state.has(ItemName.bomb_spark, player) and state.has_any({ItemName.bomb, ItemName.spark}, player)
-    else:
-        return state.has_all({ItemName.bomb, ItemName.spark}, player)
-
-
-def has_exploding_snowman(state: "CollectionState", player: int, specific_ability: int):
-    if not state.has_all(["Bomb Ability", "Ice Ability"], player):
-        return False
-    if specific_ability:
-        return state.has(ItemName.ice_bomb, player) and state.has_any({ItemName.ice, ItemName.bomb}, player)
-    else:
-        return state.has_all({ItemName.ice, ItemName.bomb}, player)
-
-
-def has_volcano(state: "CollectionState", player: int, specific_ability: int):
-    if not state.has_all(["Stone Ability", "Burning Ability"], player):
-        return False
-    if specific_ability:
-        return state.has(ItemName.burn_stone, player) and state.has_any({ItemName.stone, ItemName.burn}, player)
-    else:
-        return state.has_all({ItemName.stone, ItemName.burn}, player)
-
-
-def has_shurikens(state: "CollectionState", player: int, specific_ability: int):
-    if not state.has_all(["Bomb Ability", "Cutter Ability"], player):
-        return False
-    if specific_ability:
-        return state.has(ItemName.bomb_cutter, player) and state.has_any({ItemName.bomb, ItemName.cutter}, player)
-    else:
-        return state.has_all({ItemName.bomb, ItemName.cutter}, player)
-
-
-def has_stone_friends(state: "CollectionState", player: int, specific_ability: int):
-    if not state.has_all(["Stone Ability", "Cutter Ability"], player):
-        return False
-    if specific_ability:
-        return state.has(ItemName.stone_cutter, player) and state.has_any({ItemName.stone, ItemName.cutter}, player)
-    else:
-        return state.has_all({ItemName.stone, ItemName.cutter}, player)
-
-
-def has_dynamite(state: "CollectionState", player: int, specific_ability: int):
-    if not state.has_all(["Stone Ability", "Bomb Ability"], player):
-        return False
-    if specific_ability:
-        return state.has(ItemName.stone_bomb, player) and state.has_any({ItemName.stone, ItemName.bomb}, player)
-    else:
-        return state.has_all({ItemName.stone, ItemName.bomb}, player)
-
-
-def has_lightning_rod(state: "CollectionState", player: int, specific_ability: int):
-    if not state.has_all(["Needle Ability", "Spark Ability"], player):
-        return False
-    if specific_ability:
-        return state.has(ItemName.needle_spark, player) and state.has_any({ItemName.needle, ItemName.spark}, player)
-    else:
-        return state.has_all({ItemName.needle, ItemName.spark}, player)
-
-
-def has_drill(state: "CollectionState", player: int, specific_ability: int):
-    if not state.has_all(["Stone Ability", "Needle Ability"], player):
-        return False
-    if specific_ability:
-        return state.has(ItemName.stone_needle, player) and state.has_any({ItemName.needle, ItemName.stone}, player)
-    else:
-        return state.has_all({ItemName.needle, ItemName.stone}, player)
-
-
-def has_lightsaber(state: "CollectionState", player: int, specific_ability: int):
-    if not state.has_all(["Cutter Ability", "Spark Ability"], player):
-        return False
-    if specific_ability:
-        return state.has(ItemName.spark_cutter, player) and state.has_any({ItemName.cutter, ItemName.spark}, player)
-    else:
-        return state.has_all({ItemName.cutter, ItemName.spark}, player)
-
-
-def has_exploding_gordo(state: "CollectionState", player: int, specific_ability: int):
-    if not state.has_all(["Bomb Ability", "Needle Ability"], player):
-        return False
-    if specific_ability:
-        return state.has(ItemName.needle_bomb, player) and state.has_any({ItemName.needle, ItemName.bomb}, player)
-    else:
-        return state.has_all({ItemName.needle, ItemName.bomb}, player)
-
-
-def has_fire_arrows(state: "CollectionState", player: int, specific_ability: int):
-    if not state.has_all(["Burning Ability", "Needle Ability"], player):
-        return False
-    if specific_ability:
-        return state.has(ItemName.burn_needle, player) and state.has_any({ItemName.needle, ItemName.burn}, player)
-    else:
-        return state.has_all({ItemName.needle, ItemName.burn}, player)
-
-
-def has_waddle_dee(state: "CollectionState", player: int):
-    return state.has(ItemName.waddle_dee, player)
-
-
-def has_adeleine(state: "CollectionState", player: int):
-    return state.has(ItemName.adeleine, player)
-
-
-def has_king_dedede(state: "CollectionState", player: int):
-    return state.has(ItemName.king_dedede, player)
-
-def set_oneup_rules(world: "K64World"):
-    for location in (LocationName.neo_star_2_u1, LocationName.neo_star_2_u2):
-        set_rule(world.get_location(location), lambda state: has_waddle_dee(state, world.player))
-    for location in (LocationName.aqua_star_3_u1, LocationName.neo_star_4_u1, LocationName.ripple_star_2_u1, LocationName.ripple_star_2_u2):
-        set_rule(world.get_location(location), lambda state: has_king_dedede(state, world.player))
-    add_rule(world.get_location(LocationName.ripple_star_2_u2), lambda state: has_any_spark(state, world.player))
-    add_rule(world.get_location(LocationName.aqua_star_3_u1),
-             lambda state: has_stone_friends(state, world.player, world.options.split_power_combos.value))
-
-def set_food_rules(world: "K64World"):
-    # Waddle Dee
-    for location in (LocationName.rock_star_1_f5, LocationName.aqua_star_2_f4, LocationName.aqua_star_2_f5,
-                     LocationName.aqua_star_2_f6, LocationName.aqua_star_2_f7, LocationName.aqua_star_2_f8,
-                     LocationName.aqua_star_2_f9, LocationName.aqua_star_2_f10, LocationName.aqua_star_2_f11,
-                     LocationName.neo_star_2_f2, LocationName.neo_star_2_f3, LocationName.neo_star_2_f4,
-                     LocationName.neo_star_2_f5, LocationName.neo_star_2_f6, LocationName.neo_star_2_f7,
-                     LocationName.neo_star_2_f8, LocationName.neo_star_2_f9, LocationName.neo_star_2_f10,
-                     LocationName.shiver_star_1_f4, LocationName.shiver_star_1_f5, LocationName.shiver_star_1_f6,
-                     LocationName.shiver_star_1_f7, LocationName.shiver_star_1_f8, LocationName.shiver_star_1_f9,
-                     LocationName.shiver_star_1_f10, LocationName.shiver_star_1_f11, LocationName.shiver_star_1_f12,):
-        set_rule(world.get_location(location), lambda state: has_waddle_dee(state, world.player))
-    # King Dedede
-    for location in (LocationName.rock_star_2_f7, LocationName.rock_star_2_f8, LocationName.rock_star_2_f9,
-                     LocationName.rock_star_2_f10, LocationName.aqua_star_3_f3, LocationName.neo_star_4_f3,
-                     LocationName.neo_star_4_f4, LocationName.neo_star_4_f5, LocationName.neo_star_4_f6,
-                     LocationName.neo_star_4_f7, LocationName.neo_star_4_f8, LocationName.neo_star_4_f9,
-                     LocationName.neo_star_4_f10, LocationName.neo_star_4_f11, LocationName.neo_star_4_f12,
-                     LocationName.neo_star_4_f13, LocationName.neo_star_4_f14, LocationName.shiver_star_4_f3,
-                     LocationName.shiver_star_4_f4, LocationName.shiver_star_4_f5, LocationName.shiver_star_4_f6,
-                     LocationName.shiver_star_4_f7, LocationName.shiver_star_4_f8, LocationName.shiver_star_4_f9,
-                     LocationName.shiver_star_4_f10, LocationName.shiver_star_4_f11, LocationName.shiver_star_4_f12,
-                     LocationName.shiver_star_4_f13, LocationName.shiver_star_4_f14, LocationName.ripple_star_2_f3,
-                     LocationName.ripple_star_2_f4, LocationName.ripple_star_2_f5, LocationName.ripple_star_2_f6,
-                     LocationName.ripple_star_2_f7, LocationName.ripple_star_2_f8, LocationName.ripple_star_2_f9,
-                     LocationName.ripple_star_2_f10, LocationName.ripple_star_2_f11):
-        set_rule(world.get_location(location), lambda state: has_king_dedede(state, world.player))
-    # Adeleine
-    for location in (LocationName.pop_star_3_f3, LocationName.aqua_star_1_f8, LocationName.dark_star_adeleine):
-        set_rule(world.get_location(location), lambda state: has_adeleine(state, world.player))
-    add_rule(world.get_location(LocationName.ripple_star_2_f10), lambda state: has_any_ice(state, world.player))
-    add_rule(world.get_location(LocationName.ripple_star_2_f11), lambda state: has_any_needle(state, world.player))
-
-def set_star_rules(world: "K64World"):
-    # define the ranges for each level in question
-    waddle_dee_range_start = {
-        0x0004: 0x0455,
-        0x0009: 0x0508,
-        0x000D: 0x05C7,
-        0x0010: 0x0653,
-    }
-    dedede_range_start = {
-        0x0005: 0x0480,
-        0x000A: 0x054A,
-        0x000F: 0x061F,
-        0x0013: 0x06E3,
-        0x0015: 0x072E,
-    }
-    for level, start in waddle_dee_range_start.items():
-        for loc in range(start, consumable_by_level[level][1]):
-            if loc in star_locations:
-                set_rule(world.get_location(star_locations[loc]), lambda state: has_waddle_dee(state, world.player))
-    for level, start in dedede_range_start.items():
-        for loc in range(start, consumable_by_level[level][1]):
-            if loc in star_locations:
-                set_rule(world.get_location(star_locations[loc]), lambda state: has_king_dedede(state, world.player))
-
-    for location in (LocationName.aqua_star_1_t35, LocationName.aqua_star_1_t36,
-                     LocationName.aqua_star_1_t37, LocationName.aqua_star_1_t38):
-        add_rule(world.get_location(location),
-                 lambda state: has_exploding_snowman(state, world.player, world.options.split_power_combos.value))
-
-    for location in (LocationName.shiver_star_4_t6, LocationName.shiver_star_4_t7):
-        add_rule(world.get_location(location),
-                 lambda state: has_drill(state, world.player, world.options.split_power_combos.value))
-
+    LocationName.ripple_star_1_s3: HasExplodingGordo,
+    LocationName.ripple_star_2: HasKingDedede,
+    LocationName.ripple_star_2_s1: HasAnySpark,
+    LocationName.ripple_star_2_s2: HasKingDedede,
+    LocationName.ripple_star_2_s3: HasKingDedede & HasAnyCutter,
+    LocationName.ripple_star_3_s2: HasFireArrows,
+}
 
 
 def set_rules(world: "K64World") -> None:
-    # Level 1
-    set_rule(world.get_location(LocationName.pop_star_1_s2), lambda state: has_any_bomb(state, world.player))
-    set_rule(world.get_location(LocationName.pop_star_3_s1),
-             lambda state: has_great_cutter(state, world.player, world.options.split_power_combos.value))
-    # Level 2
-    set_rule(world.get_location(LocationName.rock_star_1), lambda state: has_waddle_dee(state, world.player))
-    set_rule(world.get_location(LocationName.rock_star_1_s3),
-             lambda state: has_geokinesis(state, world.player, world.options.split_power_combos.value)
-             and has_waddle_dee(state, world.player))
-    set_rule(world.get_location(LocationName.rock_star_2), lambda state: has_king_dedede(state, world.player))
-    set_rule(world.get_location(LocationName.rock_star_2_s3), lambda state: has_king_dedede(state, world.player))
-    set_rule(world.get_location(LocationName.rock_star_3_s1), lambda state: has_any_stone(state, world.player))
-    set_rule(world.get_location(LocationName.rock_star_4_s2),
-             lambda state: has_lightbulb(state, world.player, world.options.split_power_combos.value))
-    # Level 3
-    set_rule(world.get_location(LocationName.aqua_star_1_s3),
-             lambda state: has_exploding_snowman(state, world.player, world.options.split_power_combos.value))
-    set_rule(world.get_location(LocationName.aqua_star_2_s1),
-             lambda state: has_volcano(state, world.player, world.options.split_power_combos.value))
-    for location in (LocationName.aqua_star_2, LocationName.aqua_star_2_s2, LocationName.aqua_star_2_s3):
-        set_rule(world.get_location(location), lambda state: has_waddle_dee(state, world.player))
-    for location in (LocationName.aqua_star_3, LocationName.aqua_star_3_s2, LocationName.aqua_star_3_s3):
-        set_rule(world.get_location(location), lambda state: has_king_dedede(state, world.player))
-    set_rule(world.get_location(LocationName.aqua_star_3_s1),
-             lambda state: has_shurikens(state, world.player, world.options.split_power_combos.value))
-    add_rule(world.get_location(LocationName.aqua_star_3_s3),
-             lambda state: has_stone_friends(state, world.player, world.options.split_power_combos.value))
-    # Level 4
-    for location in (LocationName.neo_star_2, LocationName.neo_star_2_s2, LocationName.neo_star_2_s3):
-        set_rule(world.get_location(location), lambda state: has_waddle_dee(state, world.player))
-    add_rule(world.get_location(LocationName.neo_star_2_s3),
-             lambda state: has_dynamite(state, world.player, world.options.split_power_combos.value))
-    set_rule(world.get_location(LocationName.neo_star_3_s1), lambda state: has_any_needle(state, world.player))
-    set_rule(world.get_location(LocationName.neo_star_3_s2), lambda state: has_adeleine(state, world.player))
-    for location in (LocationName.neo_star_4, LocationName.neo_star_4_s1,
-                     LocationName.neo_star_4_s2, LocationName.neo_star_4_s3):
-        set_rule(world.get_location(location), lambda state: has_king_dedede(state, world.player))
-    add_rule(world.get_location(LocationName.neo_star_4_s2), lambda state: has_any_ice(state, world.player))
-    # Level 5
-    for location in (LocationName.shiver_star_1, LocationName.shiver_star_1_s1,
-                     LocationName.shiver_star_1_s2, LocationName.shiver_star_1_s3):
-        set_rule(world.get_location(location), lambda state: has_waddle_dee(state, world.player))
-    add_rule(world.get_location(LocationName.shiver_star_1_s2), lambda state: has_any_burn(state, world.player))
-    set_rule(world.get_location(LocationName.shiver_star_2_s3),
-             lambda state: has_lightning_rod(state, world.player, world.options.split_power_combos.value))
-    set_rule(world.get_location(LocationName.shiver_star_3_s3), lambda state: has_adeleine(state, world.player))
-    set_rule(world.get_location(LocationName.shiver_star_4_s1),
-             lambda state: has_drill(state, world.player, world.options.split_power_combos.value))
-    for location in (LocationName.shiver_star_4, LocationName.shiver_star_4_s2, LocationName.shiver_star_4_s3):
-        set_rule(world.get_location(location), lambda state: has_king_dedede(state, world.player))
-    add_rule(world.get_location(LocationName.shiver_star_4_s2),
-             lambda state: has_lightsaber(state, world.player, world.options.split_power_combos.value))
-    # Level 6
-    set_rule(world.get_location(LocationName.ripple_star_1_s3),
-             lambda state: has_exploding_gordo(state, world.player, world.options.split_power_combos.value)
-             and state.has_any([ItemName.bomb, ItemName.needle], world.player))  # by default cannot carry enemy across
-    set_rule(world.get_location(LocationName.ripple_star_2_s1), lambda state: has_any_spark(state, world.player))
-    for location in (LocationName.ripple_star_2, LocationName.ripple_star_2_s2, LocationName.ripple_star_2_s3):
-        set_rule(world.get_location(location), lambda state: has_king_dedede(state, world.player))
-    add_rule(world.get_location(LocationName.ripple_star_2_s3), lambda state: has_any_cutter(state, world.player))
-    set_rule(world.get_location(LocationName.ripple_star_3_s2),
-             lambda state: has_fire_arrows(state, world.player, world.options.split_power_combos.value))
+    for location, rule in STANDARD_RULES.items():
+        world.set_rule(world.get_location(location), rule)
 
     # Crystal Requirements
     for i, level in zip(range(1, 7), world.boss_requirements):
-        set_rule(world.multiworld.get_entrance(f"To Level {i + 1}", world.player),
-                 lambda state, j=level: state.has(ItemName.crystal_shard, world.player, j))
-        set_rule(world.multiworld.get_location(f"{LocationName.level_names[i]} - Boss Defeated", world.player),
-                 lambda state, j=level: state.has(ItemName.crystal_shard, world.player, j))
+        rule = Has(ItemName.crystal_shard, count=level)
+        if i == 6:
+            rule &= (HasKingDedede & HasWaddleDee & HasAdeleine)
+        world.set_rule(world.get_entrance(f"To Level {i + 1}"), rule)
+        world.set_rule(world.get_location(f"{LocationName.level_names[i]} - Boss Defeated"), rule)
 
     # Consumables
     if "1-Ups" in world.options.consumables:
-        set_oneup_rules(world)
+        for location, rule in ONEUP_RULES.items():
+            world.set_rule(world.get_location(location), rule)
     if "Food" in world.options.consumables:
-        set_food_rules(world)
+        for location, rule in FOOD_RULES.items():
+            world.set_rule(world.get_location(location), rule)
     if "Stars" in world.options.consumables:
-        set_star_rules(world)
-
-    # Friend Requirement
-    add_rule(world.get_entrance("To Level 7"), lambda state: state.has_all([ItemName.waddle_dee, ItemName.adeleine,
-                                                                            ItemName.king_dedede], world.player))
+        for location, rule in STAR_RULES.items():
+            world.set_rule(world.get_location(location), rule)
 
     world.multiworld.completion_condition[world.player] = lambda state: state.has(ItemName.ribbons_crystal,
                                                                                   world.player)

@@ -133,6 +133,7 @@ class DeathState(Enum):
     IsKillingPlayer = 1
     Dead = 2
 
+
 K64_WORLD_REMAP = {
     0: "Pop Star",
     1: "Rock Star",
