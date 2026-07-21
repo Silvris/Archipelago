@@ -118,6 +118,21 @@ class BallUpgradeChecks(Range):
     range_end = 99
 
 
+class ShopPrices(Choice):
+    """
+    Off: Shop checks are disabled.
+    Low: Shop prices linearly increase by 5.
+    Medium: Shop prices follow an exponential curve of 1.65.
+    High: Shop prices linearly increase by 10.
+    """
+    display_name = "Shop Prices"
+    option_off = 0
+    option_low = 1
+    option_medium = 2
+    option_high = 3
+    default = 0
+
+
 class EvoMode(Choice):
     """Evo Mode Behavior
     Arrows: Each arrow of Evo mode is split up and added to the pool.
@@ -156,6 +171,7 @@ class PokemonPinballRSOptions(PerGameCommonOptions):
     goal_trigger: GoalTrigger
     bonus_multiplier_checks: BonusMultChecks
     ball_upgrade_checks: BallUpgradeChecks
+    shop_prices: ShopPrices
     evo_mode: EvoMode
     collect_pokedex: CollectPokedex
     ringlink: RingLink

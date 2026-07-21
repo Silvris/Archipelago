@@ -1,10 +1,11 @@
-from BaseClasses import Region, Location
+from BaseClasses import Region, Location, MultiWorld
 from logging import getLogger
-from typing import TYPE_CHECKING
+from math import floor
+from typing import TYPE_CHECKING, Callable
 from .data.pokemon import habitats, egg_by_board, special_encounters, bonus_catches, evolutions
 from .items import PinballRSItem
 from .names import *
-from .options import StartingBoard
+from .options import StartingBoard, ShopPrices
 if TYPE_CHECKING:
     from . import PokemonPinballRSWorld
 
@@ -17,7 +18,35 @@ class PinballRSRegion(Region):
 
 class PinballRSLocation(Location):
     game = "Pokemon Pinball Ruby & Sapphire"
+    cost: int = 0
 
+    def __init__(self, player: int, name: str, address: int, parent: PinballRSRegion, cost: int = 0) -> None:
+        super().__init__(player, name, address, parent)
+        self.cost = cost
+
+
+shops_by_board: dict[int, list[str]] = {
+    1: [
+        SHOP_RED,
+        SHOP_GOLD,
+        SHOP_DIAMOND,
+        SHOP_WHITE,
+        SHOP_VIOLET,
+    ],
+    2: [
+        SHOP_GREEN,
+        SHOP_SILVER,
+        SHOP_PEARL,
+        SHOP_BLACK,
+        SHOP_SCARLET,
+    ]
+}
+
+price_functions: dict[int, Callable[[int], int]] = {
+    1: lambda x: min(x*5, 99),
+    2: lambda x: min(floor((x+2) ** 1.65), 99),
+    3: lambda x: min(x*10, 99),
+}
 
 location_lookup: dict[str, int] = {
     **{f"Pokédex - {mon}": idx + 1 for mon, idx in POKEDEX.items()},
@@ -30,6 +59,10 @@ location_lookup: dict[str, int] = {
        for i in range(1, 100)},
     **{f"Ruby Board - Makuhita Ball Upgrade {i}": 0x400 + i
        for i in range(1, 100)},
+    **{f"{shop} {k}": 0x500 + (j*15) + (i*75) + k
+       for i in range(2)
+       for j, shop in enumerate(shops_by_board[i+1])
+       for k in range(1, 16)},
 }
 
 location_groups: dict[str, set[str]] = {
@@ -52,8 +85,11 @@ def create_regions(world: "PokemonPinballRSWorld") -> None:
     pokedex = PinballRSRegion("Pokédex", world.player, world.multiworld)
     evos = PinballRSRegion("Evolutions", world.player, world.multiworld)
     bonuses = PinballRSRegion("Bonus Stages", world.player, world.multiworld)
+    ruby_shop = PinballRSRegion("Ruby Shop", world.player, world.multiworld)
+    sapphire_shop = PinballRSRegion("Sapphire Shop", world.player, world.multiworld)
 
     boards = {}
+    shops = {1: ruby_shop, 2: sapphire_shop}
 
     if world.options.single_board:
         if world.options.starting_board.value == StartingBoard.option_ruby:
@@ -65,12 +101,13 @@ def create_regions(world: "PokemonPinballRSWorld") -> None:
 
     for i, board in boards.items():
         menu.connect(board, f"To {board.name}")
+        board.connect(shops[i], f"To {shops[i].name}")
 
     menu.connect(pokedex, f"To {pokedex.name}")
     menu.connect(evos, f"To {evos.name}")
     menu.connect(bonuses, f"To {bonuses.name}")
 
-    world.multiworld.regions.extend([*(boards.values()), pokedex, menu, bonuses])
+    world.multiworld.regions.extend([*(boards.values()), pokedex, menu, bonuses, *[shops[board] for board in boards]])
 
     possible_mons = set()
 
@@ -112,13 +149,13 @@ def create_regions(world: "PokemonPinballRSWorld") -> None:
                             item_type=PinballRSItem, show_in_spoiler=False)
 
         board.add_locations({f"{board.name} - Bonus Multiplier {j}": 0x200 + ((i - 1) * 100) + j
-                             for j in range(1, world.options.bonus_multiplier_checks.value + 1)})
+                             for j in range(1, world.options.bonus_multiplier_checks.value + 1)}, PinballRSLocation)
         board.add_locations({f"{board.name} - Ball Upgrade {j}": 0x300 + ((i - 1) * 100) + j
-                             for j in range(1, world.options.ball_upgrade_checks.value + 1)})
+                             for j in range(1, world.options.ball_upgrade_checks.value + 1)}, PinballRSLocation)
 
         if i == 1:
             board.add_locations({f"{board.name} - Makuhita Ball Upgrade {j}": 0x400 + j
-                                 for j in range(1, world.options.ball_upgrade_checks.value + 1)})
+                                 for j in range(1, world.options.ball_upgrade_checks.value + 1)}, PinballRSLocation)
 
     # Now create evolution events
     for mon, prevo in evolutions.items():
@@ -137,7 +174,8 @@ def create_regions(world: "PokemonPinballRSWorld") -> None:
     world.possible_mons = possible_mons
 
     # Create the Pokédex, real checks
-    pokedex.add_locations({f"Pokédex - {mon}": idx + 1 for mon, idx in POKEDEX.items() if idx in possible_mons})
+    pokedex.add_locations({f"Pokédex - {mon}": idx + 1 for mon, idx in POKEDEX.items() if idx in possible_mons},
+                          PinballRSLocation)
 
     num_mons = len(possible_mons)
     if "Pokedex" in world.options.goal and num_mons < world.options.pokedex_requirement:
@@ -168,4 +206,18 @@ def create_regions(world: "PokemonPinballRSWorld") -> None:
     if not world.options.single_board or world.options.starting_board == StartingBoard.option_sapphire:
         bonus_stages.extend([0, 2])
 
-    bonuses.add_locations({stage: 0x100 + idx for idx, stage in BONUS_STAGES.items() if idx in bonus_stages})
+    bonuses.add_locations({stage: 0x100 + idx for idx, stage in BONUS_STAGES.items() if idx in bonus_stages},
+                          PinballRSLocation)
+
+    # Handle shops here
+    if world.options.shop_prices != ShopPrices.option_off:
+        shop_func = price_functions[world.options.shop_prices.value]
+        for i in boards:
+            shop = shops[i]
+            for item in shops_by_board[i]:
+                for j in range(1, 16):
+                    loc_name = f"{item} {j}"
+                    shop_loc = PinballRSLocation(world.player, loc_name, location_lookup[loc_name],
+                                                 shop, cost=shop_func(j))
+                    shop.locations.append(shop_loc)
+

@@ -284,6 +284,18 @@ BIG = "BIG"
 SMALL = "Small"
 BALL_SAVER = "30 Sec. Ball Saver"
 
+# Shops
+SHOP_RED = "Ruby Shop - Red"
+SHOP_GREEN = "Sapphire Shop - Green"
+SHOP_GOLD = "Ruby Shop - Gold"
+SHOP_SILVER = "Sapphire Shop - Silver"
+SHOP_DIAMOND = "Ruby Shop - Diamond"
+SHOP_PEARL = "Sapphire Shop - Pearl"
+SHOP_BLACK = "Sapphire Shop - Black"
+SHOP_WHITE = "Ruby Shop - White"
+SHOP_SCARLET = "Sapphire Shop - Scarlet"
+SHOP_VIOLET = "Ruby Shop - Violet"
+
 POKEDEX: dict[str, int] = {
     SPECIES_TREECKO: 0,
     SPECIES_GROVYLE: 1,

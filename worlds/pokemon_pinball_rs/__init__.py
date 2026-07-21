@@ -116,7 +116,7 @@ class PokemonPinballRSWorld(World):
                 itempool.append(self.create_item(area))
 
         unfilled = len(self.multiworld.get_unfilled_locations(self.player)) - len(itempool)
-        medal_count = min(unfilled, self.options.total_medals.value)
+        medal_count = min(unfilled, self.options.total_medals.value if "Medals" in self.options.goal else 0)
         unfilled = unfilled - medal_count
         self.medal_goal = math.floor(medal_count * (self.options.medal_requirement.value / 100))
         itempool += [self.create_item(POKEDEX_MEDAL) for _ in range(medal_count)]
