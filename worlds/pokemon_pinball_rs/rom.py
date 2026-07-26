@@ -119,8 +119,8 @@ def patch_rom(world: "PokemonPinballRSWorld", patch: PinballRSProcedurePatch) ->
     players.append((0, "PLAYER \x00".encode("ASCII")))
 
     for idx, player in world.multiworld.player_name.items():
-        if current_ptr + PLAYER_STRING_TABLE + (len(players) * 4) > 0x800000:
-            # we have managed to fill the rest of the rom with names
+        if current_ptr + PLAYER_STRING_TABLE + (len(players) * 4) > 0xB4000:
+            # out of space in the rom
             # pop the one that went over, then break out of the loop
             players.pop()
             break
