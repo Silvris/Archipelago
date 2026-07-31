@@ -443,7 +443,7 @@ def main(args: argparse.Namespace | dict | None = None):
             if component:
                 args['component'] = component
             if not component:
-                logging.warning(f"Could not identify Component responsible for {path}")
+                raise Exception(f"Could not identify Component responsible for {path}")
 
     if args["update_settings"]:
         update_settings()
