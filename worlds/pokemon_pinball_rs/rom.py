@@ -151,7 +151,7 @@ def patch_rom(world: "PokemonPinballRSWorld", patch: PinballRSProcedurePatch) ->
     patch.write_bytes(0x6BC03C, targets)
     patch.write_byte(0x6BC056, world.medal_goal)
     patch.write_byte(0x6BC057, world.options.goal_trigger.value)
-    patch.write_byte(0x6BC058, world.options.shop_tracks.value - 1)
+    patch.write_byte(0x6BC058, max(0, world.options.shop_tracks.value - 1))
     patch.write_byte(0x6BC059, world.options.shop_track_length.value)
     patch.write_byte(0x6BC05A, world.options.roulette_prizes.value)
     patch.write_byte(0x6BC05B, world.options.death_link.value)
