@@ -148,7 +148,9 @@ class PokemonPinballRSWorld(World):
     def fill_slot_data(self) -> Mapping[str, Any]:
         slot_data = self.options.as_dict("goal", "difficulty", "single_board", "pokedex_requirement",
                                          "score_requirement", "pokemon_targets", "goal_trigger",
-                                         "bonus_multiplier_checks", "ball_upgrade_checks", "collect_pokedex")
+                                         "bonus_multiplier_checks", "ball_upgrade_checks", "shop_tracks",
+                                         "shop_track_length", "shop_prices", "roulette_prizes",
+                                         "collect_pokedex")
         slot_data["medal_goal"] = self.medal_goal
         return slot_data
 
