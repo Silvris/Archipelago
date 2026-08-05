@@ -180,6 +180,17 @@ class RingLink(Toggle):
     display_name = "RingLink"
 
 
+class MusicShuffle(Choice):
+    """Shuffles music, including unused tracks.
+    Off: Disables music shuffle
+    Shuffle: Each track replaces exactly one other track
+    Chaos: Each track rolls a random song to replace it, allowing duplicates"""
+    display_name = "Music Shuffle"
+    option_off = 0
+    option_shuffle = 1
+    option_chaos = 2
+
+
 @dataclass
 class PokemonPinballRSOptions(PerGameCommonOptions, DeathLinkMixin):
     goal: Goal
@@ -201,3 +212,4 @@ class PokemonPinballRSOptions(PerGameCommonOptions, DeathLinkMixin):
     evo_mode: EvoMode
     collect_pokedex: CollectPokedex
     ringlink: RingLink
+    music_shuffle: MusicShuffle

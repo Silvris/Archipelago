@@ -7,6 +7,7 @@ import Utils
 from typing import TYPE_CHECKING, Iterable, Sequence
 from worlds.Files import APProcedurePatch, APPatchExtension, APTokenMixin, APTokenTypes
 from . import names
+from .options import MusicShuffle
 from .regions import price_functions
 
 if TYPE_CHECKING:
@@ -16,6 +17,43 @@ PINBALLRSHASH = "ba6d0fbff297b8937d3c8e7f2c25fa0f"
 
 PLAYER_STRING_TABLE = 7063008
 SHOP_PRICES = 7798890
+
+
+PINBALL_SONGS: dict[int, int] = {
+    # index in the song table: pointer to song data
+    1: 0x8689430,  # Title Screen
+    3: 0x8689CC0,  # Board Select
+    5: 0x868A5A4,  # E-Reader
+    6: 0x868AA8C,  # Unused
+    # 8: 0x868B0A8  # Opening
+    9: 0x868BD50,  # High Scores
+    0xB: 0x868C72C,  # Shop
+    0xE: 0x868D838,  # Bonus Pending
+    0xF: 0x868CA4C,  # Bonus Pending (Legendary)
+    0x15: 0x868AAEC,  # Egg Mode
+    0x17: 0x8690930,  # Travel Mode
+    0x18: 0x8691558,  # Unused (RS: Elite 4)
+    0x19: 0x869192C,  # Hurry Up!
+    0x1A: 0x8691EA8,  # Evolution
+    0x1C: 0x8692A98,  # Field (Ruby)
+    0x1D: 0x869346C,  # Catch'em Mode (Ruby)
+    0x1E: 0x8694548,  # Evo Mode (Ruby)
+    0x20: 0x8695268,  # Field (Sapphire)
+    0x21: 0x8695E18,  # Catch'em Mode (Sapphire)
+    0x22: 0x8696EF0,  # Evo Mode (Sapphire)
+    0x24: 0x86977A8,  # Kecleon Bonus
+    0x25: 0x8697F90,  # Dusclops Bonus (Duskull)
+    0x26: 0x8698694,  # Dusclops Bonus
+    0x27: 0x8698D34,  # Spheal Bonus
+    0x28: 0x8699B9C,  # Groudon Bonus
+    0x29: 0x869A92C,  # Kyogre Bonus
+    0x2A: 0x869B234,  # Rayquaza Bonus
+    0x2E: 0x869C2C4,  # Pokédex
+    0x2F: 0x869CA80,  # Jirachi
+    0x5B: 0x869D57C,  # Field (Ruby) 2
+    0x5C: 0x869E250,  # Field (Sapphire) 2
+    0x5D: 0x869EE34,  # Unused
+}
 
 
 class RomData:
@@ -145,6 +183,15 @@ def patch_rom(world: "PokemonPinballRSWorld", patch: PinballRSProcedurePatch) ->
     patch.write_bytes(PLAYER_STRING_TABLE, int.to_bytes(len(players) - 1, 4, "little"))
 
     patch.write_bytes(SHOP_PRICES, [price_functions[world.options.shop_prices.value](i) for i in range(1, 16)])
+
+    if world.options.music_shuffle:
+        if world.options.music_shuffle == MusicShuffle.option_chaos:
+            songs = world.random.choices(list(PINBALL_SONGS.values()), k=len(PINBALL_SONGS))
+        else:
+            songs = list(PINBALL_SONGS.values())
+            world.random.shuffle(songs)
+        for index, song in zip(PINBALL_SONGS.keys(), songs):
+            patch.write_bytes(0x534E04 + (index*8), song.to_bytes(4, "little"))
 
     patch.write_file("token_patch.bin", patch.get_token_binary())
 

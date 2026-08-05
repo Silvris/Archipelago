@@ -192,6 +192,10 @@
     bl          CheckAnyMonEvoR0Shift
 
 //; Shop hooks
+.org UpdateShopEntryAnimation+0x230
+    .thumb
+    bl          CheckLoadAPShopItemRemap2
+
 .org UpdateShopEntryAnimation+0x3EC
     .thumb
     bl          CheckLoadAPShopItemRemap
@@ -220,19 +224,27 @@
     .thumb
     bl          RingLinkShop
 
-.org UpdateShopEntryAnimation+0x1C8A
+.org LoadPortraitGraphics+0x5D6
     .thumb
     bl          CheckIsAPItem
 
-.org UpdateShopEntryAnimation+0x1C92
+.org LoadPortraitGraphics+0x5DE
     .thumb
     bl          CheckLoadAPShopData
 
-.org UpdateShopEntryAnimation+0x1CBE
+.org LoadPortraitGraphics+0x60A
     .thumb
     bl          CheckLoadAPShopGraphics
 
-.org UpdateShopEntryAnimation+0x1DF6
+.org LoadPortraitGraphics+0x62A
+    .thumb
+    bl          CheckLoadAPShopDataCoins2
+
+.org LoadPortraitGraphics+0x66C
+    .thumb
+    bl          CheckLoadAPShopPalette //; this is when you can't afford the item
+
+.org LoadPortraitGraphics+0x742
     .thumb
     bl          CheckLoadAPShopPalette
 
@@ -2093,7 +2105,7 @@ CheckLoadAPShopData:
     ldr         r0, [sp, #0x2C]
     bx          lr
 
-CheckLoadAPShopDataCoins:
+CheckLoadAPShopDataCoinsMain:
     push        {r2-r5}
     ldrh        r0, [r1, #0x6]
     ldr         r2, =gArchipelago
@@ -2120,8 +2132,21 @@ CheckLoadAPShopDataCoins:
     ldrb        r0, [r3, r2]
     @@Return:
     pop         {r2-r5}
-    mov         r1, #10
     bx          lr
+
+CheckLoadAPShopDataCoins:
+    push        {lr}
+    bl          CheckLoadAPShopDataCoinsMain
+    mov         r1, #10
+    pop         {pc}
+
+CheckLoadAPShopDataCoins2:
+    mov         r10, r4
+    push        {r0-r1, lr}
+    mov         r1, r7
+    bl          CheckLoadAPShopDataCoinsMain
+    mov         r7, r0
+    pop         {r0-r1, pc}
 
 CheckLoadAPShopGraphics:
     push        {r4-r5}
@@ -2162,7 +2187,7 @@ CheckIsAPItem:
     asr         r0, #0x18
     bx          lr
 
-CheckLoadAPShopItemRemap:
+CheckLoadAPShopItemRemapMain:
     push        {r4-r5}
     ldr         r4, =gArchipelago
     mov         r5, #0x30
@@ -2182,11 +2207,24 @@ CheckLoadAPShopItemRemap:
     strb        r0, [r1, #1]
     @@Return:
     pop         {r4-r5}
-    mov         r0, #6
-    mov         r1, #0
     bx          lr
 
 .pool
+
+CheckLoadAPShopItemRemap:
+    push        {lr}
+    bl          CheckLoadAPShopItemRemapMain
+    mov         r0, #6
+    mov         r1, #0
+    pop         {pc}
+
+CheckLoadAPShopItemRemap2:
+    push        {lr}
+    ldr         r5, =0x1A7
+    add         r1, r3, r5
+    bl          CheckLoadAPShopItemRemapMain
+    add         r1, #1
+    pop         {pc}
 
 SwapAPShop:
 //; r3 - gCurrentPinballGame
