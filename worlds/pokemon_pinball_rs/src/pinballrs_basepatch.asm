@@ -2575,7 +2575,7 @@ ChangeFlagMainHook:
 //; world version
 .byte 0x00, 0x00, 0x00
 //; basepatch version (if i remember to update it lol)
-.byte 0x00, 0x03, 0x00
+.byte 0x00, 0x04, 0x00
 //; slot data at 0x6BC030
 .org 0x86BC030
 GoalValue:

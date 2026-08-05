@@ -1,6 +1,6 @@
 {
   "game": "Pokemon Pinball Ruby & Sapphire",
   "authors": ["Silvris"],
-  "world_version": "0.2.3",
+  "world_version": "0.3.0",
   "minimum_ap_version": "0.6.7"
 }
