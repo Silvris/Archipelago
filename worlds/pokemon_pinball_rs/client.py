@@ -13,6 +13,7 @@ from Utils import get_unique_identifier
 
 from .data.pokemon import egg_groups, special_encounters
 from .names import POKEDEX, POKEDEX_INVERSE
+from .regions import shops_by_board
 
 if TYPE_CHECKING:
     from worlds._bizhawk.context import BizHawkClientContext, BizHawkClientCommandProcessor
@@ -209,6 +210,8 @@ class PinballRSClient(BizHawkClient):
     ringlink_incoming: int = 0
     ringlink_id: float | None = None
     pokedex_key: str | None = None
+    pending_death_link: bool = False
+    last_death_link: float = 0.0
 
     message_queue: list[tuple[int, int]] = []
 
@@ -276,10 +279,14 @@ class PinballRSClient(BizHawkClient):
                 data = args.get("data", {})
                 if data.get("source", 0) != self.ringlink_id:
                     self.ringlink_incoming += data.get("amount", 0)
+            elif "DeathLink" in args.get("tags", []):
+                data = args.get("data", {})
+                if data.get("time", time.time()) != self.last_death_link:
+                    self.on_deathlink(ctx)
 
     async def send_deathlink(self, ctx: "BizHawkClientContext") -> None:
-        self.sending_death_link = True
         ctx.last_death_link = time.time()
+        self.last_death_link = ctx.last_death_link
         await ctx.send_death(f"{ctx.player_names[ctx.slot]} is bad at pinball.")
 
     def on_deathlink(self, ctx: "BizHawkClientContext") -> None:
@@ -315,8 +322,9 @@ class PinballRSClient(BizHawkClient):
             (local_dex, high_scores, starting_lives, starting_coins, starting_ball, pichu_upgrade, coins, medals,
                 boards, get_arrows, evo_arrows, hatch_mode, coin_arrows, coin_mod, stages, items_received, local_eggs,
                 e_reader, bonus_stages, current_score, current_balls, evo_items, ruby_bumper, sapphire_bumper,
-                ruby_ball_upgrade, sapphire_ball_upgrade, maku_ball_upgrade, coin_plus, coin_minus, goal_check, msg_mode,
-                helpers, goal, dex_req, score_req, target_req, medal_req, trigger, slot_info) = await read(ctx.bizhawk_ctx,
+                ruby_ball_upgrade, sapphire_ball_upgrade, maku_ball_upgrade, coin_plus, coin_minus, goal_check, shops,
+                roulettes, deathlink_send, msg_mode, helpers, goal, dex_req, score_req, target_req, medal_req,
+             trigger, slot_info, shop_tracks, shop_len, roulette_len, deathlink_enable) = await read(ctx.bizhawk_ctx,
                 [
                     (PINBALL_POKEDEX, 205, "System Bus"),
                     (PINBALL_HIGH_SCORES, 0x180, "System Bus"),
@@ -348,6 +356,9 @@ class PinballRSClient(BizHawkClient):
                     (PINBALL_RINGLINK_PACKET_GAIN, 1, "System Bus"),
                     (PINBALL_RINGLINK_PACKET_LOSS, 1, "System Bus"),
                     (PINBALL_GOAL_CHECK, 1, "System Bus"),
+                    (PINBALL_SHOPS, 10, "System Bus"),
+                    (PINBALL_ROULETTES, 2, "System Bus"),
+                    (PINBALL_DEATHLINK_SEND, 1, "System Bus"),
                     (PINBALL_STR_MODE, 1, "System Bus"),
                     (PINBALL_HELPERS, 1, "System Bus"),
                     (PINBALL_GOAL, 1, "ROM"),
@@ -357,10 +368,18 @@ class PinballRSClient(BizHawkClient):
                     (PINBALL_MEDAL_REQ, 1, "ROM"),
                     (PINBALL_TRIGGER_REQ, 1, "ROM"),
                     (PINBALL_SLOT_INFO, 1, "ROM"),
+                    (PINBALL_SHOP_MAX, 1, "ROM"),
+                    (PINBALL_SHOP_CHECK_MAX, 1, "ROM"),
+                    (PINBALL_ROULETTE_MAX, 1, "ROM"),
+                    (PINBALL_DEATHLINK, 1, "ROM"),
                 ])
 
             if slot_info[0] & 0x2 and "RingLink" not in ctx.tags:
                 ctx.tags.add("RingLink")
+                await ctx.send_msgs([{"cmd": "ConnectUpdate", "tags": ctx.tags}])
+
+            if deathlink_enable[0] and "DeathLink" not in ctx.tags:
+                ctx.tags.add("DeathLink")
                 await ctx.send_msgs([{"cmd": "ConnectUpdate", "tags": ctx.tags}])
 
             if self.print_scores:
@@ -464,6 +483,14 @@ class PinballRSClient(BizHawkClient):
                     writes.append((PINBALL_SCORE_ADD, score.to_bytes(4, "little"), "System Bus"))
                 elif idx == 3:
                     writes.append((PINBALL_SAVER, int.to_bytes(1800, 2, "little"), "System Bus"))
+
+            if self.pending_death_link:
+                writes.append((PINBALL_DEATHLINK_RECV, int.to_bytes(1, 1, "little"), "System Bus"))
+                self.pending_death_link = False
+
+            if deathlink_send[0] and ctx.last_death_link + 1 < time.time():
+                writes.append((PINBALL_DEATHLINK_SEND, int.to_bytes(0, 1, "little"), "System Bus"))
+                await self.send_deathlink(ctx)
 
             # handle most items state based
             item: NetworkItem
@@ -655,11 +682,11 @@ class PinballRSClient(BizHawkClient):
             sapphire_ball_upgrade_hits = int.from_bytes(sapphire_ball_upgrade, "little")
             maku_ball_upgrade_hits = int.from_bytes(maku_ball_upgrade, "little")
 
-            ruby_bumper_locs = [loc for loc in ctx.missing_locations if loc & 0x700 == 0x200 and loc & 0xFF < 100]
-            sapphire_bumper_locs = [loc for loc in ctx.missing_locations if loc & 0x700 == 0x200 and loc & 0xFF >= 100]
-            ruby_upgrade_locs = [loc for loc in ctx.missing_locations if loc & 0x700 == 0x300 and loc & 0xFF < 100]
-            sapphire_upgrade_locs = [loc for loc in ctx.missing_locations if loc & 0x700 == 0x300 and loc & 0xFF >= 100]
-            maku_upgrade_locs = [loc for loc in ctx.missing_locations if loc & 0x700 == 0x400]
+            ruby_bumper_locs = [loc for loc in ctx.missing_locations if loc & 0xF00 == 0x200 and loc & 0xFF < 100]
+            sapphire_bumper_locs = [loc for loc in ctx.missing_locations if loc & 0xF00 == 0x200 and loc & 0xFF >= 100]
+            ruby_upgrade_locs = [loc for loc in ctx.missing_locations if loc & 0xF00 == 0x300 and loc & 0xFF < 100]
+            sapphire_upgrade_locs = [loc for loc in ctx.missing_locations if loc & 0xF00 == 0x300 and loc & 0xFF >= 100]
+            maku_upgrade_locs = [loc for loc in ctx.missing_locations if loc & 0xF00 == 0x400]
 
             for loc in ruby_bumper_locs:
                 idx = loc & 0xFF
@@ -718,6 +745,21 @@ class PinballRSClient(BizHawkClient):
                 writes.append((PINBALL_SAPPHIRE_BALL_UPGRADE, int.to_bytes(min_sapphire_upgrade - 1, 1, "little"), "System Bus"))
             if maku_ball_upgrade_hits < min_maku_upgrade - 1:
                 writes.append((PINBALL_MAKUHITA_BALL_UPGRADE, int.to_bytes(min_maku_upgrade - 1, 1, "little"), "System Bus"))
+
+            for i in range(2):
+                for j in range(int.from_bytes(shop_tracks) + 1):
+                    for k in range(1, int.from_bytes(shop_len) + 1):
+                        if shops[i*5 + j] >= k:
+                            idx = 0x500 + (i * 75) + (j * 15) + k
+                            if idx not in ctx.checked_locations:
+                                new_checks.append(idx)
+
+            for i in range(2):
+                for j in range(1, int.from_bytes(roulette_len) + 1):
+                    if roulettes[i] >= j:
+                        idx = 0x600 + (i * 40) + j
+                        if idx not in ctx.checked_locations:
+                            new_checks.append(idx)
 
             # handle remote dex here
             if self.pokedex_key in ctx.stored_data:

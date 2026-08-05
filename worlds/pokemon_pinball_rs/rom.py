@@ -113,7 +113,7 @@ def patch_rom(world: "PokemonPinballRSWorld", patch: PinballRSProcedurePatch) ->
     patch.write_bytes(0x6BC03C, targets)
     patch.write_byte(0x6BC056, world.medal_goal)
     patch.write_byte(0x6BC057, world.options.goal_trigger.value)
-    patch.write_byte(0x6BC058, world.options.shop_tracks.value)
+    patch.write_byte(0x6BC058, world.options.shop_tracks.value - 1)
     patch.write_byte(0x6BC059, world.options.shop_track_length.value)
     patch.write_byte(0x6BC05A, world.options.roulette_prizes.value)
     patch.write_byte(0x6BC05B, world.options.death_link.value)
@@ -123,7 +123,7 @@ def patch_rom(world: "PokemonPinballRSWorld", patch: PinballRSProcedurePatch) ->
     players: list[tuple[int, bytes]] = [(0, "PLAYER \x00".encode("ASCII"))]
 
     for idx, player in world.multiworld.player_name.items():
-        if current_ptr + PLAYER_STRING_TABLE + (len(players) * 4) > 0xB4000:
+        if current_ptr + PLAYER_STRING_TABLE + (len(players) * 4) > PLAYER_STRING_TABLE + 0xB4000:
             # out of space in the rom
             # pop the one that went over, then break out of the loop
             players.pop()
