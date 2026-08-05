@@ -296,6 +296,10 @@ SHOP_WHITE = "Ruby Shop - White"
 SHOP_SCARLET = "Sapphire Shop - Scarlet"
 SHOP_VIOLET = "Ruby Shop - Violet"
 
+# Roulettes
+ROULETTE_RUBY = "Ruby Board - Roulette"
+ROULETTE_SAPPHIRE = "Sapphire Board - Roulette"
+
 POKEDEX: dict[str, int] = {
     SPECIES_TREECKO: 0,
     SPECIES_GROVYLE: 1,

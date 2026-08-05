@@ -12,8 +12,9 @@ from .names import (POKEDEX, POKEDEX_INVERSE, AREAS, RUBY_BOARD, SAPPHIRE_BOARD,
                     EGG_BUNCH_DESERT, EGG_BUNCH_SEA, EGG_BUNCH_RUBY, EGG_BUNCH_SAPPHIRE, RUINS_RUBY, RUINS_SAPPHIRE,
                     RUINS_AREA_CARD, BONUS_DUSCLOPS, BONUS_KECLEON, BONUS_KYOGRE, BONUS_GROUDON, BONUS_RAYQUAZA,
                     BONUS_SPHEAL_1, BONUS_SPHEAL_2, BONUS_SPHEAL_3, EVOLUTION_METHODS, EVOLUTION_SPECIAL,
-                    HELPER_WHISCASH, HELPER_PELIPPER, HELPER_MAKUHITA)
+                    HELPER_WHISCASH, HELPER_PELIPPER, HELPER_MAKUHITA, COIN_ARROW, COIN_MODIFIER)
 from .options import Difficulty, StartingBoard
+from .regions import PinballRSLocation, roulettes
 
 if TYPE_CHECKING:
     from . import PokemonPinballRSWorld
@@ -200,6 +201,26 @@ def set_rules(world: "PokemonPinballRSWorld") -> None:
                 else:
                     rule = HasAll(RUBY_BOARD, HELPER_MAKUHITA)
                 world.set_rule(world.get_location(f"{board} - Makuhita Ball Upgrade {j}"), rule)
+
+        for j in range(1, world.options.roulette_prizes.value + 1):
+            if j > 20:
+                rule = CanPlayLongPinball
+            elif j > 5:
+                rule = CanPlayModeratePinball
+            else:
+                rule = CanPlayBasicPinball
+            world.set_rule(world.get_location(f"{roulettes[i]} {j}"), rule)
+
+    shop_locations: list[PinballRSLocation] = [location for location in world.get_locations() if location.cost]
+
+    for location in shop_locations:
+        if location.cost >= 75:
+            rule = CanPlayLongPinball | Has(COIN_ARROW, count=3) | (Has(COIN_MODIFIER) & Has(COIN_ARROW, count=2))
+        elif location.cost >= 30:
+            rule = CanPlayModeratePinball | Has(COIN_MODIFIER) | Has(COIN_ARROW, count=2)
+        else:
+            rule = CanPlayBasicPinball | Has(COIN_MODIFIER)
+        world.set_rule(location, rule)
 
     goal = True_()
 

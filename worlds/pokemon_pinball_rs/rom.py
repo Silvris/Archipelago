@@ -7,6 +7,7 @@ import Utils
 from typing import TYPE_CHECKING, Iterable, Sequence
 from worlds.Files import APProcedurePatch, APPatchExtension, APTokenMixin, APTokenTypes
 from . import names
+from .regions import price_functions
 
 if TYPE_CHECKING:
     from . import PokemonPinballRSWorld
@@ -14,6 +15,7 @@ if TYPE_CHECKING:
 PINBALLRSHASH = "ba6d0fbff297b8937d3c8e7f2c25fa0f"
 
 PLAYER_STRING_TABLE = 7063008
+SHOP_PRICES = 7798890
 
 
 class RomData:
@@ -111,12 +113,14 @@ def patch_rom(world: "PokemonPinballRSWorld", patch: PinballRSProcedurePatch) ->
     patch.write_bytes(0x6BC03C, targets)
     patch.write_byte(0x6BC056, world.medal_goal)
     patch.write_byte(0x6BC057, world.options.goal_trigger.value)
+    patch.write_byte(0x6BC058, world.options.shop_tracks.value)
+    patch.write_byte(0x6BC059, world.options.shop_track_length.value)
+    patch.write_byte(0x6BC05A, world.options.roulette_prizes.value)
+    patch.write_byte(0x6BC05B, world.options.death_link.value)
 
     # write our string binary here
     current_ptr = 8
-    players: list[tuple[int, bytes]] = []
-
-    players.append((0, "PLAYER \x00".encode("ASCII")))
+    players: list[tuple[int, bytes]] = [(0, "PLAYER \x00".encode("ASCII"))]
 
     for idx, player in world.multiworld.player_name.items():
         if current_ptr + PLAYER_STRING_TABLE + (len(players) * 4) > 0xB4000:
@@ -139,6 +143,8 @@ def patch_rom(world: "PokemonPinballRSWorld", patch: PinballRSProcedurePatch) ->
         patch.write_bytes(PLAYER_STRING_TABLE + 4 + (4 * len(players)) + ptr, player)
 
     patch.write_bytes(PLAYER_STRING_TABLE, int.to_bytes(len(players) - 1, 4, "little"))
+
+    patch.write_bytes(SHOP_PRICES, [price_functions[world.options.shop_prices.value](i) for i in range(1, 16)])
 
     patch.write_file("token_patch.bin", patch.get_token_binary())
 

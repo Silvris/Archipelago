@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from Options import Choice, OptionSet, Range, Toggle, PerGameCommonOptions
+from Options import Choice, OptionSet, Range, Toggle, PerGameCommonOptions, DeathLinkMixin
 from .names import POKEDEX, SPECIES_GROUDON, SPECIES_KYOGRE, SPECIES_RAYQUAZA, SPECIES_JIRACHI
 
 
@@ -118,19 +118,42 @@ class BallUpgradeChecks(Range):
     range_end = 99
 
 
+class ShopTracks(Range):
+    """Number of available shop tracks available per board."""
+    display_name = "Shop Tracks"
+    range_start = 0
+    range_end = 5
+    default = 3
+
+
+class ShopTrackLength(Range):
+    """Number of available locations per shop track."""
+    display_name = "Shop Track Length"
+    range_start = 1
+    range_end = 15
+    default = 10
+
+
 class ShopPrices(Choice):
     """
-    Off: Shop checks are disabled.
     Low: Shop prices linearly increase by 5.
     Medium: Shop prices follow an exponential curve of 1.65.
     High: Shop prices linearly increase by 10.
     """
     display_name = "Shop Prices"
-    option_off = 0
     option_low = 1
     option_medium = 2
     option_high = 3
-    default = 0
+    default = 1
+
+
+class RouletteChecks(Range):
+    """Number of checks locked behind roulette prizes per board.
+    Note that Zigzagoon is not considered in logic for these locations."""
+    display_name = "Roulette Locations"
+    range_start = 0
+    range_end = 40
+    default = 5
 
 
 class EvoMode(Choice):
@@ -158,7 +181,7 @@ class RingLink(Toggle):
 
 
 @dataclass
-class PokemonPinballRSOptions(PerGameCommonOptions):
+class PokemonPinballRSOptions(PerGameCommonOptions, DeathLinkMixin):
     goal: Goal
     difficulty: Difficulty
     starting_board: StartingBoard
@@ -171,7 +194,10 @@ class PokemonPinballRSOptions(PerGameCommonOptions):
     goal_trigger: GoalTrigger
     bonus_multiplier_checks: BonusMultChecks
     ball_upgrade_checks: BallUpgradeChecks
+    shop_tracks: ShopTracks
+    shop_track_length: ShopTrackLength
     shop_prices: ShopPrices
+    roulette_prizes: RouletteChecks
     evo_mode: EvoMode
     collect_pokedex: CollectPokedex
     ringlink: RingLink

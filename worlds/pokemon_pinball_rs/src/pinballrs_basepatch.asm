@@ -142,9 +142,41 @@
 
 
 //; Roulette hooks
+.org GivePrize+0x5A
+    .thumb
+    bl          GiveAPPrize
+
 .org GivePrize+0x5A4
     .thumb
     bl          RingLinkRoulette
+
+.org InitRouletteWheel+0x92
+    .thumb
+    bl          HookRouletteInit
+
+.org LoadPortraitGraphics+0x1CA
+    .thumb
+    bl          RouletteGraphicsCheckAPData
+
+.org LoadPortraitGraphics+0x1EC
+    .thumb
+    bl          RouletteGraphicsCheckAPGraphics
+
+.org LoadPortraitGraphics+0x208
+    .thumb
+    bl          RouletteGraphicsCheckAPPalettes
+
+.org LoadPortraitGraphics+0x844
+    .thumb
+    bl          RouletteResultGraphicsCheckAPData
+
+.org LoadPortraitGraphics+0x88C
+    .thumb
+    bl          RouletteResultGraphicsCheckAPGraphics
+
+.org LoadPortraitGraphics+0x8A8
+    .thumb
+    bl          RouletteResultGraphicsCheckAPPalettes
 
 //; Evo mode hooks
 .org UpdateShopEntryAnimation+0x11B8
@@ -160,13 +192,58 @@
     bl          CheckAnyMonEvoR0Shift
 
 //; Shop hooks
+.org UpdateShopEntryAnimation+0x3EC
+    .thumb
+    bl          CheckLoadAPShopItemRemap
+
+.org UpdateShopEntryAnimation+0x416
+    .thumb
+    bl          SwapAPShop
+
+.org UpdateShopEntryAnimation+0x444
+    .thumb
+    bl          ShopAPMoveLeft
+
+.org UpdateShopEntryAnimation+0x49E
+    .thumb
+    bl          ShopAPMoveRight
+
 .org UpdateShopEntryAnimation+0x656
     .thumb
     bl          ShopBlockHelpers
 
+.org UpdateShopEntryAnimation+0x66A
+    .thumb
+    bl          RemapShopCosts
+
 .org UpdateShopEntryAnimation+0x6A0
     .thumb
     bl          RingLinkShop
+
+.org UpdateShopEntryAnimation+0x1C8A
+    .thumb
+    bl          CheckIsAPItem
+
+.org UpdateShopEntryAnimation+0x1C92
+    .thumb
+    bl          CheckLoadAPShopData
+
+.org UpdateShopEntryAnimation+0x1CBE
+    .thumb
+    bl          CheckLoadAPShopGraphics
+
+.org UpdateShopEntryAnimation+0x1DF6
+    .thumb
+    bl          CheckLoadAPShopPalette
+
+.org RenderEvolutionUI+0x3A
+    .thumb
+    bl          CheckLoadAPShopDataCoins
+
+.org RenderEvolutionUI+0x58
+    .thumb
+    mov         r1, r8
+    bl          CheckLoadAPShopDataCoins
 
 //; Handle areas
 .org InitBoardIntroMode+0x38
@@ -358,7 +435,7 @@ thumb_8032604:
 .org BonusStage_HandleModeChangeFlags+0x2
     //; hook here to always run during main gameplay
     .thumb
-    bl          StringHandlingMainLoop
+    bl          ChangeFlagMainHook
 
 .org 0x8047344
 .area 0x1B0
@@ -1365,7 +1442,6 @@ ClearForcePichu:
     mov         r1, #0
     mov         r2, #0x96
     lsl         r2, #1
-    sub         r2, #1
     strb        r1, [r0, r2]
     pop         {r1, r2}
     add         r0, r4
@@ -1842,8 +1918,6 @@ StringHandlingMainLoop:
     strh            r1, [r7, #2]
     @@Return:
     pop             {r0-r7}
-    ldr             r4, =gMain
-    ldrb            r1, [r4, #0xF]
     pop             {pc}
 .pool
 
@@ -1973,11 +2047,11 @@ CheckGoalEndOfBall:
     push        {r0-r4, lr}
     bl          ClearDebugTextDisplay
     bl          CheckGoal
-    beq         @@Return
+    beq         @@Deathlink
     ldr         r1, =GoalTrigger
     ldrb        r1, [r1, #0]
     cmp         r1, #0
-    bne         @@Return
+    bne         @@Deathlink
     ldr         r1, =gArchipelago
     mov         r2, #0x2F
     strb        r0, [r1, r2]
@@ -1986,8 +2060,472 @@ CheckGoalEndOfBall:
     strb        r0, [r1, #0]
     mov         r0, #0
     strh        r0, [r1, #2]
+    @@Deathlink:
+    //; set deathlink here
+    ldr         r1, =gArchipelago
+    mov         r2, #0x41
+    ldrb        r0, [r1, r2]
+    cmp         r0, #0
+    bne         @@ClearPending
+    mov         r0, #0x1
+    add         r2, r0
+    strb        r0, [r1, r2]
     @@Return:
     pop         {r0-r4, pc}
+    @@ClearPending:
+    mov         r0, #0x00
+    strb        r0, [r1, r2]
+    b           @@Return
+
+.pool
+
+CheckLoadAPShopData:
+    push        {r4-r5}
+    ldr         r4, =gArchipelago
+    mov         r5, #0x30
+    ldrb        r4, [r4, r5]
+    cmp         r4, #0
+    beq         @@Return
+    ldr         r1, =APShopData
+    @@Return:
+    pop         {r4-r5}
+    add         r7, r0, r1
+    ldr         r0, [sp, #0x2C]
+    bx          lr
+
+CheckLoadAPShopDataCoins:
+    push        {r2-r5}
+    ldrh        r0, [r1, #0x6]
+    ldr         r2, =gArchipelago
+    mov         r5, #0x30
+    ldrb        r2, [r2, r5]
+    cmp         r2, #0
+    beq         @@Return
+    ldr         r4, =gCurrentPinballGame
+    mov         r5, #0xD3
+    lsl         r5, #1
+    ldr         r3, [r4, #0]
+    ldrb        r2, [r3, r5]
+    add         r2, #0x31
+    ldr         r3, =gMain
+    ldrb        r3, [r3, #4]
+    cmp         r3, #0
+    beq         @@Next
+    add         r2, #5
+    @@Next:
+    //; funny chain here
+    ldr         r3, =gArchipelago
+    ldrb        r2, [r3, r2]
+    ldr         r3, =ShopPrices
+    ldrb        r0, [r3, r2]
+    @@Return:
+    pop         {r2-r5}
+    mov         r1, #10
+    bx          lr
+
+CheckLoadAPShopGraphics:
+    push        {r4-r5}
+    ldr         r4, =gArchipelago
+    mov         r5, #0x30
+    ldrb        r4, [r4, r5]
+    cmp         r4, #0
+    beq         @@Return
+    ldr         r1, =ShopRedMain
+    @@Return:
+    pop         {r4-r5}
+    add         r0, r0, r1
+    str         r0, [r2, #0]
+    bx          lr
+
+CheckLoadAPShopPalette:
+    push        {r4-r5}
+    ldr         r4, =gArchipelago
+    mov         r5, #0x30
+    ldrb        r4, [r4, r5]
+    cmp         r4, #0
+    beq         @@Return
+    ldr         r1, =ShopRedPal
+    @@Return:
+    pop         {r4-r5}
+    add         r0, r0, r1
+    str         r0, [r2, #0]
+    bx          lr
+
+.pool
+
+CheckIsAPItem:
+    cmp         r0, #0x90
+    blt         @@Continue
+    sub         r0, #0x90
+    @@Continue:
+    lsl         r0, #0x18
+    asr         r0, #0x18
+    bx          lr
+
+CheckLoadAPShopItemRemap:
+    push        {r4-r5}
+    ldr         r4, =gArchipelago
+    mov         r5, #0x30
+    ldrb        r4, [r4, r5]
+    cmp         r4, #0
+    beq         @@Return
+    sub         r1, #1
+    ldrb        r0, [r1, #0]
+    ldr         r4, =gMain
+    ldrb        r5, [r4, #4]
+    ldr         r4, =APCursorToItemMapRuby
+    cmp         r5, #1
+    bne         @@Next
+    ldr         r4, =APCursorToItemMapSapphire
+    @@Next:
+    ldrb        r0, [r4, r0]
+    strb        r0, [r1, #1]
+    @@Return:
+    pop         {r4-r5}
+    mov         r0, #6
+    mov         r1, #0
+    bx          lr
+
+.pool
+
+SwapAPShop:
+//; r3 - gCurrentPinballGame
+    push        {r2-r5, lr}
+    mov         r0, #0x04
+    and         r0, r1
+    cmp         r0, #0x00
+    beq         @@ReturnNormal
+    ldr         r5, =0x6DD ;// gCurrentPinballGame.prizeSelected
+    add         r0, r3, r5
+    ldrb        r0, [r0, #0]
+    cmp         r0, #0
+    bne         @@ReturnNormal //; this will fall through
+    ldr         r0, =gArchipelago
+    mov         r1, #0x30
+    ldrb        r2, [r0, r1]
+    mov         r3, #1
+    eor         r2, r3
+    strb        r2, [r0, r1]
+    mov         r0, #0x82
+    bl          m4aSongNumStart
+    ldr         r0, =gCurrentPinballGame
+    ldr         r0, [r0, #0]
+    mov         r2, #0xD3
+    lsl         r2, #1
+    mov         r1, #0
+    strb        r1, [r0, r2]
+    mov         r2, #0xD4
+    lsl         r2, #1
+    strb        r1, [r0, r2]
+    mov         r2, #0xDC
+    lsl         r2, #1
+    mov         r1, #0x1E
+    strb        r1, [r0, r2]
+    //; now that we're done, set r1 to 0 to block anything else
+    mov         r1, #0
+    @@ReturnNormal:
+    pop         {r2-r5}
+    mov         r0, #0x20 //; RIGHT
+    and         r0, r1
+    pop         {pc}
+
+.pool
+
+ShopAPMoveRight:
+    push        {r2-r3}
+    mov         r0, #0
+    ldrb        r0, [r1, r0]
+    ldr         r2, =gArchipelago
+    mov         r3, #0x30
+    ldrb        r2, [r2, r3]
+    cmp         r2, #0
+    beq         @@Continue
+    ldr         r2, =ShopMax
+    ldrb        r2, [r2, #0]
+    cmp         r0, r2
+    blt         @@Continue
+    mov         r0, #7
+    @@Continue:
+    pop         {r2-r3}
+    bx          lr
+
+ShopAPMoveLeft:
+    push        {r2-r3}
+    cmp         r0, #0
+    bgt         @@ContinueSub
+    ldr         r2, =gArchipelago
+    mov         r3, #0x30
+    ldrb        r2, [r2, r3]
+    cmp         r2, #0
+    beq         @@SetNormal
+    ldr         r2, =ShopMax
+    ldrb        r0, [r2, #0]
+    b           @@Continue
+    @@SetNormal:
+    mov         r0, #7
+    b           @@Continue
+    @@ContinueSub:
+    sub         r0, #1
+    @@Continue:
+    pop         {r2-r3}
+    bx          lr
+
+.pool
+
+GiveAPPrize:
+    //; r4-r7 already on stack
+    ldrb        r0, [r0, #0]
+    add         r5, r1, #0
+    cmp         r0, #0x90
+    blt         @@Return
+    ldr         r4, =gCurrentPinballGame
+    ldr         r2, =0x6DE
+    ldr         r4, [r4, #0]
+    ldrh        r2, [r4, r2]
+    cmp         r2, #70
+    bne         @@Return
+    mov         r2, #0xF
+    and         r2, r0
+    add         r2, #0x31
+    ldr         r4, =gArchipelago
+    ldrb        r1, [r4, r2]
+    add         r1, #1
+    strb        r1, [r4, r2]
+    @@Return:
+    bx          lr
+
+RemapShopCosts:
+    push        {r0-r2}
+    ldrh        r3, [r4, #06] //; this will be incorrect on AP checks
+    ldr         r4, =gCurrentPinballGame
+    ldr         r1, =gArchipelago
+    mov         r2, #0x30
+    ldrb        r0, [r1, r2]
+    cmp         r0, #0
+    beq         @@Return
+    add         r2, #1
+    ldr         r5, [r4, #0]
+    ldrb        r0, [r5, r6]
+    add         r2, r0
+    ldrb        r0, [r1, r2]
+    ldr         r1, =ShopPrices
+    ldrb        r3, [r1, r0]
+    @@Return:
+    pop         {r0-r2}
+    bx          lr
+
+.pool
+
+HookRouletteInit:
+    lsr         r0, r0, #0x10
+    add         r6, r3, #0
+    push        {r1-r6}
+    cmp         r0, #5
+    beq         @@ReplaceCheck
+    cmp         r0, #6
+    bne         @@Return
+    @@ReplaceCheck:
+    ldr         r1, =gMain
+    ldrb        r5, [r1, #4]
+    mov         r3, #0x3A
+    add         r3, r5
+    ldr         r1, =gArchipelago
+    ldrb        r3, [r1, r3]
+    ldr         r1, =RouletteCheckMax
+    ldrb        r1, [r1, #0]
+    cmp         r3, r1
+    bge         @@Return
+    mov         r0, #0x9A
+    add         r0, r5
+    strh        r0, [r4, #0]
+    @@Return:
+    pop         {r1-r6}
+    bx          lr
+.pool
+
+RouletteGraphicsCheckAPData:
+    //; r0 - current item
+    mov         r1, #0xFF
+    and         r0, r1
+    cmp         r0, #0x90
+    blt         @@LoadNormal
+    mov         r1, #0xF
+    and         r0, r1
+    ldr         r1, =APShopData
+    b           @@Return
+    @@LoadNormal:
+    ldr         r1, =gShopItemData
+    @@Return:
+    lsl         r0, #3
+    bx          lr
+
+RouletteGraphicsCheckAPGraphics:
+    push        {r3-r4}
+    ldr         r3, =gCurrentPinballGame
+    ldr         r3, [r3, #0]
+    ldr         r4, =0x6EC
+    add         r3, r4
+    ldrb        r3, [r3, r2]
+    cmp         r3, #0x90
+    blt         @@LoadNormal
+    ldr         r1, =ShopRedMain
+    b           @@Return
+    @@LoadNormal:
+    ldr         r1, =gPortraitAnimFrameGraphics
+    @@Return:
+    pop         {r3-r4}
+    lsl         r0, #8
+    bx          lr
+
+RouletteGraphicsCheckAPPalettes:
+    push        {r2-r4}
+    ldr         r3, =gCurrentPinballGame
+    ldr         r3, [r3, #0]
+    ldr         r4, =0x6EC
+    add         r3, r4
+    lsr         r2, r1, #1
+    ldrb        r3, [r3, r2]
+    cmp         r3, #0x90
+    blt         @@LoadNormal
+    ldr         r0, =ShopRedPal
+    b           @@Return
+    @@LoadNormal:
+    ldr         r0, =gPortraitAnimPalettes
+    @@Return:
+    pop         {r2-r4}
+    add         r3, r0
+    bx          lr
+.pool
+
+RouletteResultGraphicsCheckAPData:
+    //; r0 - current item
+    mov         r1, #0xFF
+    and         r0, r1
+    cmp         r0, #0x90
+    blt         @@LoadNormal
+    mov         r1, #0xF
+    and         r0, r1
+    ldr         r1, =APShopData
+    b           @@Return
+    @@LoadNormal:
+    ldr         r1, =gShopItemData
+    @@Return:
+    lsl         r0, #3
+    bx          lr
+
+RouletteResultGraphicsCheckAPGraphics:
+    push        {r3-r4}
+    ldr         r3, =gCurrentPinballGame
+    ldr         r3, [r3, #0]
+    ldr         r4, =0x6DC
+    ldrb        r3, [r3, r4]
+    cmp         r3, #0x90
+    blt         @@LoadNormal
+    ldr         r1, =ShopRedMain
+    b           @@Return
+    @@LoadNormal:
+    ldr         r1, =gPortraitAnimFrameGraphics
+    @@Return:
+    pop         {r3-r4}
+    lsl         r0, #8
+    bx          lr
+
+RouletteResultGraphicsCheckAPPalettes:
+    push        {r2-r4}
+    ldr         r3, =gCurrentPinballGame
+    ldr         r3, [r3, #0]
+    ldr         r4, =0x6DC
+    ldrb        r3, [r3, r4]
+    cmp         r3, #0x90
+    blt         @@LoadNormal
+    ldr         r0, =ShopRedPal
+    b           @@Return
+    @@LoadNormal:
+    ldr         r0, =gPortraitAnimPalettes
+    @@Return:
+    pop         {r2-r4}
+    add         r2, r0
+    bx          lr
+.pool
+
+ChangeFlagMainHook:
+    push        {r0-r7, lr}
+    bl          StringHandlingMainLoop
+    ldr         r1, =DeathLink
+    ldrb        r0, [r1, #0]
+    cmp         r0, #0
+    beq         @@Return
+    ldr         r1, =gMain
+    ldrb        r0, [r1, #06]
+    cmp         r0, #0
+    bne         @@Return
+    ldrb        r0, [r1, #0xF]
+    mov         r4, #0x1
+    and         r0, r4
+    cmp         r0, #0
+    bne         @@Return
+    mov         r4, #0x28
+    ldrh        r0, [r1, r4]
+    cmp         r0, #0
+    bne         @@Return
+    ldr         r2, =gCurrentPinballGame
+    ldr         r2, [r2, #0]
+    mov         r4, #0x24
+    ldrb        r0, [r2, r4]
+    cmp         r0, #0
+    bne         @@Return
+    add         r4, #1
+    ldrb        r0, [r2, r4]
+    cmp         r0, #0
+    bne         @@Return
+    ldr         r2, =gArchipelago
+    mov         r3, 0x40 //; deathlink recv
+    ldrb        r0, [r2, r3]
+    cmp         r0, #0
+    beq         @@Return
+    mov         r0, #200
+    strh        r0, [r1, #0x12]
+    mov         r0, #0x10
+    strb        r0, [r1, #0x11]
+    mov         r0, #80
+    strh        r0, [r1, #0x14]
+    mov         r0, #0
+    strb        r0, [r2, r3]
+    add         r3, #1
+    mov         r0, #1
+    strb        r0, [r2, r3]
+    bl          m4aMPlayAllStop
+    mov         r0, #0xD
+    bl          m4aSongNumStart
+    bl          ResetBoardStateOnDeath
+    ldr         r2, =gCurrentPinballGame
+    ldr         r2, [r2, #0]
+    mov         r3, #0x24
+    mov         r0, #0
+    strb        r0, [r2, r3]
+    ldr         r5, =gArchipelago
+    ldrb        r0, [r5, #3]
+    cmp         r0, #0
+    bne         @@Return
+    mov         r3, #0xF1
+    lsl         r3, #1
+    ldrb        r0, [r2, r3]
+    cmp         r0, #2
+    blt         @@Return
+    mov         r0, #0
+    strb        r0, [r2, r3]
+    mov         r3, #0xDF
+    lsl         r3, #1
+    mov         r0, #2
+    strb        r0, [r2, r3]
+    add         r3, #2
+    ldr         r0, =800
+    strh        r0, [r2, r3]
+    @@Return:
+    pop         {r0-r7}
+    ldr         r4, =gMain
+    ldrb        r1, [r4, #0xF]
+    pop         {pc}
 
 .pool
 
@@ -2016,6 +2554,14 @@ GoalMedals:
 .byte 0x00
 GoalTrigger:
 .byte 0x00
+ShopMax:
+.byte 0x04
+ShopCheckMax:
+.byte 0x0F
+RouletteCheckMax:
+.byte 0x1E
+DeathLink:
+.byte 0x01
 .org 0x86BC080
 EggTableRuby:
 .byte 0x00, 0x02, 0x03, 0x05, 0x06, 0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0F, 0x10, 0x11, 0x12, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1A, 0x1B, 0x1D, 0x1E, 0x1F
@@ -2178,4 +2724,75 @@ Player0:
 .byte "PLAYER ", 0x00 //; generic player, manually place the number following (special case)
 
 .notice "Max Player: " + orga(MaxPlayerString)
+
+.org 0x8770000
+APShopData:
+.halfword 0x00, 0x00, 0x00, 0x01
+.halfword 0x02, 0x02, 0x02, 0x01
+.halfword 0x04, 0x04, 0x04, 0x01
+.halfword 0x07, 0x07, 0x07, 0x01
+.halfword 0x09, 0x09, 0x09, 0x01
+.halfword 0x01, 0x01, 0x01, 0x01
+.halfword 0x03, 0x03, 0x03, 0x01
+.halfword 0x05, 0x05, 0x05, 0x01
+.halfword 0x06, 0x06, 0x06, 0x01
+.halfword 0x08, 0x08, 0x08, 0x01
+.halfword 0x0A, 0x0A, 0x0A, 0x01  //; Roulette Ruby
+.halfword 0x0B, 0x0B, 0x0B, 0x01  //; Roulette Sapphire
+APCursorToItemMapRuby:
+.byte 0x90, 0x91, 0x92, 0x93, 0x94
+APCursorToItemMapSapphire:
+.byte 0x95, 0x96, 0x97, 0x98, 0x99
+ShopPrices:
+.byte 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F
+.notice "Shop Prices: " + orga(ShopPrices)
+.align 16
+ShopRedMain:
+    .incbin "pinball_sprites/ShopRed.4bpp"
+ShopGreenMain:
+    .incbin "pinball_sprites/ShopGreen.4bpp"
+ShopGoldMain:
+    .incbin "pinball_sprites/ShopGold.4bpp"
+ShopSilverMain:
+    .incbin "pinball_sprites/ShopSilver.4bpp"
+ShopDiamondMain:
+    .incbin "pinball_sprites/ShopDiamond.4bpp"
+ShopPearlMain:
+    .incbin "pinball_sprites/ShopPearl.4bpp"
+ShopBlackMain:
+    .incbin "pinball_sprites/ShopBlack.4bpp"
+ShopWhiteMain:
+    .incbin "pinball_sprites/ShopWhite.4bpp"
+ShopScarletMain:
+    .incbin "pinball_sprites/ShopScarlet.4bpp"
+ShopVioletMain:
+    .incbin "pinball_sprites/ShopViolet.4bpp"
+RouletteRubyMain:
+    .incbin "pinball_sprites/RouletteRuby.4bpp"
+RouletteSapphireMain:
+    .incbin "pinball_sprites/RouletteSapphire.4bpp"
+ShopRedPal:
+    .incbin "pinball_sprites/ShopRed.gbapal"
+ShopGreenPal:
+    .incbin "pinball_sprites/ShopGreen.gbapal"
+ShopGoldPal:
+    .incbin "pinball_sprites/ShopGold.gbapal"
+ShopSilverPal:
+    .incbin "pinball_sprites/ShopSilver.gbapal"
+ShopDiamondPal:
+    .incbin "pinball_sprites/ShopDiamond.gbapal"
+ShopPearlPal:
+    .incbin "pinball_sprites/ShopPearl.gbapal"
+ShopBlackPal:
+    .incbin "pinball_sprites/ShopBlack.gbapal"
+ShopWhitePal:
+    .incbin "pinball_sprites/ShopWhite.gbapal"
+ShopScarletPal:
+    .incbin "pinball_sprites/ShopScarlet.gbapal"
+ShopVioletPal:
+    .incbin "pinball_sprites/ShopViolet.gbapal"
+RouletteRubyPal:
+    .incbin "pinball_sprites/RouletteRuby.gbapal"
+RouletteSapphirePal:
+    .incbin "pinball_sprites/RouletteSapphire.gbapal"
 .close

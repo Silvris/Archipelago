@@ -48,6 +48,11 @@ price_functions: dict[int, Callable[[int], int]] = {
     3: lambda x: min(x*10, 99),
 }
 
+roulettes: dict[int, str] = {
+    1: ROULETTE_RUBY,
+    2: ROULETTE_SAPPHIRE
+}
+
 location_lookup: dict[str, int] = {
     **{f"Pokédex - {mon}": idx + 1 for mon, idx in POKEDEX.items()},
     **{stage: 0x100 + idx for idx, stage in BONUS_STAGES.items()},
@@ -63,6 +68,7 @@ location_lookup: dict[str, int] = {
        for i in range(2)
        for j, shop in enumerate(shops_by_board[i+1])
        for k in range(1, 16)},
+    **{f"{roulette} {k}": 0x600 + ((i-1) * 40) + k for i, roulette in roulettes.items() for k in range(1, 41)}
 }
 
 location_groups: dict[str, set[str]] = {
@@ -75,6 +81,17 @@ location_groups: dict[str, set[str]] = {
                         for board in (RUBY_BOARD, SAPPHIRE_BOARD)
                         for i in range(1, 100)],
                       *[f"Ruby Board - Makuhita Ball Upgrade {i}" for i in range(1, 100)]},
+    "Roulettes": {*[f"{roulette} {k}" for roulette in roulettes.values() for k in range(1, 41)]},
+    "Red Shop": {f"{SHOP_RED} {k}" for k in range(1, 16)},
+    "Green Shop": {f"{SHOP_GREEN} {k}" for k in range(1, 16)},
+    "Gold Shop": {f"{SHOP_GOLD} {k}" for k in range(1, 16)},
+    "Silver Shop": {f"{SHOP_SILVER} {k}" for k in range(1, 16)},
+    "Diamond Shop": {f"{SHOP_DIAMOND} {k}" for k in range(1, 16)},
+    "Pearl Shop": {f"{SHOP_PEARL} {k}" for k in range(1, 16)},
+    "Black Shop": {f"{SHOP_BLACK} {k}" for k in range(1, 16)},
+    "White Shop": {f"{SHOP_WHITE} {k}" for k in range(1, 16)},
+    "Scarlet Shop": {f"{SHOP_SCARLET} {k}" for k in range(1, 16)},
+    "Violet Shop": {f"{SHOP_VIOLET} {k}" for k in range(1, 16)},
 }
 
 
@@ -157,6 +174,9 @@ def create_regions(world: "PokemonPinballRSWorld") -> None:
             board.add_locations({f"{board.name} - Makuhita Ball Upgrade {j}": 0x400 + j
                                  for j in range(1, world.options.ball_upgrade_checks.value + 1)}, PinballRSLocation)
 
+        board.add_locations({f"{roulettes[i]} {k}": 0x600 + ((i-1) * 40) + k
+                             for k in range(1, world.options.roulette_prizes.value + 1)}, PinballRSLocation)
+
     # Now create evolution events
     for mon, prevo in evolutions.items():
         if prevo in possible_mons:
@@ -210,12 +230,14 @@ def create_regions(world: "PokemonPinballRSWorld") -> None:
                           PinballRSLocation)
 
     # Handle shops here
-    if world.options.shop_prices != ShopPrices.option_off:
+    if world.options.shop_tracks.value:
         shop_func = price_functions[world.options.shop_prices.value]
         for i in boards:
             shop = shops[i]
-            for item in shops_by_board[i]:
-                for j in range(1, 16):
+            for k, item in enumerate(shops_by_board[i]):
+                if k >= world.options.shop_tracks.value:
+                    continue
+                for j in range(1, world.options.shop_track_length.value + 1):
                     loc_name = f"{item} {j}"
                     shop_loc = PinballRSLocation(world.player, loc_name, location_lookup[loc_name],
                                                  shop, cost=shop_func(j))
