@@ -483,14 +483,14 @@ class PinballRSClient(BizHawkClient):
                     writes.append((PINBALL_SCORE_ADD, score.to_bytes(4, "little"), "System Bus"))
                 elif idx == 3:
                     writes.append((PINBALL_SAVER, int.to_bytes(1800, 2, "little"), "System Bus"))
+            if "DeathLink" in ctx.tags:
+                if self.pending_death_link:
+                    writes.append((PINBALL_DEATHLINK_RECV, int.to_bytes(1, 1, "little"), "System Bus"))
+                    self.pending_death_link = False
 
-            if self.pending_death_link:
-                writes.append((PINBALL_DEATHLINK_RECV, int.to_bytes(1, 1, "little"), "System Bus"))
-                self.pending_death_link = False
-
-            if deathlink_send[0] and ctx.last_death_link + 1 < time.time():
-                writes.append((PINBALL_DEATHLINK_SEND, int.to_bytes(0, 1, "little"), "System Bus"))
-                await self.send_deathlink(ctx)
+                if deathlink_send[0] and ctx.last_death_link + 1 < time.time():
+                    writes.append((PINBALL_DEATHLINK_SEND, int.to_bytes(0, 1, "little"), "System Bus"))
+                    await self.send_deathlink(ctx)
 
             # handle most items state based
             item: NetworkItem
