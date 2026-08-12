@@ -46,15 +46,7 @@ weapons_to_id: dict[str, int] = {
 }
 
 weapon_damage: dict[int, list[int]] = {
-    0: [1, 2, 1, 1, 2, 1, 1, 1, 1, 1, 2, 2, 1, 1, 1, 1, 1, 3, 1, 1, 1, 0, ],  # Mega Buster
-    1: [4, 1, 1, 0, 2, 4, 2, 1, 0, 1, 1, 2, 4, 2, 4, 2, 0, 3, 1, 1, 1, 0, ],  # Needle Cannon
-    2: [1, 4, 2, 4, 1, 0, 0, 1, 4, 2, 4, 1, 1, 0, 0, 1, 0, 3, 1, 0, 1, 0, ],  # Magnet Missile
-    3: [7, 2, 4, 1, 0, 1, 1, 1, 1, 4, 2, 0, 4, 1, 1, 1, 0, 3, 1, 1, 1, 0, ],  # Gemini Laser
-    4: [0, 2, 2, 4, 7, 2, 2, 2, 4, 1, 2, 7, 0, 2, 2, 2, 0, 1, 5, 4, 7, 4, ],  # Hard Knuckle
-    5: [1, 1, 2, 0, 4, 2, 1, 7, 0, 1, 1, 4, 1, 1, 2, 7, 0, 1, 0, 7, 0, 2, ],  # Top Spin
-    6: [1, 1, 5, 0, 1, 4, 0, 1, 0, 4, 1, 1, 1, 0, 4, 1, 0, 1, 0, 7, 4, 2, ],  # Search Snake
-    7: [0, 7, 1, 0, 1, 1, 4, 1, 2, 1, 4, 1, 0, 4, 1, 1, 0, 0, 0, 0, 7, 0, ],  # Spark Shot
-    8: [2, 7, 2, 0, 1, 2, 4, 4, 2, 2, 0, 1, 2, 4, 2, 4, 0, 1, 3, 2, 2, 2, ],  # Shadow Blade
+    0: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, ],  # Mega Buster
 }
 
 weapons_to_name: dict[int, str] = {
@@ -75,7 +67,7 @@ minimum_weakness_requirement: dict[int, int] = {
     1: 4,  # Flash Stopper is another special baby, 7 shots with variable damage
     2: 4,  # 7 shots of Rain Flush
     3: 1,  # 28 shots of Drill Bomb
-    4: 2,  # 14 fully-charged shots of Pharaoh Shot
+    4: 1,  # 14 fully-charged shots of Pharaoh Shot, but a full charge is 3x the uncharged damage
     5: 1,  # 28 shots of Ring Boomerang (occasionally gets a rebound hit too)
     6: 1,  # 28 shots of Dust Crusher
     7: 1,  # 28 shots of Dive Missile
@@ -155,14 +147,18 @@ class CanDefeatEnoughRBMs(Rule["MM4World"], game="Mega Man 4"):
             return False
 
 
-HasRushVertical = HasAny(names.rush_jet, names.rush_coil)
-CanTraverseLongWater = HasAny(names.rush_jet, names.rush_marine)
-HasAnyRush = HasAny(names.rush_jet, names.rush_coil, names.rush_marine)
+HasDrill = Has(names.drill_bomb)
+HasRushCoil = Has(names.rush_coil)
 HasRushJet = Has(names.rush_jet)
-
+HasBalloon = Has(names.balloon_adaptor)
+HasWire = Has(names.wire_adaptor)
+HasVerticalNonWire = HasRushCoil | HasBalloon
+HasVertical = HasVerticalNonWire | HasWire
 
 STATIC_LOCATION_RULES: dict[str, Rule] = {
-
+    names.cossack_1_boss: HasVerticalNonWire,
+    names.cossack_2_boss: HasRushJet | HasBalloon,
+    names.wily_2_boss: HasRushJet | HasBalloon,
 }
 
 STATIC_ENTRANCE_RULES: dict[str, Rule] = {
@@ -171,11 +167,28 @@ STATIC_ENTRANCE_RULES: dict[str, Rule] = {
 }
 
 STATIC_1UP_RULES: dict[str, Rule] = {
-
+    names.drill_man_c3: HasVertical,
+    names.ring_man_c2: HasVertical,
+    names.cossack_2_c9: HasDrill,
+    names.cossack_2_c10: HasVertical,
+    names.cossack_3_c4: HasBalloon,
+    names.cossack_4_c4: HasDrill,
+    names.wily_2_c1: HasRushJet | HasBalloon,
+    names.wily_2_c2: HasRushJet | HasBalloon,
 }
 
 STATIC_ENERGY_RULES: dict[str, Rule] = {
-
+    names.bright_man_c1: HasVertical | HasRushJet,
+    names.bright_man_c4: HasRushCoil,
+    names.cossack_1_c2: HasVerticalNonWire,
+    names.cossack_1_c3: HasVerticalNonWire,
+    names.cossack_2_c2: HasRushJet | HasBalloon,
+    names.cossack_2_c3: HasRushJet | HasBalloon,
+    names.cossack_2_c5: HasVertical,
+    names.cossack_4_c1: HasVerticalNonWire,
+    names.cossack_4_c2: HasVerticalNonWire,
+    names.cossack_4_c7: HasVertical & HasDrill,
+    names.cossack_4_c8: HasBalloon | HasWire
 }
 
 
@@ -189,19 +202,19 @@ def set_rules(world: "MM4World") -> None:
         if world.options.random_weakness == world.options.random_weakness.option_shuffled:
             weapon_tables = [table.copy() for weapon, table in weapon_damage.items() if weapon != 0]
             world.random.shuffle(weapon_tables)
-            for i in range(1, 9):
+            for i in range(1, 9 if not world.options.random_rush else 11):
                 world.weapon_damage[i] = weapon_tables.pop()
         elif world.options.random_weakness == world.options.random_weakness.option_randomized:
-            world.weapon_damage = {i: [] for i in range(9)}
-            for boss in range(22):
+            world.weapon_damage = {i: [] for i in range(9 if not world.options.random_rush else 11)}
+            for boss in range(16):
                 for weapon in world.weapon_damage:
                     world.weapon_damage[weapon].append(min(14, max(0, int(world.random.normalvariate(3, 3)))))
                 if not any([world.weapon_damage[weapon][boss] >= 4
-                            for weapon in range(1, 9)]):
+                            for weapon in range(1, 9 if not world.options.random_rush else 11)]):
                     # failsafe, there should be at least one defined non-Buster weakness
                     weapon = world.random.randint(1, 7)
                     world.weapon_damage[weapon][boss] = world.random.randint(4, 14)  # Force weakness
-            # handle Break Man
+            # handle Wily Capsule
             boss = 16
             for weapon in world.weapon_damage:
                 world.weapon_damage[weapon][boss] = 0
@@ -211,17 +224,16 @@ def set_rules(world: "MM4World") -> None:
         if world.options.strict_weakness:
             for weapon in weapon_damage:
                 for i in range(22):
-                    if i == 16:
-                        continue  # Break is only weak to buster on non-random, and minimal damage on random
-                    elif weapon == 0:
+                    if weapon == 0:
                         world.weapon_damage[weapon][i] = 0
-                    elif i in (20, 21) and not world.options.random_weakness:
-                        continue
-                        # Gamma and Wily Machine need all weaknesses present, so allow
-                    elif not world.options.random_weakness == world.options.random_weakness.option_randomized \
-                            and i == 17:
+                    elif i in (14, 15) and not world.options.random_weakness:
                         if 3 > world.weapon_damage[weapon][i] > 0:
-                            # Kamegoros take 3 max from weapons on non-random
+                            # Phase 1 takes 3 max
+                            world.weapon_damage[weapon][i] = 0
+                    elif not world.options.random_weakness == world.options.random_weakness.option_randomized \
+                            and i in (4, 10, 11, 16):
+                        if 2 > world.weapon_damage[weapon][i] > 0:
+                            # Any time there is a Pharaoh Shot weakness, it is capped at 2 to account for the 3x charge
                             world.weapon_damage[weapon][i] = 0
                     elif 4 > world.weapon_damage[weapon][i] > 0:
                         world.weapon_damage[weapon][i] = 0
@@ -239,22 +251,31 @@ def set_rules(world: "MM4World") -> None:
                     = world.options.plando_weakness[p_boss][p_weapon]
 
         # handle special cases
-        for boss in range(22):
-            for weapon in range(1, 9):
+        for boss in range(17):
+            for weapon in range(1, 9 if not world.options.random_rush else 11):
                 if (0 < world.weapon_damage[weapon][boss] < minimum_weakness_requirement[weapon] and
-                        not any(world.weapon_damage[i][boss] >= minimum_weakness_requirement[weapon]
-                                for i in range(1, 8) if i != weapon)):
+                        not any(world.weapon_damage[i][boss] >= minimum_weakness_requirement[i]
+                                for i in range(1, 9 if not world.options.random_rush else 11) if i != weapon)):
                     world.weapon_damage[weapon][boss] = minimum_weakness_requirement[weapon]
+
+            if boss == 10:
+                if world.weapon_damage[1][boss] > minimum_weakness_requirement[1]:
+                    # Cockroach Twins cannot be killed by Flash Stopper, we need to remove its weakness
+                    world.weapon_damage[1][boss] = 0
+                    if not any(world.weapon_damage[i][boss] >= minimum_weakness_requirement[i]
+                            for i in range(2, 9 if not world.options.random_rush else 11)):
+                        weakness = world.random.choice((2, 3, 4, 5, 7, 8))
+                        world.weapon_damage[weakness][boss] = minimum_weakness_requirement[weakness]
 
         if world.weapon_damage[0][world.options.starting_robot_master.value] < 1:
             world.weapon_damage[0][world.options.starting_robot_master.value] = 1
 
         # weakness validation, it is better to confirm a completable seed than respect plando
-        boss_health = {boss: 0x1C for boss in range(8)}
+        boss_health = {boss: 0x1C for boss in (*range(8), 14, 15)}
 
         weapon_energy = {key: float(0x1C) for key in weapon_costs}
         weapon_boss = {boss: {weapon: world.weapon_damage[weapon][boss] for weapon in world.weapon_damage}
-                       for boss in range(8)}
+                       for boss in (*range(8), 14, 15)}
         flexibility = {
             boss: (
                     sum(damage_value > 0 for damage_value in
@@ -264,7 +285,7 @@ def set_rules(world: "MM4World") -> None:
             for boss, weapon_damages in weapon_boss.items()
         }
         boss_flexibility = sorted(flexibility, key=flexibility.get)  # Fast way to sort dict by value
-        used_weapons: dict[int, set[int]] = {i: set() for i in range(8)}
+        used_weapons: dict[int, set[int]] = {i: set() for i in (*range(8), 14, 15)}
         for boss in boss_flexibility:
             boss_damage = weapon_boss[boss]
             weapon_weight = {weapon: (weapon_energy[weapon] / damage) if damage else 0 for weapon, damage in
@@ -305,7 +326,7 @@ def set_rules(world: "MM4World") -> None:
 
     location_rules: dict[str, Rule] = {}
 
-    for i, boss_locations in zip(range(16), [
+    for i, boss_locations in zip([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 16], [
         get_boss_locations("Bright Man Stage"),
         get_boss_locations("Toad Man Stage"),
         get_boss_locations("Drill Man Stage"),
@@ -326,12 +347,12 @@ def set_rules(world: "MM4World") -> None:
         if world.weapon_damage[0][i] > 0:
             continue  # this can always be in logic
         weapons = []
-        for weapon in range(1, 9):
+        for weapon in range(1, 9 if not world.options.random_rush else 11):
             if world.weapon_damage[weapon][i] > 0:
                 if world.weapon_damage[weapon][i] < minimum_weakness_requirement[weapon]:
                     continue
                 weapons.append(weapons_to_name[weapon])
-            if i == 15:
+            if i == 14:
                 if world.weapon_damage[weapon][i+1] > 0:
                     if world.weapon_damage[weapon][i+1] < minimum_weakness_requirement[weapon]:
                         continue
@@ -340,7 +361,7 @@ def set_rules(world: "MM4World") -> None:
             raise Exception(f"Attempted to have boss {i} with no weakness! Seed: {world.multiworld.seed}")
         for location in boss_locations:
             static_rule = STATIC_LOCATION_RULES.get(location, True_())
-            if i == 15:
+            if i == 14:
                 # multi-phase fight, get all potential weaknesses
                 # we should probably do this smarter, but this works for now
                 location_rules[location] = static_rule & HasAll(*weapons)
