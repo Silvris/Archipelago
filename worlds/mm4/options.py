@@ -139,6 +139,13 @@ class WeaknessPlando(OptionDict):
     default = {}
 
 
+class JammedBuster(Toggle):
+    """
+    If enabled, the ability to charge the Mega Buster is added to the item pool.
+    """
+    display_name = "Jammed Buster"
+
+
 class ReduceFlashing(Toggle):
     """
     Reduce flashing seen in gameplay, such as in stages and when defeating certain bosses.
@@ -171,6 +178,7 @@ class MM4Options(PerGameCommonOptions):
     random_rush: IncludeRush
     wily_3_requirement: Wily3Requirement
     plando_weakness: WeaknessPlando
+    jammed_buster: JammedBuster
     palette_shuffle: PaletteShuffle
     reduce_flashing: ReduceFlashing
     music_shuffle: MusicShuffle

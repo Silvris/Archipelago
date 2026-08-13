@@ -17,6 +17,9 @@ rush_marine = "Rush Marine"
 balloon_adaptor = "Balloon Adapter"
 wire_adaptor = "Wire Adapter"
 
+# Charge Buster
+charge_buster = "Charge Buster"
+
 # Access Codes
 bright_man_stage = "Bright Man Access Codes"
 toad_man_stage = "Toad Man Access Codes"

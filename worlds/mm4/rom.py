@@ -6,6 +6,9 @@ import Utils
 from worlds.Files import APProcedurePatch, APTokenMixin, APTokenTypes
 from typing import TYPE_CHECKING, Iterable
 
+from .color import write_palette_shuffle
+from .rules import bosses
+
 if TYPE_CHECKING:
     from . import MM4World
 
@@ -14,8 +17,12 @@ PROTEUSHASH = "b69fff40212b80c94f19e786d1efbf61"
 MM4NESHASH = "db45eb9413964295adb8d1da961807cc"
 MM4VCHASH = "92f52ebb2edf81a3659ea4b8ea0b1191"
 
+ENERGYLINK = 0x77CC2
+WILY3REQ = 0x7BDBA
+JAMMED = 0x7BDC9
 
 enemy_ids: dict[str, int] = {
+    # these are Object IDs in the Matrixz doc
     "Taketento": 0x10,
     "Taketento (Propeller)": 0x11,
     "Tom Boy": 0x13,
@@ -33,7 +40,6 @@ enemy_ids: dict[str, int] = {
     "Dompan": 0x37,
     "Minoan": 0x3D,
     "Super Ball Machine Jr.": 0x3E,
-    "Cockroach Twins": 0x45,
     "Jumbig": 0x46,
     "Shield Attacker": 0x48,
     "Totem Polen": 0x4E,
@@ -64,6 +70,7 @@ enemy_ids: dict[str, int] = {
     "Square Machine": 0x95,
     "Mummira": 0x9A,
     "Imorm": 0x9C,
+    "Cockroach Twins": 0x9E,
     "Mono Roader": 0xA1,
     "Metall Daddy": 0xA6,
     "Gachappon": 0xA7,
@@ -71,9 +78,25 @@ enemy_ids: dict[str, int] = {
     "Pakatto 24": 0xB0,
     "Up'n'Down": 0xB2,
     "Garyoby": 0xB7,
-    "Wily Machine 4-1": 0xBB,
+    "Wily Machine 4-1": 0xBC,
     "Wily Machine 4-2": 0xC0,
     "Wily Capsule": 0xC4,
+}
+
+enemy_weakness_ptrs: dict[int, int] = {
+    0: 0x41710,
+    1: 0x59710,
+    2: 0x49710,
+    3: 0x53710,
+    4: 0x57710,
+    5: 0x51710,
+    6: 0x55710,
+    7: 0x4F710,
+    8: 0x5B710,
+    9: 0x43710,
+    10: 0x45710,
+    11: 0x47710,
+    12: 0x4B710,
 }
 
 
@@ -101,6 +124,86 @@ class MM4ProcedurePatch(APProcedurePatch, APTokenMixin):
 
 def patch_rom(world: "MM4World", patch: MM4ProcedurePatch) -> None:
     patch.write_file("mm4_basepatch.bsdiff4", pkgutil.get_data(__name__, os.path.join("data", "mm4_basepatch.bsdiff4")))
+
+    enemy_weaknesses: dict[str, dict[int, int]] = {}
+
+    if world.options.strict_weakness or world.options.random_weakness or world.options.plando_weakness:
+        # we need to write boss weaknesses
+        for boss in bosses:
+            enemy_weaknesses[boss] = {i: world.weapon_damage[i][bosses[boss]] for i in world.weapon_damage}
+
+            if world.options.strict_weakness:
+                extra_damage = 0
+            else:
+                extra_damage = world.weapon_damage[0][bosses[boss]]
+            if not world.options.random_rush:
+                enemy_weaknesses[boss][9] = extra_damage
+                enemy_weaknesses[boss][10] = extra_damage
+            enemy_weaknesses[boss][11] = extra_damage
+            enemy_weaknesses[boss][12] = extra_damage
+
+    if world.options.enemy_weakness:
+        for enemy in enemy_ids:
+            if enemy in [*bosses.keys()]:
+                continue
+            enemy_weaknesses[enemy] = {weapon: world.random.randint(-4, 4) for weapon in enemy_weakness_ptrs}
+            if enemy in ["Whopper", "Moby", "Escaroo", "Kabatoncue"] and enemy_weaknesses[enemy][0] <= 0:
+                enemy_weaknesses[enemy][0] = 1
+
+    for enemy, damage in enemy_weaknesses.items():
+        for weapon in enemy_weakness_ptrs:
+            if damage[weapon] < 0:
+                damage[weapon] = 0
+            patch.write_byte(enemy_weakness_ptrs[weapon] + enemy_ids[enemy], damage[weapon])
+
+    patch.write_byte(WILY3REQ + 1, world.options.wily_3_requirement.value)
+    patch.write_byte(ENERGYLINK + 1, world.options.energy_link.value)
+    patch.write_byte(JAMMED + 1, world.options.jammed_buster.value)
+
+    from Utils import __version__
+    patch.name = bytearray(f'MM4{__version__.replace(".", "")[0:3]}_{world.player}_{world.multiworld.seed:11}\0',
+                           'utf8')[:21]
+    patch.name.extend([0] * (21 - len(patch.name)))
+    patch.write_bytes(0x7FFB3, patch.name)
+    deathlink_byte = world.options.death_link.value | (world.options.energy_link.value << 1)
+    patch.write_byte(0x7FFC8, deathlink_byte)
+
+    patch.write_bytes(0x7FFC9, world.world_version)
+
+    version_map = {
+        "0": 0x18,
+        "1": 0x01,
+        "2": 0x02,
+        "3": 0x03,
+        "4": 0x04,
+        "5": 0x05,
+        "6": 0x06,
+        "7": 0x07,
+        "8": 0x08,
+        "9": 0x09,
+        ".": 0x24
+    }
+
+    # SILVRIS
+    author = bytearray([0x1C, 0x12, 0x15, 0x1F, 0x1B, 0x12, 0x1C, 0x00])
+    # ARCHIPELAGO x.x.x
+    ap_version = bytearray([0x0A, 0x1B, 0x0C, 0x11, 0x12, 0x19, 0x0E, 0x15, 0x0A, 0x10, 0x18])
+    ap_version.extend(list(map(lambda c: version_map[c], __version__)))
+    if len(ap_version) % 2 == 1:
+        ap_version.append(0)
+    group_1 = bytearray()
+    group_2 = bytearray()
+    for i in range(0, len(author), 2):
+        group_1.append(author[i])
+        group_2.append(author[i + 1])
+    # just when you think you've seen it all
+    for i in range(0, len(ap_version), 2):
+        group_1.append(ap_version[i])
+        group_2.append(ap_version[i + 1])
+    patch.write_bytes(0x60280, group_1)
+    patch.write_bytes(0x60380, group_2)
+
+    patch.write_file("token_patch.bin", patch.get_token_binary())
 
 
 header = b"\x4E\x45\x53\x1A\x20\x00\x40\x08\x00\x00\x00\x07\x00\x00\x00\x01"

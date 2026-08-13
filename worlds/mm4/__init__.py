@@ -6,10 +6,11 @@ from typing import Any, Sequence, ClassVar
 from BaseClasses import Tutorial, ItemClassification, MultiWorld, Item, Location
 from worlds.AutoWorld import World, WebWorld
 from .items import (item_table, item_names, MM4Item, filler_item_weights, robot_master_weapon_table,
-                    stage_access_table, rush_item_table, lookup_item_to_id)
+                    stage_access_table, extra_item_table, lookup_item_to_id)
 from .locations import (MM4Location, mm4_regions, MM4Region, lookup_location_to_id,
                         location_groups)
-from .names import wily_4_boss
+from .names import (wily_4_boss, charge_buster, bright_man_stage, toad_man_stage, drill_man_stage, pharaoh_man_stage,
+                    ring_man_stage, dust_man_stage, dive_man_stage, skull_man_stage)
 from .rom import patch_rom, MM4ProcedurePatch, MM4LCHASH, MM4VCHASH, PROTEUSHASH, MM4NESHASH
 from .options import MM4Options, Consumables
 #from .client import MegaMan4Client
@@ -139,7 +140,9 @@ class MM4World(World):
         itempool.extend([self.create_item(name) for name in stage_access_table.keys()
                          if name != robot_master])
         itempool.extend([self.create_item(name) for name in robot_master_weapon_table.keys()])
-        itempool.extend([self.create_item(name) for name in rush_item_table.keys()])
+        itempool.extend([self.create_item(name) for name in extra_item_table.keys() if name != charge_buster])
+        if self.options.jammed_buster:
+            itempool.append(self.create_item(charge_buster))
         total_checks = 27
         if self.options.consumables in (Consumables.option_1up_etank,
                                         Consumables.option_all):
@@ -174,8 +177,51 @@ class MM4World(World):
                   useful_item_pool: list["Item"],
                   filler_item_pool: list["Item"],
                   fill_locations: list["Location"]) -> None:
-        #TODO: see if MM4 has the same issues
-        pass
+        if self.multiworld.players > 1:
+            return  # Don't need to change anything on a multi gen, fill should be able to solve it with a 4 sphere 1
+        if self.options.consumables:
+            return  # The only affected stages have both types of consumable
+        rbm_to_item = {
+            0: bright_man_stage,
+            1: toad_man_stage,
+            2: drill_man_stage,
+            3: pharaoh_man_stage,
+            4: ring_man_stage,
+            5: dust_man_stage,
+            6: dive_man_stage,
+            7: skull_man_stage
+        }
+        affected_rbm = [0, 4, 5, 7]
+        possible_rbm = [1, 2, 3, 6]  # Marine/Jet/Balloon/Wire respectively
+        if self.options.starting_robot_master.value in affected_rbm:
+            rbm_names = list(map(lambda s: rbm_to_item[s], possible_rbm))
+            valid_second = [item for item in prog_item_pool
+                            if item.name in rbm_names
+                            and item.player == self.player]
+            placed_item = self.random.choice(valid_second)
+            rbm_defeated = (f"{robot_masters[self.options.starting_robot_master.value].replace(' Defeated', '')}"
+                            f" - Defeated")
+            rbm_location = self.get_location(rbm_defeated)
+            rbm_location.place_locked_item(placed_item)
+            prog_item_pool.remove(placed_item)
+            fill_locations.remove(rbm_location)
+            target_rbm = (placed_item.code & 0xF) - 1
+            if self.options.strict_weakness or (self.options.random_weakness
+                                                and not (self.weapon_damage[0][target_rbm] > 0)):
+                # we need to find a weakness for this boss
+                weaknesses = [weapon for weapon in range(1, 9)
+                              if self.weapon_damage[weapon][target_rbm] >= minimum_weakness_requirement[weapon]]
+                weapons = list(map(lambda s: weapons_to_name[s], weaknesses))
+                valid_weapons = [item for item in prog_item_pool
+                                 if item.name in weapons
+                                 and item.player == self.player]
+                placed_weapon = self.random.choice(valid_weapons)
+                weapon_name = next(name for name, idx in lookup_location_to_id.items()
+                                   if idx == 0x0101 + self.options.starting_robot_master.value)
+                weapon_location = self.get_location(weapon_name)
+                weapon_location.place_locked_item(placed_weapon)
+                prog_item_pool.remove(placed_weapon)
+                fill_locations.remove(weapon_location)
 
     def generate_output(self, output_directory: str) -> None:
         try:

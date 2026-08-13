@@ -191,14 +191,14 @@ location_table: dict[str, int | None] = {
 
 location_groups = {
     "Get Equipped": {
-        names.get_needle_cannon,
-        names.get_magnet_missile,
-        names.get_gemini_laser,
-        names.get_hard_knuckle,
-        names.get_top_spin,
-        names.get_search_snake,
-        names.get_spark_shock,
-        names.get_shadow_blade,
+        names.get_flash_stopper,
+        names.get_rain_flush,
+        names.get_drill_bomb,
+        names.get_pharaoh_shot,
+        names.get_ring_boomerang,
+        names.get_dust_crusher,
+        names.get_dive_missile,
+        names.get_skull_barrier,
         names.get_rush_marine,
         names.get_rush_jet,
         names.get_balloon_adapter,
