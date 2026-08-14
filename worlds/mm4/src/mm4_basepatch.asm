@@ -24,8 +24,9 @@ norom
 !returning_latch = $6006
 !energylink_health = $6007
 !energylink_weapon = $6008
-!bank_store = $6009
-!received_charge_buster = $600A
+!energylink_lives = $6009
+!bank_store = $600A
+!received_charge_buster = $600B
 
 !sent_items = $6064 ; this one is done really weird frankly, but this has it hit at $60B0, which is the actual weapons array
 !sent_weapons = $60B0 ; this is equivalent to the above, but only used by weapons and not wire/balloon
@@ -383,15 +384,19 @@ assert realbase() <= $074010 ;
 %org($814E, $3A)
     JMP     FlashStopperCheck
 
+%org($BBF6, $3B)
+    JMP     EnergylinkOneUp
+    NOP
+
 %org($BC19, $3B)
-    JMP     Energylink
+    JMP     EnergylinkEnergy
 
 %org($BC66, $3B)
     LDA     #$01
     STA     !sent_items, Y
 
 %org($BCB2, $3B)
-Energylink:
+EnergylinkEnergy:
     print "Energylink: ", hex(realbase())
     LDA     #$00
     BEQ     .Normal
@@ -409,6 +414,17 @@ Energylink:
     .Normal:
     LDA     $BC87, Y
     JMP     $BC1C
+
+EnergylinkOneUp:
+    LDA     EnergylinkEnergy+1
+    BEQ     .Normal
+    LDA     #$01
+    STA     !energylink_lives
+    JMP     $BC41
+    .Normal:
+    LDA     $A1
+    CMP     #$09
+    JMP     $BBFA
 
 %org($8B07, $3C)
     JMP     Wily3Requirement
@@ -520,6 +536,11 @@ FlashStopperCheck:
     STA     $12
     .Return:
     JMP     $8153
+
+%org($EF00, $3F)
+db "MM4_ARCHIPELAGO_BASE", $00
+db $00 ; deathlink
+db $FF, $FF, $FF ; world version
 
 assert realbase() <= $07EFFF ;
 

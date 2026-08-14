@@ -164,11 +164,11 @@ def patch_rom(world: "MM4World", patch: MM4ProcedurePatch) -> None:
     patch.name = bytearray(f'MM4{__version__.replace(".", "")[0:3]}_{world.player}_{world.multiworld.seed:11}\0',
                            'utf8')[:21]
     patch.name.extend([0] * (21 - len(patch.name)))
-    patch.write_bytes(0x7FFB3, patch.name)
+    patch.write_bytes(0x7EF10, patch.name)
     deathlink_byte = world.options.death_link.value | (world.options.energy_link.value << 1)
-    patch.write_byte(0x7FFC8, deathlink_byte)
+    patch.write_byte(0x7EF25, deathlink_byte)
 
-    patch.write_bytes(0x7FFC9, world.world_version)
+    patch.write_bytes(0x7EF26, world.world_version)
 
     version_map = {
         "0": 0x18,
@@ -187,7 +187,8 @@ def patch_rom(world: "MM4World", patch: MM4ProcedurePatch) -> None:
     # SILVRIS
     author = bytearray([0x1C, 0x12, 0x15, 0x1F, 0x1B, 0x12, 0x1C, 0x00])
     # ARCHIPELAGO x.x.x
-    ap_version = bytearray([0x0A, 0x1B, 0x0C, 0x11, 0x12, 0x19, 0x0E, 0x15, 0x0A, 0x10, 0x18])
+    ap_version = bytearray([0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                            0x0A, 0x1B, 0x0C, 0x11, 0x12, 0x19, 0x0E, 0x15, 0x0A, 0x10, 0x18])
     ap_version.extend(list(map(lambda c: version_map[c], __version__)))
     if len(ap_version) % 2 == 1:
         ap_version.append(0)

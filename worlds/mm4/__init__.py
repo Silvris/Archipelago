@@ -13,7 +13,7 @@ from .names import (wily_4_boss, charge_buster, bright_man_stage, toad_man_stage
                     ring_man_stage, dust_man_stage, dive_man_stage, skull_man_stage)
 from .rom import patch_rom, MM4ProcedurePatch, MM4LCHASH, MM4VCHASH, PROTEUSHASH, MM4NESHASH
 from .options import MM4Options, Consumables
-#from .client import MegaMan4Client
+from .client import MegaMan4Client
 from .rules import set_rules, weapon_damage, robot_masters, weapons_to_name, minimum_weakness_requirement
 import os
 import threading
@@ -158,19 +158,6 @@ class MM4World(World):
         self.multiworld.itempool += itempool
 
     set_rules = set_rules
-
-    """def generate_early(self) -> None:
-        if (self.options.starting_robot_master.current_key == "gemini_man"
-            and not any(item in self.options.start_inventory for item in rush_item_table.keys())) or \
-                (self.options.starting_robot_master.current_key == "hard_man"
-                 and not any(item in self.options.start_inventory for item in [rush_coil, rush_jet])):
-            robot_master_pool = [0, 1, 4, 5, 6, 7, ]
-            if rush_marine in self.options.start_inventory:
-                robot_master_pool.append(2)
-            self.options.starting_robot_master.value = self.random.choice(robot_master_pool)
-            logger.warning(
-                f"Incompatible starting Robot Master, changing to "
-                f"{self.options.starting_robot_master.current_key.replace('_', ' ').title()}")"""
 
     def fill_hook(self,
                   prog_item_pool: list["Item"],

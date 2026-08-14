@@ -38,10 +38,10 @@ stage_access_table = {
     dust_man_stage: ItemData(0x0106, True),
     dive_man_stage: ItemData(0x0107, True),
     skull_man_stage: ItemData(0x0108, True),
-    cossack_1_stage: ItemData(0x0109, True, True),
-    cossack_2_stage: ItemData(0x010A, True, True),
-    cossack_3_stage: ItemData(0x010B, True, True),
-    cossack_4_stage: ItemData(0x010C, True, True),
+    cossack_1_stage: ItemData(0x0110, True, True),
+    cossack_2_stage: ItemData(0x0111, True, True),
+    cossack_3_stage: ItemData(0x0112, True, True),
+    cossack_4_stage: ItemData(0x0113, True, True),
 }
 
 extra_item_table = {
@@ -50,7 +50,7 @@ extra_item_table = {
     rush_jet: ItemData(0x0013, True, True),
     balloon_adaptor: ItemData(0x0014, True, True),
     wire_adaptor: ItemData(0x0015, True),
-    charge_buster: ItemData(0x0016, False, True),
+    charge_buster: ItemData(0x0024, False, True),
 }
 
 filler_item_table = {

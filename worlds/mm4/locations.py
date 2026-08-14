@@ -37,13 +37,13 @@ mm4_regions: dict[str, RegionData] = {
     "Toad Man Stage": RegionData({
         names.toad_man: LocationData(0x0002),
         names.get_rain_flush: LocationData(0x0102),
-        names.get_rush_marine: LocationData(0x0112),
+        names.get_rush_marine: LocationData(0x0113),
     }, [names.toad_man_stage], []),
 
     "Drill Man Stage": RegionData({
         names.drill_man: LocationData(0x0003),
         names.get_drill_bomb: LocationData(0x0103),
-        names.get_rush_jet: LocationData(0x0111),
+        names.get_rush_jet: LocationData(0x0112),
         names.drill_man_c1: LocationData(0x0204, energy=True),
         names.drill_man_c2: LocationData(0x0205, oneup_tank=True),
         names.drill_man_c3: LocationData(0x0206, oneup_tank=True),
@@ -52,7 +52,7 @@ mm4_regions: dict[str, RegionData] = {
     "Pharaoh Man Stage": RegionData({
         names.pharaoh_man: LocationData(0x0004),
         names.get_pharaoh_shot: LocationData(0x0104),
-        names.get_balloon_adapter: LocationData(0x113),
+        names.get_balloon_adapter: LocationData(0x115),
     }, [names.pharaoh_man_stage], []),
 
     "Ring Man Stage": RegionData({
@@ -100,7 +100,7 @@ mm4_regions: dict[str, RegionData] = {
     }, [names.cossack_1_stage], []),
 
     "Dr. Cossack's Fortress 2": RegionData({
-        names.cossack_2_boss: LocationData(0x0010),
+        names.cossack_2_boss: LocationData(0x000A),
         names.cossack_2_c1: LocationData(0x021A, energy=True),
         names.cossack_2_c2: LocationData(0x021B, energy=True),
         names.cossack_2_c3: LocationData(0x021C, energy=True),
@@ -114,7 +114,7 @@ mm4_regions: dict[str, RegionData] = {
     }, [names.cossack_2_stage], []),
 
     "Dr. Cossack's Fortress 3": RegionData({
-        names.cossack_3_boss: LocationData(0x0011),
+        names.cossack_3_boss: LocationData(0x000B),
         names.cossack_3_c1: LocationData(0x0224, energy=True),
         names.cossack_3_c2: LocationData(0x0225, energy=True),
         names.cossack_3_c3: LocationData(0x0226, energy=True),
@@ -122,47 +122,49 @@ mm4_regions: dict[str, RegionData] = {
     }, [names.cossack_3_stage], []),
 
     "Dr. Cossack's Fortress 4": RegionData({
-        names.cossack_4_boss: LocationData(0x0012),
+        names.cossack_4_boss: LocationData(0x000C),
         names.cossack_4_c1: LocationData(0x0228, energy=True),
         names.cossack_4_c2: LocationData(0x0229, energy=True),
         names.cossack_4_c3: LocationData(0x022A, oneup_tank=True),
         names.cossack_4_c4: LocationData(0x022B, energy=True),
         names.cossack_4_c5: LocationData(0x022C, oneup_tank=True),
-        names.cossack_4_c6: LocationData(0x022D, energy=True),
+        names.cossack_4_c6: LocationData(0x022D, oneup_tank=True),
         names.cossack_4_c7: LocationData(0x022E, energy=True),
         names.cossack_4_c8: LocationData(0x022F, energy=True),
+        names.cossack_4_c9: LocationData(0x0230, energy=True),
     }, [names.cossack_4_stage], []),
 
     "Wily Stage 1": RegionData({
-        names.wily_1_boss: LocationData(0x0013),
-        names.wily_1_c1: LocationData(0x0230, energy=True),
-        names.wily_1_c2: LocationData(0x0231, energy=True),
-        names.wily_1_c3: LocationData(0x0232, energy=True),
-        names.wily_1_c4: LocationData(0x0233, oneup_tank=True),
+        names.wily_1_boss: LocationData(0x000D),
+        names.wily_1_c1: LocationData(0x0231, energy=True),
+        names.wily_1_c2: LocationData(0x0232, energy=True),
+        names.wily_1_c3: LocationData(0x0233, energy=True),
+        names.wily_1_c4: LocationData(0x0234, oneup_tank=True),
     }, [], [names.cossack_1_boss, names.cossack_2_boss,
             names.cossack_3_boss, names.cossack_4_boss,]),
 
     "Wily Stage 2": RegionData({
-        names.wily_2_boss: LocationData(0x0014),
-        names.wily_2_c1: LocationData(0x0234, oneup_tank=True),
-        names.wily_2_c2: LocationData(0x0235, oneup_tank=True),
+        names.wily_2_boss: LocationData(0x000E),
+        names.wily_2_c1: LocationData(0x0235, oneup_tank=True),
+        names.wily_2_c2: LocationData(0x0236, oneup_tank=True),
+        names.wily_2_c3: LocationData(0x0237, energy=True)
     }, [], [names.wily_1_boss], parent="Wily Stage 1"),
 
     "Wily Stage 3": RegionData({
-        names.wily_3_boss: LocationData(0x0015),
-        names.wily_3_c1: LocationData(0x0236, oneup_tank=True),
-        names.wily_3_c2: LocationData(0x0237, oneup_tank=True),
-        names.wily_3_c3: LocationData(0x0238, energy=True),
-        names.wily_3_c4: LocationData(0x0239, energy=True),
-        names.wily_3_c5: LocationData(0x023A, energy=True),
-        names.wily_3_c6: LocationData(0x023B, energy=True),
-        names.wily_3_c7: LocationData(0x023C, energy=True),
-        names.wily_3_c8: LocationData(0x023D, energy=True),
-        names.wily_3_c9: LocationData(0x023E, energy=True),
-        names.wily_3_c10: LocationData(0x023F, energy=True),
-        names.wily_3_c11: LocationData(0x0240, energy=True),
-        names.wily_3_c12: LocationData(0x0241, energy=True),
-        names.wily_3_c13: LocationData(0x0242, energy=True),
+        names.wily_3_boss: LocationData(0x000F),
+        names.wily_3_c1: LocationData(0x0238, oneup_tank=True),
+        names.wily_3_c2: LocationData(0x0239, oneup_tank=True),
+        names.wily_3_c3: LocationData(0x023A, energy=True),
+        names.wily_3_c4: LocationData(0x023B, energy=True),
+        names.wily_3_c5: LocationData(0x023C, energy=True),
+        names.wily_3_c6: LocationData(0x023D, energy=True),
+        names.wily_3_c7: LocationData(0x023E, energy=True),
+        names.wily_3_c8: LocationData(0x023F, energy=True),
+        names.wily_3_c9: LocationData(0x0240, energy=True),
+        names.wily_3_c10: LocationData(0x0241, energy=True),
+        names.wily_3_c11: LocationData(0x0242, energy=True),
+        names.wily_3_c12: LocationData(0x0243, energy=True),
+        names.wily_3_c13: LocationData(0x0244, energy=True),
     }, [], [names.wily_2_boss], parent="Wily Stage 2"),
 
     "Wily Stage 4": RegionData({

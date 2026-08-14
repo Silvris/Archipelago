@@ -187,13 +187,14 @@ STATIC_1UP_RULES: dict[str, Rule] = {
     names.cossack_2_c10: HasVertical,
     names.cossack_3_c4: HasBalloon,
     names.cossack_4_c3: HasDrill,
+    names.cossack_4_c5: HasDrill & (HasRushCoil | HasWire),
     names.wily_2_c1: HasRushJet | HasBalloon,
     names.wily_2_c2: HasRushJet | HasBalloon,
 }
 
 STATIC_ENERGY_RULES: dict[str, Rule] = {
     names.bright_man_c1: HasVertical | HasRushJet,
-    names.bright_man_c4: HasRushCoil,
+    names.bright_man_c4: HasRushCoil | HasWire,
     names.cossack_1_c2: HasVerticalNonWire,
     names.cossack_1_c3: HasVerticalNonWire,
     names.cossack_2_c2: HasRushJet | HasBalloon,
@@ -201,8 +202,9 @@ STATIC_ENERGY_RULES: dict[str, Rule] = {
     names.cossack_2_c5: HasVertical,
     names.cossack_4_c1: HasVerticalNonWire,
     names.cossack_4_c2: HasVerticalNonWire,
-    names.cossack_4_c7: HasVertical & HasDrill,
-    names.cossack_4_c8: HasBalloon | HasWire
+    names.cossack_4_c8: HasVertical & HasDrill,
+    names.cossack_4_c9: HasBalloon | HasWire,
+    names.wily_2_c3: HasVertical,
 }
 
 
