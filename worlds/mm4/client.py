@@ -619,7 +619,7 @@ class MegaMan4Client(BizHawkClient):
             if castle_status[0] & (1 << i) != 0:
                 if boss_id not in ctx.checked_locations:
                     new_checks.append(boss_id)
-            elif i < 4 and boss_id in ctx.checked_locations:
+            elif boss_id in ctx.checked_locations:
                 # collect here
                 update_castle |= (1 << i)
         if update_castle != castle_status[0]:
