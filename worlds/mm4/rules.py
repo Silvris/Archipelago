@@ -281,15 +281,6 @@ def set_rules(world: "MM4World") -> None:
                                 for i in range(1, 9 if not world.options.random_rush else 11) if i != weapon)):
                     world.weapon_damage[weapon][boss] = minimum_weakness_requirement[weapon]
 
-            if boss == 10:
-                if world.weapon_damage[1][boss] > minimum_weakness_requirement[1]:
-                    # Cockroach Twins cannot be killed by Flash Stopper, we need to remove its weakness
-                    world.weapon_damage[1][boss] = 0
-                    if not any(world.weapon_damage[i][boss] >= minimum_weakness_requirement[i]
-                            for i in range(2, 9 if not world.options.random_rush else 11)):
-                        weakness = world.random.choice((2, 3, 4, 5, 7, 8))
-                        world.weapon_damage[weakness][boss] = minimum_weakness_requirement[weakness]
-
         if world.weapon_damage[0][world.options.starting_robot_master.value] < 1:
             world.weapon_damage[0][world.options.starting_robot_master.value] = 1
 

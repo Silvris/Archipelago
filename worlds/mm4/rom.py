@@ -70,7 +70,8 @@ enemy_ids: dict[str, int] = {
     "Square Machine": 0x95,
     "Mummira": 0x9A,
     "Imorm": 0x9C,
-    "Cockroach Twins": 0x9E,
+    "Cockroach Twin #1": 0x9E,
+    "Cockroach Twin #2"
     "Mono Roader": 0xA1,
     "Metall Daddy": 0xA6,
     "Gachappon": 0xA7,
@@ -130,7 +131,11 @@ def patch_rom(world: "MM4World", patch: MM4ProcedurePatch) -> None:
     if world.options.strict_weakness or world.options.random_weakness or world.options.plando_weakness:
         # we need to write boss weaknesses
         for boss in bosses:
-            enemy_weaknesses[boss] = {i: world.weapon_damage[i][bosses[boss]] for i in world.weapon_damage}
+            if boss == "Cockroach Twins":
+                enemy_weaknesses["Cockroach Twin #1"] = {i: world.weapon_damage[i][bosses[boss]] for i in world.weapon_damage}
+                enemy_weaknesses["Cockroach Twin #2"] = {i: world.weapon_damage[i][bosses[boss]] for i in world.weapon_damage}
+            else:
+                enemy_weaknesses[boss] = {i: world.weapon_damage[i][bosses[boss]] for i in world.weapon_damage}
 
             if world.options.strict_weakness:
                 extra_damage = 0
@@ -144,7 +149,7 @@ def patch_rom(world: "MM4World", patch: MM4ProcedurePatch) -> None:
 
     if world.options.enemy_weakness:
         for enemy in enemy_ids:
-            if enemy in [*bosses.keys()]:
+            if enemy in [*bosses.keys(), "Cockroach Twin #1", "Cockroach Twin #2"]:
                 continue
             enemy_weaknesses[enemy] = {weapon: world.random.randint(-4, 4) for weapon in enemy_weakness_ptrs}
             if enemy in ["Whopper", "Moby", "Escaroo", "Kabatoncue"] and enemy_weaknesses[enemy][0] <= 0:
@@ -155,6 +160,11 @@ def patch_rom(world: "MM4World", patch: MM4ProcedurePatch) -> None:
             if damage[weapon] < 0:
                 damage[weapon] = 0
             patch.write_byte(enemy_weakness_ptrs[weapon] + enemy_ids[enemy], damage[weapon])
+
+    # BUG FIX: if Cockroach Twins are defeated while Flash Stopper is active, a softlock occurs
+    # This is because object 4A (the Cockroach Twins defeat handler) is marked as susceptible to Flash Stopper
+    # We can just force disable this
+    patch.write_byte(enemy_weakness_ptrs[1] + 0x4A, 0x00)
 
     patch.write_byte(WILY3REQ + 1, world.options.wily_3_requirement.value)
     patch.write_byte(ENERGYLINK + 1, world.options.energy_link.value)
