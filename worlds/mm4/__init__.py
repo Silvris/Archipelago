@@ -79,7 +79,8 @@ class MM4WebWorld(WebWorld):
 
 class MM4World(World):
     """
-    MM4 description
+    One year later, history repeats itself again. Dr. Cossack has created another 8 Robot Masters with the intent of
+    world domination. Armed with an upgraded Mega Buster, Mega Man sets off to save the world once again.
     """
 
     game = "Mega Man 4"
