@@ -612,12 +612,18 @@ class MegaMan4Client(BizHawkClient):
                 if itm_id not in ctx.checked_locations:
                     new_checks.append(itm_id)
 
+        update_castle = castle_status[0]
         for i in range(7):
             # Wily 4 does not have a boss check
             boss_id = 0x0009 + i
             if castle_status[0] & (1 << i) != 0:
                 if boss_id not in ctx.checked_locations:
                     new_checks.append(boss_id)
+            elif i < 4 and boss_id in ctx.checked_locations:
+                # collect here
+                update_castle |= (1 << i)
+        if update_castle != castle_status[0]:
+            writes.append((MM4_CASTLE_STATUS, update_castle.to_bytes(1, 'little'), "RAM"))
 
         if bar_state[0] == 0x80:  # currently in stage
             stage_consumables = MM4_CONSUMABLE_TABLE.get(current_stage[0], [])
