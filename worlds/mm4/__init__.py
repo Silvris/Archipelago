@@ -197,7 +197,7 @@ class MM4World(World):
             if self.options.strict_weakness or (self.options.random_weakness
                                                 and not (self.weapon_damage[0][target_rbm] > 0)):
                 # we need to find a weakness for this boss
-                weaknesses = [weapon for weapon in range(1, 9)
+                weaknesses = [weapon for weapon in range(1, 9 if not self.options.random_rush else 11)
                               if self.weapon_damage[weapon][target_rbm] >= minimum_weakness_requirement[weapon]]
                 weapons = list(map(lambda s: weapons_to_name[s], weaknesses))
                 valid_weapons = [item for item in prog_item_pool
