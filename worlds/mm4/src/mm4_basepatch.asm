@@ -364,6 +364,10 @@ ReturnCossackToStageSelect:
     BCS     .ReturnTrue
     JMP     $8E78
     .ReturnTrue:
+    LDA     !current_cossack_wily
+    CLC
+    ADC     #$01
+    STA     !current_cossack_wily
     LDA     !completed_cossack_stages
     CMP     #$0F
     JMP     $8CAF
@@ -386,6 +390,10 @@ assert realbase() <= $074010 ;
 
 %org($BBF6, $3B)
     JMP     EnergylinkOneUp
+    NOP
+
+%org($BC15, $3B)
+    JMP     EnergylinkBuster
     NOP
 
 %org($BC19, $3B)
@@ -414,6 +422,21 @@ EnergylinkEnergy:
     .Normal:
     LDA     $BC87, Y
     JMP     $BC1C
+
+EnergylinkBuster:
+    ; called if you pick up weapon energy with Buster equipped
+    LDX     EnergylinkEnergy+1
+    BEQ     .Normal
+    LDA     $BC87, Y
+    STA     !energylink_weapon
+    .Normal:
+    LDA     !current_weapon
+    BEQ     .False
+    .Return:
+    JMP     $BC19
+    .False:
+    JMP     $BC3B
+
 
 EnergylinkOneUp:
     LDA     EnergylinkEnergy+1
@@ -452,8 +475,7 @@ Wily3Requirement:
     CMP     #$00
     BNE     .Loop
     .Check:
-    print "Wily 3 Requirement:", hex(realbase())
-    CPY     #$08
+    CPY     RealWily3Req+1
     BMI     .False
     LDA     #$FF
     BNE     .Return
@@ -483,9 +505,12 @@ MarkComplete:
     STA     $0528
     RTS
 
-
 %org($C70D, $3E)
     JMP     MegaManInputHook
+    NOP
+
+%org($D66D, $3E)
+    JMP     Wily3Requirement2
     NOP
 
 %org($E814, $3F)
@@ -536,6 +561,33 @@ FlashStopperCheck:
     STA     $12
     .Return:
     JMP     $8153
+
+Wily3Requirement2:
+    PHA
+    LDY     #$00
+    LDA     $AC
+    .Loop:
+    PHA
+    AND     #$01
+    BEQ     .Skip
+    INY
+    .Skip:
+    PLA
+    LSR
+    CMP     #$00
+    BNE     .Loop
+    RealWily3Req:
+    print "Wily 3 Requirement:", hex(realbase())
+    CPY     #$08
+    BMI     .False
+    LDY     #$FF
+    BNE     .Return
+    .False:
+    LDY     $AC
+    .Return:
+    PLA
+    CPY     #$FF
+    JMP     $D671
 
 %org($EF00, $3F)
 db "MM4_ARCHIPELAGO_BASE", $00
