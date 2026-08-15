@@ -207,7 +207,8 @@ location_groups = {
         names.get_balloon_adapter,
         names.get_wire_adapter,
     },
-    **{name: {location for location, data in region.locations.items() if data.location_id} for name, region in mm4_regions.items()}
+    **{name: {location for location, data in region.locations.items() if data.location_id} for name, region in mm4_regions.items()
+       if name != "Wily Stage 4"}
 }
 
 lookup_location_to_id: dict[str, int] = {location: idx for location, idx in location_table.items() if idx is not None}

@@ -1,3 +1,4 @@
+import typing
 from math import ceil
 
 from .bases import MM4TestBase
@@ -19,21 +20,22 @@ def validate_wily_3(base: MM4TestBase) -> None:
         7: 1,
         8: 2,
     }
-    boss_health = {boss: 0x1C for boss in range(8)}
-    weapon_energy = {key: float(0x1C) for key in weapon_costs}
-    weapon_boss = {boss: {weapon: world.weapon_damage[weapon][boss] for weapon in world.weapon_damage}
-                   for boss in range(8)}
+    boss_health = {boss: 0x1C for boss in (*range(8), 14, 15)}
+    weapon_energy = {key: float(0x1C) for key in weapon_costs if key not in (9, 10) or world.options.random_rush}
+    weapon_boss = {boss: {weapon: world.weapon_damage[weapon][boss] for weapon in world.weapon_damage
+                          if weapon not in (9, 10) or world.options.random_rush}
+                   for boss in (*range(8), 14, 15)}
     flexibility = {
         boss: (
                 sum(damage_value > 0 for damage_value in
                     weapon_damages.values())  # Amount of weapons that hit this boss
                 * sum(weapon_damages.values())  # Overall damage that those weapons do
         )
-        for boss, weapon_damages in weapon_boss.items()
+        for boss, weapon_damages in weapon_boss.items() if boss not in (14, 15)
     }
     boss_flexibility = sorted(flexibility, key=flexibility.get)  # Fast way to sort dict by value
-    used_weapons: dict[int, set[int]] = {i: set() for i in range(8)}
-    for boss in boss_flexibility:
+    used_weapons: dict[int, set[int]] = {i: set() for i in (*range(8), 14, 15)}
+    for boss in [*boss_flexibility, 14, 15]:
         boss_damage = weapon_boss[boss]
         weapon_weight = {weapon: (weapon_energy[weapon] / damage) if damage else 0 for weapon, damage in
                          boss_damage.items() if weapon_energy[weapon] > 0}
@@ -103,3 +105,6 @@ class ShuffledStrictWeaknessTests(WeaknessTests):
         "strict_weakness": True,
         "random_weakness": "shuffled"
     }
+
+    def world_setup(self, seed: typing.Optional[int] = None) -> None:
+        super().world_setup(28108592829562768234)
