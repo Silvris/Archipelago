@@ -8,6 +8,7 @@ from typing import TYPE_CHECKING, Iterable
 
 from .color import write_palette_shuffle
 from .rules import bosses
+from .options import MusicShuffle
 
 if TYPE_CHECKING:
     from . import MM4World
@@ -70,9 +71,9 @@ enemy_ids: dict[str, int] = {
     "Square Machine": 0x95,
     "Mummira": 0x9A,
     "Imorm": 0x9C,
-    "Cockroach Twin #1": 0x9E,
-    "Cockroach Twin #2"
+    "Cockroach Twins": 0x9E,
     "Mono Roader": 0xA1,
+    "Cockroach Twin #2": 0xA2,
     "Metall Daddy": 0xA6,
     "Gachappon": 0xA7,
     "Tako Trash": 0xAB,
@@ -131,11 +132,7 @@ def patch_rom(world: "MM4World", patch: MM4ProcedurePatch) -> None:
     if world.options.strict_weakness or world.options.random_weakness or world.options.plando_weakness:
         # we need to write boss weaknesses
         for boss in bosses:
-            if boss == "Cockroach Twins":
-                enemy_weaknesses["Cockroach Twin #1"] = {i: world.weapon_damage[i][bosses[boss]] for i in world.weapon_damage}
-                enemy_weaknesses["Cockroach Twin #2"] = {i: world.weapon_damage[i][bosses[boss]] for i in world.weapon_damage}
-            else:
-                enemy_weaknesses[boss] = {i: world.weapon_damage[i][bosses[boss]] for i in world.weapon_damage}
+            enemy_weaknesses[boss] = {i: world.weapon_damage[i][bosses[boss]] for i in world.weapon_damage}
 
             if world.options.strict_weakness:
                 extra_damage = 0
@@ -146,6 +143,13 @@ def patch_rom(world: "MM4World", patch: MM4ProcedurePatch) -> None:
                 enemy_weaknesses[boss][10] = extra_damage
             enemy_weaknesses[boss][11] = extra_damage
             enemy_weaknesses[boss][12] = extra_damage
+            if boss == "Cockroach Twins":
+                enemy_weaknesses["Cockroach Twin #2"] = {i: world.weapon_damage[i][bosses[boss]] for i in world.weapon_damage}
+                if not world.options.random_rush:
+                    enemy_weaknesses["Cockroach Twin #2"][9] = extra_damage
+                    enemy_weaknesses["Cockroach Twin #2"][10] = extra_damage
+                enemy_weaknesses["Cockroach Twin #2"][11] = extra_damage
+                enemy_weaknesses["Cockroach Twin #2"][12] = extra_damage
 
     if world.options.enemy_weakness:
         for enemy in enemy_ids:
@@ -169,6 +173,37 @@ def patch_rom(world: "MM4World", patch: MM4ProcedurePatch) -> None:
     patch.write_byte(WILY3REQ + 1, world.options.wily_3_requirement.value)
     patch.write_byte(ENERGYLINK + 1, world.options.energy_link.value)
     patch.write_byte(JAMMED + 1, world.options.jammed_buster.value)
+
+    write_palette_shuffle(world, patch)
+
+    # music shuffle
+    if world.options.music_shuffle:
+        if world.options.music_shuffle == MusicShuffle.option_no_music:
+            pool = [0xF0] * 24
+            patch.write_byte(0x36E81, 0xF0)  # intro 0A
+            patch.write_byte(0x37159, 0xF0)  # intro 43
+            patch.write_byte(0x6B32B, 0xF0)  # Stage Clear 0C
+            patch.write_byte(0x6B7D1, 0xF0)  # Wily 4 Clear 46
+            patch.write_byte(0x721C9, 0xF0)  # Cossack Castle Intro 3C
+            patch.write_byte(0x7243E, 0xF0)  # Wily Castle Intro 3B
+            patch.write_byte(0x72F11, 0xF0)  # Game Over 0E
+            patch.write_byte(0x73061, 0xF0)  # stage intro 0F
+            patch.write_byte(0x77C7C, 0xF0)  # Collect Balloon/Wire 3A
+        elif world.options.music_shuffle == MusicShuffle.option_randomized:
+            pool = world.random.choices([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xB, 0xD,
+                                         0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x45], k=24)
+        else:
+            pool = [0, 1, 2, 3, 4, 5, 6, 7, 8, 1, 3, 7, 8, 9, 9, 0x15, 0x15, 0x16, 0x16, 0x10, 0x12, 0x45, 0x11, 0x0B, 0x13, 0xD, 0x14]
+        world.random.shuffle(pool)
+        patch.write_bytes(0x7C86B, pool[:16])
+        patch.write_bytes(0x7288A, pool[16:18])  # Title Screen and Stage Select
+        patch.write_byte(0x7FDB3, pool[18])  # Wily Capsule boss theme
+        patch.write_byte(0x7FDBF, pool[19])  # Regular boss theme
+        patch.write_byte(0x361E1, pool[20])  # Ending
+        patch.write_byte(0x36375, pool[21])  # Credits
+        patch.write_byte(0x72E93, pool[22])  # Password
+        patch.write_byte(0x72D4C, pool[23])  # Weapon Get
+
 
     from Utils import __version__
     patch.name = bytearray(f'MM4{__version__.replace(".", "")[0:3]}_{world.player}_{world.multiworld.seed:11}\0',
@@ -198,7 +233,7 @@ def patch_rom(world: "MM4World", patch: MM4ProcedurePatch) -> None:
     author = bytearray([0x1C, 0x12, 0x15, 0x1F, 0x1B, 0x12, 0x1C, 0x00])
     # ARCHIPELAGO x.x.x
     ap_version = bytearray([0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-                            0x0A, 0x1B, 0x0C, 0x11, 0x12, 0x19, 0x0E, 0x15, 0x0A, 0x10, 0x18])
+                            0x0A, 0x1B, 0x0C, 0x11, 0x12, 0x19, 0x0E, 0x15, 0x0A, 0x10, 0x18, 0x00])
     ap_version.extend(list(map(lambda c: version_map[c], __version__)))
     if len(ap_version) % 2 == 1:
         ap_version.append(0)

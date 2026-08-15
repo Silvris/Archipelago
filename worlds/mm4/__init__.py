@@ -5,6 +5,7 @@ from typing import Any, Sequence, ClassVar
 
 from BaseClasses import Tutorial, ItemClassification, MultiWorld, Item, Location
 from worlds.AutoWorld import World, WebWorld
+from .color import check_for_known_worlds
 from .items import (item_table, item_names, MM4Item, filler_item_weights, robot_master_weapon_table,
                     stage_access_table, extra_item_table, lookup_item_to_id)
 from .locations import (MM4Location, mm4_regions, MM4Region, lookup_location_to_id,
@@ -146,10 +147,10 @@ class MM4World(World):
         total_checks = 27
         if self.options.consumables in (Consumables.option_1up_etank,
                                         Consumables.option_all):
-            total_checks += 23
+            total_checks += 21
         if self.options.consumables in (Consumables.option_weapon_health,
                                         Consumables.option_all):
-            total_checks += 47
+            total_checks += 48
         remaining = total_checks - len(itempool)
         itempool.extend([self.create_item(name)
                          for name in self.random.choices(list(filler_item_weights.keys()),
@@ -209,6 +210,9 @@ class MM4World(World):
                 weapon_location.place_locked_item(placed_weapon)
                 prog_item_pool.remove(placed_weapon)
                 fill_locations.remove(weapon_location)
+
+    def pre_output(self):
+        check_for_known_worlds()
 
     def generate_output(self, output_directory: str) -> None:
         try:

@@ -460,6 +460,14 @@ EnergylinkOneUp:
 %org($8D39, $3C)
     JMP     JammedBuster
 
+%org($993F, $3C)
+    JMP     WeaponSoftlock
+    NOP
+
+%org($9970, $3C)
+    ;JMP     WeaponSoftlock
+    ;NOP
+
 %org($BD9A, $3D)
 Wily3Requirement:
     LDY     #$00
@@ -504,6 +512,12 @@ MarkComplete:
     LDA     #$D0
     STA     $0528
     RTS
+
+%org($C53D, $3E)
+    NOP     ; don't grant Rush Coil on startup
+    NOP
+    NOP
+    NOP
 
 %org($C70D, $3E)
     JMP     MegaManInputHook
@@ -588,6 +602,36 @@ Wily3Requirement2:
     PLA
     CPY     #$FF
     JMP     $D671
+    
+WeaponSoftlock:
+    AND     #$08
+    STA     $00
+    PHA     
+    TYA 
+    PHA
+    ORA     #$07
+    TAY
+    DEY
+    .Loop
+    LDX     $9B71, Y
+    LDA     $B0, X
+    BNE     .ContinueTrue
+    DEY
+    CPY     $00
+    BNE     .Loop
+    ; we're in the false case, jump out to a safe spot
+    LDA     #$00
+    STA     $0138
+    PLA
+    TAY
+    PLA
+    JMP     $9992
+    .ContinueTrue:
+    ; true case, pull and return
+    PLA
+    TAY
+    PLA
+    JMP     $9943
 
 %org($EF00, $3F)
 db "MM4_ARCHIPELAGO_BASE", $00

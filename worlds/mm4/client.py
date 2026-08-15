@@ -299,6 +299,7 @@ class MegaMan4Client(BizHawkClient):
     health_energy: int = 0
     auto_heal: bool = False
     refill_queue: list[tuple[MM4EnergyLinkType, int]] = []
+    last_death_link: float = 0.0
 
     async def validate_rom(self, ctx: "BizHawkClientContext") -> bool:
         from worlds._bizhawk import RequestFailedError, read, get_memory_size
@@ -367,7 +368,8 @@ class MegaMan4Client(BizHawkClient):
         if cmd == "Bounced":
             if "tags" in args:
                 assert ctx.slot is not None
-                if "DeathLink" in args["tags"] and args["data"]["source"] != ctx.slot_info[ctx.slot].name:
+                if "DeathLink" in args["tags"] and (args["data"]["source"] != ctx.slot_info[ctx.slot].name or
+                                                    args["data"]["time"] != self.last_death_link):
                     self.on_deathlink(ctx)
         elif cmd == "Connected":
             if self.energy_link:
@@ -377,11 +379,11 @@ class MegaMan4Client(BizHawkClient):
 
     async def send_deathlink(self, ctx: "BizHawkClientContext") -> None:
         self.sending_death_link = True
-        ctx.last_death_link = time.time()
+        self.last_death_link = time.time()
         await ctx.send_death("Mega Man was defeated.")
 
     def on_deathlink(self, ctx: "BizHawkClientContext") -> None:
-        ctx.last_death_link = time.time()
+        self.last_death_link = time.time()
         self.pending_death_link = True
 
     async def game_watcher(self, ctx: "BizHawkClientContext") -> None:

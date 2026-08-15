@@ -359,7 +359,7 @@ def write_palette_shuffle(world: "MM4World", rom: "MM4ProcedurePatch") -> None:
                 rom.write_bytes(pointer + 2, bytes(pal1))
                 rom.write_bytes(pointer + 6, bytes(pal2))
             else:
-                rom.write_bytes(pointer + 2, bytes(palettes_to_write[character]))
+                rom.write_bytes(pointer + 1, bytes(palettes_to_write[character]))
         if character == "Mega Buster":
             # update charging routine
             rom.write_bytes(0x7928D, [palettes_to_write[character][0]] * 13)
