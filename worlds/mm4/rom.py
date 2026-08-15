@@ -20,7 +20,7 @@ MM4VCHASH = "92f52ebb2edf81a3659ea4b8ea0b1191"
 
 ENERGYLINK = 0x77CC2
 WILY3REQ = 0x7E88C
-JAMMED = 0x7BDC9
+JAMMED = 0x7BDCA
 
 enemy_ids: dict[str, int] = {
     # these are Object IDs in the Matrixz doc
