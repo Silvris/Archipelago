@@ -64,7 +64,9 @@ MM4_CONSUMABLE_TABLE: dict[int, dict[int, tuple[int, int]]] = {
         0x0205: (2, 2),
         0x0206: (3, 3),
     },
-    3: {},
+    3: {
+        0x0244: (3, 5),
+    },
     4: {
         0x0207: (4, 2),
         0x0208: (8, 7),

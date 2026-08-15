@@ -181,6 +181,7 @@ STATIC_ENTRANCE_RULES: dict[str, Rule] = {
 }
 
 STATIC_1UP_RULES: dict[str, Rule] = {
+    names.pharaoh_man_c1: HasVertical,
     names.drill_man_c3: HasVertical,
     names.ring_man_c2: HasVertical,
     names.cossack_2_c9: HasDrill,

@@ -24,7 +24,7 @@ viewing the ending sequence after defeating Gamma.
 - Weapon Energy (L)
 
 ## What is considered a location check in Mega Man 4?
-- The defeat of a Robot Master or Wily Boss
+- The defeat of a Robot Master or Cossack/Wily Boss
 - Receiving a weapon or Rush item from Dr. Light
 - Optionally, 1-Ups, E-Tanks, and gifts from Eddie present within stages
 - Optionally, Weapon and Health Energy pickups present within stages
@@ -59,6 +59,7 @@ The palette shuffle option supports specifying a specific palette for a given we
 so is `Character-Color1|Color2;Option`. Character is the individual that this should apply to, and can only be one of 
 the following:
 - Mega Buster
+- Charge Buster
 - Flash Stopper
 - Rain Flush
 - Drill Bomb
@@ -103,7 +104,7 @@ plando_weakness:
 ```
 This would cause Bright Man to take 4 damage from Skull Barrier, and 0 from Rain Flush.
 
-Note: it is possible that plando weakness is not be respected should the plando create a situation in which the game 
+Note: it is possible that plando weakness will not be respected should the plando create a situation in which the game 
 becomes impossible to complete. In this situation, the damage would be boosted to the minimum required to defeat the 
 Robot Master.
 

@@ -147,7 +147,7 @@ class MM4World(World):
         total_checks = 27
         if self.options.consumables in (Consumables.option_1up_etank,
                                         Consumables.option_all):
-            total_checks += 21
+            total_checks += 22
         if self.options.consumables in (Consumables.option_weapon_health,
                                         Consumables.option_all):
             total_checks += 48

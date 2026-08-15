@@ -237,12 +237,13 @@ def patch_rom(world: "MM4World", patch: MM4ProcedurePatch) -> None:
     ap_version.extend(list(map(lambda c: version_map[c], __version__)))
     if len(ap_version) % 2 == 1:
         ap_version.append(0)
+    # just when you think you've seen it all
     group_1 = bytearray()
     group_2 = bytearray()
     for i in range(0, len(author), 2):
         group_1.append(author[i])
         group_2.append(author[i + 1])
-    # just when you think you've seen it all
+
     for i in range(0, len(ap_version), 2):
         group_1.append(ap_version[i])
         group_2.append(ap_version[i + 1])

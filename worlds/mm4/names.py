@@ -78,6 +78,7 @@ bright_man_c4 = "Bright Man Stage - Weapon Energy"
 drill_man_c1 = "Drill Man Stage - Health Energy"
 drill_man_c2 = "Drill Man Stage - 1-Up"
 drill_man_c3 = "Drill Man Stage - E-Tank"  # Needs vertical
+pharaoh_man_c1 = "Pharaoh Man Stage - E-Tank"  # Needs vertical
 ring_man_c1 = "Ring Man Stage - Health Energy"
 ring_man_c2 = "Ring Man Stage - Item from Eddie"  # Needs vertical
 dust_man_c1 = "Dust Man Stage - Health Energy"

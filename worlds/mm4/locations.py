@@ -53,6 +53,7 @@ mm4_regions: dict[str, RegionData] = {
         names.pharaoh_man: LocationData(0x0004),
         names.get_pharaoh_shot: LocationData(0x0104),
         names.get_balloon_adapter: LocationData(0x115),
+        names.pharaoh_man_c1: LocationData(0x244, oneup_tank=True),
     }, [names.pharaoh_man_stage], []),
 
     "Ring Man Stage": RegionData({
