@@ -77,6 +77,7 @@ bright_man_c3 = "Bright Man Stage - 1-Up"
 bright_man_c4 = "Bright Man Stage - Weapon Energy"
 toad_man_c1 = "Toad Man Stage - Health Energy 1"
 toad_man_c2 = "Toad Man Stage - Health Energy 2"
+toad_man_c3 = "Toad Man Stage - Health Energy 3"
 drill_man_c1 = "Drill Man Stage - Health Energy"
 drill_man_c2 = "Drill Man Stage - 1-Up"
 drill_man_c3 = "Drill Man Stage - E-Tank"  # Needs vertical
