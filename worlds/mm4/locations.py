@@ -37,13 +37,13 @@ mm4_regions: dict[str, RegionData] = {
     "Toad Man Stage": RegionData({
         names.toad_man: LocationData(0x0002),
         names.get_rain_flush: LocationData(0x0102),
-        names.get_rush_marine: LocationData(0x0113),
+        names.get_rush_marine: LocationData(0x0112),
     }, [names.toad_man_stage], []),
 
     "Drill Man Stage": RegionData({
         names.drill_man: LocationData(0x0003),
         names.get_drill_bomb: LocationData(0x0103),
-        names.get_rush_jet: LocationData(0x0112),
+        names.get_rush_jet: LocationData(0x0113),
         names.drill_man_c1: LocationData(0x0204, energy=True),
         names.drill_man_c2: LocationData(0x0205, oneup_tank=True),
         names.drill_man_c3: LocationData(0x0206, oneup_tank=True),
@@ -52,7 +52,7 @@ mm4_regions: dict[str, RegionData] = {
     "Pharaoh Man Stage": RegionData({
         names.pharaoh_man: LocationData(0x0004),
         names.get_pharaoh_shot: LocationData(0x0104),
-        names.get_balloon_adapter: LocationData(0x115),
+        names.get_balloon_adapter: LocationData(0x114),
         names.pharaoh_man_c1: LocationData(0x0245, oneup_tank=True),
     }, [names.pharaoh_man_stage], []),
 
@@ -73,7 +73,7 @@ mm4_regions: dict[str, RegionData] = {
     "Dive Man Stage": RegionData({
         names.dive_man: LocationData(0x0007),
         names.get_dive_missile: LocationData(0x0107),
-        names.get_wire_adapter: LocationData(0x0114),
+        names.get_wire_adapter: LocationData(0x0115),
         names.dive_man_c1: LocationData(0x020B, oneup_tank=True),
     }, [names.dive_man_stage], []),
 

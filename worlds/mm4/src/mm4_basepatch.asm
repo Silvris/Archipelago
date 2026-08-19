@@ -646,6 +646,13 @@ EnableSaveRam:
     LDA     #$80
     STA     $A001
     LDA     #$00
+    LDX     #$00
+    .Loop:
+    STA     $6000, X
+    INX
+    CPX     #$00
+    BNE     .Loop
+    .Return:
     JMP     $FE9E
 
 
