@@ -151,7 +151,7 @@ class MM4World(World):
             total_checks += 22
         if self.options.consumables in (Consumables.option_weapon_health,
                                         Consumables.option_all):
-            total_checks += 48
+            total_checks += 51
         remaining = total_checks - len(itempool)
         itempool.extend([self.create_item(name)
                          for name in self.random.choices(list(filler_item_weights.keys()),
