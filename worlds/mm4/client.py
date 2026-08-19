@@ -588,7 +588,7 @@ class MegaMan4Client(BizHawkClient):
                 writes.append(get_sfx_writes(0x29))
             elif idx == 3:
                 current_tanks = e_tanks[0]
-                if current_tanks > 0x1F:
+                if current_tanks > 9:
                     self.item_queue.append(item)
                 else:
                     current_tanks += 1
