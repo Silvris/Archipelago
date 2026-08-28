@@ -1474,7 +1474,7 @@ ShopBlockHelpers:
     pop         {r2}
     cmp         r0, #1
     bge         @@Skip
-    add         r2, #0x12
+    add         r2, #0x14
     @@Get:
     ldr         r3, =#999
     @@Skip:
@@ -2333,7 +2333,7 @@ GiveAPPrize:
     bx          lr
 
 RemapShopCosts:
-    push        {r0-r2}
+    push        {r0-r2, r6}
     ldrh        r3, [r4, #06] //; this will be incorrect on AP checks
     ldr         r4, =gCurrentPinballGame
     ldr         r1, =gArchipelago
@@ -2343,13 +2343,18 @@ RemapShopCosts:
     beq         @@Return
     add         r2, #1
     ldr         r5, [r4, #0]
+    ldr         r6, =gMain
     ldrb        r0, [r5, r6]
     add         r2, r0
+    ldrb        r0, [r6, #4]
+    bne         @@Set
+    add         r2, #5
+    @@Set:
     ldrb        r0, [r1, r2]
     ldr         r1, =ShopPrices
     ldrb        r3, [r1, r0]
     @@Return:
-    pop         {r0-r2}
+    pop         {r0-r2, r6}
     bx          lr
 
 .pool
