@@ -1144,8 +1144,13 @@ CheckWhiscash:
     push        {r3, lr}
     lsl         r0, #0x10
     lsr         r0, #0x10
+    cmp         r0, #3
+    blt         @@Return
     mov         r3, #3
     bl          CheckHelper
+    cmp         r0, #0
+    beq         @@False
+    mov         r0, #3
     @@Return:
     pop         {r3, pc}
     @@False:
