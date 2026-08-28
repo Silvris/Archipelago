@@ -224,6 +224,10 @@
     .thumb
     bl          RingLinkShop
 
+.org UpdateShopEntryAnimation+0x6AA
+    .thumb
+    bl          AllNightShop
+
 .org LoadPortraitGraphics+0x5D6
     .thumb
     bl          CheckIsAPItem
@@ -299,6 +303,10 @@
     .thumb
     bl          WeightsCheckEvo
 
+.org BuildSpeciesWeightsForCatchEmMode+0x1CE
+    .thumb
+    bl          WeightsCheckCaught
+
 .org BuildSpeciesWeightsForCatchEmMode+0x216
     .thumb
     bl          ForceNormal
@@ -314,6 +322,10 @@
 .org BuildSpeciesWeightsForEggMode+0x102
     .thumb
     bl          EggGroups
+
+.org BuildSpeciesWeightsForEggMode+0x10C
+    .thumb
+    bl          EggsCheckCaught
 
 .org BuildSpeciesWeightsForEggMode+0x13C
     .thumb
@@ -741,6 +753,30 @@ WeightsCheckEvo:
 
 .pool
 
+WeightsCheckCaught:
+    //; r6 - species, r5 - weight
+    //; if we have already caught this mon and it is currently in our evolvable party, don't try to force another one
+    mov         r4, r10
+    ldr         r4, [r4, #0] //; gCurrentPinballGame
+    ldr         r2, =0x280
+    ldr         r3, =0x270
+    @@Loop:
+    ldrb        r0, [r4, r3]
+    cmp         r0, r6
+    beq         @@Fail
+    add         r3, #1
+    cmp         r3, r2
+    blt         @@Loop
+    @@Return:
+    mov         r1, r10
+    ldr         r4, [r1, #0]
+    bx          lr
+    @@Fail:
+    mov         r5, #2
+    b           @@Return
+
+.pool
+
 ClamperlCheck:
     //; clamperl is a special little baby
     push        {r0-r3}
@@ -790,6 +826,30 @@ EggsCheckEvo:
     pop         {r1-r4}
     add         r0, r5, #0
     bx          lr
+
+.pool
+
+EggsCheckCaught:
+    //; r0 - species, r3 - weight, r4 - gCurrentPinballGame
+    //; if we have already caught this mon and it is currently in our evolvable party, don't try to force another one
+    push        {r2, r6}
+    ldr         r2, =0x280
+    ldr         r5, =0x270
+    @@Loop:
+    ldrb        r6, [r4, r5]
+    cmp         r0, r6
+    beq         @@Fail
+    add         r5, #1
+    cmp         r5, r2
+    blt         @@Loop
+    @@Return:
+    pop         {r2, r6}
+    mov         r5, #0x97
+    lsl         r5, #1
+    bx          lr
+    @@Fail:
+    mov         r3, #2
+    b           @@Return
 
 .pool
 
@@ -1237,7 +1297,7 @@ ForceNormal:
 ForceEgg:
     mov         r9, r4
     mov         r10, r5
-    push        {r0-r5}
+    push        {r0-r6}
     mov         r2, #0x4
     @@GetMain:
     ldr         r1, =gMain
@@ -1265,6 +1325,13 @@ ForceEgg:
     //; change compared to normal, check if we've already nulled the weight here
     ldrh        r2, [r4, r0]
     cmp         r2, #0
+    beq         @@NoWeight
+    cmp         r0, #0
+    beq         @@NoWeight //; edge case: can't check the prev of index 0, but if 0 has no weight it gets caught by the first one
+    mov         r6, r0
+    sub         r6, #2
+    ldrh        r6, [r4, r6]
+    cmp         r2, r6
     beq         @@NoWeight
     ldrh        r2, [r3, r0]
     cmp         r2, r1
@@ -1306,7 +1373,7 @@ ForceEgg:
     add         r4, #2
     strh        r1, [r4, r0]
     @@Return:
-    pop         {r0-r5}
+    pop         {r0-r6}
     bx          lr
     .align      4
 
@@ -1657,6 +1724,21 @@ RingLinkShop:
     bx          lr
 
 .pool
+
+AllNightShop:
+    push        {lr}
+    bl          m4aSongNumStart
+    ldr         r0, =gArchipelago
+    ldr         r1, =0x43
+    ldrb        r2, [r0, r1]
+    cmp         r2, #0
+    beq         @@ReturnNormal
+    pop         {r0}
+    ldr         r1, =0x16
+    add         r0, r1
+    bx          r0
+    @@ReturnNormal:
+    pop         {pc}
 
 PrepareTextDisplay:
     push            {r0-r3}
