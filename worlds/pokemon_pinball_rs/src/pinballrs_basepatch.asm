@@ -228,6 +228,10 @@
     .thumb
     bl          AllNightShop
 
+.org LoadPortraitGraphics+0x4C6
+    .thumb
+    bl          ResetAPShopOnTravel
+
 .org LoadPortraitGraphics+0x5D6
     .thumb
     bl          CheckIsAPItem
@@ -2177,6 +2181,18 @@ CheckGoalEndOfBall:
     b           @@Return
 
 .pool
+
+ResetAPShopOnTravel:
+    //; kind of a hack, some of the code for loading travel graphics is reused from the shop
+    //; so we just reset it when we try to load travel specifically
+    push        {r0-r2}
+    ldr         r0, =gArchipelago
+    ldr         r1, =0x30
+    mov         r2, #0
+    strb        r2, [r0, r1]
+    pop         {r0-r2}
+    bx          lr
+    
 
 CheckLoadAPShopData:
     push        {r4-r5}
