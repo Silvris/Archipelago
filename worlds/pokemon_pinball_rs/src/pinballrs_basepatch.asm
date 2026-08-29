@@ -265,6 +265,10 @@
     mov         r1, r8
     bl          CheckLoadAPShopDataCoins
 
+.org RenderEvolutionUI+0x59C
+    .thumb
+    bl          APShopOutOfStock
+
 //; Handle areas
 .org InitBoardIntroMode+0x38
     .thumb
@@ -2231,15 +2235,27 @@ CheckLoadAPShopDataCoinsMain:
     //; funny chain here
     ldr         r3, =gArchipelago
     ldrb        r2, [r3, r2]
+    ldr         r3, =ShopCheckMax
+    ldrb        r3, [r3, #0]
+    cmp         r2, r3
+    bge         @@False
     ldr         r3, =ShopPrices
     ldrb        r0, [r3, r2]
     @@Return:
     pop         {r2-r5}
     bx          lr
+    @@False:
+    ldr         r0, =999
+    b           @@Return
 
 CheckLoadAPShopDataCoins:
     push        {lr}
     bl          CheckLoadAPShopDataCoinsMain
+    ldr         r1, =999
+    cmp         r0, r1
+    bne         @@Skip
+    ldr         r0, =99
+    @@Skip:
     mov         r1, #10
     pop         {pc}
 
@@ -2328,6 +2344,56 @@ CheckLoadAPShopItemRemap2:
     bl          CheckLoadAPShopItemRemapMain
     add         r1, #1
     pop         {pc}
+
+.pool
+
+APShopOutOfStock:
+//; r10 - gCurrentPinballGame ptr
+    push        {r0, r2, r3, r5, lr}
+    cmp         r1, #0
+    bne         @@Return //; quick return to keep the animation mostly normal
+    mov         r0, r10
+    ldr         r0, [r0, #0]
+    mov         r3, #0xD3
+    lsl         r3, #1
+    add         r3, #1
+    ldrb        r5, [r0, r3]
+    ldr         r2, =gArchipelago
+    ldr         r3, =0x30
+    ldrb        r3, [r2, r3]
+    cmp         r3, #1
+    bne         @@Vanilla
+    mov         r3, #0xF
+    and         r5, r3
+    mov         r3, #0x31
+    add         r5, r3
+    ldrb        r5, [r2, r5]
+    ldr         r2, =ShopCheckMax
+    ldrb        r2, [r2, #0]
+    cmp         r5, r2
+    blt         @@Return
+    mov         r1, #4
+    @@Return:
+    pop         {r0, r2, r3, r5, pc}
+    @@Vanilla:
+    //; we have a case we want to handle here too
+    //; in the case where we don't have the helper whiscash/pelipper
+    cmp         r5, #22
+    beq         @@TrueWhiscash
+    cmp         r5, #23
+    bne         @@Return
+    mov         r3, #2
+    b           @@TrueMain
+    @@TrueWhiscash:
+    mov         r3, #3
+    @@TrueMain:
+    bl          CheckHelper
+    cmp         r0, #1
+    beq         @@Return
+    mov         r1, #4
+    b           @@Return
+
+.pool
 
 SwapAPShop:
 //; r3 - gCurrentPinballGame
@@ -2445,20 +2511,27 @@ RemapShopCosts:
     cmp         r0, #0
     beq         @@Return
     add         r2, #1
-    ldr         r5, [r4, #0]
-    ldr         r6, =gMain
-    ldrb        r0, [r5, r6]
-    add         r2, r0
-    ldrb        r0, [r6, #4]
-    bne         @@Set
-    add         r2, #5
-    @@Set:
+    mov         r5, #0xD3
+    lsl         r5, #1
+    add         r5, #1
+    ldr         r6, [r4, #0]
+    ldrb        r5, [r6, r5]
+    mov         r6, #0xF
+    and         r5, r6
+    add         r2, r5
     ldrb        r0, [r1, r2]
+    ldr         r1, =ShopCheckMax
+    ldrb        r1, [r1, #0]
+    cmp         r0, r1
+    bge         @@ReturnFalse
     ldr         r1, =ShopPrices
     ldrb        r3, [r1, r0]
     @@Return:
     pop         {r0-r2, r6}
     bx          lr
+    @@ReturnFalse:
+    ldr         r3, =999
+    b           @@Return
 
 .pool
 
