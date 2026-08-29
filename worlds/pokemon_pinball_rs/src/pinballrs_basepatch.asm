@@ -2546,7 +2546,7 @@ HookRouletteInit:
     @@ReplaceCheck:
     ldr         r1, =gMain
     ldrb        r5, [r1, #4]
-    mov         r3, #0x3A
+    mov         r3, #0x3B
     add         r3, r5
     ldr         r1, =gArchipelago
     ldrb        r3, [r1, r3]
