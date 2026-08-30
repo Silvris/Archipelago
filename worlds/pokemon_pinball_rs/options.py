@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from Options import Choice, OptionSet, Range, Toggle, PerGameCommonOptions, DeathLinkMixin
+from Options import Choice, OptionSet, Range, Toggle, PerGameCommonOptions, DeathLinkMixin, StartInventoryPool
 from .names import POKEDEX, SPECIES_GROUDON, SPECIES_KYOGRE, SPECIES_RAYQUAZA, SPECIES_JIRACHI
 
 
@@ -193,6 +193,7 @@ class MusicShuffle(Choice):
 
 @dataclass
 class PokemonPinballRSOptions(PerGameCommonOptions, DeathLinkMixin):
+    start_inventory_from_pool: StartInventoryPool
     goal: Goal
     difficulty: Difficulty
     starting_board: StartingBoard

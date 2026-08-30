@@ -324,7 +324,7 @@ class PinballRSClient(BizHawkClient):
                 boards, get_arrows, evo_arrows, hatch_mode, coin_arrows, coin_mod, stages, items_received, local_eggs,
                 e_reader, bonus_stages, current_score, current_balls, evo_items, ruby_bumper, sapphire_bumper,
                 ruby_ball_upgrade, sapphire_ball_upgrade, maku_ball_upgrade, coin_plus, coin_minus, goal_check, shops,
-                roulettes, deathlink_send, msg_mode, helpers, goal, dex_req, score_req, target_req, medal_req,
+                roulettes, deathlink_send, msg_mode, helpers, open_shop, goal, dex_req, score_req, target_req, medal_req,
              trigger, slot_info, shop_tracks, shop_len, roulette_len, deathlink_enable) = await read(ctx.bizhawk_ctx,
                 [
                     (PINBALL_POKEDEX, 205, "System Bus"),
@@ -362,6 +362,7 @@ class PinballRSClient(BizHawkClient):
                     (PINBALL_DEATHLINK_SEND, 1, "System Bus"),
                     (PINBALL_STR_MODE, 1, "System Bus"),
                     (PINBALL_HELPERS, 1, "System Bus"),
+                    (PINBALL_ALWAYS_OPEN_SHOP, 1, "System Bus"),
                     (PINBALL_GOAL, 1, "ROM"),
                     (PINBALL_DEX_REQ, 1, "ROM"),
                     (PINBALL_SCORE_REQ, 8, "ROM"),
@@ -580,6 +581,10 @@ class PinballRSClient(BizHawkClient):
             remote_medals = sum(item.item == 26 for item in ctx.items_received)
             if remote_medals and int.from_bytes(medals, "little") != remote_medals:
                 writes.append((PINBALL_MEDALS, remote_medals.to_bytes(1, "little"), "System Bus"))
+
+            remote_open_shop = any(item.item == 27 for item in ctx.items_received)
+            if remote_open_shop and int.from_bytes(open_shop, "little") != 1:
+                writes.append((PINBALL_ALWAYS_OPEN_SHOP, int.to_bytes(1, 1, "little"), "System Bus"))
 
             # Check dexnav here
             if self.dexnav is not None:

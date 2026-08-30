@@ -4,7 +4,7 @@ from .names import (RUBY_BOARD, SAPPHIRE_BOARD, AREAS, EXTRA_STARTING_LIFE, STAR
                     CHIKORITA_DEX, CYNDAQUIL_DEX, TOTODILE_DEX, AERODACTYL_DEX, EGG_BUNCH_FOREST, EGG_BUNCH_CAVE,
                     EGG_BUNCH_MOUNTAIN, EGG_BUNCH_DESERT, EGG_BUNCH_SEA, EGG_BUNCH_RUBY, EGG_BUNCH_SAPPHIRE, BIG, SMALL,
                     BALL_SAVER, EXTRA_BALL, EVOLUTION_METHODS, EVO_MODE, HELPER_ZIGZAGOON, HELPER_MAKUHITA,
-                    HELPER_PELIPPER, HELPER_WHISCASH, COIN_MODIFIER, COIN_ARROW, POKEDEX_MEDAL)
+                    HELPER_PELIPPER, HELPER_WHISCASH, COIN_MODIFIER, COIN_ARROW, POKEDEX_MEDAL, ALWAYS_OPEN_SHOPS)
 from typing import NamedTuple
 
 
@@ -46,6 +46,7 @@ MAIN_ITEMS: dict[str, ItemData] = {
     COIN_ARROW: ItemData(24, ItemClassification.progression, num=3),
     COIN_MODIFIER: ItemData(25, ItemClassification.progression),
     POKEDEX_MEDAL: ItemData(26, ItemClassification.progression, num=0),
+    ALWAYS_OPEN_SHOPS: ItemData(27, ItemClassification.useful),
     # Helpers
     HELPER_ZIGZAGOON: ItemData(0x800, ItemClassification.useful, board=2),
     HELPER_PELIPPER: ItemData(0x801, ItemClassification.progression, board=2),
