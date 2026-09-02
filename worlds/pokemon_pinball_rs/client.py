@@ -466,7 +466,11 @@ class PinballRSClient(BizHawkClient):
                     writes.append(get_sfx_write(0xB2))
                 else:
                     writes.append(get_sfx_write(0xD8))
-                self.message_queue.append((item_id, item.player))
+                if item.location > 0:
+                    self.message_queue.append((item_id, item.player))
+                else:
+                    # edge case, if it's from core we need to know the location instead of player
+                    self.message_queue.append((item_id, item.location))
                 if item_id & 0x200:
                     self.item_queue.append(item)
 
@@ -631,7 +635,7 @@ class PinballRSClient(BizHawkClient):
                 writes.extend([
                     (PINBALL_STR_MODE, int.to_bytes(1, 1, "little"), "System Bus"),
                     (PINBALL_STR_ITEM, item_id.to_bytes(2, "little"), "System Bus"),
-                    (PINBALL_STR_PLAYER, player.to_bytes(4, "little"), "System Bus"),
+                    (PINBALL_STR_PLAYER, player.to_bytes(4, "little", signed=True), "System Bus"),
                 ])
 
             # check ringlink here
@@ -752,20 +756,40 @@ class PinballRSClient(BizHawkClient):
             if maku_ball_upgrade_hits < min_maku_upgrade - 1:
                 writes.append((PINBALL_MAKUHITA_BALL_UPGRADE, int.to_bytes(min_maku_upgrade - 1, 1, "little"), "System Bus"))
 
+            shop_collect: dict[int, int] = {}
+
             for i in range(2):
                 for j in range(int.from_bytes(shop_tracks) + 1):
                     for k in range(1, int.from_bytes(shop_len) + 1):
+                        idx = 0x500 + (i * 75) + (j * 15) + k
                         if shops[i*5 + j] >= k:
-                            idx = 0x500 + (i * 75) + (j * 15) + k
                             if idx not in ctx.checked_locations:
                                 new_checks.append(idx)
+                        else:
+                            if idx in ctx.checked_locations:
+                                shop_collect[i*5 + j] = k
+                            else:
+                                break
+
+            roulette_collect: dict[int, int] = {}
 
             for i in range(2):
                 for j in range(1, int.from_bytes(roulette_len) + 1):
+                    idx = 0x600 + (i * 40) + j
                     if roulettes[i] >= j:
-                        idx = 0x600 + (i * 40) + j
                         if idx not in ctx.checked_locations:
                             new_checks.append(idx)
+                    else:
+                        if idx in ctx.checked_locations:
+                            roulette_collect[i] = j
+                        else:
+                            break
+
+            for ptr, val in shop_collect.items():
+                writes.append((PINBALL_SHOPS + ptr, int.to_bytes(val, 1, "little"), "System Bus"))
+
+            for ptr, val in roulette_collect.items():
+                writes.append((PINBALL_ROULETTES + ptr, int.to_bytes(val, 1, "little"), "System Bus"))
 
             # handle remote dex here
             if self.pokedex_key in ctx.stored_data:
