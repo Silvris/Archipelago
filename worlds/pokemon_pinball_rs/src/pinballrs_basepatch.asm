@@ -61,7 +61,7 @@
     .thumb
     bl          UpdateRubyUpgrade
 
-.org ProcessRubyCollisionEvent+0x680
+.org ProcessRubyCollisionEvent+0x67E
     .thumb
     bl          GetArrows
 
