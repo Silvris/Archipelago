@@ -1742,7 +1742,7 @@ AllNightShop:
     cmp         r2, #0
     beq         @@ReturnNormal
     pop         {r0}
-    ldr         r1, =0x16
+    ldr         r1, =0x14
     add         r0, r1
     bx          r0
     @@ReturnNormal:
