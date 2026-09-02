@@ -1895,6 +1895,11 @@ PopulatePlayerString:
     ldr             r2, =#-2
     cmp             r0, r2
     beq             @@Server
+    mov             r2, #0
+    cmp             r0, r2
+    blt             @@GenericPlayer //; edge case, if the number is so large we go into the negatives we fail the first check
+    //; this can happen primarily with unknown core locations
+    @@PullTable:
     ldr             r2, =PlayerTable
     lsl             r0, #2
     ldr             r5, [r2, r0]
@@ -2756,7 +2761,7 @@ ChangeFlagMainHook:
 //; world version
 .byte 0x00, 0x00, 0x00
 //; basepatch version (if i remember to update it lol)
-.byte 0x00, 0x04, 0x00
+.byte 0x00, 0x04, 0x01
 //; slot data at 0x6BC030
 .org 0x86BC030
 GoalValue:
@@ -2802,7 +2807,7 @@ StandardItemStrTable: //; have to offset by 1 because 0 index is reserved
 .word 0x0, RubyBoard, SapphireBoard, StartingBall, StartingCoins, StartingModifier, PermPichu
 .word SpecialGuests, EncounterRate, RuinsAreaCard, GetArrow, EvoArrow, EvoMode, ChikoritaDex
 .word CyndaquilDex, TotodileDex, AerodactylDex, EggForest, EggCave, EggMountain, EggDesert, EggSea
-.word EggRuby, EggSapphire, CoinArrow, CoinModifier, PokedexMedal
+.word EggRuby, EggSapphire, CoinArrow, CoinModifier, PokedexMedal, AllNightShops
 AreaItemStrTable:
 .word ForestRuby, VolcanoRuby, PlainsRuby, OceanRuby, SafariZoneRuby, CaveRuby, RuinsRuby
 .word ForestSapphire, LakeSapphire, PlainsSapphire, WildernessSapphire, OceanSapphire, CaveSapphire, RuinsSapphire
@@ -2840,6 +2845,8 @@ CoinModifier:
 .byte "DOUBLE COINS", 0x00
 PokedexMedal:
 .byte "POKEDEX MEDAL ", 0x00 //; extend in code to show counts
+AllNightShops:
+.byte "24/7 SHOPS", 0x00
 EvoMode:
 .byte "EVO MODE", 0x00
 ChikoritaDex:
