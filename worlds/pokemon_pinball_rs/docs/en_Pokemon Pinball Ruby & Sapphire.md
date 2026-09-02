@@ -34,6 +34,8 @@ Soothe Bell, Dry Pokéblocks)
 - Egg Bunches
 - Chikorita/Cyndaquil/Totodile/Aerodactyl Pokédex Entries
 - Pokédex Medal (if required for goal)
+- 24/7 Shops
+  - Keeps shops open after purchasing an item from them
 - BIG (score bonus)
 - Small (score bonus)
 - Extra Ball
@@ -45,10 +47,13 @@ Soothe Bell, Dry Pokéblocks)
 - Hitting 5 Spheal/Poké Ball baskets, as well as 10 total baskets in the Spheal bonus stage.
 - If enabled, hitting the bonus multiplier bumper on each board.
 - If enabled, receiving a ball upgrade via on-board indicators (and separately, Makuhita on the Ruby Board).
+- If enabled, purchasing specific items within the Shop (can be accessed by pressing Select on the Shop screen).
+- If enabled, hitting certain options on the roulette wheel (replaces Small and BIG options until exhausted).
 
 ## When the player receives an item, what happens?
 A sound effect will play based on the type of item received, and the effects of the item will be immediately applied.
 Some items may only be applied the next time they are relevant, such as starting a new game.
+The game will also display the item received at the top of the screen, as well as who sent it.
 
 ## Unique Local Commands
 - `/ereader` Used to activate E-reader Card effects. Valid entries are `Special Guests`, `Encounter Rate Up`, and 
