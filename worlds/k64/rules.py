@@ -222,10 +222,10 @@ class PowerCombo(Rule["K64World"], game="Kirby 64 - The Crystal Shards"):
         def explain_str(self, state: CollectionState | None = None) -> str:
             key = sorted([copy_ability_table[self.ability_a].code, copy_ability_table[self.ability_b].code])
             combo = power_combo_map[tuple(key)]
-            s = (f"{combo}: {'Have' if state.has(combo, self.player) else 'Don\'t Have'}\n"
-                 f"{self.ability_a}: {'Have' if state.has(self.ability_a, self.player) else 'Don\'t Have'}\n"
+            s = (f"{combo}: {'Have' if state.has(combo, self.player) else 'Do Not Have'}\n"
+                 f"{self.ability_a}: {'Have' if state.has(self.ability_a, self.player) else 'Do Not Have'}\n"
                  f"Can Reach {self.ability_a}: {state.has(ABILITY_ACCESS_TABLE[self.ability_a], self.player)}\n"
-                 f"{self.ability_b}: {'Have' if state.has(self.ability_b, self.player) else 'Don\'t Have'}\n"
+                 f"{self.ability_b}: {'Have' if state.has(self.ability_b, self.player) else 'Do Not Have'}\n"
                  f"Can Reach {self.ability_b}: {state.has(ABILITY_ACCESS_TABLE[self.ability_b], self.player)}")
             return s
 
@@ -258,9 +258,9 @@ class PowerCombo(Rule["K64World"], game="Kirby 64 - The Crystal Shards"):
 
         @override
         def explain_str(self, state: CollectionState | None = None) -> str:
-            s = (f"{self.ability_a}: {'Have' if state.has(self.ability_a, self.player) else 'Don\'t Have'}\n"
+            s = (f"{self.ability_a}: {'Have' if state.has(self.ability_a, self.player) else 'Do Not Have'}\n"
                  f"Can Reach {self.ability_a}: {state.has(ABILITY_ACCESS_TABLE[self.ability_a], self.player)}\n"
-                 f"{self.ability_b}: {'Have' if state.has(self.ability_b, self.player) else 'Don\'t Have'}\n"
+                 f"{self.ability_b}: {'Have' if state.has(self.ability_b, self.player) else 'Do Not Have'}\n"
                  f"Can Reach {self.ability_b}: {state.has(ABILITY_ACCESS_TABLE[self.ability_b], self.player)}")
             return s
 
