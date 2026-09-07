@@ -246,7 +246,7 @@ rock_star_2_f9 = "Rock Star 2 - Cake 3"
 rock_star_2_t36 = "Rock Star 2 - Star 36"
 rock_star_2_t37 = "Rock Star 2 - Star 37"
 rock_star_2_t38 = "Rock Star 2 - Star 38"
-rock_star_2_f10 = "Rock Star 2 - Sandwich 2"
+rock_star_2_f10 = "Rock Star 2 - Sandwich 3"
 
 rock_star_3_f1 = "Rock Star 3 - Cake"
 rock_star_3_t1 = "Rock Star 3 - Star 1"
