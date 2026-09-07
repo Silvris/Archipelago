@@ -311,10 +311,6 @@ HasAnySpark = HasBasicSpark | Or(*[PowerCombo(ItemName.spark, x) for x in [ItemN
                                                                               ItemName.ice, ItemName.needle,
                                                                               ItemName.bomb, ItemName.spark,
                                                                               ItemName.cutter]])
-HasAnyCutter = HasBasicCutter | Or(*[PowerCombo(ItemName.cutter, x) for x in [ItemName.burn, ItemName.stone,
-                                                                              ItemName.ice, ItemName.needle,
-                                                                              ItemName.bomb, ItemName.spark,
-                                                                              ItemName.cutter]])
 
 HasGreatCutter = PowerCombo(ItemName.cutter, ItemName.cutter)
 HasGeokinesis = PowerCombo(ItemName.stone, ItemName.spark)
@@ -329,6 +325,16 @@ HasDrill = PowerCombo(ItemName.stone, ItemName.needle)
 HasLightsaber = PowerCombo(ItemName.spark, ItemName.cutter)
 HasExplodingGordo = PowerCombo(ItemName.needle, ItemName.bomb)
 HasFireArrows = PowerCombo(ItemName.burn, ItemName.needle)
+
+# Ripple Star 2-specific rules
+# Don't need any for Spark, slide is enough
+HasIceVertical = Or(*[PowerCombo(ItemName.ice, second) for second in (ItemName.burn, ItemName.stone, ItemName.ice,
+                                                                      ItemName.needle, ItemName.cutter, ItemName.bomb)])
+HasNeedleVertical = HasBasicNeedle | Or(*[PowerCombo(ItemName.needle, second)
+                                          for second in (ItemName.burn, ItemName.stone, ItemName.ice,
+                                                         ItemName.needle, ItemName.spark, ItemName.bomb)])
+HasCutterVertical = Or(*[PowerCombo(ItemName.cutter, second) for second in [ItemName.stone, ItemName.ice,
+                                                                            ItemName.bomb, ItemName.cutter]])
 
 HasWaddleDee = Has(ItemName.waddle_dee)
 HasAdeleine = Has(ItemName.adeleine)
@@ -407,8 +413,8 @@ FOOD_RULES: dict[str, Rule] = {
     LocationName.ripple_star_2_f7: HasKingDedede,
     LocationName.ripple_star_2_f8: HasKingDedede,
     LocationName.ripple_star_2_f9: HasKingDedede,
-    LocationName.ripple_star_2_f10: HasKingDedede & HasAnyIce,
-    LocationName.ripple_star_2_f11: HasKingDedede & HasAnyNeedle,
+    LocationName.ripple_star_2_f10: HasKingDedede & HasIceVertical,
+    LocationName.ripple_star_2_f11: HasKingDedede & HasNeedleVertical,
     LocationName.pop_star_3_f3: HasAdeleine,
     LocationName.aqua_star_1_f8: HasAdeleine,
     LocationName.dark_star_adeleine: HasAdeleine,
@@ -703,7 +709,7 @@ STANDARD_RULES: dict[str, Rule] = {
     LocationName.ripple_star_2: HasKingDedede,
     LocationName.ripple_star_2_s1: HasAnySpark,
     LocationName.ripple_star_2_s2: HasKingDedede,
-    LocationName.ripple_star_2_s3: HasKingDedede & HasAnyCutter,
+    LocationName.ripple_star_2_s3: HasKingDedede & HasCutterVertical,
     LocationName.ripple_star_3_s2: HasFireArrows,
 }
 
