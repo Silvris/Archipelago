@@ -238,6 +238,9 @@ class K64Client(BizHawkClient):
             ctx.ui.connect_layout.add_widget(self.crystal_label)
 
         current_crystals = sum(1 for item in ctx.items_received if item.item == 0x0020)
+        waddle_dee = any(item.item == 0x0100 for item in ctx.items_received)
+        adeleine = any(item.item == 0x0101 for item in ctx.items_received)
+        king_dedede = any(item.item == 0x0102 for item in ctx.items_received)
         highest = 1
         for crystal in self.boss_requirements:
             if current_crystals < crystal:
@@ -245,7 +248,11 @@ class K64Client(BizHawkClient):
                 break
             highest += 1
         else:
-            self.crystal_label.text = "Level 7"
+            if waddle_dee and adeleine and king_dedede:
+                self.crystal_label.text = "Level 7"
+            else:
+                self.crystal_label.text = "Level 6"
+            self.crystal_label.text += f": {''.join('T' if x else 'F' for x in (waddle_dee, adeleine, king_dedede))}"
 
     async def game_watcher(self, ctx: "BizHawkClientContext") -> None:
         from worlds._bizhawk import read, write
