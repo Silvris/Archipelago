@@ -13,13 +13,15 @@ as Crystal Shards, 1-Ups, and Invincibility Candy will be shuffled into the pool
 - Completing a stage for the first time
 - Collecting a Crystal Shard
 - Defeating a boss
+- Optionally, all food, 1-Ups, and stars present within each stage
 
 ## When the player receives an item, what happens?
 Kirby will immediately receive the effects of that item, such as being able to receive Copy Abilities from enemies that 
-give said Copy Ability. Friends will require leaving the room you are currently in before they will appear.
+give said Copy Ability. Friends will generally require leaving the room you are currently in before they will appear.
 
 ## What is the goal of Kirby 64 - The Crystal Shards?
 Players must collect enough Crystal Shards to travel across the galaxy to save the inhabitants of Ripple Star and gain access to Dark Star,
-where Zero-Two can be found and defeated.
+where Zero-Two can be found and defeated. In order to access Dark Star, all 3 of Kirby's friends (Waddle Dee, Adeleine, and King Dedede) must 
+also be found.
 
 If Fast Goal mode is enabled, Dark Star will be unlocked as soon as the required number of Crystal Shards and all 3 of Kirby's friends are received.
