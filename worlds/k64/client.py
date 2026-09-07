@@ -332,13 +332,17 @@ class K64Client(BizHawkClient):
             ctx.finished_game = True
 
         if self.death_link:
-            if self.death_state != DeathState.Dead and int.from_bytes(health_visual, "big") == 0:
-                if self.death_state == DeathState.Alive:
-                    # send a death link
-                    await ctx.send_death(
-                        f"{ctx.player_names[ctx.slot]} couldn't handle {K64_WORLD_REMAP[int.from_bytes(current_level, 'big')]}.")
-                self.death_state = DeathState.Dead
-            elif int.from_bytes(health_visual, "big") != 0 and self.death_state == DeathState.Dead:
+            if game_state_val == 0xF:
+                if self.death_state != DeathState.Dead and int.from_bytes(health_visual, "big") == 0:
+                    if self.death_state == DeathState.Alive:
+                        # send a death link
+                        await ctx.send_death(
+                            f"{ctx.player_names[ctx.slot]} couldn't handle {K64_WORLD_REMAP[int.from_bytes(current_level, 'big')]}.")
+                    self.death_state = DeathState.Dead
+                elif int.from_bytes(health_visual, "big") != 0 and self.death_state == DeathState.Dead:
+                    self.death_state = DeathState.Alive
+            else:
+                # If we are in a game state that isn't in a stage, we are alive
                 self.death_state = DeathState.Alive
 
         writes = []
