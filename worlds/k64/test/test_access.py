@@ -14,3 +14,5 @@ class TestAccess(K64TestBase):
             self.collect(shards[shard_num:shard_requirement])
             self.assertTrue(self.count(ItemName.crystal_shard) == shard_requirement)
             self.assertTrue(self.can_reach_entrance(f"To Level {i + 1}"))
+            if i < 6:
+                self.assertFalse(self.can_reach_entrance(f"To Level {i + 2}"))
