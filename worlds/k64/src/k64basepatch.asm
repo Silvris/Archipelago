@@ -10,13 +10,17 @@ alloc_with_alignment:
 
 .headersize 0x8009B540 - 0x43790 //;ovl1
 
-.org 0x800A28A8
-OpenNewWorld:
-li      at, LevelStart
-addu    at, at, t7
-lb      s2, 0x0000 (at)
-sb      s2, 0x0007 (s6)
-jr      ra
+.org 0x800A336C  //; boss cutscene
+lui     v0, 0x800D
+lw      v0, 0x6B98 (v0)
+
+.org 0x800A33A0
+lui     t7, 0x800D
+lw      t7, 0x6B98 (t7)
+
+.org 0x800A33D8
+lui     t9, 0x800D
+lw      t9, 0x6B98 (t9)
 
 .org 0x800A3B1C
 jal     RedirectStage
@@ -27,6 +31,10 @@ nop
 
 .org 0x800A3CD4
 nop
+
+.org 0x800A3D34
+lui     t4, 0x800D
+lw      t4, 0x6B98 (t4)
 
 .org 0x800A3E0C
 jal     AllowFinalBoss
@@ -787,6 +795,14 @@ nop
 j       0x801A93B4
 nop
 
+OpenNewWorld:
+li      at, LevelStart
+addu    at, at, t7
+lb      s2, 0x0000 (at)
+sb      s2, 0x0007 (s6)
+li      s2, 0x1
+jr      ra
+nop
 
 .org 0x8011E1BC //; write our jump
 jal     CopyAbilityBlocker
