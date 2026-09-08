@@ -855,6 +855,10 @@ nop
 j   ConsumableCollide
 nop
 
+.org 0x801BE944
+lui     at, 0x800D
+lw      t9, 0x6B98 (at)
+
 
 .headersize 0x801D0C60 - 0x174740 //; ovl8
 

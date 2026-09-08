@@ -236,7 +236,7 @@ class K64Options(PerGameCommonOptions, DeathLinkMixin):
     goal_speed: GoalSpeed
     split_power_combos: SplitPowerCombos
     stage_shuffle: LevelShuffle
-    # boss_shuffle: BossShuffle
+    boss_shuffle: BossShuffle
     boss_requirement_random: BossRequirementRandom
     max_crystals: MaxCrystalShards
     required_crystals: CrystalShardsRequired

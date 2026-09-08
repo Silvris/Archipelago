@@ -5,6 +5,7 @@ from .consumable_info import consumable_by_level
 from .locations import K64Location, location_table, star_locations, food_locations, one_up_locations
 from .items import K64Item
 from .names import LocationName, ItemName
+from .options import BossShuffle
 from .rules import (burn_levels, needle_levels, stone_levels,
                     spark_levels, bomb_levels, ice_levels, cutter_levels, dedede_copy_levels, waddle_copy_levels)
 
@@ -117,7 +118,6 @@ def generate_valid_levels(world: "K64World", enforce_world: bool) -> dict:
                     levels[level][stage] = new_stage
             except Exception:
                 raise Exception(f"Failed to find valid stage for {level}-{stage}. Remaining Stages:{possible_stages}")
-    """
     # now handle bosses
     boss_shuffle: typing.Union[int, str] = world.options.boss_shuffle.value
     plando_bosses = []
@@ -141,20 +141,19 @@ def generate_valid_levels(world: "K64World", enforce_world: bool) -> dict:
 
     if boss_shuffle > 0:
         if boss_shuffle == 2:
-            possible_bosses = [default_levels[world.random.randint(1, 5)][6]
-                               for _ in range(5 - len(plando_bosses))]
+            possible_bosses = [default_levels[world.random.randint(1, 6)][-1]
+                               for _ in range(6 - len(plando_bosses))]
         elif boss_shuffle == 3:
-            boss = world.random.randint(1, 5)
-            possible_bosses = [default_levels[boss][6] for _ in range(5 - len(plando_bosses))]
+            boss = world.random.randint(1, 6)
+            possible_bosses = [default_levels[boss][-1] for _ in range(6 - len(plando_bosses))]
         else:
-            possible_bosses = [default_levels[level][6] for level in default_levels
-                               if default_levels[level][6] not in plando_bosses]
+            possible_bosses = [default_levels[level][-1] for level in default_levels
+                               if default_levels[level][-1] not in plando_bosses]
         for level in levels:
-            if levels[level][6] is None:
+            if levels[level][-1] is None:
                 boss = world.random.choice(possible_bosses)
-                levels[level][6] = boss
+                levels[level][-1] = boss
                 possible_bosses.remove(boss)
-    else:"""
     for level in levels:
         if levels[level][len(default_levels[level]) - 1] is None:
             levels[level][len(default_levels[level]) - 1] = default_levels[level][len(default_levels[level]) - 1]
@@ -191,6 +190,9 @@ def create_levels(world: "K64World") -> None:
         for stage in range(len(world.player_levels[level])):
             real_stage = world.player_levels[level][stage]
             assert real_stage is not None, "Level tried to be sent with a None stage, incorrect plando?"
+            if real_stage in LocationName.boss_names.values():
+                # little jank but what we care about is the index here
+                real_stage = 0x200 + level - 1
             # placeholder for when I want to add a data file eventually
             region = K64Region(location_table[real_stage].replace(" - Complete", "").replace(" Defeated", ""),
                                world.player, world.multiworld)
