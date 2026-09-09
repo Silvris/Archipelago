@@ -721,10 +721,10 @@ def set_rules(world: "K64World") -> None:
     # Crystal Requirements
     for i, level in zip(range(1, 7), world.boss_requirements):
         rule = Has(ItemName.crystal_shard, count=level)
+        world.set_rule(world.get_location(f"{LocationName.level_names[i]} - Boss Defeated"), rule)
         if i == 6:
             rule &= (HasKingDedede & HasWaddleDee & HasAdeleine)
         world.set_rule(world.get_entrance(f"To Level {i + 1}"), rule)
-        world.set_rule(world.get_location(f"{LocationName.level_names[i]} - Boss Defeated"), rule)
 
     # Consumables
     if "1-Ups" in world.options.consumables:
