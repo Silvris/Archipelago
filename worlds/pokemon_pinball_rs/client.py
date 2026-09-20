@@ -282,16 +282,16 @@ class PinballRSClient(BizHawkClient):
                     self.ringlink_incoming += data.get("amount", 0)
             elif "DeathLink" in args.get("tags", []):
                 data = args.get("data", {})
-                if data.get("time", time.time()) != self.last_death_link:
-                    self.on_deathlink(ctx)
+                death_time = data.get("time", time.time())
+                if death_time != self.last_death_link:
+                    self.on_deathlink(ctx, death_time)
 
     async def send_deathlink(self, ctx: "BizHawkClientContext") -> None:
-        ctx.last_death_link = time.time()
-        self.last_death_link = ctx.last_death_link
         await ctx.send_death(f"{ctx.player_names[ctx.slot]} is bad at pinball.")
+        self.last_death_link = ctx.last_death_link
 
-    def on_deathlink(self, ctx: "BizHawkClientContext") -> None:
-        ctx.last_death_link = time.time()
+    def on_deathlink(self, ctx: "BizHawkClientContext", death_time: float) -> None:
+        ctx.last_death_link = death_time
         self.pending_death_link = True
 
     @staticmethod
