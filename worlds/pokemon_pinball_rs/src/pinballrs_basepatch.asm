@@ -216,7 +216,7 @@
     .thumb
     bl          ShopBlockHelpers
 
-.org UpdateShopEntryAnimation+0x66A
+.org UpdateShopEntryAnimation+0x66C
     .thumb
     bl          RemapShopCosts
 
@@ -2507,6 +2507,9 @@ GiveAPPrize:
 
 RemapShopCosts:
     push        {r0-r2, r6}
+    ldr         r2, =999
+    cmp         r3, r2
+    beq         @@Return  //; if we failed an earlier check, just pass through
     ldrh        r3, [r4, #06] //; this will be incorrect on AP checks
     ldr         r4, =gCurrentPinballGame
     ldr         r1, =gArchipelago
@@ -2532,6 +2535,7 @@ RemapShopCosts:
     ldrb        r3, [r1, r0]
     @@Return:
     pop         {r0-r2, r6}
+    ldr         r2, [r4, #0]
     bx          lr
     @@ReturnFalse:
     ldr         r3, =999
