@@ -247,8 +247,8 @@ class MegaMan1Client(BizHawkClient):
                     ctx.command_processor.commands.pop("autoheal")
                 return False
 
-            game_name, version = (await read(ctx.bizhawk_ctx, [(0x1FFE0, 16, "PRG ROM"),
-                                                               (0x1FFDD, 3, "PRG ROM")]))
+            game_name, version = (await read(ctx.bizhawk_ctx, [(0x3FFE0, 16, "PRG ROM"),
+                                                               (0x3FFDD, 3, "PRG ROM")]))
             if game_name[:3] != b"MM1" or version != bytes(MM1World.world_version):
                 if game_name[:3] == b"MM1":
                     # I think this is an easier check than the other?
@@ -273,7 +273,7 @@ class MegaMan1Client(BizHawkClient):
         self.rom = game_name
         ctx.items_handling = 0b111
         ctx.want_slot_data = False
-        deathlink = (await read(ctx.bizhawk_ctx, [(0x1FFDC, 1, "PRG ROM")]))[0][0]
+        deathlink = (await read(ctx.bizhawk_ctx, [(0x3FFDC, 1, "PRG ROM")]))[0][0]
         if deathlink & 0x01:
             self.death_link = True
         if deathlink & 0x02:
@@ -344,7 +344,7 @@ class MegaMan1Client(BizHawkClient):
                 (MM1_LAST_WILY, 1, "RAM"),
                 (MM1_COMPLETED_STAGES, 2, "RAM"),
                 (MM1_BOSS_REFIGHTS, 1, "RAM"),
-                (MM1_CONSUMABLE_CHECK, 3, "RAM")
+                (MM1_CONSUMABLE_CHECK, 32, "RAM")
             ])
 
         #if difficulty[0] not in (0, 1):
@@ -530,9 +530,19 @@ class MegaMan1Client(BizHawkClient):
                 writes.extend(get_sfx_writes(0x1a))
                 writes.append((MM1_HEALTH, bytes([0x1C]*8), "RAM"))
 
+        new_checks = []
+
+        for i in range(0, 30, 3):
+            consumable_tuple = (consumable_check[i], consumable_check[i+1], consumable_check[i+2])
+            if consumable_tuple != (0, 0, 0):
+                if consumable_tuple in MM1_CONSUMABLES:
+                    if MM1_CONSUMABLES[consumable_tuple] not in ctx.checked_locations:
+                        new_checks.append(MM1_CONSUMABLES[consumable_tuple])
+                writes.append((MM1_CONSUMABLE_CHECK, bytes([0]*3), "RAM"))
+
         await write(ctx.bizhawk_ctx, writes)
 
-        new_checks = []
+
         # check for locations
         for i in range(1, 7):
             flag = 1 << (i - 1)
@@ -554,10 +564,6 @@ class MegaMan1Client(BizHawkClient):
                 if boss_id not in ctx.checked_locations:
                     new_checks.append(boss_id)
 
-        consumable_tuple = (consumable_check[0], consumable_check[1], consumable_check[2])
-        if consumable_tuple in MM1_CONSUMABLES:
-            if MM1_CONSUMABLES[consumable_tuple] not in ctx.checked_locations:
-                new_checks.append(MM1_CONSUMABLES[consumable_tuple])
 
         for new_check_id in new_checks:
             ctx.locations_checked.add(new_check_id)

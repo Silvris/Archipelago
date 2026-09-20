@@ -1,4 +1,4 @@
-from typing import Dict, Tuple, List, TYPE_CHECKING, Union
+from typing import TYPE_CHECKING, Union
 from zlib import crc32
 import struct
 import sys
@@ -8,7 +8,7 @@ if TYPE_CHECKING:
     from . import MM1World
     from .rom import MM1ProcedurePatch
 
-HTML_TO_NES: Dict[str, int] = {
+HTML_TO_NES: dict[str, int] = {
     "SNOW": 0x20,
     "LINEN": 0x36,
     "SEASHELL": 0x36,
@@ -56,7 +56,7 @@ HTML_TO_NES: Dict[str, int] = {
     # can add more as needed
 }
 
-MM1_COLORS: Dict[str, Tuple[int, int]] = {
+MM1_COLORS: dict[str, tuple[int, int]] = {
     "Rolling Cutter": (0x30, 0x00),
     "Ice Slasher": (0x30, 0x12),
     "Hyper Bomb": (0x30, 0x19),
@@ -72,49 +72,50 @@ MM1_COLORS: Dict[str, Tuple[int, int]] = {
     "Guts Man Access Codes": (0x27, 0x15),
 }
 
-palette_pointers: Dict[str, List[int]] = {
-    "Mega Buster": [0x1D495,
+palette_pointers: dict[str, list[int]] = {
+    "Mega Buster": [0x3D495,
                     0xCF1, 0xCC1,
                     0x4CC1, 0x4CF1,
                     0x8CC1, 0x8CF1,
                     0xCCC1, 0xCCF1,
                     0x10CC1, 0x10CF1,
                     0x14CC1, 0x14CF1], # 0xCC1 might also?
-    "Rolling Cutter":  [0x1D497],
-    "Ice Slasher":  [0x1D499],
-    "Hyper Bomb":  [0x1D49B],
-    "Fire Storm":  [0x1D49D],
-    "Thunder Beam":  [0x1D49F],
-    "Super Arm":  [0x1D4A1],
-    "Magnet Beam":  [0x1D4A3],
+    "Rolling Cutter":  [0x3D497],
+    "Ice Slasher":  [0x3D499],
+    "Hyper Bomb":  [0x3D49B],
+    "Fire Storm":  [0x3D49D],
+    "Thunder Beam":  [0x3D49F],
+    "Super Arm":  [0x3D4A1],
+    "Magnet Beam":  [0x3D4A3],
     "Cut Man": [0x4DD7, 0x0DD7],
     "Ice Man": [0xCDCC, 0x4DB6],
     "Bomb Man": [0xCDC1, 0x8DB1],
-    "Fire Man": [0xCDB6, 0xCDA6],
+    "Fire Man": [0xCDB6],  # Why do they reuse Fire Man's but none of the others?
     "Elec Man": [0x4DE3, 0x10DC1],
     "Guts Man": [0xCDD7, 0x14DB6],
 }
 
-if "worlds.mm2" in sys.modules:
-    # is this the proper way to do this? who knows!
-    try:
-        mm2 = sys.modules["worlds.mm2"]
-        for item in MM1_COLORS:
-            mm2.color.add_color_to_mm2(item, MM1_COLORS[item])
-    except AttributeError:
-        # pass through if an old MM2 is found
-        pass
+def check_for_known_worlds():
+    if "worlds.mm2" in sys.modules:
+        # is this the proper way to do this? who knows!
+        try:
+            mm2 = sys.modules["worlds.mm2"]
+            for item in MM1_COLORS:
+                mm2.color.add_color_to_mm2(item, MM1_COLORS[item])
+        except AttributeError:
+            # pass through if an old MM2 is found
+            pass
 
-if "worlds.mm3" in sys.modules:
-    try:
-        mm3 = sys.modules["worlds.mm3"]
-        for item in MM1_COLORS:
-            mm3.color.add_color_to_mm3(item, MM1_COLORS[item])
-    except AttributeError:
-        # pass through if an old MM3 is found
-        pass
+    if "worlds.mm3" in sys.modules:
+        try:
+            mm3 = sys.modules["worlds.mm3"]
+            for item in MM1_COLORS:
+                mm3.color.add_color_to_mm3(item, MM1_COLORS[item])
+        except AttributeError:
+            # pass through if an old MM3 is found
+            pass
 
-def extrapolate_color(color: int) -> Tuple[int, int]:
+def extrapolate_color(color: int) -> tuple[int, int]:
     if color > 0x1F:
         color_1 = color
         color_2 = color_1 - 0x10
@@ -124,7 +125,7 @@ def extrapolate_color(color: int) -> Tuple[int, int]:
     return color_1, color_2
 
 
-def validate_colors(color_1: int, color_2: int, allow_match: bool = False) -> Tuple[int, int]:
+def validate_colors(color_1: int, color_2: int, allow_match: bool = False) -> tuple[int, int]:
     # Black should be reserved for outlines, a gray should suffice
     if color_1 in [0x0D, 0x0E, 0x0F, 0x1E, 0x2E, 0x3E, 0x1F, 0x2F, 0x3F]:
         color_1 = 0x10
@@ -138,7 +139,7 @@ def validate_colors(color_1: int, color_2: int, allow_match: bool = False) -> Tu
     return color_1, color_2
 
 
-def parse_color(colors: List[str]) -> Tuple[int, int]:
+def parse_color(colors: list[str]) -> tuple[int, int]:
     color_a = colors[0]
     if color_a.startswith("$"):
         color_1 = int(color_a[1:], 16)
@@ -159,7 +160,7 @@ def parse_color(colors: List[str]) -> Tuple[int, int]:
 
 def write_palette_shuffle(world: "MM1World", rom: "MM1ProcedurePatch") -> None:
     palette_shuffle: Union[int, str] = world.options.palette_shuffle.value
-    palettes_to_write: Dict[str, Tuple[int, int]] = {}
+    palettes_to_write: dict[str, tuple[int, int]] = {}
     if isinstance(palette_shuffle, str):
         color_sets = palette_shuffle.split(";")
         if len(color_sets) == 1:

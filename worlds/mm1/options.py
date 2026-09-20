@@ -99,7 +99,7 @@ class RandomWeaknesses(Choice):
     """
     None: Bosses will have their regular weaknesses.
     Shuffled: Weapon damage will be shuffled amongst the weapons, so Elec Beam may do Rolling Cutter damage.
-    Super Arm will do a random amount of damage to susceptible bosses.
+    Super Arm will do a random amount of damage to susceptible bosses without Enhanced Super Arm enabled.
     Randomized: Weapon damage will be fully randomized.
     """
     display_name = "Random Boss Weaknesses"
@@ -126,6 +126,19 @@ class WeaknessPlando(OptionDict):
     default = {}
 
 
+class EnhancedSuperArm(Toggle):
+    """
+    Allows the use of Super Arm without nearby blocks. Can affect logic for weakness randomization.
+    """
+    display_name = "Enhanced Super Arm"
+
+class EnhancedHyperBomb(Toggle):
+    """
+    Allows Hyper Bombs to be detonated by pressing the A button while a bomb is active.
+    Can affect logic for weakness randomization.
+    """
+    display_name = "Enhanced Hyper Bomb"
+
 class Consumables(Toggle):
     """
     Whether in-stage consumable pickups should be randomized. This includes the Yashichi.
@@ -141,7 +154,6 @@ class EnergyLink(Toggle):
     Some of the energy sent to the pool will be lost on transfer.
     """
     display_name = "EnergyLink"
-    visibility = Visibility.none
 
 
 class PaletteShuffle(TextChoice):
@@ -186,6 +198,8 @@ class MM1Options(PerGameCommonOptions, DeathLinkMixin):
     random_weakness: RandomWeaknesses
     plando_weakness: WeaknessPlando
     enemy_weakness: EnemyWeaknesses
+    enhanced_super_arm: EnhancedSuperArm
+    enhanced_hyper_bomb: EnhancedHyperBomb
     consumables: Consumables
     energy_link: EnergyLink
     palette_shuffle: PaletteShuffle

@@ -21,6 +21,7 @@ import time
 import typing
 import weakref
 import zlib
+from signal import SIGINT, SIGTERM, signal
 
 import ModuleUpdate
 
@@ -2571,6 +2572,8 @@ async def console(ctx: Context):
             input_text = await queue.get()
             queue.task_done()
             ctx.commandprocessor(input_text)
+        except asyncio.exceptions.CancelledError:
+            ctx.logger.info("ConsoleTask cancelled")
         except:
             import traceback
             traceback.print_exc()
@@ -2630,8 +2633,8 @@ def parse_args() -> argparse.Namespace:
                              goal:     !remaining can be used after goal completion
                              ''')
     parser.add_argument('--auto_shutdown', default=defaults["auto_shutdown"], type=int,
-                        help="automatically shut down the server after this many minutes without new location checks. "
-                             "0 to keep running. Not yet implemented.")
+                        help="automatically shut down the server after this many seconds without new location checks. "
+                             "0 to keep running.")
     parser.add_argument('--use_embedded_options', action="store_true",
                         help='retrieve release, remaining and hint options from the multidata file,'
                              ' instead of host.yaml')
@@ -2737,6 +2740,26 @@ async def main(args: argparse.Namespace):
     console_task = asyncio.create_task(console(ctx))
     if ctx.auto_shutdown:
         ctx.shutdown_task = asyncio.create_task(auto_shutdown(ctx, [console_task]))
+
+    def stop():
+        try:
+            for remove_signal in [SIGINT, SIGTERM]:
+                asyncio.get_event_loop().remove_signal_handler(remove_signal)
+        except NotImplementedError:
+            pass
+        ctx.commandprocessor._cmd_exit()
+
+    def shutdown(signum, frame):
+        stop()
+
+    try:
+        for sig in [SIGINT, SIGTERM]:
+            asyncio.get_event_loop().add_signal_handler(sig, stop)
+    except NotImplementedError:
+        # add_signal_handler is only implemented for UNIX platforms
+        for sig in [SIGINT, SIGTERM]:
+            signal(sig, shutdown)
+
     await ctx.exit_event.wait()
     console_task.cancel()
     if ctx.shutdown_task:
