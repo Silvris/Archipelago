@@ -30,7 +30,7 @@ PINBALL_SONGS: dict[int, int] = {
     0xB: 0x868C72C,  # Shop
     0xE: 0x868D838,  # Bonus Pending
     0xF: 0x868CA4C,  # Bonus Pending (Legendary)
-    0x15: 0x868AAEC,  # Egg Mode
+    0x15: 0x868EEAC,  # Egg Mode
     0x17: 0x8690930,  # Travel Mode
     0x18: 0x8691558,  # Unused (RS: Elite 4)
     0x19: 0x869192C,  # Hurry Up!
