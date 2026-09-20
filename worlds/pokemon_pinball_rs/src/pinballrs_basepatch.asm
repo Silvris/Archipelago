@@ -122,7 +122,7 @@
 
 .org ProcessSapphireCollisionEvent+0x796
     .thumb
-    bl          GetArrowsSapphire
+    bl          GetArrows
 
 .org UpdateSapphireBumperLogic+0x4C2
     .thumb
@@ -691,11 +691,8 @@ HatchLockSapphire:
 
 .pool
 
-GetArrowsSapphire:
-    add         r0, #1
-    nop
-
 GetArrows:
+    add         r0, #1
     push        {r2, lr}
     cmp         r0, #2
     ble         @@Set
@@ -2200,6 +2197,8 @@ ResetAPShopOnTravel:
     mov         r2, #0
     strb        r2, [r0, r1]
     pop         {r0-r2}
+    ldr         r2, [r0, #0]
+    mov         r1, #0x17
     bx          lr
     
 
