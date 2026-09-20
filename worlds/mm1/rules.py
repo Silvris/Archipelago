@@ -262,10 +262,9 @@ def set_rules(world: "MM1World"):
             world.weapon_damage[0][world.options.starting_robot_master.value] = \
                 weapon_damage[0][world.options.starting_robot_master.value]
 
-
         world.wily_weapons = validate_fights(world, (1, 2, 3, 5, 9, 10))
 
-    #static rules
+    # static rules
     location_rules: dict[str, Rule] = {}
     entrance_rules: dict[str, Rule] = {}
 

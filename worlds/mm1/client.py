@@ -54,7 +54,7 @@ MM1_COMPLETED_STAGES = 0xC7  # and C8
 MM1_SFX_QUEUE = 0xC9
 MM1_RBM_STROBE = 0xCA
 MM1_BOSS_REFIGHTS = 0xCB
-MM1_RECEIVED_ITEMS = 0xCC # C0 is used in a single location, the credits
+MM1_RECEIVED_ITEMS = 0xCC  # C0 is used in a single location, the credits
 MM1_CONSUMABLE_CHECK = 0x7E0
 
 MM1_STAGE_CHECKS = {
