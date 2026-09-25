@@ -1,0 +1,35 @@
+# Colosseums
+GATEWAY_COLO = "Gateway Colosseum"
+MAIN_STREET_COLO = "Main Street Colosseum"
+WATERFALL_COLO = "Waterfall Colosseum"
+NEON_COLO = "Neon Colosseum"
+CRYSTAL_COLO = "Crystal Colosseum"
+SUNNY_PARK_COLO = "Sunny Park Colosseum"
+MAGMA_COLO = "Magma Colosseum"
+SUNSET_COLO = "Sunset Colosseum"
+COURTYARD_COLO = "Courtyard Colosseum"
+STARGAZER_COLO = "Stargazer Colosseum"
+
+# Pokemon Groups
+WEST_KANTO = "PokéRadar - West Kanto"
+MIDDLE_KANTO = "PokéRadar - Middle Kanto"
+EAST_KANTO = "PokéRadar - East Kanto"
+STARTER_KANTO = "PokéRadar - Kanto Partners"
+LEGEND_KANTO = "PokéRadar - Kanto Legends"
+
+WEST_JOHTO = "PokéRadar - West Johto"
+EAST_JOHTO = "PokéRadar - East Johto"
+STARTER_JOHTO = "PokéRadar - Johto Partners"
+LEGEND_JOHTO = "PokéRadar - Johto Legends"
+
+WEST_HOENN = "PokéRadar - West Hoenn"
+EAST_HOENN = "PokéRadar - East Hoenn"
+SEAS_HOENN = "PokéRadar - Hoenn Seas"
+STARTER_HOENN = "PokéRadar - Hoenn Partners"
+LEGEND_HOENN = "PokéRadar - Hoenn Legends"
+
+WEST_SINNOH = "PokéRadar - West Sinnoh"
+EAST_SINNOH = "PokéRadar - East Sinnoh"
+BATTLE_RESORT = "PokéRadar - Battle Resort"
+STARTER_SINNOH = "PokéRadar - Sinnoh Partners"
+LEGEND_SINNOH = "PokéRadar - Sinnoh Legends"

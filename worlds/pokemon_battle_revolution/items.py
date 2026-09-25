@@ -6,3 +6,7 @@ class ItemData(NamedTuple):
     id: int
     classification: ItemClassification
     count: int = 1
+
+COLOSSEUMS: dict[str, ItemData] = {
+    
+}

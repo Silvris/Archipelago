@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import argparse
 import asyncio
 import logging
@@ -28,11 +30,18 @@ BATTLE_REV_ASSOC_SID = 0x124E5  # short
 logger = logging.getLogger("Wii")
 
 
+class PBRCommandProcessor(ClientCommandProcessor):
+    ctx: PBRContext
+
+    def __cmd_debug_display(self):
+        self.ctx.display_hooked = True
+
+
 class PBRContext(CommonContext):
     game = "Pokemon Battle Revolution"
     tags = {"AP"}
     items_handling = 0b111
-    display_hooked = True
+    display_hooked = False
 
     def make_gui(self) -> "type[kvui.GameManager]":
         from kvui import GameManager
@@ -51,6 +60,33 @@ class PBRContext(CommonContext):
         await self.get_username()
         await self.send_connect()
 
+    async def debug_display(self):
+        logger.warning(f"Hooked.")
+        save_base = dolphin_memory_engine.read_word(BATTLE_REV_SAVE_FILE_PTR)
+        save_slot = dolphin_memory_engine.read_byte(save_base + BATTLE_REV_SAVE_FILE_INDEX)
+        save_ptr = save_base + (save_slot * BATTLE_REV_SAVE_SIZE) + BATTLE_REV_SAVE_START
+        tid_low = dolphin_memory_engine.read_byte(save_ptr + BATTLE_REV_ASSOC_TID)
+        tid_high = dolphin_memory_engine.read_byte(save_ptr + BATTLE_REV_ASSOC_TID + 7)
+        tid = tid_high << 8 | tid_low
+        sid = int.from_bytes(dolphin_memory_engine.read_bytes(save_ptr + BATTLE_REV_ASSOC_SID, 2), byteorder="big")
+        coupons = int.from_bytes(dolphin_memory_engine.read_bytes(save_ptr + BATTLE_REV_COUPONS, 3), byteorder="big")
+        logger.warning(f"TID: {tid}, SID: {sid}, Coupons: {coupons}")
+        for pkm in range(6):
+            species = int.from_bytes(dolphin_memory_engine.read_bytes(save_ptr + BATTLE_REV_PARTY_OFS +
+                                                                      (pkm * BATTLE_REV_PARTY_PKM_SIZE) + 8, 2),
+                                     byteorder="big")
+            if species != 0:
+                logger.warning(f"Party: species: {species}, pkm: {pkm}")
+            for box in range(18):
+                for pkm in range(30):
+                    species = int.from_bytes(dolphin_memory_engine.read_bytes(save_ptr +
+                                                                              (box * BATTLE_REV_BOX_SIZE) +
+                                                                              BATTLE_REV_BOX_OFS +
+                                                                              (pkm * BATTLE_REV_PKM_SIZE) + 8, 2)
+                                             , byteorder="big")
+                    if species != 0:
+                        logger.warning(f"species: {species}, pkm: {pkm}, box: {box}")
+
 
 async def game_watcher(ctx: PBRContext) -> None:
     while not ctx.exit_event.is_set():
@@ -62,36 +98,12 @@ async def game_watcher(ctx: PBRContext) -> None:
             ctx.watcher_event.clear()
             if not dolphin_memory_engine.is_hooked():
                 dolphin_memory_engine.hook()
-            else:
-                if not ctx.slot:
-                    continue
-                if ctx.display_hooked:
-                    logger.warning(f"Hooked.")
-                    save_base = dolphin_memory_engine.read_word(BATTLE_REV_SAVE_FILE_PTR)
-                    save_slot = dolphin_memory_engine.read_byte(save_base + BATTLE_REV_SAVE_FILE_INDEX)
-                    save_ptr = save_base + (save_slot * BATTLE_REV_SAVE_SIZE) + BATTLE_REV_SAVE_START
-                    tid_low = dolphin_memory_engine.read_byte(save_ptr + BATTLE_REV_ASSOC_TID)
-                    tid_high = dolphin_memory_engine.read_byte(save_ptr + BATTLE_REV_ASSOC_TID+7)
-                    tid = tid_high << 8 | tid_low
-                    sid = int.from_bytes(dolphin_memory_engine.read_bytes(save_ptr + BATTLE_REV_ASSOC_SID, 2), byteorder="big")
-                    coupons = int.from_bytes(dolphin_memory_engine.read_bytes(save_ptr + BATTLE_REV_COUPONS, 3), byteorder="big")
-                    logger.warning(f"TID: {tid}, SID: {sid}, Coupons: {coupons}")
-                    for pkm in range(6):
-                        species = int.from_bytes(dolphin_memory_engine.read_bytes(save_ptr + BATTLE_REV_PARTY_OFS +
-                                                                                  (pkm * BATTLE_REV_PARTY_PKM_SIZE) + 8, 2),
-                                                 byteorder="big")
-                        if species != 0:
-                            logger.warning(f"Party: species: {species}, pkm: {pkm}")
-                    for box in range(18):
-                        for pkm in range(30):
-                            species = int.from_bytes(dolphin_memory_engine.read_bytes(save_ptr +
-                                                                                      (box * BATTLE_REV_BOX_SIZE) +
-                                                                                      BATTLE_REV_BOX_OFS +
-                                                                                      (pkm * BATTLE_REV_PKM_SIZE) + 8, 2)
-                                                     , byteorder="big")
-                            if species != 0:
-                                logger.warning(f"species: {species}, pkm: {pkm}, box: {box}")
-                    ctx.display_hooked = False
+                continue
+            if not ctx.slot:
+                continue
+            if ctx.display_hooked:
+                await ctx.debug_display()
+                ctx.display_hooked = False
         except Exception as ex:
             import traceback
             Utils.messagebox("Error", str(ex), True)
