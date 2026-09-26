@@ -1003,7 +1003,10 @@ class MHFUContext(CommonContext):
 
             def update_keys(self, current: int, target: int) -> None:
                 if self.keys:
-                    self.keys.text = f"Key Quests: {current}/{target}"
+                    if target == 65535:
+                        self.keys.text = "All Quests"
+                    else:
+                        self.keys.text = f"Key Quests: {current}/{target}"
 
         self.ui = MHFUManager(self)
         self.ui_task = asyncio.create_task(self.ui.async_run(), name="UI")
