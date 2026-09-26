@@ -536,7 +536,8 @@ async def connect_psp(ctx: MHFUContext, target: int | None = None) -> None:
         ctx.debugger = None
         return
     ctx.lang = SERIAL_TO_LANG[game_status["game"]["id"]]
-    ppsspp_logger.info(f"Connected to PPSSPP {hello['version']} playing Monster Hunter Freedom Unite!")
+    ppsspp_logger.info(f"Connected to PPSSPP {hello['version']} playing Monster Hunter Freedom Unite "
+                       f"({game_status['game']['id']}!")
     await send_and_receive(ctx, json.dumps(PPSSPP_CONFIG), "AP_CONFIG")
     for bp in MHFU_BREAKPOINTS[ctx.lang]:
         if MHFU_BREAKPOINTS[ctx.lang][bp][0]:
