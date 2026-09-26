@@ -29,7 +29,7 @@ from .data.monsters import elder_dragons, monster_lookup
 from .data.trap_link import trap_link_matches, local_trap_to_type
 from .items import item_name_groups
 from .quests import (quest_data, base_id, goal_quests, get_quest_by_id,
-                     location_name_to_id, SlotQuestInfo)
+                     location_name_to_id, SlotQuestInfo, get_star_name)
 from .guild_card_awards import award_start
 
 if TYPE_CHECKING:
@@ -537,7 +537,7 @@ async def connect_psp(ctx: MHFUContext, target: int | None = None) -> None:
         return
     ctx.lang = SERIAL_TO_LANG[game_status["game"]["id"]]
     ppsspp_logger.info(f"Connected to PPSSPP {hello['version']} playing Monster Hunter Freedom Unite "
-                       f"({game_status['game']['id']}!")
+                       f"({game_status['game']['id']})!")
     await send_and_receive(ctx, json.dumps(PPSSPP_CONFIG), "AP_CONFIG")
     for bp in MHFU_BREAKPOINTS[ctx.lang]:
         if MHFU_BREAKPOINTS[ctx.lang][bp][0]:
@@ -568,6 +568,20 @@ class MHFUClientCommandProcessor(ClientCommandProcessor):
         :param target: Specific instance of PPSSPP to connect to if multiple are running.
         """
         asyncio.create_task(connect_psp(self.ctx, target))
+
+    def _cmd_check_goal(self):
+        """
+        Lists Goal Quest name, and required key quests for goal.
+        """
+        if not self.ctx.server or not self.ctx.slot:
+            logger.info("Unable to show goal information without multiworld connection.")
+            return
+        outstr = (f"Goal Quest: {get_quest_by_id(self.ctx.goal_quest).proper_name}\n"
+                  f"Required Key Quests: {self.ctx.unlocked_keys}/{self.ctx.required_keys}\n"
+                  f"Rank Unlocks:\n")
+        for hub_rank_star, keys in self.ctx.rank_requirements.items():
+            outstr += f"\n{get_star_name(*hub_rank_star)}: {keys}"
+        logger.info(outstr)
 
 
 class MHFUContext(CommonContext):
