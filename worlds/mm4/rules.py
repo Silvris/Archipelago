@@ -397,6 +397,10 @@ def set_rules(world: "MM4World") -> None:
                     weapons.append(weapons_to_name[weapon])
         if not weapons:
             raise Exception(f"Attempted to have boss {i} with no weakness! Seed: {world.multiworld.seed}")
+        if i == 13 and len(weapons) == 1:
+            if names.skull_barrier in weapons:
+                # edge case: in order to hit Tako Trash with Skull Barrier, you have to "kill" its hitbox with Drill Bomb
+                weapons.append(names.drill_bomb)
         for location in boss_locations:
             static_rule = STATIC_LOCATION_RULES.get(location, True_())
             if i == 14:
