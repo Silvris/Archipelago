@@ -295,7 +295,7 @@ async def handle_logs(ctx: MHFUContext) -> None:
                 continue
             if ctx.breakpoint_queue:
                 log = ctx.breakpoint_queue.pop(0)
-                if log["channel"] in ("MEMMAP", "JIT"):
+                if log["channel"].upper() in ("MEMMAP", "JIT"):
                     # we hit a breakpoint
                     bp = log["message"].replace("\n", "").rsplit(" ")[-1]
                     ctx.debug_print(bp)
@@ -464,9 +464,11 @@ async def send_and_receive(ctx: MHFUContext, message: str, ticket: str) -> dict[
         raise Exception("Cannot perform read/write without valid ticket.")
     if ctx.debugger and not ctx.debugger.closed:
         try:
+            #ctx.debug_print(message)
             await ctx.debugger.send(message)
             while ticket not in ctx.outgoing_tickets:
                 await asyncio.sleep(0.125)
+            #ctx.debug_print(str(ctx.outgoing_tickets.get(ticket)))
             return ctx.outgoing_tickets.pop(ticket)
         except websockets.exceptions.ConnectionClosed:
             return {}
@@ -478,6 +480,7 @@ async def send_without_receive(ctx: MHFUContext, message: str) -> None:
     # cpu actions do not return tickets
     if ctx.debugger:
         try:
+            #ctx.debug_print(message)
             await ctx.debugger.send(message)
         except websockets.exceptions.ConnectionClosed:
             pass
