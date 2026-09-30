@@ -171,7 +171,7 @@ class K64LogicMixin(LogicMixin):
 
     def copy_mixin(self, other: "K64LogicMixin"):
         other.k64_stale = self.k64_stale.copy()
-        other.k64_level_state = deepcopy(self.k64_level_state)
+        other.k64_level_state = {k: v.copy() for k, v in self.k64_level_state.items()}
         return other
 
 
