@@ -1,6 +1,5 @@
 from worlds.AutoWorld import LogicMixin
 from BaseClasses import MultiWorld, CollectionState
-from copy import deepcopy
 from dataclasses import dataclass
 from rule_builder.rules import Rule, Has, HasAll, Or
 from .items import copy_ability_table, power_combo_map
