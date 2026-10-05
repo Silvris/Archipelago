@@ -456,7 +456,6 @@ aqua_star_3_t23 = "Aqua Star 3 - Star 23"
 aqua_star_3_t24 = "Aqua Star 3 - Star 24"
 aqua_star_3_t25 = "Aqua Star 3 - Star 25"
 aqua_star_3_t26 = "Aqua Star 3 - Star 26"
-aqua_star_3_t27 = "Aqua Star 3 - Star 27"
 
 aqua_star_4_t1 = "Aqua Star 4 - Star 1"
 aqua_star_4_t2 = "Aqua Star 4 - Star 2"
