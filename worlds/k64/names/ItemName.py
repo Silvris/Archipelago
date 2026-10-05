@@ -58,6 +58,7 @@ ice_cream = "Ice Cream"
 cake = "Cake"
 sandwich = "Sandwich"
 meat = "Meat"
+secret_snack = "Secret Snack"
 
 # Event Ability Access
 burn_event = "Burning Ability"

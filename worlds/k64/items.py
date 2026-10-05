@@ -113,6 +113,7 @@ misc_item_table = {
     ItemName.cake: ItemData(0x0026, False),
     ItemName.sandwich: ItemData(0x0027, False),
     ItemName.meat: ItemData(0x0028, False),
+    ItemName.secret_snack: ItemData(0x0029, False),
 }
 
 filler_item_weights = {

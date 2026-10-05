@@ -219,7 +219,7 @@ def create_levels(world: "K64World") -> None:
     dark_star_locations: dict[str, int|None] = {LocationName.dark_star: None}
 
     if "Food" in world.options.consumables:
-        dark_star_locations[LocationName.dark_star_adeleine] = 0x0761
+        dark_star_locations[LocationName.dark_star_adeleine] = 0x0762
 
     level7.add_locations(dark_star_locations, K64Location)
 
