@@ -28,6 +28,7 @@ if Utils.is_frozen():
     os.environ["KIVY_DATA_DIR"] = Utils.local_path("data")
 
 import platformdirs
+
 os.environ["KIVY_HOME"] = os.path.join(platformdirs.user_config_dir("Archipelago", False), "kivy")
 os.makedirs(os.environ["KIVY_HOME"], exist_ok=True)
 
@@ -42,6 +43,7 @@ Config.set("graphics", "multisamples", "0")  # multisamples crash old intel driv
 # which assumes all multi touch deviecs are touch screens. 
 # workaround provided by Snu of the kivy commmunity c:
 from kivy.utils import platform
+
 if platform == "linux":
     options = Config.options("input")
     for option in options:
@@ -53,6 +55,7 @@ if platform == "linux":
 # kivymd imports kivy.core.window, so we have to do this before the first kivymd import.
 # No longer necessary when we switch to kivy 3.0.0, which fixes this issue.
 from kivy.core.audio import SoundLoader
+
 for classobj in SoundLoader._classes:
     # The least invasive way to force a SoundLoader class to load its audio engine seems to be calling
     # .extensions(), which e.g. in audio_sdl2.pyx then calls a function called "mix_init()"
@@ -81,6 +84,7 @@ from kivy.uix.popup import Popup
 from kivy.uix.image import AsyncImage
 from kivymd.app import MDApp
 from kivymd.effects.stiffscroll import StiffScrollEffect
+from kivymd.uix.behaviors.ripple_behavior import M3CommonRipple
 from kivymd.uix.dialog import MDDialog, MDDialogHeadlineText, MDDialogSupportingText, MDDialogButtonContainer
 from kivymd.uix.gridlayout import MDGridLayout
 from kivymd.uix.floatlayout import MDFloatLayout
@@ -117,8 +121,35 @@ remove_between_brackets = re.compile(r"\[.*?]")
 #TODO: remove after a couple of versions (or stable KivyMD)
 ResizableTextField = MDTextField
 
+
 def kv_unescape(text: str) -> str:
     return text.replace("&amp;", "&").replace("&bl;", "[").replace("&br;", "]")
+
+
+# TODO: remove after KivyMD 2.0.1+
+
+
+def ripple_fbos(self: M3CommonRipple):
+    from kivy.graphics import (
+        ClearBuffers,
+        ClearColor,
+        Fbo,
+        Color,
+        Rectangle
+    )
+    self._phase = 0.0
+    self.ripple_pos = (0, 0)
+    self.fbo = Fbo(size=[50] * 2, group="m3_ripple_behavior")
+    self.set_shader(self.fbo)
+
+    with self.fbo:
+        ClearColor(0, 0, 0, 0)
+        ClearBuffers()
+        Color(1, 1, 1, 1)
+        self.rect = Rectangle(pos=(0, 0), size=[50] * 2)
+
+
+M3CommonRipple.init_fbos = ripple_fbos
 
 
 class ThemedApp(MDApp):
@@ -420,51 +451,51 @@ class MarkupDropdown(MDDropdownMenu):
         for data in value:
             if "viewclass" not in data:
                 if (
-                    "leading_icon" not in data
-                    and "trailing_icon" not in data
-                    and "trailing_text" not in data
+                        "leading_icon" not in data
+                        and "trailing_icon" not in data
+                        and "trailing_text" not in data
                 ):
                     viewclass = "MarkupDropdownTextItem"
                 elif (
-                    "leading_icon" in data
-                    and "trailing_icon" not in data
-                    and "trailing_text" not in data
+                        "leading_icon" in data
+                        and "trailing_icon" not in data
+                        and "trailing_text" not in data
                 ):
                     viewclass = "MDDropdownLeadingIconItem"
                 elif (
-                    "leading_icon" not in data
-                    and "trailing_icon" in data
-                    and "trailing_text" not in data
+                        "leading_icon" not in data
+                        and "trailing_icon" in data
+                        and "trailing_text" not in data
                 ):
                     viewclass = "MDDropdownTrailingIconItem"
                 elif (
-                    "leading_icon" not in data
-                    and "trailing_icon" in data
-                    and "trailing_text" in data
+                        "leading_icon" not in data
+                        and "trailing_icon" in data
+                        and "trailing_text" in data
                 ):
                     viewclass = "MDDropdownTrailingIconTextItem"
                 elif (
-                    "leading_icon" in data
-                    and "trailing_icon" in data
-                    and "trailing_text" in data
+                        "leading_icon" in data
+                        and "trailing_icon" in data
+                        and "trailing_text" in data
                 ):
                     viewclass = "MDDropdownLeadingTrailingIconTextItem"
                 elif (
-                    "leading_icon" in data
-                    and "trailing_icon" in data
-                    and "trailing_text" not in data
+                        "leading_icon" in data
+                        and "trailing_icon" in data
+                        and "trailing_text" not in data
                 ):
                     viewclass = "MDDropdownLeadingTrailingIconItem"
                 elif (
-                    "leading_icon" not in data
-                    and "trailing_icon" not in data
-                    and "trailing_text" in data
+                        "leading_icon" not in data
+                        and "trailing_icon" not in data
+                        and "trailing_text" in data
                 ):
                     viewclass = "MDDropdownTrailingTextItem"
                 elif (
-                    "leading_icon" in data
-                    and "trailing_icon" not in data
-                    and "trailing_text" in data
+                        "leading_icon" in data
+                        and "trailing_icon" not in data
+                        and "trailing_text" in data
                 ):
                     viewclass = "MDDropdownLeadingIconTrailingTextItem"
 
@@ -492,7 +523,7 @@ class AutocompleteHintInput(MDTextField):
         self.bind(width=lambda instance, x: setattr(self.dropdown, "width", x))
 
     def on_message(self, instance):
-        MDApp.get_running_app().commandprocessor("!hint "+instance.text)
+        MDApp.get_running_app().commandprocessor("!hint " + instance.text)
 
     def on_text(self, instance, value):
         if len(value) >= self.min_chars:
@@ -515,8 +546,8 @@ class AutocompleteHintInput(MDTextField):
                     pass  # substring not found
                 else:
                     prefix = escape_markup(item_name[:index])
-                    matching = escape_markup(item_name[index:index+len(value)])
-                    postfix = escape_markup(item_name[index+len(value):])
+                    matching = escape_markup(item_name[index:index + len(value)])
+                    postfix = escape_markup(item_name[index + len(value):])
                     text = f"{prefix}[b]{matching}[/b]{postfix}"
                     self.dropdown.items.append({
                         "text": text,
@@ -666,11 +697,11 @@ class CommandPromptTextInput(MDTextField):
             self._command_history.appendleft(new_entry)
 
     def keyboard_on_key_down(
-        self,
-        window,
-        keycode: typing.Tuple[int, str],
-        text: typing.Optional[str],
-        modifiers: typing.List[str]
+            self,
+            window,
+            keycode: typing.Tuple[int, str],
+            text: typing.Optional[str],
+            modifiers: typing.List[str]
     ) -> bool:
         """
         :param window: The kivy window object
@@ -804,6 +835,7 @@ class CommandButton(MDButton, MDTooltip):
     def on_leave(self) -> None:
         self.animation_tooltip_dismiss()
 
+
 class GameManager(ThemedApp):
     logging_pairs = [
         ("Client", "Archipelago"),
@@ -852,6 +884,7 @@ class GameManager(ThemedApp):
     def on_start(self):
         def on_start(*args):
             self.root.md_bg_color = self.theme_cls.backgroundColor
+
         super().on_start()
         Clock.schedule_once(on_start)
 
@@ -915,7 +948,8 @@ class GameManager(ThemedApp):
         self.grid.add_widget(self.main_area_container)
 
         # bottom part
-        bottom_layout = MDBoxLayout(orientation="horizontal", size_hint_y=None, height=dp(40), spacing=5, padding=(5, 10))
+        bottom_layout = MDBoxLayout(orientation="horizontal", size_hint_y=None, height=dp(40), spacing=5,
+                                    padding=(5, 10))
         info_button = CommandButton(MDButtonText(text="Command:", halign="left"), manager=self, radius=5,
                                     style="filled", size=(dp(100), dp(70)), size_hint_x=None, size_hint_y=None,
                                     pos_hint={"center_y": 0.575})
@@ -1075,7 +1109,7 @@ class GameManager(ThemedApp):
     def enable_energy_link(self):
         if not hasattr(self, "energy_link_label"):
             self.energy_link_label = MDLabel(text="Energy Link: Standby",
-                                           size_hint_x=None, width=150, halign="center")
+                                             size_hint_x=None, width=150, halign="center")
             self.connect_layout.add_widget(self.energy_link_label)
 
     def set_new_energy_link_value(self):
@@ -1205,7 +1239,7 @@ class HintLog(MDRecycleView):
         data = []
         ctx = MDApp.get_running_app().ctx
         for hint in hints:
-            if not hint.get("status"): # Allows connecting to old servers
+            if not hint.get("status"):  # Allows connecting to old servers
                 hint["status"] = HintStatus.HINT_FOUND if hint["found"] else HintStatus.HINT_UNSPECIFIED
             hint_status_node = self.parser.handle_node({"type": "color",
                                                         "color": status_colors.get(hint["status"], "red"),
@@ -1228,7 +1262,7 @@ class HintLog(MDRecycleView):
                 })},
                 "entrance": {"text": self.parser.handle_node({"type": "color" if hint["entrance"] else "text",
                                                               "color": "blue", "text": hint["entrance"]
-                                                              if hint["entrance"] else "Vanilla"})},
+                    if hint["entrance"] else "Vanilla"})},
                 "status": {
                     "text": hint_status_node,
                     "hint": hint,
