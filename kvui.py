@@ -6,6 +6,7 @@ import re
 import io
 import pkgutil
 from collections import deque
+
 assert "kivy" not in sys.modules, "kvui should be imported before kivy for frozen compatibility"
 
 if sys.platform == "win32":
@@ -79,6 +80,7 @@ from kivy.animation import Animation
 from kivy.uix.popup import Popup
 from kivy.uix.image import AsyncImage
 from kivymd.app import MDApp
+from kivymd.effects.stiffscroll import StiffScrollEffect
 from kivymd.uix.dialog import MDDialog, MDDialogHeadlineText, MDDialogSupportingText, MDDialogButtonContainer
 from kivymd.uix.gridlayout import MDGridLayout
 from kivymd.uix.floatlayout import MDFloatLayout
@@ -214,6 +216,7 @@ class ToggleButton(MDButton, ToggleButtonBehavior):
                     child.theme_icon_color = "Custom"
                 child.text_color = self.theme_cls.primaryColor
                 child.icon_color = self.theme_cls.primaryColor
+
 
 class ToolTip(MDTooltipPlain):
     markup = True
@@ -1107,6 +1110,7 @@ class LogtoUI(logging.Handler):
 class UILog(MDRecycleView):
     messages: typing.ClassVar[int]  # comes from kv file
     adaptive_height = True
+    effect_cls = StiffScrollEffect
 
     def __init__(self, *loggers_to_handle, **kwargs):
         super(UILog, self).__init__(**kwargs)
@@ -1173,7 +1177,9 @@ status_sort_weights: dict[HintStatus, int] = {
     HintStatus.HINT_PRIORITY: 4,
 }
 
+
 class HintLog(MDRecycleView):
+    effect_cls = StiffScrollEffect
     header = {
         "receiving": {"text": "[u]Receiving Player[/u]"},
         "item": {"text": "[u]Item[/u]"},
