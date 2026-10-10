@@ -88,7 +88,7 @@ class PBRContext(CommonContext):
                 mon = Gen4Pokemon.create_from_binary(mon_bytes)
                 test_mon = Gen4Pokemon.create_from_binary(mon.build_binary())
                 if mon.species != 0:
-                    logger.warning(f"species: {mon.species}, pkm: {pkm}, box: {box}, valid: {mon.build_binary() == test_mon.build_binary()}")
+                    logger.warning(f"species: {mon.species}, pkm: {pkm}, box: {box}, valid: {mon.build_binary() == mon_bytes}")
 
 
 async def game_watcher(ctx: PBRContext) -> None:

@@ -316,7 +316,6 @@ class Gen4Pokemon:
         output = bytearray()
         output.extend(int.to_bytes(self.personality_value, 4, byteorder="big"))
         output.extend(int.to_bytes(self.flagsBase, 2, byteorder="big"))
-        output.extend(int.to_bytes(self.checksum, 2, byteorder="big"))
 
         blocks = {
             "A": self.build_a_block(),
@@ -324,6 +323,17 @@ class Gen4Pokemon:
             "C": self.build_c_block(),
             "D": self.build_d_block(),
         }
+
+        checksum = 0
+        for block in blocks.values():
+            for i in range(0x10):
+                checksum += int.from_bytes(block[(2*i):(2*i)+2], byteorder="big")
+
+        checksum &= 0xFFFF
+        self.checksum = checksum
+
+        output.extend(int.to_bytes(self.checksum, 2, byteorder="big"))
+
         block_shuffle = BLOCK_ORDERS[((self.personality_value & 0x3E000) >> 0xD) % 24]
         for block in block_shuffle:
             output.extend(blocks[block])
