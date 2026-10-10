@@ -33,7 +33,7 @@ logger = logging.getLogger("Wii")
 class PBRCommandProcessor(ClientCommandProcessor):
     ctx: PBRContext
 
-    def __cmd_debug_display(self):
+    def _cmd_debug_display(self):
         self.ctx.display_hooked = True
 
 
@@ -42,6 +42,7 @@ class PBRContext(CommonContext):
     tags = {"AP"}
     items_handling = 0b111
     display_hooked = False
+    command_processor = PBRCommandProcessor
 
     def make_gui(self) -> "type[kvui.GameManager]":
         from kvui import GameManager
@@ -61,6 +62,7 @@ class PBRContext(CommonContext):
         await self.send_connect()
 
     async def debug_display(self):
+        from .gen4_pokemon_structure import Gen4Pokemon
         logger.warning(f"Hooked.")
         save_base = dolphin_memory_engine.read_word(BATTLE_REV_SAVE_FILE_PTR)
         save_slot = dolphin_memory_engine.read_byte(save_base + BATTLE_REV_SAVE_FILE_INDEX)
@@ -77,15 +79,16 @@ class PBRContext(CommonContext):
                                      byteorder="big")
             if species != 0:
                 logger.warning(f"Party: species: {species}, pkm: {pkm}")
-            for box in range(18):
-                for pkm in range(30):
-                    species = int.from_bytes(dolphin_memory_engine.read_bytes(save_ptr +
-                                                                              (box * BATTLE_REV_BOX_SIZE) +
-                                                                              BATTLE_REV_BOX_OFS +
-                                                                              (pkm * BATTLE_REV_PKM_SIZE) + 8, 2)
-                                             , byteorder="big")
-                    if species != 0:
-                        logger.warning(f"species: {species}, pkm: {pkm}, box: {box}")
+        for box in range(18):
+            for pkm in range(30):
+                mon_bytes = dolphin_memory_engine.read_bytes(save_ptr +
+                                                                    (box * BATTLE_REV_BOX_SIZE) +
+                                                                     BATTLE_REV_BOX_OFS +
+                                                                     (pkm * BATTLE_REV_PKM_SIZE), 0x88)
+                mon = Gen4Pokemon.create_from_binary(mon_bytes)
+                test_mon = Gen4Pokemon.create_from_binary(mon.build_binary())
+                if mon.species != 0:
+                    logger.warning(f"species: {mon.species}, pkm: {pkm}, box: {box}, valid: {mon.build_binary() == test_mon.build_binary()}")
 
 
 async def game_watcher(ctx: PBRContext) -> None:
