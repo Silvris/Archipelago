@@ -179,7 +179,7 @@ mm4_regions: dict[str, RegionData] = {
 
 def get_boss_locations(region: str) -> list[str]:
     return [location for location, data in mm4_regions[region].locations.items()
-            if not data.energy and not data.oneup_tank]
+            if not data.energy and not data.oneup_tank and not names.get_balloon_adapter and not names.get_wire_adapter]
 
 
 def get_energy_locations(region: str) -> list[str]:
