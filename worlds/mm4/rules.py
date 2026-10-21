@@ -250,9 +250,10 @@ def set_rules(world: "MM4World") -> None:
                         continue
                     if weapon == 0:
                         world.weapon_damage[weapon][i] = 0
-                    elif i in (14, 15) and not world.options.random_weakness:
+                    elif not world.options.random_weakness == RandomWeaknesses.option_randomized \
+                            and i in (2, 14):
                         if 3 > world.weapon_damage[weapon][i] > 0:
-                            # Phase 1 takes 3 max
+                            # Drill Man and Wily Machine 4's 1st phase take 3 max
                             world.weapon_damage[weapon][i] = 0
                     elif not world.options.random_weakness == RandomWeaknesses.option_randomized \
                             and i in (4, 10, 11, 12):
