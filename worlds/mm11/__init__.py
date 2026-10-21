@@ -10,8 +10,8 @@ from .items import (item_table, item_names, MM11Item, filler_item_weights, robot
                     stage_access_table, extra_item_table, lookup_item_to_id)
 from .locations import (MM11Location, mm11_regions, MM11Region, lookup_location_to_id,
                         location_groups)
-from .names import (wily_4_boss, charge_buster, bright_man_stage, toad_man_stage, drill_man_stage, pharaoh_man_stage,
-                    ring_man_stage, dust_man_stage, dive_man_stage, skull_man_stage)
+from .names import (wily_4_boss, charge_buster, block_man_stage, acid_man_stage, impact_man_stage, bounce_man_stage,
+                    fuse_man_stage, tundra_man_stage, torch_man_stage, blast_man_stage)
 from .options import MM11Options, Consumables
 from .rules import set_rules, weapon_damage, robot_masters, weapons_to_name, minimum_weakness_requirement
 import os
@@ -37,8 +37,7 @@ class MM11WebWorld(WebWorld):
 
 class MM11World(World):
     """
-    One year later, history repeats itself again. Dr. Cossack has created another 8 Robot Masters with the intent of
-    world domination. Armed with an upgraded Mega Buster, Mega Man sets off to save the world once again.
+    MM11
     """
 
     game = "Mega Man 11"
@@ -123,19 +122,20 @@ class MM11World(World):
                   useful_item_pool: list["Item"],
                   filler_item_pool: list["Item"],
                   fill_locations: list["Location"]) -> None:
-        if self.multiworld.players > 1:
+        if self.multiworld.players:
+            # testing this again
             return  # Don't need to change anything on a multi gen, fill should be able to solve it with a 4 sphere 1
         if self.options.consumables:
             return  # The only affected stages have both types of consumable
         rbm_to_item = {
-            0: bright_man_stage,
-            1: toad_man_stage,
-            2: drill_man_stage,
-            3: pharaoh_man_stage,
-            4: ring_man_stage,
-            5: dust_man_stage,
-            6: dive_man_stage,
-            7: skull_man_stage
+            0: block_man_stage,
+            1: acid_man_stage,
+            2: impact_man_stage,
+            3: bounce_man_stage,
+            4: fuse_man_stage,
+            5: tundra_man_stage,
+            6: torch_man_stage,
+            7: blast_man_stage
         }
         affected_rbm = [0, 4, 5, 7]
         possible_rbm = [1, 2, 3, 6]  # Marine/Jet/Balloon/Wire respectively
@@ -155,7 +155,7 @@ class MM11World(World):
             if self.options.strict_weakness or (self.options.random_weakness
                                                 and not (self.weapon_damage[0][target_rbm] > 0)):
                 # we need to find a weakness for this boss
-                weaknesses = [weapon for weapon in range(1, 9 if not self.options.random_rush else 11)
+                weaknesses = [weapon for weapon in range(1, 9)
                               if self.weapon_damage[weapon][target_rbm] >= minimum_weakness_requirement[weapon]]
                 weapons = list(map(lambda s: weapons_to_name[s], weaknesses))
                 valid_weapons = [item for item in prog_item_pool
@@ -184,11 +184,3 @@ class MM11World(World):
         local_wily = {int(key): value for key, value in slot_data["wily_3_weapons"].items()}
         return {"weapon_damage": local_weapon, "wily_3_weapons": local_wily}
 
-    def modify_multidata(self, multidata: dict[str, Any]) -> None:
-        # wait for self.rom_name to be available.
-        self.rom_name_available_event.wait()
-        rom_name = getattr(self, "rom_name", None)
-        # we skip in case of error, so that the original error in the output thread is the one that gets raised
-        if rom_name:
-            new_name = base64.b64encode(bytes(self.rom_name)).decode()
-            multidata["connect_names"][new_name] = multidata["connect_names"][self.player_name]

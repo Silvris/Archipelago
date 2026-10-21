@@ -78,12 +78,40 @@ mm11_regions: dict[str, RegionData] = {
     }, [], [names.wily_1_boss], parent="Wily Stage 1"),
 
     "Wily Stage 3": RegionData({
-        #names.wily_3_boss: LocationData(0x000B),
+        names.wily_3_b1: LocationData(0x000B),
+        names.wily_3_b2: LocationData(0x000C),
+        names.wily_3_b3: LocationData(0x000D),
+        names.wily_3_b4: LocationData(0x000E),
+        names.wily_3_b5: LocationData(0x000F),
+        names.wily_3_b6: LocationData(0x0010),
+        names.wily_3_b7: LocationData(0x0011),
+        names.wily_3_b8: LocationData(0x0012),
     }, [], [names.wily_2_boss], parent="Wily Stage 2"),
 
     "Wily Stage 4": RegionData({
         names.wily_4_boss: LocationData(None),
     }, [], [], parent="Wily Stage 3"),
+
+    "Dr. Light's Lab": RegionData({
+        names.shop_energy_balancer: LocationData(0x0020),
+        names.shop_energy_balancer_neo: LocationData(0x0021),
+        names.shop_auto_charge: LocationData(0x0022),
+        names.shop_buster_plus: LocationData(0x0023),
+        names.shop_power_shield: LocationData(0x0024),
+        names.shop_spike_boots: LocationData(0x0025),
+        names.shop_shock_absorber: LocationData(0x0026),
+        names.shop_speed_gear_booster: LocationData(0x0027),
+        names.shop_energy_dispenser: LocationData(0x0028),
+        names.shop_awakener: LocationData(0x0029),
+        names.shop_screws_up: LocationData(0x002A),
+        names.shop_health_up: LocationData(0x002B),
+        names.shop_weapon_up: LocationData(0x002C),
+        names.shop_cooling_fan: LocationData(0x002D),
+        names.shop_cooling_infinite: LocationData(0x002E),
+        names.shop_mystery: LocationData(0x002F),
+        names.shop_buddy_plus: LocationData(0x0030),
+        names.shop_tank_container: LocationData(0x0031),
+    }, [], [])
 }
 
 

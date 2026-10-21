@@ -5,117 +5,104 @@ from typing_extensions import override
 from BaseClasses import CollectionState
 from NetUtils import JSONMessagePart
 from . import names
-from .locations import get_boss_locations, mm4_regions
+from .locations import get_boss_locations, mm11_regions
 from rule_builder.rules import CanReachLocation, HasAll, HasAny, Has, OptionFilter, Rule, True_, TWorld
 
 if TYPE_CHECKING:
-    from . import MM4World
+    from . import MM11World
 
 bosses: dict[str, int] = {
-    "Bright Man": 0,
-    "Toad Man": 1,
-    "Drill Man": 2,
-    "Pharaoh Man": 3,
-    "Ring Man": 4,
-    "Dust Man": 5,
-    "Dive Man": 6,
-    "Skull Man": 7,
-    "Mothraya": 8,
-    "Square Machine": 9,
-    "Cockroach Twins": 10,
-    "Cossack Catcher": 11,
-    "Metall Daddy": 12,
-    "Tako Trash": 13,
-    "Wily Machine 4-1": 14,
-    "Wily Machine 4-2": 15,
-    "Wily Capsule": 16,
+    "Block Man": 0,
+    "Acid Man": 1,
+    "Impact Man": 2,
+    "Bounce Man": 3,
+    "Fuse Man": 4,
+    "Tundra Man": 5,
+    "Torch Man": 6,
+    "Blast Man": 7,
+    "Yellow Devil MK-III": 8,
+    "Mawverne": 9,
+    "Wily Machine 11 V1": 10,
+    "Wily Machine 11 V2": 11,
 }
 
 weapons_to_id: dict[str, int] = {
     "Mega Buster": 0,
-    names.flash_stopper: 1,
-    names.rain_flush: 2,
-    names.drill_bomb: 3,
-    names.pharaoh_shot: 4,
-    names.ring_boomerang: 5,
-    names.dust_crusher: 6,
-    names.dive_missile: 7,
-    names.skull_barrier: 8,
-    names.rush_coil: 9,
-    names.rush_jet: 10,
+    names.block_dropper: 1,
+    names.acid_barrier: 2,
+    names.pile_driver: 3,
+    names.bounce_ball: 4,
+    names.scramble_thunder: 5,
+    names.tundra_storm: 6,
+    names.blazing_torch: 7,
+    names.chain_blast: 8,
 }
 
+# this will need rewritten entirely, but use this so I can test connection before rewriting the logic
+# numbers will assume no power gear for now
 weapon_damage: dict[int, list[int]] = {
-    0: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, ],  # Mega Buster
-    1: [0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ],  # Flash Stopper
-    2: [4, 1, 1, 2, 1, 1, 1, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, ],  # Rain Flush
-    3: [1, 4, 1, 1, 1, 1, 1, 1, 2, 2, 2, 0, 0, 1, 1, 4, 0, ],  # Drill Bomb
-    4: [1, 1, 1, 1, 2, 1, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 2, ],  # Pharaoh Shot
-    5: [1, 1, 1, 1, 1, 4, 1, 1, 4, 0, 2, 1, 2, 4, 3, 1, 1, ],  # Ring Boomerang
-    6: [1, 1, 1, 2, 1, 1, 3, 4, 2, 4, 1, 2, 2, 1, 1, 1, 0, ],  # Dust Crusher
-    7: [1, 1, 3, 1, 1, 1, 1, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, ],  # Dive Missile
-    8: [2, 1, 1, 1, 1, 1, 4, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, ],  # Skull Barrier
-    9: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, ],  # Rush Coil
-    10: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, ],  # Rush Jet
+    0: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, ],  # Mega Buster
+    1: [1, 5, 2, 2, 2, 2, 2, 1, 1, 1, 1, 1, ],  # Block Dropper
+    2: [1, 1, 4, 1, 1, 1, 1, 1, 1, 1, 5, 3, ],  # Acid Barrier
+    3: [2, 2, 1, 4, 2, 2, 2, 2, 2, 3, 2, 2, ],  # Pile Driver
+    4: [1, 1, 1, 1, 4, 1, 1, 1, 1, 3, 1, 1, ],  # Bounce Ball
+    5: [1, 1, 1, 1, 1, 4, 1, 1, 1, 1, 1, 3, ],  # Scramble Thunder
+    6: [4, 4, 4, 4, 1, 1, 6, 4, 1, 1, 1, 1, ],  # Tundra Storm
+    7: [2, 2, 2, 2, 2, 2, 1, 6, 1, 1, 1, 1, ],  # Blazing Torch
+    8: [4, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, ],  # Chain Blast
 }
 
 weapons_to_name: dict[int, str] = {
-    1: names.flash_stopper,
-    2: names.rain_flush,
-    3: names.drill_bomb,
-    4: names.pharaoh_shot,
-    5: names.ring_boomerang,
-    6: names.dust_crusher,
-    7: names.dive_missile,
-    8: names.skull_barrier,
-    9: names.rush_coil,
-    10: names.rush_jet
+    1: names.block_dropper,
+    2: names.acid_barrier,
+    3: names.pile_driver,
+    4: names.bounce_ball,
+    5: names.scramble_thunder,
+    6: names.tundra_storm,
+    7: names.blazing_torch,
+    8: names.chain_blast,
 }
 
 minimum_weakness_requirement: dict[int, int] = {
     0: 1,  # Mega Buster is free
-    1: 4,  # Flash Stopper is another special baby, 7 shots with variable damage (max 7)
-    2: 4,  # 7 shots of Rain Flush
-    3: 1,  # 28 shots of Drill Bomb
-    4: 1,  # 14 fully-charged shots of Pharaoh Shot, but a full charge is 3x the uncharged damage
-    5: 1,  # 28 shots of Ring Boomerang (occasionally gets a rebound hit too)
-    6: 1,  # 28 shots of Dust Crusher
-    7: 1,  # 28 shots of Dive Missile
-    8: 2,  # 14 applications of Skull Barrier (painful)
-    9: 1,  # Rush Coil doesn't use energy to fire
-    10: 1,  # Rush Jet doesn't use energy to fire
+    1: 2,  # 14 shots of Block Dropper
+    2: 1,  # 7 activations of Acid Barrier, this one is a skill issue more than anything
+    3: 3,  # 10 uses of Pile Driver
+    4: 1,  # 28 shots of Bounce Ball
+    5: 2,  # 14 shots of Scramble Thunder
+    6: 4,  # 7 uses of Tundra Storm
+    7: 2,  # 14 shots of Blazing Torch
+    8: 1,  # 28 shots of Chain Blast
 }
 
 robot_masters: dict[int, str] = {
-    0: "Bright Man Defeated",
-    1: "Toad Man Defeated",
-    2: "Drill Man Defeated",
-    3: "Pharaoh Man Defeated",
-    4: "Ring Man Defeated",
-    5: "Dust Man Defeated",
-    6: "Dive Man Defeated",
-    7: "Skull Man Defeated"
+    0: "Block Man Defeated",
+    1: "Acid Man Defeated",
+    2: "Impact Man Defeated",
+    3: "Bounce Man Defeated",
+    4: "Fuse Man Defeated",
+    5: "Tundra Man Defeated",
+    6: "Torch Man Defeated",
+    7: "Blast Man Defeated"
 }
 
 weapon_costs = {
     0: 0,
-    1: 4,
+    1: 2,
     2: 4,
-    3: 1,
-    4: 2,
-    5: 1,
-    6: 1,
-    7: 1,
-    8: 2,
-    9: 0,
-    10: 0,
+    3: 3,
+    4: 1,
+    5: 2,
+    6: 4,
+    7: 2,
+    8: 1,
 }
 
 
 @dataclass
-class CanDefeatEnoughRBMs(Rule["MM4World"], game="Mega Man 4"):
+class CanDefeatEnoughRBMs(Rule["MM11World"], game="Mega Man 11"):
     @override
-    def _instantiate(self, world: "MM4World") -> Rule.Resolved:
+    def _instantiate(self, world: "MM11World") -> Rule.Resolved:
         return self.Resolved(tuple([(key, tuple(val)) for key, val in sorted(world.wily_3_weapons.items())]),
                              world.options.wily_3_requirement.value,
                              player=world.player, caching_enabled=True)
@@ -161,18 +148,13 @@ class CanDefeatEnoughRBMs(Rule["MM4World"], game="Mega Man 4"):
             return False
 
 
-HasDrill = Has(names.drill_bomb)
+HasPile = Has(names.pile_driver)
 HasRushCoil = Has(names.rush_coil)
 HasRushJet = Has(names.rush_jet)
-HasBalloon = Has(names.balloon_adaptor)
-HasWire = Has(names.wire_adaptor)
-HasVerticalNonWire = HasRushCoil | HasBalloon
-HasVertical = HasVerticalNonWire | HasWire
+HasVertical = HasRushJet | HasRushCoil
 
 STATIC_LOCATION_RULES: dict[str, Rule] = {
-    names.cossack_1_boss: HasVerticalNonWire,
-    names.cossack_2_boss: HasRushJet | HasBalloon,
-    names.wily_2_boss: HasRushJet | HasBalloon,
+
 }
 
 STATIC_ENTRANCE_RULES: dict[str, Rule] = {
@@ -181,39 +163,15 @@ STATIC_ENTRANCE_RULES: dict[str, Rule] = {
 }
 
 STATIC_1UP_RULES: dict[str, Rule] = {
-    names.pharaoh_man_c1: HasVertical,
-    names.drill_man_c3: HasVertical,
-    names.ring_man_c2: HasVertical,
-    names.cossack_2_c9: HasDrill & (HasRushJet | HasBalloon),
-    names.cossack_2_c10: HasVertical & (HasRushJet | HasBalloon),
-    names.cossack_3_c4: HasBalloon,
-    names.cossack_4_c3: HasDrill,
-    names.cossack_4_c5: HasDrill & (HasRushCoil | HasWire),
-    names.wily_2_c1: HasRushJet | HasBalloon,
-    names.wily_2_c2: HasRushJet | HasBalloon,
+
 }
 
 STATIC_ENERGY_RULES: dict[str, Rule] = {
-    names.bright_man_c1: HasVertical | HasRushJet,
-    names.bright_man_c4: HasRushCoil | HasWire,
-    names.cossack_1_c2: HasVerticalNonWire,
-    names.cossack_1_c3: HasVerticalNonWire,
-    names.cossack_2_c2: HasRushJet | HasBalloon,
-    names.cossack_2_c3: HasRushJet | HasBalloon,
-    names.cossack_2_c4: HasRushJet | HasBalloon,
-    names.cossack_2_c5: HasVertical & (HasRushJet | HasBalloon),
-    names.cossack_2_c6: HasRushJet | HasBalloon,
-    names.cossack_2_c7: HasRushJet | HasBalloon,
-    names.cossack_2_c8: HasRushJet | HasBalloon,
-    names.cossack_4_c1: HasVerticalNonWire,
-    names.cossack_4_c2: HasVerticalNonWire,
-    names.cossack_4_c8: HasVertical & HasDrill,
-    names.cossack_4_c9: HasBalloon | HasWire,
-    names.wily_2_c3: HasVertical,
+
 }
 
 
-def set_rules(world: "MM4World") -> None:
+def set_rules(world: "MM11World") -> None:
     from .options import RandomWeaknesses
     # most rules are set on region, so we only worry about rules required within stage access
     # or rules variable on settings
@@ -222,17 +180,17 @@ def set_rules(world: "MM4World") -> None:
         world.weapon_damage = slot_data["weapon_damage"]
     else:
         if world.options.random_weakness == world.options.random_weakness.option_shuffled:
-            weapon_tables = [table.copy() for weapon, table in weapon_damage.items() if weapon != 0 and (world.options.random_rush or weapon not in (9, 10))]
+            weapon_tables = [table.copy() for weapon, table in weapon_damage.items() if weapon != 0]
             world.random.shuffle(weapon_tables)
-            for i in range(1, 9 if not world.options.random_rush else 11):
+            for i in range(1, 9):
                 world.weapon_damage[i] = weapon_tables.pop()
         elif world.options.random_weakness == world.options.random_weakness.option_randomized:
-            world.weapon_damage = {i: [] for i in range(9 if not world.options.random_rush else 11)}
+            world.weapon_damage = {i: [] for i in range(9)}
             for boss in range(16):
                 for weapon in world.weapon_damage:
                     world.weapon_damage[weapon].append(min(14, max(0, int(world.random.normalvariate(3, 3)))))
                 if not any([world.weapon_damage[weapon][boss] >= 4
-                            for weapon in range(1, 9 if not world.options.random_rush else 11)]):
+                            for weapon in range(1, 9)]):
                     # failsafe, there should be at least one defined non-Buster weakness
                     weapon = world.random.randint(1, 7)
                     world.weapon_damage[weapon][boss] = world.random.randint(4, 14)  # Force weakness
@@ -246,8 +204,6 @@ def set_rules(world: "MM4World") -> None:
         if world.options.strict_weakness:
             for weapon in weapon_damage:
                 for i in range(16):
-                    if weapon > 8 and not world.options.random_rush:
-                        continue
                     if weapon == 0:
                         world.weapon_damage[weapon][i] = 0
                     elif i in (14, 15) and not world.options.random_weakness:
@@ -364,28 +320,23 @@ def set_rules(world: "MM4World") -> None:
 
     location_rules: dict[str, Rule] = {}
 
-    for i, boss_locations in zip([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 16], [
-        get_boss_locations("Bright Man Stage"),
-        get_boss_locations("Toad Man Stage"),
-        get_boss_locations("Drill Man Stage"),
-        get_boss_locations("Pharaoh Man Stage"),
-        get_boss_locations("Ring Man Stage"),
-        get_boss_locations("Dust Man Stage"),
-        get_boss_locations("Dive Man Stage"),
-        get_boss_locations("Skull Man Stage"),
-        get_boss_locations("Dr. Cossack's Fortress 1"),
-        get_boss_locations("Dr. Cossack's Fortress 2"),
-        get_boss_locations("Dr. Cossack's Fortress 3"),
-        get_boss_locations("Dr. Cossack's Fortress 4"),
+    for i, boss_locations in zip([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10] , [
+        get_boss_locations("Block Man Stage"),
+        get_boss_locations("Acid Man Stage"),
+        get_boss_locations("Impact Man Stage"),
+        get_boss_locations("Bounce Man Stage"),
+        get_boss_locations("Fuse Man Stage"),
+        get_boss_locations("Tundra Man Stage"),
+        get_boss_locations("Torch Man Stage"),
+        get_boss_locations("Blast Man Stage"),
         get_boss_locations("Wily Stage 1"),
         get_boss_locations("Wily Stage 2"),
-        get_boss_locations("Wily Stage 3"),
         get_boss_locations("Wily Stage 4")
     ]):
         if world.weapon_damage[0][i] > 0:
             continue  # this can always be in logic
         weapons = []
-        for weapon in range(1, 9 if not world.options.random_rush else 11):
+        for weapon in range(1, 9):
             if world.weapon_damage[weapon][i] > 0:
                 if world.weapon_damage[weapon][i] < minimum_weakness_requirement[weapon]:
                     continue
@@ -411,7 +362,7 @@ def set_rules(world: "MM4World") -> None:
             location_rules[location] = STATIC_LOCATION_RULES[location]
 
     # Handle entrance rules
-    for region, info in mm4_regions.items():
+    for region, info in mm11_regions.items():
         entrance = world.get_entrance(f"To {region}")
         static_rule = STATIC_ENTRANCE_RULES.get(entrance.name, True_())
         location_rule = True_()
