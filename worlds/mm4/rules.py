@@ -262,9 +262,13 @@ def set_rules(world: "MM4World") -> None:
                             world.weapon_damage[weapon][i] = 0
                     elif 4 > world.weapon_damage[weapon][i] > 0:
                         world.weapon_damage[weapon][i] = 0
-            if world.options.random_weakness != RandomWeaknesses.option_randomized:
+            if world.options.random_weakness == RandomWeaknesses.option_none:
                 # manually remove the Ring Boomerang damage
                 world.weapon_damage[5][16] = 0
+            elif world.options.random_weakness == RandomWeaknesses.option_shuffled:
+                for weapon in weapon_damage:
+                    if 2 > world.weapon_damage[weapon][16] > 0:
+                        world.weapon_damage[weapon][16] = 0
 
         for p_boss in world.options.plando_weakness:
             for p_weapon in world.options.plando_weakness[p_boss]:
