@@ -59,7 +59,7 @@ get_rush_jet = "Rush Jet - Received"
 
 # Consumable Locations
 # Anti-Eddie - Power Gear | Weapon?
-# Block Man gets a "gearless platforming" toggle
+# Block Man, Torch Man, and Wily 2 get a "gearless platforming" toggle
 
 block_man_c1 = "Block Man Stage - Big Bolt" # nothing, use the enemy 0x8
 block_man_c2 = "Block Man Stage - Health Energy 1" # 0x10
@@ -189,3 +189,48 @@ torch_man_c18 = "Torch Man Stage - Weapon Energy 2" # 0x20
 torch_man_c19 = "Torch Man Stage - Gear Recovery 5" # 0x8000
 torch_man_c20 = "Torch Man Stage - Health Energy 5" # 0x10000
 
+blast_man_c1 = "Blast Man Stage - Big Bolt 1" # 0x80
+blast_man_c2 = "Blast Man Stage - 1-Up" # 0x10000 Rush Jet
+blast_man_c3 = "Blast Man Stage - Health Energy 1" # 0x8000
+blast_man_c4 = "Blast Man Stage - Health Energy 2" # 0x2000
+blast_man_c5 = "Blast Man Stage - Health Energy 3" # 0x4000
+blast_man_c6 = "Blast Man Stage - Health Energy 4" # 0x1
+blast_man_c7 = "Blast Man Stage - Health Energy 5" # 0x2
+blast_man_c8 = "Blast Man Stage - W-Tank" # 0x100
+blast_man_c9 = "Blast Man Stage - Weapon Energy 1" # 0x20
+blast_man_c10 = "Blast Man Stage - Weapon Energy 2" # 0x40
+blast_man_c11 = "Blast Man Stage - Health Energy 6" # 0x10
+blast_man_c12 = "Blast Man Stage - Health Energy 7" # 0x8
+blast_man_c13 = "Blast Man Stage - Health Energy 8" # 0x4
+blast_man_c14 = "Blast Man Stage - Small Bolt 1" # 0x800
+blast_man_c15 = "Blast Man Stage - Small Bolt 2" # 0x400
+blast_man_c16 = "Blast Man Stage - Small Bolt 3" # 0x200
+blast_man_c17 = "Blast Man Stage - E-Tank" # 0x1000 Rush Jet + maybe Speed Gear
+
+wily_1_c1 = "Wily Stage 1 - Weapon Energy 1" # 0x80
+wily_1_c2 = "Wily Stage 1 - Weapon Energy 2" # 0x2
+wily_1_c3 = "Wily Stage 1 - Weapon Energy 3" # 0x1
+wily_1_c4 = "Wily Stage 1 - Health Energy 1" # 0x4 Jet
+wily_1_c5 = "Wily Stage 1 - Weapon Energy 4" # 0x8 Coil
+wily_1_c6 = "Wily Stage 1 - Weapon Energy 5" # 0x40 Coil + Speed / Jet
+wily_1_c7 = "Wily Stage 1 - Weapon Energy 6" # 0x20 Coil + Speed / Jet
+wily_1_c8 = "Wily Stage 1 - Weapon Energy 7" # 0x10 Coil + Speed / Jet
+
+# need to double check this is possible gearless
+wily_2_c1 = "Wily Stage 2 - Weapon Energy 1" # 0x8
+wily_2_c2 = "Wily Stage 2 - Weapon Energy 2" # 0x4
+wily_2_c3 = "Wily Stage 2 - Weapon Energy 3" # 0x2
+wily_2_c4 = "Wily Stage 2 - Weapon Energy 4" # 0x1
+
+wily_3_c1 = "Wily Stage 3 - Health Energy 1" # 0x1
+wily_3_b1 = "Wily Stage 3 - Block Man Rematch" # 0x1
+wily_3_b2 = "Wily Stage 3 - Acid Man Rematch" # 0x2
+wily_3_b3 = "Wily Stage 3 - Impact Man Rematch" # 0x4
+wily_3_b4 = "Wily Stage 3 - Bounce Man Rematch" # 0x8
+wily_3_b5 = "Wily Stage 3 - Fuse Man Rematch" # 0x10
+wily_3_b6 = "Wily Stage 3 - Tundra Man Rematch" # 0x20
+wily_3_b7 = "Wily Stage 3 - Torch Man Rematch" # 0x40
+wily_3_b8 = "Wily Stage 3 - Blast Man Rematch" # 0x80
+
+wily_4_c1 = "Wily Stage 4 - Health Energy" # 0x2
+wily_4_c2 = "Wily Stage 4 - Weapon Energy" # 0x1
