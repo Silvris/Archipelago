@@ -6,37 +6,11 @@ from BaseClasses import CollectionState
 from NetUtils import JSONMessagePart
 from . import names
 from .locations import get_boss_locations, mm11_regions
-from rule_builder.rules import CanReachLocation, HasAll, HasAny, Has, OptionFilter, Rule, True_, TWorld
+from .options import weapons_to_id, bosses, SpeedPlatforming
+from rule_builder.rules import CanReachLocation, HasAll, HasAny, Has, AtLeast, Rule, True_, OptionFilter
 
 if TYPE_CHECKING:
     from . import MM11World
-
-bosses: dict[str, int] = {
-    "Block Man": 0,
-    "Acid Man": 1,
-    "Impact Man": 2,
-    "Bounce Man": 3,
-    "Fuse Man": 4,
-    "Tundra Man": 5,
-    "Torch Man": 6,
-    "Blast Man": 7,
-    "Yellow Devil MK-III": 8,
-    "Mawverne": 9,
-    "Wily Machine 11 V1": 10,
-    "Wily Machine 11 V2": 11,
-}
-
-weapons_to_id: dict[str, int] = {
-    "Mega Buster": 0,
-    names.block_dropper: 1,
-    names.acid_barrier: 2,
-    names.pile_driver: 3,
-    names.bounce_ball: 4,
-    names.scramble_thunder: 5,
-    names.tundra_storm: 6,
-    names.blazing_torch: 7,
-    names.chain_blast: 8,
-}
 
 # this will need rewritten entirely, but use this so I can test connection before rewriting the logic
 # numbers will assume no power gear for now
@@ -152,14 +126,18 @@ HasPile = Has(names.pile_driver)
 HasRushCoil = Has(names.rush_coil)
 HasRushJet = Has(names.rush_jet)
 HasVertical = HasRushJet | HasRushCoil
+HasSpeed = Has(names.speed_gear)
+GearlessPlatforming = HasSpeed | OptionFilter(SpeedPlatforming, value=False)
 
 STATIC_LOCATION_RULES: dict[str, Rule] = {
+    names.block_man: GearlessPlatforming,
+    names.get_block_dropper: GearlessPlatforming,
 
 }
 
 STATIC_ENTRANCE_RULES: dict[str, Rule] = {
-
-
+    "To Torch Man Stage": GearlessPlatforming,
+    "To Wily Stage 4": CanDefeatEnoughRBMs(),
 }
 
 STATIC_1UP_RULES: dict[str, Rule] = {
@@ -167,7 +145,7 @@ STATIC_1UP_RULES: dict[str, Rule] = {
 }
 
 STATIC_ENERGY_RULES: dict[str, Rule] = {
-
+    names.block_man_c12: GearlessPlatforming
 }
 
 

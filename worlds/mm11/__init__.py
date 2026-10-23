@@ -98,9 +98,7 @@ class MM11World(World):
         itempool.extend([self.create_item(name) for name in stage_access_table.keys()
                          if name != robot_master])
         itempool.extend([self.create_item(name) for name in robot_master_weapon_table.keys()])
-        itempool.extend([self.create_item(name) for name in extra_item_table.keys() if name != charge_buster])
-        if self.options.jammed_buster:
-            itempool.append(self.create_item(charge_buster))
+        itempool.extend([self.create_item(name) for name in extra_item_table.keys()])
         total_checks = 27
         if self.options.consumables in (Consumables.option_1up_etank,
                                         Consumables.option_all):

@@ -2,7 +2,34 @@ from dataclasses import dataclass
 
 from Options import Choice, Toggle, DeathLink, TextChoice, Range, OptionDict, PerGameCommonOptions, Visibility
 from schema import Schema, And, Use, Optional
-from .rules import bosses, weapons_to_id
+from . import names
+
+bosses: dict[str, int] = {
+    "Block Man": 0,
+    "Acid Man": 1,
+    "Impact Man": 2,
+    "Bounce Man": 3,
+    "Fuse Man": 4,
+    "Tundra Man": 5,
+    "Torch Man": 6,
+    "Blast Man": 7,
+    "Yellow Devil MK-III": 8,
+    "Mawverne": 9,
+    "Wily Machine 11 V1": 10,
+    "Wily Machine 11 V2": 11,
+}
+
+weapons_to_id: dict[str, int] = {
+    "Mega Buster": 0,
+    names.block_dropper: 1,
+    names.acid_barrier: 2,
+    names.pile_driver: 3,
+    names.bounce_ball: 4,
+    names.scramble_thunder: 5,
+    names.tundra_storm: 6,
+    names.blazing_torch: 7,
+    names.chain_blast: 8,
+}
 
 
 class EnergyLink(Toggle):
@@ -20,14 +47,14 @@ class StartingRobotMaster(Choice):
     The initial stage unlocked at the start.
     """
     display_name = "Starting Robot Master"
-    option_bright_man = 0
-    option_toad_man = 1
-    option_drill_man = 2
-    option_pharaoh_man = 3
-    option_ring_man = 4
-    option_dust_man = 5
-    option_dive_man = 6
-    option_skull_man = 7
+    option_block_man = 0
+    option_acid_man = 1
+    option_impact_man = 2
+    option_bounce_man = 3
+    option_fuse_man = 4
+    option_tundra_man = 5
+    option_torch_man = 6
+    option_blast_man = 7
     default = "random"
 
 
@@ -51,6 +78,14 @@ class Consumables(Choice):
         elif value == 2:
             return "Weapon/Health Energy"
         return super().get_option_name(value)
+
+
+class SpeedPlatforming(Toggle):
+    """
+    When enabled, Torch Man's stage, the end of Block Man's stage, and Wily 2 will logically require you to have
+    Speed Gear to complete them.
+    """
+    display_name = "Gearless Platforming"
 
 
 class PaletteShuffle(TextChoice):
@@ -78,6 +113,7 @@ class EnemyWeaknesses(Toggle):
     Randomizes the damage dealt to enemies by weapons. Certain enemies will always take damage from the buster.
     """
     display_name = "Random Enemy Weaknesses"
+    visibility = Visibility.none
 
 
 class StrictWeaknesses(Toggle):
@@ -167,7 +203,5 @@ class MM11Options(PerGameCommonOptions):
     random_weakness: RandomWeaknesses
     wily_3_requirement: Wily3Requirement
     plando_weakness: WeaknessPlando
-    jammed_buster: JammedBuster
-    palette_shuffle: PaletteShuffle
-    reduce_flashing: ReduceFlashing
+    # palette_shuffle: PaletteShuffle
     music_shuffle: MusicShuffle
