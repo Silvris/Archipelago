@@ -281,7 +281,7 @@ class TooltipLabel(HovererableLabel, MDTooltip):
             # update
             self._tooltip.text = text
         else:
-            self._tooltip = ToolTip(text=text)
+            self._tooltip = ToolTip(text=text, pos_hint={})
             self.display_tooltip()
 
     def on_mouse_update(self, window, pos):
