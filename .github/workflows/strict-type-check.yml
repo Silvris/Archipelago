@@ -30,6 +30,7 @@ jobs:
         run: |
           if [ "$RUNNER_OS" == "Linux" ]; then
             sudo apt -y install libcairo2-dev
+          fi
           python -m pip install --upgrade pip pyright==1.1.392.post0
           python ModuleUpdate.py --append "WebHostLib/requirements.txt" --force --yes
 

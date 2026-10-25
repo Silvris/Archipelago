@@ -59,6 +59,7 @@ jobs:
       run: |
         if [ "$RUNNER_OS" == "Linux" ]; then
             sudo apt install libcairo2-dev
+        fi
         python -m pip install --upgrade pip
         pip install -r ci-requirements.txt
         python ModuleUpdate.py --yes --force --append "WebHostLib/requirements.txt"
@@ -88,6 +89,7 @@ jobs:
       run: |
         if [ "$RUNNER_OS" == "Linux" ]; then
             sudo apt -y install libcairo2-dev
+        fi
         python -m venv venv
         source venv/bin/activate
         python -m pip install --upgrade pip
