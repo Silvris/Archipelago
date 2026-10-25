@@ -282,7 +282,7 @@ class TooltipLabel(HovererableLabel, MDTooltip):
             self._tooltip.text = text
         else:
             self._tooltip = ToolTip(text=text, pos_hint={})
-            self.display_tooltip()
+            Clock.schedule_once(self.display_tooltip, 0)
 
     def on_mouse_update(self, window, pos):
         super().on_mouse_update(window, pos)
@@ -325,7 +325,7 @@ class ServerLabel(HoverBehavior, MDTooltip, MDBoxLayout):
         self._tooltip.text = self.get_text()
         if self._tooltip.parent:
             self.remove_tooltip()
-        self.display_tooltip()
+        Clock.schedule_once(self.display_tooltip, 0)
 
     def on_leave(self):
         self.animation_tooltip_dismiss()
@@ -828,7 +828,7 @@ class CommandButton(MDButton, MDTooltip):
         self._tooltip.font_size = dp(20 - (len(self._tooltip.text) // 400))  # mostly guessing on the numbers here
         if self._tooltip.parent:
             self.remove_tooltip()
-        self.display_tooltip()
+        Clock.schedule_once(self.display_tooltip, 0)
 
     def on_leave(self) -> None:
         self.animation_tooltip_dismiss()
