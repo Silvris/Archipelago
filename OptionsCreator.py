@@ -625,7 +625,7 @@ class OptionsCreator(ThemedApp):
                 group_content = MDExpansionPanelContent(orientation="vertical", theme_bg_color="Custom",
                                                         md_bg_color=self.theme_cls.surfaceContainerColor,
                                                         padding=[dp(12), dp(100), dp(12), 0],
-                                                        spacing=dp(3), size_hint_y=None)
+                                                        spacing=dp(3))
                 group_item.add_widget(group_header)
                 for name, option in options:
                     group_content.add_widget(self.create_option(option, name, cls))
