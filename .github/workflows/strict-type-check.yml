@@ -25,12 +25,11 @@ jobs:
       - uses: actions/setup-python@v6.2.0
         with:
           python-version: "3.12"
-
+      - name: Install libcairo
+        run: |
+          sudo apt install libcairo2-dev
       - name: "Install dependencies"
         run: |
-          if [ "$RUNNER_OS" == "Linux" ]; then
-            sudo apt -y install libcairo2-dev
-          fi
           python -m pip install --upgrade pip pyright==1.1.392.post0
           python ModuleUpdate.py --append "WebHostLib/requirements.txt" --force --yes
 
