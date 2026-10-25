@@ -118,9 +118,6 @@ else:
 
 remove_between_brackets = re.compile(r"\[.*?]")
 
-#TODO: remove after a couple of versions
-ResizableTextField = MDTextField
-
 
 def kv_unescape(text: str) -> str:
     return text.replace("&amp;", "&").replace("&bl;", "[").replace("&br;", "]")
