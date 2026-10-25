@@ -118,7 +118,7 @@ else:
 
 remove_between_brackets = re.compile(r"\[.*?]")
 
-#TODO: remove after a couple of versions (or stable KivyMD)
+#TODO: remove after a couple of versions
 ResizableTextField = MDTextField
 
 
