@@ -52,6 +52,8 @@ jobs:
         python-version: '3.12'
     - name: Install dependencies
       run: |
+        if [ "$RUNNER_OS" == "Linux" ]; then
+            sudo apt install libcairo2-dev
         python -m venv venv
         source venv/bin/activate
         python -m pip install --upgrade pip -r requirements.txt

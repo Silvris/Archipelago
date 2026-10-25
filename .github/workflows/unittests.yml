@@ -57,6 +57,8 @@ jobs:
         python-version: ${{ matrix.python.version }}
     - name: Install dependencies
       run: |
+        if [ "$RUNNER_OS" == "Linux" ]; then
+            sudo apt install libcairo2-dev
         python -m pip install --upgrade pip
         pip install -r ci-requirements.txt
         python ModuleUpdate.py --yes --force --append "WebHostLib/requirements.txt"
@@ -84,6 +86,8 @@ jobs:
         python-version: ${{ matrix.python.version }}
     - name: Install dependencies
       run: |
+        if [ "$RUNNER_OS" == "Linux" ]; then
+            sudo apt -y install libcairo2-dev
         python -m venv venv
         source venv/bin/activate
         python -m pip install --upgrade pip
