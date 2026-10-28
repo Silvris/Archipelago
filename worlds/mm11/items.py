@@ -6,7 +6,9 @@ from .names import (block_dropper, acid_barrier, pile_driver, bounce_ball, scram
                     impact_man_stage, bounce_man_stage, fuse_man_stage, tundra_man_stage, torch_man_stage,
                     blast_man_stage, energy_balancer, energy_balancer_neo, auto_charge, buster_plus, power_shield,
                     spike_boots, shock_absorber, speed_gear_booster, energy_dispenser, awakener, screws_up, health_up,
-                    weapon_up, cooling_fan, cooling_infinite, mystery, buddy_plus, tank_container)
+                    weapon_up, cooling_fan, cooling_infinite, mystery, buddy_plus, tank_container, lives_schematic,
+                    etank_schematic, mtank_schematic, wtank_schematic, pierce_protect_schematic, super_guard_schematic,
+                    eddie_call_schematic, beat_call_schematic)
 
 
 class ItemData(NamedTuple):
@@ -22,12 +24,12 @@ class MM11Item(Item):
 
 robot_master_weapon_table = {
     block_dropper: ItemData(0x0001, True),
-    acid_barrier: ItemData(0x0002, True, True),
-    pile_driver: ItemData(0x0003, True),
+    acid_barrier: ItemData(0x0002, True),
+    pile_driver: ItemData(0x0003, True, True),
     bounce_ball: ItemData(0x0004, True),
     scramble_thunder: ItemData(0x0005, True),
     tundra_storm: ItemData(0x0006, True),
-    blazing_torch: ItemData(0x0007, True, True),
+    blazing_torch: ItemData(0x0007, True),
     chain_blast: ItemData(0x0008, True),
 }
 
@@ -53,7 +55,7 @@ extra_item_table = {
     auto_charge: ItemData(0x0032, False, True),
     buster_plus: ItemData(0x0033, False, True),
     power_shield: ItemData(0x0034, False, True),
-    spike_boots: ItemData(0x0035, False, True),
+    spike_boots: ItemData(0x0035, True),
     shock_absorber: ItemData(0x0036, False, True),
     speed_gear_booster: ItemData(0x0037, False, True),
     energy_dispenser: ItemData(0x0038, False, True),
@@ -66,6 +68,14 @@ extra_item_table = {
     mystery: ItemData(0x003F, False, True),
     buddy_plus: ItemData(0x0040, False, True),
     tank_container: ItemData(0x0041, False, True),
+    lives_schematic: ItemData(0x0042, False, True),
+    etank_schematic: ItemData(0x0043, False, True),
+    mtank_schematic: ItemData(0x0044, False, True),
+    wtank_schematic: ItemData(0x0045, False, True),
+    pierce_protect_schematic: ItemData(0x0046, False, True),
+    super_guard_schematic: ItemData(0x0047, False, True),
+    eddie_call_schematic: ItemData(0x0048, False, True),
+    beat_call_schematic: ItemData(0x0049, False, True),
 }
 
 filler_item_table = {
@@ -79,10 +89,13 @@ filler_item_table = {
 }
 
 filler_item_weights = {
-    one_up: 1,
+    one_up: 2,
     weapon_energy: 4,
-    health_energy: 1,
-    e_tank: 2,
+    health_energy: 3,
+    e_tank: 1,
+    w_tank: 1,
+    small_bolt: 10,
+    big_bolt: 5,
 }
 
 item_table = {

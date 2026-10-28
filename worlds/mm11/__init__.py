@@ -99,13 +99,13 @@ class MM11World(World):
                          if name != robot_master])
         itempool.extend([self.create_item(name) for name in robot_master_weapon_table.keys()])
         itempool.extend([self.create_item(name) for name in extra_item_table.keys()])
-        total_checks = 27
+        total_checks = 44
         if self.options.consumables in (Consumables.option_1up_etank,
                                         Consumables.option_all):
-            total_checks += 22
+            total_checks += 21
         if self.options.consumables in (Consumables.option_weapon_health,
                                         Consumables.option_all):
-            total_checks += 51
+            total_checks += 148
         remaining = total_checks - len(itempool)
         itempool.extend([self.create_item(name)
                          for name in self.random.choices(list(filler_item_weights.keys()),
@@ -171,10 +171,14 @@ class MM11World(World):
         check_for_known_worlds()
 
     def fill_slot_data(self) -> dict[str, Any]:
-        return {
+        slot_data = self.options.as_dict("energy_link", "consumables", )
+        slot_data.update({
             "weapon_damage": self.weapon_damage,
-            "wily_3_weapons": self.wily_3_weapons
-        }
+            "wily_3_weapons": self.wily_3_weapons,
+            "DeathLink": self.options.death_link.value,
+
+        })
+        return slot_data
 
     @staticmethod
     def interpret_slot_data(slot_data: dict[str, Any]) -> dict[str, Any]:

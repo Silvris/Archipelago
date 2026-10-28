@@ -198,10 +198,11 @@ class MM11Options(PerGameCommonOptions):
     energy_link: EnergyLink
     starting_robot_master: StartingRobotMaster
     consumables: Consumables
+    speed_platforming: SpeedPlatforming
     enemy_weakness: EnemyWeaknesses
     strict_weakness: StrictWeaknesses
     random_weakness: RandomWeaknesses
-    wily_3_requirement: Wily3Requirement
     plando_weakness: WeaknessPlando
+    wily_3_requirement: Wily3Requirement
     # palette_shuffle: PaletteShuffle
     music_shuffle: MusicShuffle

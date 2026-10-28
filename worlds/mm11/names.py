@@ -37,6 +37,16 @@ m_tank = "M-Tank"
 small_bolt = "10 Bolts"
 big_bolt = "100 Bolts"
 
+# Schematics
+lives_schematic = "Extra Life Schematics"
+etank_schematic = "E-Tank Schematics"
+mtank_schematic = "M-Tank Schematics"
+wtank_schematic = "W-Tank Schematics"
+pierce_protect_schematic = "Pierce Protect Schematics"
+super_guard_schematic = "Super Guard Schematics"
+eddie_call_schematic = "Eddie Call Schematics"
+beat_call_schematic = "Beat Call Schematics"
+
 energy_balancer = "Energy Balancer"
 energy_balancer_neo = "Energy Balancer Neo"
 auto_charge = "Auto Charge Chip"
