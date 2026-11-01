@@ -5,6 +5,7 @@ from typing import Any, Sequence, ClassVar
 
 from BaseClasses import Tutorial, ItemClassification, MultiWorld, Item, Location
 from worlds.AutoWorld import World, WebWorld
+from .boss import Boss
 from .color import check_for_known_worlds
 from .items import (item_table, item_names, MM11Item, filler_item_weights, robot_master_weapon_table,
                     stage_access_table, extra_item_table, lookup_item_to_id)
@@ -13,7 +14,7 @@ from .locations import (MM11Location, mm11_regions, MM11Region, lookup_location_
 from .names import (wily_4_boss, charge_buster, block_man_stage, acid_man_stage, impact_man_stage, bounce_man_stage,
                     fuse_man_stage, tundra_man_stage, torch_man_stage, blast_man_stage)
 from .options import MM11Options, Consumables
-from .rules import set_rules, weapon_damage, robot_masters, weapons_to_name, minimum_weakness_requirement
+from .rules import set_rules, weapon_damage, robot_masters, weapons_to_name, bosses
 import os
 import threading
 import base64
@@ -55,7 +56,9 @@ class MM11World(World):
         self.rom_name_available_event = threading.Event()
         super().__init__(multiworld, player)
         self.weapon_damage = deepcopy(weapon_damage)
+        self.bosses: dict[int, Boss] = bosses.copy()
         self.wily_3_weapons: dict[int, list[int]] = {}
+        self.wily_4_weapons: dict[int, list[int]] = {}
 
     def create_regions(self) -> None:
         menu = MM11Region("Menu", self.player, self.multiworld)
@@ -153,8 +156,7 @@ class MM11World(World):
             if self.options.strict_weakness or (self.options.random_weakness
                                                 and not (self.weapon_damage[0][target_rbm] > 0)):
                 # we need to find a weakness for this boss
-                weaknesses = [weapon for weapon in range(1, 9)
-                              if self.weapon_damage[weapon][target_rbm] >= minimum_weakness_requirement[weapon]]
+                weaknesses = self.bosses[target_rbm].get_weaknesses()
                 weapons = list(map(lambda s: weapons_to_name[s], weaknesses))
                 valid_weapons = [item for item in prog_item_pool
                                  if item.name in weapons

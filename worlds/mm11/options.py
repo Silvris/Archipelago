@@ -3,33 +3,7 @@ from dataclasses import dataclass
 from Options import Choice, Toggle, DeathLink, TextChoice, Range, OptionDict, PerGameCommonOptions, Visibility
 from schema import Schema, And, Use, Optional
 from . import names
-
-bosses: dict[str, int] = {
-    "Block Man": 0,
-    "Acid Man": 1,
-    "Impact Man": 2,
-    "Bounce Man": 3,
-    "Fuse Man": 4,
-    "Tundra Man": 5,
-    "Torch Man": 6,
-    "Blast Man": 7,
-    "Yellow Devil MK-III": 8,
-    "Mawverne": 9,
-    "Wily Machine 11 V1": 10,
-    "Wily Machine 11 V2": 11,
-}
-
-weapons_to_id: dict[str, int] = {
-    "Mega Buster": 0,
-    names.block_dropper: 1,
-    names.acid_barrier: 2,
-    names.pile_driver: 3,
-    names.bounce_ball: 4,
-    names.scramble_thunder: 5,
-    names.tundra_storm: 6,
-    names.blazing_torch: 7,
-    names.chain_blast: 8,
-}
+from .boss import DamageType, boss_names
 
 
 class EnergyLink(Toggle):
@@ -116,12 +90,18 @@ class EnemyWeaknesses(Toggle):
     visibility = Visibility.none
 
 
-class StrictWeaknesses(Toggle):
+class StrictWeaknesses(Choice):
     """
     Only your starting Robot Master will take damage from the Mega Buster, the rest must be defeated with weapons.
     Weapons that only do 1-3 damage to bosses no longer deal damage.
+    Include Charge: the Charge Buster is considered a weapon separate from the Mega Buster and may deal damage.
     """
     display_name = "Strict Boss Weaknesses"
+    option_disabled = 0
+    option_include_charge = 1
+    option_enabled = 2
+    alias_false = 0
+    alias_true = 2
 
 
 class RandomWeaknesses(Choice):
@@ -158,26 +138,11 @@ class WeaknessPlando(OptionDict):
     """
     display_name = "Plando Weaknesses"
     schema = Schema({
-        Optional(And(str, Use(str.title), lambda s: s in bosses)): {
-            And(str, Use(str.title), lambda s: s in weapons_to_id): And(int, lambda i: i in range(0, 14))
+        Optional(And(str, Use(str.title), lambda s: s in boss_names)): {
+            And(str, Use(str.title), lambda s: getattr(DamageType, s, None) is not None): And(int, lambda i: i in range(0, 20))
         }
     })
     default = {}
-
-
-class JammedBuster(Toggle):
-    """
-    If enabled, the ability to charge the Mega Buster is added to the item pool.
-    """
-    display_name = "Jammed Buster"
-
-
-class ReduceFlashing(Toggle):
-    """
-    Reduce flashing seen in gameplay, such as in stages and when defeating certain bosses.
-    """
-    display_name = "Reduce Flashing"
-    visibility = Visibility.none
 
 
 class MusicShuffle(Choice):

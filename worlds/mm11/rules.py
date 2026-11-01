@@ -5,8 +5,9 @@ from typing_extensions import override
 from BaseClasses import CollectionState
 from NetUtils import JSONMessagePart
 from . import names
+from .boss import bosses, damage_type_to_weapons, weapon_to_main_damage, DamageType
 from .locations import get_boss_locations, mm11_regions
-from .options import weapons_to_id, bosses, SpeedPlatforming
+from .options import SpeedPlatforming
 from rule_builder.rules import CanReachLocation, HasAll, HasAny, Has, AtLeast, Rule, True_, OptionFilter
 
 if TYPE_CHECKING:
@@ -35,18 +36,6 @@ weapons_to_name: dict[int, str] = {
     6: names.tundra_storm,
     7: names.blazing_torch,
     8: names.chain_blast,
-}
-
-minimum_weakness_requirement: dict[int, int] = {
-    0: 1,  # Mega Buster is free
-    1: 2,  # 14 shots of Block Dropper
-    2: 1,  # 7 activations of Acid Barrier, this one is a skill issue more than anything
-    3: 3,  # 10 uses of Pile Driver
-    4: 1,  # 28 shots of Bounce Ball
-    5: 2,  # 14 shots of Scramble Thunder
-    6: 4,  # 7 uses of Tundra Storm
-    7: 2,  # 14 shots of Blazing Torch
-    8: 1,  # 28 shots of Chain Blast
 }
 
 robot_masters: dict[int, str] = {
@@ -167,140 +156,53 @@ STATIC_ENERGY_RULES: dict[str, Rule] = {
 }
 
 
+def wily_validate(world: "MM11World", boss_list: list[int]) -> dict[int, list[int]]:
+    # Wily validation
+    weapon_energy = {idx: 56 for idx in boss_list}
+    wily_flexibility: list[tuple[int, float]] = sorted({idx: world.bosses[idx].get_flexibility()
+                                                          for idx in boss_list}.items(), key=lambda x: x[1])
+    wily_weapons = {}
+    while wily_flexibility:
+        idx, _ = wily_flexibility.pop(0)
+        defeated, used = world.bosses[idx].can_defeat(weapon_energy)
+        if not defeated:
+            # catastrophe, find what they used most and incrementally increase its damage
+            wily_flexibility.insert(0, (idx, 0))
+            if not used:
+                # We have no weapons used, check if we have any weapons at all
+                available = [weapon for weapon, energy in weapon_energy.items() if energy > 0]
+                if available:
+                    world.bosses[idx].damage[weapon_to_main_damage[world.random.choice(available)]] = 8
+                else:
+                    # Buster time
+                    world.bosses[idx].damage[DamageType.BusterLv0] = 1
+            else:
+                top, uses = max({wep: uses for wep, uses in used.items() if wep in range(1, 9)}, key=lambda x: x[1])
+                world.bosses[idx].damage[weapon_to_main_damage[top]] += 1
+        wily_weapons[idx].extend(x for x in used.keys() if x != 0)
+    return wily_weapons
+
+
 def set_rules(world: "MM11World") -> None:
     from .options import RandomWeaknesses
     # most rules are set on region, so we only worry about rules required within stage access
     # or rules variable on settings
     if hasattr(world.multiworld, "re_gen_passthrough"):
         slot_data = getattr(world.multiworld, "re_gen_passthrough")["Mega Man 11"]
-        world.weapon_damage = slot_data["weapon_damage"]
     else:
-        if world.options.random_weakness == world.options.random_weakness.option_shuffled:
-            weapon_tables = [table.copy() for weapon, table in weapon_damage.items() if weapon != 0]
-            world.random.shuffle(weapon_tables)
-            for i in range(1, 9):
-                world.weapon_damage[i] = weapon_tables.pop()
-        elif world.options.random_weakness == world.options.random_weakness.option_randomized:
-            world.weapon_damage = {i: [] for i in range(9)}
-            for boss in range(11):
-                for weapon in world.weapon_damage:
-                    world.weapon_damage[weapon].append(min(14, max(0, int(world.random.normalvariate(3, 3)))))
-                if not any([world.weapon_damage[weapon][boss] >= 4
-                            for weapon in range(1, 9)]):
-                    # failsafe, there should be at least one defined non-Buster weakness
-                    weapon = world.random.randint(1, 7)
-                    world.weapon_damage[weapon][boss] = world.random.randint(4, 14)  # Force weakness
-            # handle Wily Capsule
-            boss = 11
-            for weapon in world.weapon_damage:
-                world.weapon_damage[weapon].append(0)
-            weapon = world.random.choice(list(world.weapon_damage.keys()))
-            world.weapon_damage[weapon][boss] = minimum_weakness_requirement[weapon]
+        world.bosses = bosses.copy()
+        shuffle_remap = {}
+        if world.options.random_weakness == RandomWeaknesses.option_shuffled:
+            vals = list(damage_type_to_weapons.keys())
+            shuffle_remap = dict(zip(damage_type_to_weapons.keys(), vals))
+        for idx, boss in world.bosses.items():
+            boss.generate_weakness(world, shuffle_remap)
 
-        if world.options.strict_weakness:
-            for weapon in weapon_damage:
-                for i in range(12):
-                    if weapon == 0:
-                        world.weapon_damage[weapon][i] = 0
-                    elif i in (9, 11):
-                        if 3 > world.weapon_damage[weapon][i] > 0:
-                            world.weapon_damage[weapon][i] = 0
-                    elif i == 8:
-                        if 2 > world.weapon_damage[weapon][i] > 0:
-                            world.weapon_damage[weapon][i] = 0
-                    elif 4 > world.weapon_damage[weapon][i] > 0:
-                        world.weapon_damage[weapon][i] = 0
+        # Wily 3
+        world.wily_3_weapons = wily_validate(world, list(range(8)))
 
-        for p_boss in world.options.plando_weakness:
-            for p_weapon in world.options.plando_weakness[p_boss]:
-                if not any(w for w in world.weapon_damage
-                           if w != weapons_to_id[p_weapon]
-                           and world.weapon_damage[w][bosses[p_boss]] > minimum_weakness_requirement[w]):
-                    # we need to replace this weakness
-                    weakness = world.random.choice([key for key in world.weapon_damage
-                                                    if key != weapons_to_id[p_weapon]])
-                    world.weapon_damage[weakness][bosses[p_boss]] = minimum_weakness_requirement[weakness]
-                world.weapon_damage[weapons_to_id[p_weapon]][bosses[p_boss]] \
-                    = world.options.plando_weakness[p_boss][p_weapon]
-
-        # handle special cases
-        for boss in range(12):
-            for weapon in range(1, 9):
-                if (0 < world.weapon_damage[weapon][boss] < minimum_weakness_requirement[weapon] and
-                        not any(world.weapon_damage[i][boss] >= minimum_weakness_requirement[i]
-                                for i in range(1, 9) if i != weapon)):
-                    world.weapon_damage[weapon][boss] = minimum_weakness_requirement[weapon]
-
-        if world.weapon_damage[0][world.options.starting_robot_master.value] < 1:
-            world.weapon_damage[0][world.options.starting_robot_master.value] = 1
-
-        # weakness validation, it is better to confirm a completable seed than respect plando
-        boss_health = {boss: 0x1C for boss in range(8)}
-
-        weapon_energy = {key: float(0x1C) for key in weapon_costs}
-        weapon_boss = {boss: {weapon: world.weapon_damage[weapon][boss] for weapon in world.weapon_damage}
-                       for boss in range(8)}
-        flexibility = {
-            boss: (
-                    sum(damage_value > 0 for damage_value in
-                        weapon_damages.values())  # Amount of weapons that hit this boss
-                    * sum(weapon_damages.values())  # Overall damage that those weapons do
-            )
-            for boss, weapon_damages in weapon_boss.items()
-        }
-        boss_flexibility = sorted(flexibility, key=flexibility.get)  # Fast way to sort dict by value
-        used_weapons: dict[int, set[int]] = {i: set() for i in range(8)}
-        for boss in boss_flexibility:
-            boss_damage = weapon_boss[boss]
-            weapon_weight = {weapon: (weapon_energy[weapon] / damage) if damage else 0 for weapon, damage in
-                             boss_damage.items() if weapon_energy[weapon] > 0 and weapon != 0}
-            while boss_health[boss] > 0:
-                if boss_damage[0] > 0:
-                    boss_health[boss] = 0  # if we can buster, we should buster
-                    continue
-                if not weapon_weight:
-                    # no choice, we have to apply a buster weakness to any remaining bosses
-                    for boss, health in boss_health.items():
-                        if health > 0:
-                            world.weapon_damage[0][boss] = 1
-                    break
-                highest, wp = max(zip(weapon_weight.values(), weapon_weight.keys()))
-                uses = weapon_energy[wp] // weapon_costs[wp]
-                if int(uses * boss_damage[wp]) >= boss_health[boss]:
-                    used = ceil(boss_health[boss] / boss_damage[wp])
-                    weapon_energy[wp] -= weapon_costs[wp] * used
-                    boss_health[boss] = 0
-                    used_weapons[boss].add(wp)
-                elif highest <= 0:
-                    # we are out of weapons that can actually damage the boss
-                    # so find the weapon that has the most uses, and apply that as an additional weakness
-                    max_uses, wp = max((weapon_energy[weapon] // weapon_costs[weapon], weapon)
-                                       for weapon in weapon_weight
-                                       if weapon != 0)
-                    world.weapon_damage[wp][boss] = minimum_weakness_requirement[wp]
-                    used = min(int(weapon_energy[wp] // weapon_costs[wp]),
-                               ceil(boss_health[boss] / minimum_weakness_requirement[wp]))
-                    weapon_energy[wp] -= weapon_costs[wp] * used
-                    boss_health[boss] -= int(used * minimum_weakness_requirement[wp])
-                    weapon_weight.pop(wp)
-                    used_weapons[boss].add(wp)
-                    if not weapon_weight:
-                        # DANGER: we are out of weapons!!
-                        if not all(health <= 0 for health in boss_health.values()):
-                            # this boss still has HP, add 1 to the damage for this boss until it dies
-                            # if there's still another boss remaining, we've entered a catastrophic failure state
-                            while boss_health[boss] > 0:
-                                world.weapon_damage[wp][boss] += 1
-                                boss_health[boss] -= int(used)
-                        # if the boss doesn't have HP, it'll harmlessly break out of the while
-                else:
-                    # drain the weapon and continue
-                    boss_health[boss] -= int(uses * boss_damage[wp])
-                    weapon_energy[wp] -= weapon_costs[wp] * uses
-                    weapon_weight.pop(wp)
-                    used_weapons[boss].add(wp)
-
-            world.wily_3_weapons = {boss: sorted(weapons) for boss, weapons in used_weapons.items()}
+        # Wily 4
+        world.wily_4_weapons = wily_validate(world, [10, 11])
 
     location_rules: dict[str, Rule] = {}
 
@@ -317,29 +219,25 @@ def set_rules(world: "MM11World") -> None:
         get_boss_locations("Wily Stage 2"),
         get_boss_locations("Wily Stage 4")
     ]):
-        if world.weapon_damage[0][i] > 0:
+        if i == 10:
+            weapons = []
+            for weps in world.wily_4_weapons.values():
+                weapons.append(weps)
+        else:
+            weapons = world.bosses[i].get_vulnerabilities()
+        if 0 in weapons:
             continue  # this can always be in logic
-        weapons = []
-        for weapon in range(1, 9):
-            if world.weapon_damage[weapon][i] > 0:
-                if world.weapon_damage[weapon][i] < minimum_weakness_requirement[weapon]:
-                    continue
-                weapons.append(weapons_to_name[weapon])
-            if i == 10:
-                if world.weapon_damage[weapon][i+1] > 0:
-                    if world.weapon_damage[weapon][i+1] < minimum_weakness_requirement[weapon]:
-                        continue
-                    weapons.append(weapons_to_name[weapon])
         if not weapons:
-            raise Exception(f"Attempted to have boss {i} with no weakness! Seed: {world.multiworld.seed}")
+            raise Exception(f"Attempted to have {world.bosses[i].name} with no weakness! Seed: {world.multiworld.seed}")
         for location in boss_locations:
             static_rule = STATIC_LOCATION_RULES.get(location, True_())
-            if i == 10:
-                # multi-phase fight, get all potential weaknesses
-                # we should probably do this smarter, but this works for now
-                location_rules[location] = static_rule & HasAll(*weapons)
-            else:
-                location_rules[location] = static_rule & HasAny(*weapons)
+            for weapon_group in weapons:
+                if i == 10:
+                    # multi-phase fight, get used weapons for each phase
+                    static_rule &= HasAll(*weapon_group)
+                else:
+                    static_rule |= HasAll(*weapon_group)
+            location_rules[location] = static_rule
 
     for location in STATIC_LOCATION_RULES:
         if location not in location_rules:
