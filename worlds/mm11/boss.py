@@ -1,11 +1,11 @@
 import math
 from dataclasses import dataclass
-from enum import IntEnum, StrEnum
+from enum import IntEnum
 from typing import TYPE_CHECKING
 from . import names
-from .options import RandomWeaknesses, StrictWeaknesses
 if TYPE_CHECKING:
     from . import MM11World
+
 
 class DamageType(IntEnum):
     BusterLv0 = 0
@@ -239,7 +239,7 @@ class Boss:
                 vulnerabilities.append(damage_type_to_weapons[d_type])
         return vulnerabilities
 
-    def get_weaknesses(self, damage: dict[DamageType, int] | None) -> list[DamageType]:
+    def get_weaknesses(self, damage: dict[DamageType, int] | None = None) -> list[DamageType]:
         if not damage:
             damage = self.damage
         weaknesses = []
@@ -249,16 +249,17 @@ class Boss:
         return weaknesses
 
     def generate_weakness(self, world: "MM11World", shuffle_remap: dict[DamageType, DamageType]) -> None:
+        from .options import RandomWeaknesses, StrictWeaknesses
         new_weaknesses = self.damage.copy()
 
         # first handle random
         if world.options.random_weakness:
             if world.options.random_weakness == RandomWeaknesses.option_shuffled:
-                for old, new in shuffle_remap.values():
+                for old, new in shuffle_remap.items():
                     new_weaknesses[new] = self.damage[old]
             else:
                 for d_type in self.damage:
-                    new_weaknesses[d_type] = min(20, max(0, int(world.random.normalvariate(6, 6))))
+                    new_weaknesses[d_type] = min(20, max(0, int(world.random.normalvariate(5, 4))))
             if not self.get_weaknesses(new_weaknesses):
                 # need to guarantee at least one weakness
                 new_weaknesses[world.random.choice(standard_damage_types)] = world.random.randint(8, 20)
@@ -293,12 +294,15 @@ class Boss:
         # Special cases
         if self.name == "Bounce Man":
             # Because he's made of rubber, thunder bursts don't spawn
-            self.damage[DamageType.ThunderBurst] = 0
-            self.damage[DamageType.PowerThunderBurst] = 0
+            new_weaknesses[DamageType.ThunderBurst] = 0
+            new_weaknesses[DamageType.PowerThunderBurst] = 0
 
         # Starting RBM
         if boss_names[self.name] == world.options.starting_robot_master.value:
-            self.damage[DamageType.BusterLv0] = 2  # Maybe consider 1, but that's evil lmao
+            new_weaknesses[DamageType.BusterLv0] = 2  # Maybe consider 1, but that's evil lmao
+
+        # finally apply
+        self.damage = new_weaknesses
 
 
 bosses: dict[int, Boss] = {

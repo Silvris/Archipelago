@@ -8,7 +8,7 @@ from ..rules import bosses
 # Need to figure out how this test should work
 def validate_wily(base: MM11TestBase, boss_list: list[int]) -> None:
     # Wily validation
-    weapon_energy = {idx: 56 for idx in boss_list}
+    weapon_energy = {idx: 56 for idx in range(1, 9)}
     wily_flexibility: list[tuple[int, float]] = sorted({idx: base.world.bosses[idx].get_flexibility()
                                                           for idx in boss_list}.items(), key=lambda x: x[1])
     wily_weapons = {}

@@ -1,6 +1,5 @@
 from dataclasses import dataclass
-from math import ceil
-from typing import TYPE_CHECKING, Sequence
+from typing import TYPE_CHECKING
 from typing_extensions import override
 from BaseClasses import CollectionState
 from NetUtils import JSONMessagePart
@@ -8,24 +7,10 @@ from . import names
 from .boss import bosses, damage_type_to_weapons, weapon_to_main_damage, DamageType
 from .locations import get_boss_locations, mm11_regions
 from .options import SpeedPlatforming
-from rule_builder.rules import CanReachLocation, HasAll, HasAny, Has, AtLeast, Rule, True_, OptionFilter
+from rule_builder.rules import CanReachLocation, HasAll, HasAny, Has, AtLeast, Rule, True_, OptionFilter, And
 
 if TYPE_CHECKING:
     from . import MM11World
-
-# this will need rewritten entirely, but use this so I can test connection before rewriting the logic
-# numbers will assume no power gear for now
-weapon_damage: dict[int, list[int]] = {
-    0: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, ],  # Mega Buster
-    1: [1, 5, 2, 2, 2, 2, 2, 1, 1, 1, 1, 1, ],  # Block Dropper
-    2: [1, 1, 4, 1, 1, 1, 1, 1, 1, 1, 5, 3, ],  # Acid Barrier
-    3: [2, 2, 1, 4, 2, 2, 2, 2, 2, 3, 2, 2, ],  # Pile Driver
-    4: [1, 1, 1, 1, 4, 1, 1, 1, 1, 3, 1, 1, ],  # Bounce Ball
-    5: [1, 1, 1, 1, 1, 4, 1, 1, 1, 1, 1, 3, ],  # Scramble Thunder
-    6: [4, 4, 4, 4, 1, 1, 6, 4, 1, 1, 1, 1, ],  # Tundra Storm
-    7: [2, 2, 2, 2, 2, 2, 1, 6, 1, 1, 1, 1, ],  # Blazing Torch
-    8: [4, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, ],  # Chain Blast
-}
 
 weapons_to_name: dict[int, str] = {
     1: names.block_dropper,
@@ -36,6 +21,8 @@ weapons_to_name: dict[int, str] = {
     6: names.tundra_storm,
     7: names.blazing_torch,
     8: names.chain_blast,
+    9: names.charge_buster,
+    10: names.power_gear
 }
 
 robot_masters: dict[int, str] = {
@@ -49,18 +36,6 @@ robot_masters: dict[int, str] = {
     7: "Blast Man Defeated"
 }
 
-weapon_costs = {
-    0: 0,
-    1: 2,
-    2: 4,
-    3: 3,
-    4: 1,
-    5: 2,
-    6: 4,
-    7: 2,
-    8: 1,
-}
-
 
 @dataclass
 class CanDefeatEnoughRBMs(Rule["MM11World"], game="Mega Man 11"):
@@ -68,7 +43,7 @@ class CanDefeatEnoughRBMs(Rule["MM11World"], game="Mega Man 11"):
     def _instantiate(self, world: "MM11World") -> Rule.Resolved:
         return self.Resolved(tuple([(key, tuple(val)) for key, val in sorted(world.wily_3_weapons.items())]),
                              world.options.wily_3_requirement.value,
-                             player=world.player, caching_enabled=False)
+                             player=world.player, caching_enabled=getattr(world, "caching_enabled", False))
 
     class Resolved(Rule.Resolved):
         boss_requirements: tuple[tuple[int, tuple[int, ...]], ...]
@@ -121,6 +96,22 @@ GearlessPlatforming = HasSpeed | OptionFilter(SpeedPlatforming, value=False)
 STATIC_LOCATION_RULES: dict[str, Rule] = {
     names.block_man: GearlessPlatforming,
     names.get_block_dropper: GearlessPlatforming,
+    names.light_gift_1: AtLeast(2, CanReachLocation(names.block_man), CanReachLocation(names.acid_man),
+                                CanReachLocation(names.impact_man), CanReachLocation(names.bounce_man),
+                                CanReachLocation(names.fuse_man), CanReachLocation(names.tundra_man),
+                                CanReachLocation(names.torch_man), CanReachLocation(names.blast_man)),
+    names.get_rush_jet: AtLeast(4, CanReachLocation(names.block_man), CanReachLocation(names.acid_man),
+                                CanReachLocation(names.impact_man), CanReachLocation(names.bounce_man),
+                                CanReachLocation(names.fuse_man), CanReachLocation(names.tundra_man),
+                                CanReachLocation(names.torch_man), CanReachLocation(names.blast_man)),
+    names.light_gift_2: AtLeast(6, CanReachLocation(names.block_man), CanReachLocation(names.acid_man),
+                                CanReachLocation(names.impact_man), CanReachLocation(names.bounce_man),
+                                CanReachLocation(names.fuse_man), CanReachLocation(names.tundra_man),
+                                CanReachLocation(names.torch_man), CanReachLocation(names.blast_man)),
+    names.light_gift_3: And(CanReachLocation(names.block_man), CanReachLocation(names.acid_man),
+                            CanReachLocation(names.impact_man), CanReachLocation(names.bounce_man),
+                            CanReachLocation(names.fuse_man), CanReachLocation(names.tundra_man),
+                            CanReachLocation(names.torch_man), CanReachLocation(names.blast_man)),
     names.wily_2_boss: GearlessPlatforming,
 }
 
@@ -158,10 +149,10 @@ STATIC_ENERGY_RULES: dict[str, Rule] = {
 
 def wily_validate(world: "MM11World", boss_list: list[int]) -> dict[int, list[int]]:
     # Wily validation
-    weapon_energy = {idx: 56 for idx in boss_list}
+    weapon_energy = {idx: 56 for idx in range(1, 9)}
     wily_flexibility: list[tuple[int, float]] = sorted({idx: world.bosses[idx].get_flexibility()
                                                           for idx in boss_list}.items(), key=lambda x: x[1])
-    wily_weapons = {}
+    wily_weapons = {boss: [] for boss in boss_list}
     while wily_flexibility:
         idx, _ = wily_flexibility.pop(0)
         defeated, used = world.bosses[idx].can_defeat(weapon_energy)
@@ -234,9 +225,9 @@ def set_rules(world: "MM11World") -> None:
             for weapon_group in weapons:
                 if i == 10:
                     # multi-phase fight, get used weapons for each phase
-                    static_rule &= HasAll(*weapon_group)
+                    static_rule &= HasAll(*[weapons_to_name[x] for x in weapon_group])
                 else:
-                    static_rule |= HasAll(*weapon_group)
+                    static_rule |= HasAll(*[weapons_to_name[x] for x in weapon_group])
             location_rules[location] = static_rule
 
     for location in STATIC_LOCATION_RULES:

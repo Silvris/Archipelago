@@ -282,6 +282,10 @@ mm11_regions: dict[str, RegionData] = {
         names.shop_mystery: LocationData(0x002F),
         names.shop_buddy_plus: LocationData(0x0030),
         names.shop_tank_container: LocationData(0x0031),
+        names.light_gift_1: LocationData(0x0032),
+        names.get_rush_jet: LocationData(0x0033),
+        names.light_gift_2: LocationData(0x0034),
+        names.light_gift_3: LocationData(0x0035),
     }, [], [])
 }
 

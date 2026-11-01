@@ -86,7 +86,12 @@ get_scramble_thunder = "Scramble Thunder - Received"
 get_tundra_storm = "Tundra Storm - Received"
 get_blazing_torch = "Blazing Torch - Received"
 get_chain_blast = "Chain Blast - Received"
+
+# RBM Defeated gifts
+light_gift_1 = "Gift from Dr. Light - 1"
 get_rush_jet = "Rush Jet - Received"
+light_gift_2 = "Gift from Dr. Light - 2"
+light_gift_3 = "Gift from Dr. Light - 3"
 
 # Auto's Shop
 shop_energy_balancer = "Auto's Shop - Energy Balancer"
