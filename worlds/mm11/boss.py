@@ -189,21 +189,22 @@ class Boss:
         return Boss(self.name, {d_type: damage for d_type, damage in self.damage.items()},
                     default_health=self.default_health)
 
-    def can_defeat(self, weapon_energy: dict[int, int]) -> tuple[bool, dict[int, int]]:
+    def can_defeat(self, weapon_energy: dict[int, int]) -> tuple[bool, dict[DamageType, int]]:
         used = {}
         # first, if buster is possible we should use that
         # this includes the Charge Buster and Power Shot, but not final buster
         if self.damage[DamageType.BusterLv0] > 0:
+            used[DamageType.BusterLv0] = 1
             return True, used
 
         if self.damage[DamageType.BusterLv1] > 0 or self.damage[DamageType.BusterLv2] > 0:
             for weapon in damage_type_to_weapons[DamageType.BusterLv1]:
-                used[weapon] = 1
+                used[DamageType.BusterLv1] = 1
             return True, used
 
         if self.damage[DamageType.PowerShot1] > 0 or self.damage[DamageType.PowerShot2] > 0:
             for weapon in damage_type_to_weapons[DamageType.PowerShot1]:
-                used[weapon] = 1
+                used[DamageType.BusterLv1] = 1
             return True, used
 
         health = self.default_health
@@ -212,17 +213,22 @@ class Boss:
                                     for d_type in [*standard_damage_types, *power_damage_types]}.items(),
                                    key=lambda t: t[1], reverse=True)
         while damage_efficiency:
-            d_type, _ = damage_efficiency.pop()
+            d_type, eff = damage_efficiency.pop(0)
+            if eff == 0:
+                # out of weapons that can damage, break the while
+                break
             main_weapon = -1
             for weapon in damage_type_to_weapons[d_type]:
                 if weapon < 9:
                     main_weapon = weapon
 
-            uses = weapon_energy[main_weapon] // cost_per_damage_type[d_type]
-            if uses:
-                health -= (uses * self.damage[d_type])
-                for weapon in damage_type_to_weapons[d_type]:
-                    used[weapon] = uses
+            # MM11 grants you 1 final shot that drains the rest of your remaining energy if you're below the req amount
+            # so we can use ceiling to mimic that
+            uses = math.ceil(weapon_energy[main_weapon] / cost_per_damage_type[d_type])
+            if uses > 0:
+                needed_uses = math.ceil(health / self.damage[d_type])
+                health -= (min(needed_uses, uses) * self.damage[d_type])
+                used[d_type] = uses
                 if health <= 0:
                     return True, used
 
@@ -233,9 +239,14 @@ class Boss:
 
     def get_vulnerabilities(self) -> list[list[int]]:
         vulnerabilities = []
-        for d_type in [*standard_damage_types, *power_damage_types]:
-            uses_max = math.ceil(56 / cost_per_damage_type[d_type])
-            if uses_max * self.damage[d_type] >= 56:
+        for d_type in [DamageType.BusterLv0, DamageType.BusterLv1, DamageType.BusterLv2, DamageType.PowerShot1,
+                       DamageType.PowerShot2, *standard_damage_types, *power_damage_types]:
+            if cost_per_damage_type[d_type] > 0:
+                uses_max = math.ceil(56 / cost_per_damage_type[d_type])
+                if uses_max * self.damage[d_type] >= 56:
+                    vulnerabilities.append(damage_type_to_weapons[d_type])
+            else:
+                # This weapon is free, always add
                 vulnerabilities.append(damage_type_to_weapons[d_type])
         return vulnerabilities
 

@@ -4,7 +4,7 @@ from typing_extensions import override
 from BaseClasses import CollectionState
 from NetUtils import JSONMessagePart
 from . import names
-from .boss import bosses, damage_type_to_weapons, weapon_to_main_damage, DamageType
+from .boss import bosses, damage_type_to_weapons, weapon_to_main_damage, DamageType, cost_per_damage_type
 from .locations import get_boss_locations, mm11_regions
 from .options import SpeedPlatforming
 from rule_builder.rules import CanReachLocation, HasAll, HasAny, Has, AtLeast, Rule, True_, OptionFilter, And
@@ -79,7 +79,12 @@ class CanDefeatEnoughRBMs(Rule["MM11World"], game="Mega Man 11"):
             can_defeat = 0
             for boss, reqs in self.boss_requirements:
                 if boss in robot_masters:
-                    if state.has_all(map(lambda x: weapons_to_name[x], reqs), self.player):
+                    boss_weapons = []
+                    for req in reqs:
+                        boss_weapons.extend(damage_type_to_weapons[req])
+                    if 0 in boss_weapons:
+                        return True
+                    if state.has_all(map(lambda x: weapons_to_name[x], boss_weapons), self.player):
                         can_defeat += 1
                         if can_defeat >= self.required:
                             return True
@@ -147,7 +152,7 @@ STATIC_ENERGY_RULES: dict[str, Rule] = {
 }
 
 
-def wily_validate(world: "MM11World", boss_list: list[int]) -> dict[int, list[int]]:
+def wily_validate(world: "MM11World", boss_list: list[int]) -> dict[int, list[DamageType]]:
     # Wily validation
     weapon_energy = {idx: 56 for idx in range(1, 9)}
     wily_flexibility: list[tuple[int, float]] = sorted({idx: world.bosses[idx].get_flexibility()
@@ -168,9 +173,15 @@ def wily_validate(world: "MM11World", boss_list: list[int]) -> dict[int, list[in
                     # Buster time
                     world.bosses[idx].damage[DamageType.BusterLv0] = 1
             else:
-                top, uses = max({wep: uses for wep, uses in used.items() if wep in range(1, 9)}, key=lambda x: x[1])
-                world.bosses[idx].damage[weapon_to_main_damage[top]] += 1
-        wily_weapons[idx].extend(x for x in used.keys() if x != 0)
+                top, uses = max(used.items(), key=lambda x: x[1])
+                world.bosses[idx].damage[top] += 1
+        else:
+            for d_type in used:
+                for weapon in damage_type_to_weapons[d_type]:
+                    if weapon in weapon_energy:
+                        # don't have consider buster/gear energy
+                        weapon_energy[weapon] -= (used[d_type] * cost_per_damage_type[d_type])
+            wily_weapons[idx].extend(x for x in used.keys())
     return wily_weapons
 
 
@@ -212,11 +223,12 @@ def set_rules(world: "MM11World") -> None:
     ]):
         if i == 10:
             weapons = []
-            for weps in world.wily_4_weapons.values():
-                weapons.append(weps)
+            for phase in world.wily_4_weapons.values():
+                for d_type in phase:
+                    weapons.append(damage_type_to_weapons[d_type])
         else:
             weapons = world.bosses[i].get_vulnerabilities()
-        if 0 in weapons:
+        if any(0 in weapon_group for weapon_group in weapons):
             continue  # this can always be in logic
         if not weapons:
             raise Exception(f"Attempted to have {world.bosses[i].name} with no weakness! Seed: {world.multiworld.seed}")

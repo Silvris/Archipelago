@@ -20,7 +20,7 @@ import base64
 logger = logging.getLogger("Mega Man 11")
 
 if TYPE_CHECKING:
-    from .boss import Boss
+    from .boss import Boss, DamageType
 
 
 class MM11WebWorld(WebWorld):
@@ -54,12 +54,13 @@ class MM11World(World):
     rom_name: bytearray
 
     def __init__(self, multiworld: MultiWorld, player: int):
+        print(multiworld.seed)
         self.rom_name = bytearray()
         self.rom_name_available_event = threading.Event()
         super().__init__(multiworld, player)
         self.bosses: dict[int, "Boss"] = bosses.copy()
-        self.wily_3_weapons: dict[int, list[int]] = {}
-        self.wily_4_weapons: dict[int, list[int]] = {}
+        self.wily_3_weapons: dict[int, list[DamageType]] = {}
+        self.wily_4_weapons: dict[int, list[DamageType]] = {}
 
     def create_regions(self) -> None:
         menu = MM11Region("Menu", self.player, self.multiworld)
