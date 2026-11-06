@@ -14,7 +14,7 @@ from kivy.uix.anchorlayout import AnchorLayout
 from kivymd.uix.button import MDButton, MDButtonText, MDIconButton
 from kivymd.uix.card import MDCard
 from kivymd.uix.label import MDLabel
-from kivy.uix.rst import RstDocument, RstImage
+from kivy.uix.rst import RstDocument, RstImage, RstLiteralBlock
 from kivy.clock import Clock
 from kivy.core.window import Window
 from kivy.metrics import dp
@@ -78,6 +78,7 @@ class DocumentView(MDScreen):
             "paragraph": get_hex_from_color(self.theme_cls.onSurfaceColor)[1:],
             "title": get_hex_from_color(self.theme_cls.onSurfaceColor)[1:],
             "bullet": get_hex_from_color(self.theme_cls.onSurfaceColor)[1:],
+            "code": get_hex_from_color(self.theme_cls.surfaceContainerLowColor)[1:],
         }
 
     def load_document(self, document: str, docs_path: str):
@@ -106,16 +107,10 @@ class DocumentView(MDScreen):
                         child.add_widget(new)
                         original.unbind()
 
-
-
-
         doc._load_from_text = doc_load
         doc._trigger_load = Clock.create_trigger(doc._load_from_text, -1)
         doc.colors = self.get_colors()
         doc.render()
-
-
-
         self.scroll.layout.add_widget(doc)
 
 

@@ -1,3 +1,4 @@
+#:import parse_color kivy.parser.parse_color
 <WorldButton>:
     theme_width: "Custom"
     width: "145dp"
@@ -8,6 +9,30 @@
         text: self.parent.name
         adaptive_size: False
         adaptive_height: True
+
+<-RstLiteralBlock>:
+    cols: 1
+    content: content
+    size_hint_y: None
+    height: content.texture_size[1] + dp(20)
+    canvas:
+        Color:
+            rgb: parse_color(app.doc_view.get_colors()["bullet"])
+        Rectangle:
+            pos: self.x - 1, self.y - 1
+            size: self.width + 2, self.height + 2
+        Color:
+            rgb: parse_color(app.doc_view.get_colors()["code"])
+        Rectangle:
+            pos: self.pos
+            size: self.size
+    Label:
+        id: content
+        markup: True
+        valign: 'top'
+        text_size: self.width - 20, None
+        font_name: 'data/fonts/RobotoMono-Regular.ttf'
+        color: (0, 0, 0, 1)
 
 <DocumentVisual>:
     id: main
