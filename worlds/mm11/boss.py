@@ -246,8 +246,9 @@ class Boss:
                 if uses_max * self.damage[d_type] >= 56:
                     vulnerabilities.append(damage_type_to_weapons[d_type])
             else:
-                # This weapon is free, always add
-                vulnerabilities.append(damage_type_to_weapons[d_type])
+                # This weapon is free, always add if it does damage
+                if self.damage[d_type] > 0:
+                    vulnerabilities.append(damage_type_to_weapons[d_type])
         return vulnerabilities
 
     def get_weaknesses(self, damage: dict[DamageType, int] | None = None) -> list[DamageType]:
