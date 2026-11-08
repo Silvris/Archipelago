@@ -256,7 +256,8 @@ class Boss:
             damage = self.damage
         weaknesses = []
         for d_type in [*standard_damage_types, *power_damage_types]:
-            if damage[d_type] >= min(8, math.ceil(56 / cost_per_damage_type[d_type])):
+            # the math here ends up being symmetric, the lowest amount of damage needs a 1:1 ratio with cost
+            if damage[d_type] >= max(8, math.ceil(cost_per_damage_type[d_type])):
                 weaknesses.append(d_type)
         return weaknesses
 
@@ -274,7 +275,8 @@ class Boss:
                     new_weaknesses[d_type] = min(20, max(0, int(world.random.normalvariate(5, 4))))
             if not self.get_weaknesses(new_weaknesses):
                 # need to guarantee at least one weakness
-                new_weaknesses[world.random.choice(standard_damage_types)] = world.random.randint(8, 20)
+                weakness = world.random.choice(standard_damage_types)
+                new_weaknesses[weakness] = world.random.randint(max(8, math.ceil(cost_per_damage_type[weakness])), 20)
 
         # now we can handle strict
         if world.options.strict_weakness:
@@ -300,8 +302,8 @@ class Boss:
                 new_weaknesses[d_type] = damage
                 if not self.get_weaknesses(new_weaknesses):
                     # need to roll a new weakness
-                    new_weaknesses[world.random.choice([dt for dt in standard_damage_types if dt != d_type])] =\
-                        world.random.randint(8, 20)
+                    weakness = world.random.choice([dt for dt in standard_damage_types if dt != d_type])
+                    new_weaknesses[weakness] = world.random.randint(max(8, math.ceil(cost_per_damage_type[weakness])), 20)
 
         # Special cases
         if self.name == "Bounce Man":

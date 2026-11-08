@@ -7,7 +7,7 @@ from . import names
 from .boss import bosses, damage_type_to_weapons, weapon_to_main_damage, DamageType, cost_per_damage_type
 from .locations import get_boss_locations, mm11_regions
 from .options import SpeedPlatforming
-from rule_builder.rules import CanReachLocation, HasAll, HasAny, Has, AtLeast, Rule, True_, OptionFilter, And
+from rule_builder.rules import CanReachLocation, HasAll, HasAny, Has, AtLeast, Rule, True_, False_, OptionFilter, And
 
 if TYPE_CHECKING:
     from . import MM11World
@@ -96,7 +96,7 @@ HasRushCoil = Has(names.rush_coil)
 HasRushJet = Has(names.rush_jet)
 HasVertical = HasRushJet | HasRushCoil
 HasSpeed = Has(names.speed_gear)
-GearlessPlatforming = HasSpeed | OptionFilter(SpeedPlatforming, value=False)
+GearlessPlatforming = HasSpeed | OptionFilter(SpeedPlatforming, value=True)
 
 STATIC_LOCATION_RULES: dict[str, Rule] = {
     names.block_man: GearlessPlatforming,
@@ -250,13 +250,16 @@ def set_rules(world: "MM11World") -> None:
             raise Exception(f"Attempted to have {world.bosses[i].name} with no weakness! Seed: {world.multiworld.seed}")
         for location in boss_locations:
             static_rule = STATIC_LOCATION_RULES.get(location, True_())
+            weapon_rule = False_()
+            if i == 10:
+                weapon_rule = True_()
             for weapon_group in weapons:
                 if i == 10:
                     # multi-phase fight, get used weapons for each phase
-                    static_rule &= HasAll(*[weapons_to_name[x] for x in weapon_group])
+                    weapon_rule &= HasAll(*[weapons_to_name[x] for x in weapon_group])
                 else:
-                    static_rule |= HasAll(*[weapons_to_name[x] for x in weapon_group])
-            location_rules[location] = static_rule
+                    weapon_rule |= HasAll(*[weapons_to_name[x] for x in weapon_group])
+            location_rules[location] = static_rule & weapon_rule
 
     for location in STATIC_LOCATION_RULES:
         if location not in location_rules:
