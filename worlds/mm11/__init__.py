@@ -62,6 +62,22 @@ class MM11World(World):
         self.wily_3_weapons: dict[int, list[DamageType]] = {}
         self.wily_4_weapons: dict[int, list[DamageType]] = {}
 
+    def generate_early(self) -> None:
+        if (not self.options.speed_platforming
+            and self.options.starting_robot_master.current_key in ("block_man", "torch_man")):
+            if self.options.consumables and self.options.starting_robot_master == "block_man":
+                # Only the end of Block Man needs the gear, we can allow it if there are locations in there
+                # Torch wants it early though
+                return
+            robot_master_pool = [1, 2, 3, 4, 5, 7, ]
+            if self.options.consumables:
+                robot_master_pool.append(0)
+            self.options.starting_robot_master.value = self.random.choice(robot_master_pool)
+            logger.warning(
+                f"Mega Man 11 ({self.player_name}): "
+                f"Incompatible starting Robot Master, changing to "
+                f"{self.options.starting_robot_master.current_key.replace('_', ' ').title()}")
+
     def create_regions(self) -> None:
         menu = MM11Region("Menu", self.player, self.multiworld)
         self.multiworld.regions.append(menu)
