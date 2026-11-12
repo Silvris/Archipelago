@@ -150,7 +150,7 @@ STATIC_1UP_RULES: dict[str, Rule] = {
     names.torch_man_c15: HasPile | HasRushJet,
     names.blast_man_c3: HasRushJet,
     names.blast_man_c8: HasRushJet | Has(names.blazing_torch),
-    names.blast_man_c18: HasRushJet,
+    names.blast_man_c20: HasRushJet,
     names.wily_1_c5: HasRushCoil,
 }
 
@@ -159,6 +159,7 @@ STATIC_ENERGY_RULES: dict[str, Rule] = {
     names.impact_man_c2: HasPile | HasRushJet,  # not really but it's like the Metal Man E-Tank
     names.tundra_man_c10: HasPile | HasVertical,
     names.torch_man_c20: HasVertical,
+    names.blast_man_c21: HasVertical,
     names.wily_1_c4: HasRushJet,
     names.wily_1_c6: HasRushJet | (HasSpeed & HasRushCoil),
     names.wily_1_c7: HasRushJet | (HasSpeed & HasRushCoil),
@@ -206,7 +207,7 @@ def set_rules(world: "MM11World") -> None:
     # most rules are set on region, so we only worry about rules required within stage access
     # or rules variable on settings
     if hasattr(world.multiworld, "re_gen_passthrough"):
-        slot_data = getattr(world.multiworld, "re_gen_passthrough")["Mega Man 11"]
+        pass  # we set all of this in gen_early
     else:
         world.bosses = bosses.copy()
         shuffle_remap = {}

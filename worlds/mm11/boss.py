@@ -251,7 +251,7 @@ class Boss:
                     vulnerabilities.append(damage_type_to_weapons[d_type])
         return vulnerabilities
 
-    def get_weaknesses(self, damage: dict[DamageType, int] | None = None) -> list[DamageType]:
+    def get_weaknesses(self, damage: dict[DamageType, int] | None = None, include_buster: bool = False) -> list[DamageType]:
         if not damage:
             damage = self.damage
         weaknesses = []
@@ -259,6 +259,11 @@ class Boss:
             # the math here ends up being symmetric, the lowest amount of damage needs a 1:1 ratio with cost
             if damage[d_type] >= max(8, math.ceil(cost_per_damage_type[d_type])):
                 weaknesses.append(d_type)
+        if include_buster:
+            for d_type in [DamageType.BusterLv0, DamageType.BusterLv1, DamageType.BusterLv2,
+                           DamageType.PowerShot1, DamageType.PowerShot2,]:
+                if damage[d_type] >= 0:
+                    weaknesses.append(d_type)
         return weaknesses
 
     def generate_weakness(self, world: "MM11World", shuffle_remap: dict[DamageType, DamageType]) -> None:
@@ -317,6 +322,11 @@ class Boss:
 
         # finally apply
         self.damage = new_weaknesses
+
+    def set_damage(self, damage: dict[int, int]):
+        # Internal, used for UT
+        for damage_type, damage_val in damage.items():
+            self.damage[DamageType(damage_type)] = damage_val
 
 
 bosses: dict[int, Boss] = {
