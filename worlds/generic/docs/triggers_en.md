@@ -8,9 +8,8 @@ about 5 minutes to read.
 
 Triggers allow you to customize your game options by allowing you to define one or many options which only occur under
 specific conditions. These are essentially "if, then" statements for options in your game. A good example of what you
-can do with triggers is the [custom mercenary mode YAML
-](https://github.com/alwaysintreble/Archipelago-yaml-dump/blob/main/Snippets/Mercenary%20Mode%20Snippet.yaml) that was
-created using entirely triggers and plando.
+can do with triggers is the [custom mercenary mode YAML](https://github.com/alwaysintreble/Archipelago-yaml-dump/blob/main/Snippets/Mercenary%20Mode%20Snippet.yaml)
+that was created using entirely triggers and plando.
 
 For more information on plando, you can reference the [general plando guide](/tutorial/Archipelago/plando/en) or the
 [A Link to the Past plando guide](/tutorial/A%20Link%20to%20the%20Past/plando/en).

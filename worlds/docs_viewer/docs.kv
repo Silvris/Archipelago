@@ -34,6 +34,12 @@
         font_name: 'data/fonts/RobotoMono-Regular.ttf'
         color: (0, 0, 0, 1)
 
+<RstTitle>:
+    text_have_anchor: True
+
+<RstParagraph>:
+    on_ref_press: app.doc_view.handle_click(*args)
+
 <DocumentVisual>:
     id: main
     style: "filled"
@@ -85,18 +91,16 @@
         id: scroll
 
 <DocumentView>:
-    scroll: scroll
+    box: box
     back: back
-    BoxLayout:
+    MDBoxLayout:
+        id: box
         orientation: "vertical"
         size_hint: 1, 1
         MDIconButton:
             id: back
             icon: "arrow-left"
             on_release: app.return_to_world_docs()
-
-        ScrollBox:
-            id: scroll
 
 
 

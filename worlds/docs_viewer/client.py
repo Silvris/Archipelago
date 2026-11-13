@@ -3,18 +3,20 @@ import zipfile
 import os
 from collections import Counter
 from io import BytesIO
+from pathlib import Path
+from re import compile, Pattern
 from typing import Type
 
 from kvui import (ThemedApp, ScrollBox, MainLayout, ContainerLayout, ApAsyncImage, MDScreenManager, MDScreen)
 from kivy.lang.builder import Builder
 from kivy.properties import StringProperty, ObjectProperty
-from kivy.uix.widget import Widget
 from kivymd.app import MDApp
 from kivy.uix.anchorlayout import AnchorLayout
+from kivymd.uix.boxlayout import MDBoxLayout
 from kivymd.uix.button import MDButton, MDButtonText, MDIconButton
 from kivymd.uix.card import MDCard
 from kivymd.uix.label import MDLabel
-from kivy.uix.rst import RstDocument, RstImage, RstLiteralBlock
+from kivy.uix.rst import RstDocument, RstImage, RstParagraph, _Visitor
 from kivy.clock import Clock
 from kivy.core.window import Window
 from kivy.metrics import dp
@@ -25,6 +27,7 @@ from Utils import init_logging
 
 from worlds.AutoWorld import AutoWorldRegister, World, WebWorld
 
+markdown_link_pattern: Pattern = compile(r"\[(.+)]\((.+)\)")
 
 class WorldButton(MDButton):
     name: str = StringProperty("")
@@ -44,8 +47,9 @@ class DocumentVisual(MDCard):
     relative_path: str = StringProperty("")
     button: MDButton = ObjectProperty(None)
     multilang: bool = False
+    game: str = ""
 
-    def __init__(self, name, description, authors, language, relative_path, multilang,  *args, **kwargs):
+    def __init__(self, name, description, authors, language, relative_path, multilang, game, *args, **kwargs):
         self.multilang = multilang
         super().__init__(*args, **kwargs)
         self.name = name
@@ -53,8 +57,8 @@ class DocumentVisual(MDCard):
         self.authors = authors
         self.language = language
         self.relative_path = relative_path
+        self.game = game
         self.button.bind(on_release=self.open_doc)
-
 
     def open_doc(self, button: MDButton):
         MDApp.get_running_app().display_doc(self)
@@ -62,14 +66,15 @@ class DocumentVisual(MDCard):
 
 class DocumentView(MDScreen):
     name = "DocumentView"
-    scroll: ScrollBox = ObjectProperty(None)
+    doc: RstDocument = ObjectProperty(None)
     back: MDIconButton = ObjectProperty(None)
+    box: MDBoxLayout = ObjectProperty(None)
+    game: str = ""
+    links: dict[str, str] = {}
+
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.scroll.layout.spacing = 25
-        self.scroll.layout.padding = (5, 10)
-        self.scroll.layout.size_hint = (1, 1)
 
     def get_colors(self):
         return {
@@ -81,10 +86,32 @@ class DocumentView(MDScreen):
             "code": get_hex_from_color(self.theme_cls.surfaceContainerLowColor)[1:],
         }
 
-    def load_document(self, document: str, docs_path: str):
-        self.scroll.layout.clear_widgets()
+    def handle_click(self, instance: RstParagraph, value: str):
+        if value in self.links:
+            link = self.links[value]
+            print(link)
+            if link.startswith("#"):
+                # this is a section header
+                self.doc.goto(link[1:])
+            elif link.startswith("."):
+                # this is relative to the document in question
+                # this can also be a link to player options, which we check for specifically
+                if "player-options" in link:
+                    if self.game:
+                        print(self.game)
+                else:
+                    doc_root = Path(self.doc.document_root)
+                    print(doc_root.relative_to(link, walk_up=True))
+
+    def load_document(self, document: str, docs_path: str, game: str):
+        if self.doc:
+            self.box.remove_widget(self.doc)
+        self.links.clear()
         convert_rst = create_markdown(renderer=RSTRenderer())
-        doc = RstDocument(text=convert_rst(document))
+        doc = RstDocument(text=convert_rst(document), document_root=docs_path)
+
+        for ref, link in markdown_link_pattern.findall(document):
+            self.links[ref] = link
 
         original_load = RstDocument._load_from_text
 
@@ -107,12 +134,27 @@ class DocumentView(MDScreen):
                         child.add_widget(new)
                         original.unbind()
 
+        original_dispatch = _Visitor.dispatch_visit
+
+        def dispatch_visit_patch(visitor, node):
+            from docutils import nodes
+            cls = node.__class__
+            run_original = True
+            if cls is nodes.section:
+                visitor.text = f"[anchor={node.attributes['ids'][0]}]"
+                visitor.text_have_anchor = True
+            if run_original:
+                original_dispatch(visitor, node)
+
+        _Visitor.dispatch_visit = dispatch_visit_patch
+
         doc._load_from_text = doc_load
         doc._trigger_load = Clock.create_trigger(doc._load_from_text, -1)
         doc.colors = self.get_colors()
         doc.render()
-        self.scroll.layout.add_widget(doc)
-
+        self.doc = doc
+        self.game = game
+        self.box.add_widget(doc)
 
 
 class DocumentSelect(MDScreen):
@@ -150,7 +192,7 @@ class DocumentSelect(MDScreen):
                     self.scroll.layout.add_widget(DocumentVisual(f"{world.game} Info",
                                                                  f"Game info for {world.game} "
                                                                  f"for language {lang.upper()}.","",
-                                                                 lang.upper(), rel_path, True))
+                                                                 lang.upper(), rel_path, True, world.game))
             if hasattr(web, "tutorials"):
                 lang_count = Counter([tutorial.tutorial_name for tutorial in web.tutorials])
                 for tutorial in web.tutorials:
@@ -158,7 +200,8 @@ class DocumentSelect(MDScreen):
                     if path:
                         self.scroll.layout.add_widget(DocumentVisual(tutorial.tutorial_name, tutorial.description,
                                                                      ", ".join(tutorial.authors), tutorial.language,
-                                                                     path, lang_count[tutorial.tutorial_name] > 1))
+                                                                     path, lang_count[tutorial.tutorial_name] > 1,
+                                                                     world.game))
 
         if len(self.scroll.layout.children) == 0:
             self.scroll.layout.add_widget(MDLabel(text="No documents could be found for this game."))
@@ -195,7 +238,7 @@ class DocsViewer(ThemedApp):
         self.screen_manager.current = self.doc_view.name
         doc_path = f"ap:{world.__module__}/docs/"
         self.doc_view.load_document(pkgutil.get_data(world.__module__, visual.relative_path).decode("utf-8"),
-                                    doc_path)
+                                    doc_path, visual.game)
 
 
     def build(self):
