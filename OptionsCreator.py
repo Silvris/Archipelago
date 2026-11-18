@@ -4,12 +4,13 @@ if __name__ == "__main__":
     ModuleUpdate.update()
 
 
-from kvui import (ThemedApp, ScrollBox, MainLayout, ContainerLayout, dp, Widget, MDBoxLayout, TooltipLabel, MDLabel,
+from kvui import (ThemedApp, ScrollBox, MainLayout, ContainerLayout, TooltipLabel, MDLabel,
                   ToggleButton, MarkupDropdown, ResizableTextField)
 from kivy.clock import Clock
 from kivy.uix.behaviors.button import ButtonBehavior
 from kivymd.uix.behaviors import RotateBehavior
 from kivymd.uix.anchorlayout import MDAnchorLayout
+from kivymd.uix.boxlayout import MDBoxLayout
 from kivymd.uix.expansionpanel import MDExpansionPanel, MDExpansionPanelContent, MDExpansionPanelHeader
 from kivymd.uix.list import MDListItem, MDListItemTrailingIcon, MDListItemSupportingText
 from kivymd.uix.slider import MDSlider
@@ -18,6 +19,8 @@ from kivymd.uix.menu import MDDropdownMenu
 from kivymd.uix.button import MDButton, MDButtonText, MDIconButton
 from kivymd.uix.dialog import MDDialog
 from kivy.core.text.markup import MarkupLabel
+from kivy.uix.widget import Widget
+from kivy.metrics import dp
 from kivy.utils import escape_markup
 from kivy.lang.builder import Builder
 from kivy.properties import ObjectProperty
