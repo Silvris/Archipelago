@@ -2,6 +2,7 @@
   "include": [
     "../BizHawkClient.py",
     "../Patch.py",
+    "../OptionsCreator.py",
     "../rule_builder/cached_world.py",
     "../rule_builder/field_resolvers.py",
     "../rule_builder/options.py",
@@ -35,7 +36,7 @@
   "reportMissingImports": true,
   "reportMissingTypeStubs": true,
 
-  "pythonVersion": "3.11",
+  "pythonVersion": "3.12",
   "pythonPlatform": "Windows",
 
   "executionEnvironments": [
