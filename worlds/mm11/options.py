@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 
-from Options import Choice, Toggle, DeathLink, TextChoice, Range, OptionDict, PerGameCommonOptions, Visibility
+from Options import (Choice, Toggle, DeathLink, TextChoice, Range, OptionDict, PerGameCommonOptions, Visibility,
+                     OptionSet)
 from schema import Schema, And, Use, Optional
 from . import names
 from .boss import DamageType, boss_names
@@ -31,6 +32,61 @@ class StartingRobotMaster(Choice):
     option_blast_man = 7
     default = "random"
 
+class GoalRequirements(OptionSet):
+    """
+    What requirements will need to be fulfilled in order for Wily's Gear Fortress to be unlocked:
+    Robot Masters: a specified number of Robot Masters must be defeated
+    Weapons: a specified number of weapons must be received (not including Rush Coil/Jet or Speed/Power Gear)
+    Medals: a certain number of Gear Medals must be received. This option can only be enabled with Consumables enabled.
+    """
+    display_name = "Wily Castle Unlock Requirements"
+    valid_keys = [
+        "Robot Masters",
+        "Weapons",
+        "Medals",
+    ]
+    default = ["Weapons"]
+
+class RequiredRBMs(Range):
+    """
+    Number of Robot Masters required to be defeated in order to unlock Wily's Gear Fortress.
+    This requires "Robot Masters" to be enabled in wily_stage_unlock.
+    """
+    display_name = "Robot Master Requirement"
+    range_start = 1
+    range_end = 8
+    default = 4
+
+class RequiredWeapons(Range):
+    """
+    Number of weapons required to be received in order to unlock Wily's Gear Fortress.
+    This requires "Weapons" to be enabled in wily_stage_unlock.
+    """
+    display_name = "Weapon Requirement"
+    range_start = 1
+    range_end = 8
+    default = 4
+
+class TotalMedals(Range):
+    """
+    Maximum number of medals to include in the pool of items if "Medals" goal is enabled.
+    The exact number may be less depending on settings.
+    """
+    display_name = "Max Medal Count"
+    range_start = 1
+    range_end = 100
+    default = 75
+
+
+class RequiredMedals(Range):
+    """
+    Percentage of Gear Medals required to be received in order to unlock Wily's Gear Fortress.
+    This requires "Medals" to be enabled in wily_stage_unlock.
+    """
+    display_name = "Required Medal Count"
+    range_start = 1
+    range_end = 100
+    default = 66
 
 class Consumables(Choice):
     """
@@ -162,6 +218,11 @@ class MM11Options(PerGameCommonOptions):
     death_link: DeathLink
     energy_link: EnergyLink
     starting_robot_master: StartingRobotMaster
+    wily_stage_unlock: GoalRequirements
+    rbm_requirement: RequiredRBMs
+    weapon_requirement: RequiredWeapons
+    total_medals: TotalMedals
+    medal_requirement: RequiredMedals
     consumables: Consumables
     speed_platforming: SpeedPlatforming
     enemy_weakness: EnemyWeaknesses

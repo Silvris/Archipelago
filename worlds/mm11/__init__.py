@@ -1,7 +1,9 @@
 import logging
+import math
 from typing import Any, TYPE_CHECKING, TextIO
 
 from BaseClasses import Tutorial, ItemClassification, MultiWorld
+from Options import OptionError
 from worlds.AutoWorld import World, WebWorld
 from .color import check_for_known_worlds
 from .items import (item_table, item_names, MM11Item, filler_item_weights, robot_master_weapon_table,
@@ -12,12 +14,16 @@ from .names import (wily_4_boss, charge_buster, block_man_stage, acid_man_stage,
                     fuse_man_stage, tundra_man_stage, torch_man_stage, blast_man_stage)
 from .options import MM11Options, Consumables
 from .rules import set_rules, robot_masters, weapons_to_name, bosses
-import threading
 logger = logging.getLogger("Mega Man 11")
 
 if TYPE_CHECKING:
     from .boss import Boss, DamageType
 
+goal_map = {
+    "Robot Masters": 1,
+    "Weapons": 2,
+    "Medals": 4,
+}
 
 class MM11WebWorld(WebWorld):
     theme = "partyTime"
@@ -53,6 +59,7 @@ class MM11World(World):
     def __init__(self, multiworld: MultiWorld, player: int):
         super().__init__(multiworld, player)
         self.bosses: dict[int, "Boss"] = bosses.copy()
+        self.medal_goal: int = 0
         self.wily_3_weapons: dict[int, list[DamageType]] = {}
         self.wily_4_weapons: dict[int, list[DamageType]] = {}
 
@@ -71,10 +78,26 @@ class MM11World(World):
                 f"Mega Man 11 ({self.player_name}): "
                 f"Incompatible starting Robot Master, changing to "
                 f"{self.options.starting_robot_master.current_key.replace('_', ' ').title()}")
-        regen = getattr(self.multiworld, "re_gen_passthrough")
+        if "Medals" in self.options.wily_stage_unlock and not self.options.consumables:
+            self.options.wily_stage_unlock.value.remove("Medals")
+            if not self.options.wily_stage_unlock:
+                raise OptionError(f"Mega Man 11 ({self.player_name}): "
+                                  f"Attempted to have only Medals goal without consumables enabled.")
+            else:
+                logger.warning(f"Mega Man 11 ({self.player_name}): "
+                               f"Attempted to have Medals goal without consumables enabled. Removing...")
+        regen = getattr(self.multiworld, "re_gen_passthrough", None)
         if regen and self.game in regen:
             slot_data: dict[str, Any] = regen[self.game]
+            self.options.wily_stage_unlock.value.clear()
+            goal_int = slot_data.get("goal")
+            for key, val in goal_map.items():
+                if goal_int & val:
+                    self.options.wily_stage_unlock.value.add(key)
+            self.options.rbm_requirement.value = slot_data.get("rbm_requirement")
+            self.options.weapon_requirement.value = slot_data.get("weapon_requirement")
             self.options.wily_3_requirement.value = slot_data.get("wily_3_requirement")
+            self.medal_goal = slot_data.get("medal_goal")
             self.wily_3_weapons = {int(key): value for key, value in slot_data["wily_3_weapons"].items()}
             self.wily_4_weapons = {int(key): value for key, value in slot_data["wily_4_weapons"].items()}
             for i, key in enumerate(
@@ -108,8 +131,11 @@ class MM11World(World):
         item = item_table[name]
         classification = ItemClassification.filler
         if item.progression and not force_non_progression:
-            classification = ItemClassification.progression_skip_balancing \
-                if item.skip_balancing else ItemClassification.progression
+            classification = ItemClassification.progression
+        if item.skip_balancing:
+            classification |= ItemClassification.skip_balancing
+        if item.deprio:
+            classification |= ItemClassification.deprioritized
         if item.useful:
             classification |= ItemClassification.useful
         return MM11Item(name, classification, item.code, self.player)
@@ -135,10 +161,15 @@ class MM11World(World):
                                         Consumables.option_all):
             total_checks += 152
         remaining = total_checks - len(itempool)
+        medal_count = min(remaining, self.options.total_medals.value
+                                     if "Medals" in self.options.wily_stage_unlock else 0)
+        unfilled = remaining - medal_count
+        self.medal_goal = math.floor(medal_count * (self.options.medal_requirement.value / 100))
+        itempool += [self.create_item(names.gear_medal) for _ in range(medal_count)]
         itempool.extend([self.create_item(name)
                          for name in self.random.choices(list(filler_item_weights.keys()),
                                                          weights=list(filler_item_weights.values()),
-                                                         k=remaining)])
+                                                         k=unfilled)])
         self.multiworld.itempool += itempool
 
     set_rules = set_rules
@@ -154,8 +185,12 @@ class MM11World(World):
 
     def fill_slot_data(self) -> dict[str, Any]:
         slot_data = self.options.as_dict("energy_link", "starting_robot_master", "speed_platforming",
-                                         "consumables", "wily_3_requirement")
+                                         "consumables", "wily_3_requirement", "rbm_requirement", "weapon_requirement")
+        goal_int = 0
+        for goal in self.options.wily_stage_unlock:
+            goal_int |= goal_map[goal]
         slot_data.update({
+            "goal": goal_int,
             "wily_3_weapons": self.wily_3_weapons,
             "wily_4_weapons": self.wily_4_weapons,
             "DeathLink": self.options.death_link.value,

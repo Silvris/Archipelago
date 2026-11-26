@@ -102,5 +102,12 @@ def check_for_known_worlds():
                 mm4.color.add_color_to_mm4(item, MM11_NES_COLORS[item])
         except AttributeError:
             pass
+    if "worlds.mm5" in sys.modules:
+        try:
+            mm5 = sys.modules["worlds.mm5"]
+            for item in MM11_NES_COLORS:
+                mm5.color.add_color_to_mm5(item, MM11_NES_COLORS[item])
+        except AttributeError:
+            pass
 
 # Maybe we expand this in the future, but MM11 doesn't use color masking and just has 8 different textures per weapon

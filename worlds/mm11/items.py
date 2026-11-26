@@ -8,7 +8,7 @@ from .names import (block_dropper, acid_barrier, pile_driver, bounce_ball, scram
                     spike_boots, shock_absorber, speed_gear_booster, energy_dispenser, awakener, screws_up, health_up,
                     weapon_up, cooling_fan, cooling_infinite, mystery, buddy_plus, tank_container, lives_schematic,
                     etank_schematic, mtank_schematic, wtank_schematic, pierce_protect_schematic, super_guard_schematic,
-                    eddie_call_schematic, beat_call_schematic)
+                    eddie_call_schematic, beat_call_schematic, gear_medal)
 
 
 class ItemData(NamedTuple):
@@ -16,6 +16,7 @@ class ItemData(NamedTuple):
     progression: bool
     useful: bool = False  # primarily use this for incredibly useful items of their class, like Metal Blade
     skip_balancing: bool = False
+    deprio: bool = False
 
 
 class MM11Item(Item):
@@ -86,6 +87,7 @@ filler_item_table = {
     w_tank: ItemData(0x0024, False, True),
     small_bolt: ItemData(0x0025, False),
     big_bolt: ItemData(0x0026, False),
+    gear_medal: ItemData(0x004A, True, skip_balancing=True, deprio=True),
 }
 
 filler_item_weights = {

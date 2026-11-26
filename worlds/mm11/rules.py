@@ -6,8 +6,10 @@ from NetUtils import JSONMessagePart
 from . import names
 from .boss import bosses, damage_type_to_weapons, weapon_to_main_damage, DamageType, cost_per_damage_type
 from .locations import get_boss_locations, mm11_regions
-from .options import SpeedPlatforming
-from rule_builder.rules import CanReachLocation, HasAll, HasAny, Has, AtLeast, Rule, True_, False_, OptionFilter, And
+from .options import SpeedPlatforming, RequiredRBMs, RequiredWeapons
+from rule_builder.field_resolvers import FromOption, FromWorldAttr
+from rule_builder.rules import (CanReachLocation, HasAll, Has, AtLeast, Rule, True_, False_, OptionFilter, And,
+                                HasGroupUnique)
 
 if TYPE_CHECKING:
     from . import MM11World
@@ -97,6 +99,7 @@ HasRushJet = Has(names.rush_jet)
 HasVertical = HasRushJet | HasRushCoil
 HasSpeed = Has(names.speed_gear)
 GearlessPlatforming = HasSpeed | OptionFilter(SpeedPlatforming, value=True)
+
 
 STATIC_LOCATION_RULES: dict[str, Rule] = {
     names.block_man: GearlessPlatforming,
@@ -262,6 +265,18 @@ def set_rules(world: "MM11World") -> None:
                     weapon_rule |= HasAll(*[weapons_to_name[x] for x in weapon_group])
             location_rules[location] = static_rule & weapon_rule
 
+    # have to handle the Wily Castle rule here due to lack of "not in"
+    wily_castle_rule = True_()
+    if "Robot Masters" in world.options.wily_stage_unlock:
+        wily_castle_rule &= AtLeast(FromOption(RequiredRBMs), CanReachLocation(names.block_man), CanReachLocation(names.acid_man),
+                                CanReachLocation(names.impact_man), CanReachLocation(names.bounce_man),
+                                CanReachLocation(names.fuse_man), CanReachLocation(names.tundra_man),
+                                CanReachLocation(names.torch_man), CanReachLocation(names.blast_man))
+    if "Weapons" in world.options.wily_stage_unlock:
+        wily_castle_rule &= HasGroupUnique("Weapons", FromOption(RequiredWeapons))
+    if "Medals" in world.options.wily_stage_unlock:
+        wily_castle_rule &= Has(names.gear_medal, count=FromWorldAttr("medal_goal"))
+
     for location in STATIC_LOCATION_RULES:
         if location not in location_rules:
             location_rules[location] = STATIC_LOCATION_RULES[location]
@@ -273,6 +288,8 @@ def set_rules(world: "MM11World") -> None:
         location_rule = True_()
         for location in info.required_locations:
             location_rule &= CanReachLocation(location)
+        if region == "Wily Stage 1":
+            location_rule &= wily_castle_rule
         world.set_rule(entrance, static_rule & location_rule & HasAll(*info.required_items))
 
     # Consumable rules

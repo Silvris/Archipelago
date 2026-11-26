@@ -36,6 +36,7 @@ w_tank = "W-Tank"
 m_tank = "M-Tank"
 small_bolt = "10 Bolts"
 big_bolt = "100 Bolts"
+gear_medal = "Gear Medal"
 
 # Schematics
 lives_schematic = "Extra Life Schematics"

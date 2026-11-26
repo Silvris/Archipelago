@@ -224,10 +224,7 @@ mm11_regions: dict[str, RegionData] = {
         names.wily_1_c7: LocationData(0x9007, energy=True),
         names.wily_1_c8: LocationData(0x9008, energy=True),
         names.wily_1_c9: LocationData(0x9009, energy=True),
-    }, [], [names.block_man, names.acid_man,
-            names.impact_man, names.bounce_man,
-            names.fuse_man, names.tundra_man,
-            names.torch_man, names.blast_man,]),
+    }, [], []),
 
     "Wily Stage 2": RegionData({
         names.wily_2_boss: LocationData(0x000A),
