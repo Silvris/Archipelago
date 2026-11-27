@@ -191,6 +191,7 @@ class MM11World(World):
             goal_int |= goal_map[goal]
         slot_data.update({
             "goal": goal_int,
+            "medal_goal": self.medal_goal,
             "wily_3_weapons": self.wily_3_weapons,
             "wily_4_weapons": self.wily_4_weapons,
             "DeathLink": self.options.death_link.value,
